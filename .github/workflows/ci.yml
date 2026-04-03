@@ -24,7 +24,7 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - run: bunx convex codegen --yes
+      - run: bunx convex codegen
         env:
           CONVEX_DEPLOYMENT: ${{ secrets.CONVEX_DEPLOYMENT }}
 
