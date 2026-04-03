@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Scissors, Trash2, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import EmptyState from "#/components/EmptyState"
-import SkeletonList from "#/components/SkeletonList"
+import AsyncList from "#/components/AsyncList"
+import PageHeader from "#/components/PageHeader"
 import { showToast } from "#/components/ui/Toast"
 import { useFormState } from "#/hooks/useFormState"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import type { Barber } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -22,11 +23,11 @@ const EMPTY: BarberForm = { name: "", bio: "", specializations: "" }
 
 function BusinessBarbers() {
 	const { t } = useTranslation()
+	useRequireRole(["owner", "admin"])
 	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY)
 
 	const shop = useOwnerShop()
-	const barbersRaw = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip")
-	const barbers = barbersRaw as Barber[] | undefined
+	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip") as Barber[] | undefined
 
 	const createBarber = useMutation(api.barbers.create)
 	const updateBarber = useMutation(api.barbers.update)
@@ -77,26 +78,16 @@ function BusinessBarbers() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<div className="flex items-center justify-between mb-6">
-					<div className="page-header">
-						<a href="/business" className="breadcrumb-back">
-							← {t("nav.business")}
-						</a>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("business.barbers.title")}</h1>
-					</div>
+				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.barbers.title")}>
 					<button
 						type="button"
-						onClick={() => {
-							reset()
-							setShowForm(!showForm)
-						}}
+						onClick={() => { reset(); setShowForm(!showForm) }}
 						className="btn btn-primary gap-2 text-sm"
 					>
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
 						{showForm ? t("common.cancel") : t("business.barbers.addBarber")}
 					</button>
-				</div>
+				</PageHeader>
 
 				{showForm && (
 					<div className="card p-5 mb-6 fade-up">
@@ -155,18 +146,12 @@ function BusinessBarbers() {
 					</div>
 				)}
 
-				{barbers === undefined ? (
-					<SkeletonList count={3} height="h-20" />
-				) : barbers.length === 0 ? (
-					<EmptyState icon={Scissors} message={t("business.barbers.noBarbers")} />
-				) : (
+				<AsyncList data={barbers} skeleton={{ count: 3, height: "h-20" }} empty={{ icon: Scissors, message: t("business.barbers.noBarbers") }}>
+					{(barbers) => (
 					<div className="space-y-3">
 						{barbers.map((b: Barber) => (
 							<div key={b._id} className="card p-4 flex items-center gap-4">
-								<div
-									className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0"
-									style={{ background: "rgba(245,158,11,0.1)" }}
-								>
+								<div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
 									{b.name.charAt(0)}
 								</div>
 								<div className="flex-1 min-w-0">
@@ -191,7 +176,8 @@ function BusinessBarbers() {
 							</div>
 						))}
 					</div>
-				)}
+					)}
+				</AsyncList>
 			</div>
 		</main>
 	)

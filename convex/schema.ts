@@ -1,6 +1,6 @@
 import { authTables } from "@convex-dev/auth/server"
 import { defineSchema, defineTable } from "convex/server"
-import { v } from "convex/values"
+import { socialLinksValidator, workingHoursValidator } from "./validators"
 
 export default defineSchema({
 	...authTables,
@@ -30,24 +30,8 @@ export default defineSchema({
 		reviewCount: v.number(),
 		isVerified: v.boolean(),
 		isActive: v.boolean(),
-		workingHours: v.optional(
-			v.object({
-				monday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				tuesday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				wednesday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				thursday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				friday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				saturday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				sunday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-			}),
-		),
-		socialLinks: v.optional(
-			v.object({
-				instagram: v.optional(v.string()),
-				facebook: v.optional(v.string()),
-				website: v.optional(v.string()),
-			}),
-		),
+		workingHours: workingHoursValidator,
+		socialLinks: socialLinksValidator,
 	})
 		.index("by_slug", ["slug"])
 		.index("by_owner", ["ownerId"])
@@ -61,17 +45,7 @@ export default defineSchema({
 		bio: v.optional(v.string()),
 		specializations: v.array(v.string()),
 		avatarUrl: v.optional(v.string()),
-		workingHours: v.optional(
-			v.object({
-				monday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				tuesday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				wednesday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				thursday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				friday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				saturday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-				sunday: v.optional(v.object({ open: v.string(), close: v.string(), closed: v.boolean() })),
-			}),
-		),
+		workingHours: workingHoursValidator,
 		isActive: v.boolean(),
 	})
 		.index("by_shop", ["barbershopId"])

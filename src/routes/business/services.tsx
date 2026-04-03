@@ -3,9 +3,11 @@ import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
+import PageHeader from "#/components/PageHeader"
 import { showToast } from "#/components/ui/Toast"
 import { useFormState } from "#/hooks/useFormState"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice } from "#/lib/format"
 import type { Service } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -32,12 +34,12 @@ const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other
 type Category = (typeof CATEGORIES)[number]
 
 function BusinessServices() {
+	useRequireRole(["owner", "admin"])
 	const { t } = useTranslation()
 	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY_FORM)
 
 	const shop = useOwnerShop()
-	const servicesRaw = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")
-	const services = servicesRaw as Service[] | undefined
+	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as Service[] | undefined
 
 	const createService = useMutation(api.services.create)
 	const updateService = useMutation(api.services.update)
@@ -99,26 +101,16 @@ function BusinessServices() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<div className="flex items-center justify-between mb-6">
-					<div className="page-header">
-						<a href="/business" className="breadcrumb-back">
-							← {t("nav.business")}
-						</a>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("business.services.title")}</h1>
-					</div>
+				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.services.title")}>
 					<button
 						type="button"
-						onClick={() => {
-							reset()
-							setShowForm(!showForm)
-						}}
+						onClick={() => { reset(); setShowForm(!showForm) }}
 						className="btn btn-primary gap-2 text-sm"
 					>
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
 						{showForm ? t("common.cancel") : t("business.services.addService")}
 					</button>
-				</div>
+				</PageHeader>
 
 				{showForm && (
 					<div className="card p-5 mb-6 fade-up">

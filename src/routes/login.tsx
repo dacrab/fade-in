@@ -18,10 +18,6 @@ function LoginPage() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (!(email && password)) {
-			showToast(t("errors.fillAllFields"), "error")
-			return
-		}
 		setLoading(true)
 		try {
 			await login(email, password)
@@ -57,6 +53,7 @@ function LoginPage() {
 								{t("auth.emailLabel")}
 							</label>
 							<input
+								id="login-email"
 								type="email"
 								className="input"
 								placeholder={t("auth.emailPlaceholder")}
@@ -72,6 +69,7 @@ function LoginPage() {
 							</label>
 							<div className="relative">
 								<input
+									id="login-password"
 									type={showPass ? "text" : "password"}
 									className="input pr-10"
 									placeholder={t("auth.passwordPlaceholder")}
@@ -82,7 +80,7 @@ function LoginPage() {
 								/>
 								<button
 									type="button"
-									onClick={() => setShowPass(!showPass)}
+									onClick={() => setShowPass((v) => !v)}
 									className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)] btn-bare"
 								>
 									{showPass ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -100,10 +98,7 @@ function LoginPage() {
 
 					<div className="mt-6 text-center text-sm text-[var(--text-muted)]">
 						{t("auth.noAccount")}{" "}
-						<Link
-							to="/register"
-							className="text-[var(--gold)] hover:underline no-underline font-semibold"
-						>
+						<Link to="/register" className="text-[var(--gold)] hover:underline no-underline font-semibold">
 							{t("common.createAccount")}
 						</Link>
 					</div>

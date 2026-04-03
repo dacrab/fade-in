@@ -47,20 +47,18 @@ function BusinessDashboard() {
 	)
 	const shop = shopsRaw?.[0] as Barbershop | undefined
 
-	const todayStr = new Date().toISOString().split("T")[0]
-	const todayApptsRaw = useQuery(
+	const todayStr = new Date().toISOString().slice(0, 10)
+	const todayAppts = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: todayStr } : "skip",
-	)
-	const allApptsRaw = useQuery(
+	) as Appointment[] | undefined
+	const allAppts = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id } : "skip",
-	)
-	const reviewsRaw = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip")
+	) as Appointment[] | undefined
+	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as Review[] | undefined
 
-	const todayAppts = todayApptsRaw as Appointment[] | undefined
-	const allAppts = allApptsRaw as Appointment[] | undefined
-	const reviews = reviewsRaw as Review[] | undefined
+
 
 	if (loading || !user) return <DashSkeleton />
 
@@ -163,8 +161,7 @@ function BusinessDashboard() {
 								{todayAppts.map((appt) => (
 									<div
 										key={appt._id}
-										className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)]"
-										style={{ background: "var(--bg-input)" }}
+										className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] bg-[var(--bg-input)]"
 									>
 										<div className="text-sm font-bold text-[var(--gold)] w-14">{appt.startTime}</div>
 										<div className="flex-1 min-w-0">

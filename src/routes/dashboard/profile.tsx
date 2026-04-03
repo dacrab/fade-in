@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
 import { Save } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { showToast } from "#/components/ui/Toast"
+import PageHeader from "#/components/PageHeader"
+import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { useFormState } from "#/hooks/useFormState"
 import { api } from "../../../convex/_generated/api"
@@ -22,30 +23,18 @@ function ProfilePage() {
 		e.preventDefault()
 		if (!user) return
 		setSaving(true)
-		try {
-			await updateProfile({
-				id: user.id as Id<"users">,
-				name: form.name,
-				phone: form.phone || undefined,
-			})
-			showToast(t("errors.profileSaved"), "success")
-		} catch {
-			showToast(t("errors.profileFailed"), "error")
-		} finally {
-			setSaving(false)
-		}
+		await withToast(
+			() => updateProfile({ id: user.id as Id<"users">, name: form.name, phone: form.phone || undefined }),
+			t("errors.profileSaved"),
+			t("errors.profileFailed"),
+		)
+		setSaving(false)
 	}
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-xl">
-				<div className="page-header">
-					<Link to="/dashboard" className="breadcrumb-back">
-						← {t("nav.dashboard")}
-					</Link>
-					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.profileTitle")}</h1>
-				</div>
+				<PageHeader back="/dashboard" backLabel={t("nav.dashboard")} title={t("dashboard.profileTitle")} />
 
 				<div className="card p-6">
 					<div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border)]">

@@ -64,11 +64,7 @@ function RegisterPage() {
 								key={r}
 								type="button"
 								onClick={() => setRole(r)}
-								className="btn-bare flex-1 py-2.5 text-sm font-semibold transition-colors"
-								style={{
-									background: role === r ? "var(--gold)" : "var(--bg-card)",
-									color: role === r ? "#000" : "var(--text-muted)",
-								}}
+								className={`btn-bare flex-1 py-2.5 text-sm font-semibold transition-colors ${role === r ? "bg-[var(--gold)] text-black" : "bg-[var(--bg-card)] text-[var(--text-muted)]"}`}
 							>
 								{r === "customer" ? t("auth.roleCustomer") : t("auth.roleOwner")}
 							</button>
@@ -119,7 +115,7 @@ function RegisterPage() {
 								/>
 								<button
 									type="button"
-									onClick={() => setShowPass(!showPass)}
+									onClick={() => setShowPass((v) => !v)}
 									className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] btn-bare"
 								>
 									{showPass ? <EyeOff size={16} /> : <Eye size={16} />}

@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { Building2, ShieldCheck, Star, Users } from "lucide-react"
+import { Star } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import AdminNav from "#/components/AdminNav"
 import StatsGrid from "#/components/StatsGrid"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useRequireRole } from "#/hooks/useRequireRole"
@@ -23,34 +24,10 @@ function AdminDashboard() {
 	const owners = allUsers?.filter((u) => u.role === "owner").length ?? 0
 	const customers = allUsers?.filter((u) => u.role === "customer").length ?? 0
 
-	const navLinks = [
-		{ to: "/admin", label: t("admin.overviewTitle"), icon: ShieldCheck },
-		{ to: "/admin/shops", label: t("admin.shops.title"), icon: Building2 },
-		{ to: "/admin/users", label: t("admin.users.title"), icon: Users },
-	] as const
-
 	return (
 		<main>
 			<div className="dashboard-layout">
-				<aside className="bg-card border-r border-[var(--border)] px-4 py-6 hidden md:block">
-					<div className="mb-6">
-						<h2 className="font-bold text-[var(--text)]">{t("admin.title")}</h2>
-						<p className="text-xs text-[var(--text-muted)]">{t("admin.subtitle")}</p>
-					</div>
-					<nav className="space-y-1">
-						{navLinks.map(({ to, label, icon: Icon }) => (
-							<Link
-								key={to}
-								to={to}
-								className="sidebar-link"
-								activeProps={{ className: "sidebar-link active" }}
-							>
-								<Icon size={16} />
-								{label}
-							</Link>
-						))}
-					</nav>
-				</aside>
+				<AdminNav />
 
 				<div className="page-main">
 					<h1 className="text-2xl font-bold text-[var(--text)] mb-6">{t("admin.overviewTitle")}</h1>

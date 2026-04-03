@@ -144,10 +144,7 @@ function HomePage() {
 							] as const
 						).map(({ icon: Icon, step, key }) => (
 							<div key={step} className="text-center">
-								<div
-									className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 text-[var(--gold)]"
-									style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
-								>
+								<div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 text-[var(--gold)] bg-[rgba(245,158,11,0.1)] border border-[rgba(245,158,11,0.2)]">
 									<Icon size={24} />
 								</div>
 								<div className="text-xs text-[var(--gold)] font-bold mb-1">{step}</div>
@@ -162,13 +159,7 @@ function HomePage() {
 			{/* CTA */}
 			<section className="px-4 py-16">
 				<div className="page-wrap">
-					<div
-						className="rounded-2xl p-10 text-center"
-						style={{
-							background: "linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(217,119,6,0.04) 100%)",
-							border: "1px solid rgba(245,158,11,0.15)",
-						}}
-					>
+					<div className="rounded-2xl p-10 text-center bg-[linear-gradient(135deg,rgba(245,158,11,0.08)_0%,rgba(217,119,6,0.04)_100%)] border border-[rgba(245,158,11,0.15)]">
 						<h2 className="text-3xl font-bold text-[var(--text)] mb-3">{t("home.ctaTitle")}</h2>
 						<p className="text-[var(--text-muted)] mb-6 max-w-md mx-auto">{t("home.ctaSubtitle")}</p>
 						<Link to="/for-business" className="btn btn-primary inline-flex text-base px-8 py-3">

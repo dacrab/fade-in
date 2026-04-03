@@ -111,23 +111,14 @@ export const create = mutation({
 		socialLinks: socialLinksValidator,
 	},
 	handler: async (ctx, args) => {
+		const { images, ...rest } = args
 		return await ctx.db.insert("barbershops", {
-			name: args.name,
-			slug: args.slug,
-			ownerId: args.ownerId,
-			description: args.description,
-			phone: args.phone,
-			address: args.address,
-			city: args.city,
-			lat: args.lat,
-			lng: args.lng,
-			images: args.images ?? [],
+			...rest,
+			images: images ?? [],
 			rating: 0,
 			reviewCount: 0,
 			isVerified: false,
 			isActive: true,
-			workingHours: args.workingHours,
-			socialLinks: args.socialLinks,
 		})
 	},
 })

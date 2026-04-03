@@ -3,10 +3,20 @@ import { Globe, Scissors } from "lucide-react"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 
+const linkCls = "text-sm text-muted no-underline hover:text-[var(--gold)] transition-colors"
+
+function FooterSection({ title, children }: { title: string; children: React.ReactNode }) {
+	return (
+		<div>
+			<h4 className="text-sm font-semibold mb-3 text-[var(--text)]">{title}</h4>
+			<ul className="space-y-2 list-none p-0 m-0">{children}</ul>
+		</div>
+	)
+}
+
 export default memo(function Footer() {
 	const { t } = useTranslation()
 	const year = new Date().getFullYear()
-	const linkCls = "text-sm text-muted no-underline hover:text-[var(--gold)] transition-colors"
 
 	return (
 		<footer className="border-t border-[var(--border)] px-4 pt-12 pb-8 mt-20">
@@ -24,63 +34,22 @@ export default memo(function Footer() {
 						<p className="text-sm text-muted">{t("footer.tagline")}</p>
 					</div>
 
-					<div>
-						<h4 className="text-sm font-semibold mb-3 text-[var(--text)]">{t("footer.discover")}</h4>
-						<ul className="space-y-2 list-none p-0 m-0">
-							<li>
-								<Link to="/barbershops" className={linkCls}>
-									{t("nav.barbershops")}
-								</Link>
-							</li>
-							<li>
-								<Link to="/for-business" className={linkCls}>
-									{t("nav.forBusiness")}
-								</Link>
-							</li>
-						</ul>
-					</div>
+					<FooterSection title={t("footer.discover")}>
+						<li><Link to="/barbershops" className={linkCls}>{t("nav.barbershops")}</Link></li>
+						<li><Link to="/for-business" className={linkCls}>{t("nav.forBusiness")}</Link></li>
+					</FooterSection>
 
-					<div>
-						<h4 className="text-sm font-semibold mb-3 text-[var(--text)]">{t("footer.account")}</h4>
-						<ul className="space-y-2 list-none p-0 m-0">
-							<li>
-								<Link to="/login" className={linkCls}>
-									{t("footer.links.login")}
-								</Link>
-							</li>
-							<li>
-								<Link to="/register" className={linkCls}>
-									{t("footer.links.register")}
-								</Link>
-							</li>
-							<li>
-								<Link to="/login" className={linkCls}>
-									{t("footer.links.businessLogin")}
-								</Link>
-							</li>
-						</ul>
-					</div>
+					<FooterSection title={t("footer.account")}>
+						<li><Link to="/login" className={linkCls}>{t("footer.links.login")}</Link></li>
+						<li><Link to="/register" className={linkCls}>{t("footer.links.register")}</Link></li>
+						<li><Link to="/login" className={linkCls}>{t("footer.links.businessLogin")}</Link></li>
+					</FooterSection>
 
-					<div>
-						<h4 className="text-sm font-semibold mb-3 text-[var(--text)]">{t("footer.company")}</h4>
-						<ul className="space-y-2 list-none p-0 m-0">
-							<li>
-								<a href="/about" className={linkCls}>
-									{t("footer.links.about")}
-								</a>
-							</li>
-							<li>
-								<a href="/privacy" className={linkCls}>
-									{t("footer.links.privacy")}
-								</a>
-							</li>
-							<li>
-								<a href="/terms" className={linkCls}>
-									{t("footer.links.terms")}
-								</a>
-							</li>
-						</ul>
-					</div>
+					<FooterSection title={t("footer.company")}>
+						<li><a href="/about" className={linkCls}>{t("footer.links.about")}</a></li>
+						<li><a href="/privacy" className={linkCls}>{t("footer.links.privacy")}</a></li>
+						<li><a href="/terms" className={linkCls}>{t("footer.links.terms")}</a></li>
+					</FooterSection>
 				</div>
 
 				<hr className="divider mb-6" />
