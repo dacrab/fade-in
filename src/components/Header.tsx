@@ -14,6 +14,20 @@ import { useAuth } from "#/hooks/useAuth"
 import LanguageToggle from "./LanguageToggle"
 import { Menu } from "./ui/Menu"
 
+const NAV_LINKS = [
+	{ to: "/" as const, labelKey: "nav.home" },
+	{ to: "/barbershops" as const, labelKey: "nav.barbershops" },
+	{ to: "/for-business" as const, labelKey: "nav.forBusiness" },
+]
+
+const ROLE_NAV: Partial<
+	Record<"customer" | "owner" | "admin", { labelKey: string; icon: React.ReactNode; to: string }>
+> = {
+	customer: { labelKey: "nav.dashboard", icon: <LayoutDashboard size={14} />, to: "/dashboard" },
+	owner: { labelKey: "nav.business", icon: <Building2 size={14} />, to: "/business" },
+	admin: { labelKey: "nav.admin", icon: <ShieldCheck size={14} />, to: "/admin" },
+}
+
 export default function Header() {
 	const [mobileOpen, setMobileOpen] = useState(false)
 	const { user, logout } = useAuth()
@@ -25,20 +39,12 @@ export default function Header() {
 		void router.navigate({ to: "/" })
 	}
 
-	const ROLE_NAV: Partial<
-		Record<"customer" | "owner" | "admin", { label: string; icon: React.ReactNode; to: string }>
-	> = {
-		customer: { label: t("nav.dashboard"), icon: <LayoutDashboard size={14} />, to: "/dashboard" },
-		owner: { label: t("nav.business"), icon: <Building2 size={14} />, to: "/business" },
-		admin: { label: t("nav.admin"), icon: <ShieldCheck size={14} />, to: "/admin" },
-	}
-
-	const roleItem = user && ROLE_NAV[user.role as "customer" | "owner" | "admin"]
+	const roleItem = user ? ROLE_NAV[user.role as "customer" | "owner" | "admin"] : undefined
 	const userMenuItems = [
 		...(roleItem
 			? [
 					{
-						label: roleItem.label,
+						label: t(roleItem.labelKey),
 						icon: roleItem.icon,
 						onClick: () => void router.navigate({ to: roleItem.to }),
 					},
@@ -61,15 +67,11 @@ export default function Header() {
 				</Link>
 
 				<div className="hidden md:flex items-center gap-1 ml-4">
-					<Link to="/" className="nav-link" activeProps={{ className: "nav-link active" }}>
-						{t("nav.home")}
-					</Link>
-					<Link to="/barbershops" className="nav-link" activeProps={{ className: "nav-link active" }}>
-						{t("nav.barbershops")}
-					</Link>
-					<Link to="/for-business" className="nav-link" activeProps={{ className: "nav-link active" }}>
-						{t("nav.forBusiness")}
-					</Link>
+					{NAV_LINKS.map(({ to, labelKey }) => (
+						<Link key={to} to={to} className="nav-link" activeProps={{ className: "nav-link active" }}>
+							{t(labelKey)}
+						</Link>
+					))}
 				</div>
 
 				<div className="flex items-center gap-2 ml-auto">
@@ -112,21 +114,17 @@ export default function Header() {
 
 			{mobileOpen && (
 				<div className="md:hidden bg-card border-t border-[var(--border)] px-4 py-4 flex flex-col gap-2">
-					<Link to="/" className="nav-link" onClick={() => setMobileOpen(false)}>
-						{t("nav.home")}
-					</Link>
-					<Link to="/barbershops" className="nav-link" onClick={() => setMobileOpen(false)}>
-						{t("nav.barbershops")}
-					</Link>
-					<Link to="/for-business" className="nav-link" onClick={() => setMobileOpen(false)}>
-						{t("nav.forBusiness")}
-					</Link>
+					{NAV_LINKS.map(({ to, labelKey }) => (
+						<Link key={to} to={to} className="nav-link" onClick={() => setMobileOpen(false)}>
+							{t(labelKey)}
+						</Link>
+					))}
 					{user ? (
 						<>
 							<hr className="divider my-1" />
 							{roleItem && (
 								<Link to={roleItem.to} className="nav-link" onClick={() => setMobileOpen(false)}>
-									{roleItem.label}
+									{t(roleItem.labelKey)}
 								</Link>
 							)}
 							<button
