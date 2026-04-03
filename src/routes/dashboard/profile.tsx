@@ -45,7 +45,7 @@ function ProfilePage() {
 
 				<div className="card p-6">
 					<div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border)]">
-						<div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "var(--gold)", color: "#000" }}>
+						<div className="avatar avatar-lg">
 							{user?.name.charAt(0).toUpperCase()}
 						</div>
 						<div>
