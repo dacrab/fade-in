@@ -137,7 +137,10 @@ export default function Header() {
 							)}
 							<button
 								type="button"
-								onClick={() => { handleLogout(); closeMobile() }}
+								onClick={() => {
+									handleLogout()
+									closeMobile()
+								}}
 								className="nav-link text-left text-[var(--error)] btn-bare"
 							>
 								{t("common.signOut")}

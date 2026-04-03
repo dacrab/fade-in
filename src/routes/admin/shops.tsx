@@ -100,12 +100,7 @@ function AdminShops() {
 					{(shops) => (
 						<div className="space-y-2">
 							{shops.map((shop) => (
-								<ShopRow
-									key={shop._id}
-									shop={shop}
-									onVerify={handleVerify}
-									onSuspend={handleSuspend}
-								/>
+								<ShopRow key={shop._id} shop={shop} onVerify={handleVerify} onSuspend={handleSuspend} />
 							))}
 						</div>
 					)}

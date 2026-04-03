@@ -28,12 +28,20 @@ function BusinessAppointments() {
 	const updateStatus = useMutation(api.appointments.updateStatus)
 
 	const handleStatus = (id: Id<"appointments">, status: AppointmentStatus) =>
-		withToast(() => updateStatus({ id, status }), t(`status.${status}`), t("errors.updateStatusFailed"))
+		withToast(
+			() => updateStatus({ id, status }),
+			t(`status.${status}`),
+			t("errors.updateStatusFailed"),
+		)
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.appointments.title")} />
+				<PageHeader
+					back="/business"
+					backLabel={t("nav.business")}
+					title={t("business.appointments.title")}
+				/>
 
 				<div className="flex items-center gap-3 mb-6">
 					<div className="relative">
@@ -61,56 +69,58 @@ function BusinessAppointments() {
 					empty={{ icon: Clock, message: t("business.appointments.noAppointments") }}
 				>
 					{(appointments) => (
-					<div className="space-y-3">
-						{appointments.map((appt) => (
-							<div key={appt._id} className="card p-4 flex flex-col sm:flex-row sm:items-center gap-4">
-								<div className="flex items-center gap-3 flex-1 min-w-0">
-									<div className="text-center flex-shrink-0">
-										<div className="text-lg font-bold text-[var(--gold)]">{appt.startTime}</div>
-										<div className="text-xs text-[var(--text-muted)]">{formatDateShort(appt.date)}</div>
-									</div>
-									<div className="min-w-0">
-										<div className="text-sm font-medium text-[var(--text)] truncate">{appt.notes ?? "—"}</div>
-										<div className="text-xs text-[var(--text-muted)]">
-											{appt.endTime} · {formatPrice(appt.totalPrice)}
+						<div className="space-y-3">
+							{appointments.map((appt) => (
+								<div key={appt._id} className="card p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+									<div className="flex items-center gap-3 flex-1 min-w-0">
+										<div className="text-center flex-shrink-0">
+											<div className="text-lg font-bold text-[var(--gold)]">{appt.startTime}</div>
+											<div className="text-xs text-[var(--text-muted)]">{formatDateShort(appt.date)}</div>
+										</div>
+										<div className="min-w-0">
+											<div className="text-sm font-medium text-[var(--text)] truncate">
+												{appt.notes ?? "—"}
+											</div>
+											<div className="text-xs text-[var(--text-muted)]">
+												{appt.endTime} · {formatPrice(appt.totalPrice)}
+											</div>
 										</div>
 									</div>
-								</div>
-								<div className="flex items-center gap-2 flex-shrink-0">
-									<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
-									{appt.status === "pending" && (
-										<>
+									<div className="flex items-center gap-2 flex-shrink-0">
+										<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
+										{appt.status === "pending" && (
+											<>
+												<button
+													type="button"
+													onClick={() => void handleStatus(appt._id, "confirmed")}
+													className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
+													title={t("business.appointments.confirm")}
+												>
+													<Check size={14} />
+												</button>
+												<button
+													type="button"
+													onClick={() => void handleStatus(appt._id, "cancelled")}
+													className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+													title={t("business.appointments.cancel")}
+												>
+													<X size={14} />
+												</button>
+											</>
+										)}
+										{appt.status === "confirmed" && (
 											<button
 												type="button"
-												onClick={() => void handleStatus(appt._id, "confirmed")}
-												className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
-												title={t("business.appointments.confirm")}
-	>
-												<Check size={14} />
+												onClick={() => void handleStatus(appt._id, "completed")}
+												className="btn btn-secondary text-xs py-1 px-2"
+											>
+												{t("business.appointments.complete")}
 											</button>
-											<button
-												type="button"
-												onClick={() => void handleStatus(appt._id, "cancelled")}
-												className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-												title={t("business.appointments.cancel")}
-	>
-												<X size={14} />
-											</button>
-										</>
-									)}
-									{appt.status === "confirmed" && (
-										<button
-											type="button"
-											onClick={() => void handleStatus(appt._id, "completed")}
-											className="btn btn-secondary text-xs py-1 px-2"
-										>
-											{t("business.appointments.complete")}
-										</button>
-									)}
+										)}
+									</div>
 								</div>
-							</div>
-						))}
-					</div>
+							))}
+						</div>
 					)}
 				</AsyncList>
 			</div>

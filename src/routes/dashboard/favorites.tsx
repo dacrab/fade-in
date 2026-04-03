@@ -15,7 +15,10 @@ export const Route = createFileRoute("/dashboard/favorites")({ component: Favori
 function FavoritesPage() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const userData = useQuery(api.users.getById, user ? { id: user.id as Id<"users"> } : "skip") as User | null | undefined
+	const userData = useQuery(api.users.getById, user ? { id: user.id as Id<"users"> } : "skip") as
+		| User
+		| null
+		| undefined
 	const favoriteIds = userData?.favoriteShopIds ?? []
 
 	const shopsRaw = useQuery(
@@ -27,7 +30,11 @@ function FavoritesPage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<PageHeader back="/dashboard" backLabel={t("nav.dashboard")} title={t("dashboard.favoritesTitle")} />
+				<PageHeader
+					back="/dashboard"
+					backLabel={t("nav.dashboard")}
+					title={t("dashboard.favoritesTitle")}
+				/>
 
 				{favoriteIds.length === 0 ? (
 					<EmptyState icon={Heart} message={t("dashboard.noFavorites")}>

@@ -56,9 +56,9 @@ function BusinessDashboard() {
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id } : "skip",
 	) as Appointment[] | undefined
-	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as Review[] | undefined
-
-
+	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as
+		| Review[]
+		| undefined
 
 	if (loading || !user) return <DashSkeleton />
 

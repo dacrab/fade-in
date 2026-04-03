@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { Star } from "lucide-react"
+import { Building2, ShieldCheck, Star, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import AdminNav from "#/components/AdminNav"
 import StatsGrid from "#/components/StatsGrid"
