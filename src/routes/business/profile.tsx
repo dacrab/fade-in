@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
+import { useFormState } from "#/hooks/useFormState"
 import { slugify } from "#/lib/format"
 import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -41,7 +42,7 @@ function BusinessProfile() {
 		user ? { ownerId: user.id as Id<"users"> } : "skip",
 	)
 	const shop = shopsRaw?.[0] as Barbershop | undefined
-	const [form, setForm] = useState<ShopForm>(EMPTY)
+	const { form, setForm, set } = useFormState(EMPTY)
 	const [saving, setSaving] = useState(false)
 
 	useEffect(() => {
@@ -56,14 +57,10 @@ function BusinessProfile() {
 			facebook: shop.socialLinks?.facebook ?? "",
 			website: shop.socialLinks?.website ?? "",
 		})
-	}, [shop])
+	}, [shop, setForm])
 
 	const createShop = useMutation(api.barbershops.create)
 	const updateShop = useMutation(api.barbershops.update)
-
-	const set =
-		(key: keyof ShopForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-			setForm((f) => ({ ...f, [key]: e.target.value }))
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()

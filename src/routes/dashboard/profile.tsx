@@ -5,6 +5,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
+import { useFormState } from "#/hooks/useFormState"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -13,8 +14,7 @@ export const Route = createFileRoute("/dashboard/profile")({ component: ProfileP
 function ProfilePage() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const [name, setName] = useState(user?.name ?? "")
-	const [phone, setPhone] = useState("")
+	const { form, set } = useFormState({ name: user?.name ?? "", phone: "" })
 	const [saving, setSaving] = useState(false)
 	const updateProfile = useMutation(api.users.updateProfile)
 
@@ -23,7 +23,11 @@ function ProfilePage() {
 		if (!user) return
 		setSaving(true)
 		try {
-			await updateProfile({ id: user.id as Id<"users">, name, phone: phone || undefined })
+			await updateProfile({
+				id: user.id as Id<"users">,
+				name: form.name,
+				phone: form.phone || undefined,
+			})
 			showToast(t("errors.profileSaved"), "success")
 		} catch {
 			showToast(t("errors.profileFailed"), "error")
@@ -60,8 +64,8 @@ function ProfilePage() {
 							</label>
 							<input
 								className="input"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
+								value={form.name}
+								onChange={set("name")}
 								placeholder={t("auth.namePlaceholder")}
 							/>
 						</div>
@@ -71,8 +75,8 @@ function ProfilePage() {
 							</label>
 							<input
 								className="input"
-								value={phone}
-								onChange={(e) => setPhone(e.target.value)}
+								value={form.phone}
+								onChange={set("phone")}
 								placeholder={t("dashboard.phonePlaceholder")}
 								type="tel"
 							/>
