@@ -15,7 +15,7 @@ export const list = query({
 	},
 	handler: async (ctx, args) => {
 		// Use city index when a city filter is provided, otherwise use the active index.
-		let shops = args.city
+		const shops = args.city
 			? await ctx.db
 					.query("barbershops")
 					.withIndex("by_city", (q) => q.eq("city", args.city as string))
@@ -34,9 +34,11 @@ export const list = query({
 			if (args.search) {
 				const term = args.search.toLowerCase()
 				if (
-					!s.name.toLowerCase().includes(term) &&
-					!s.city.toLowerCase().includes(term) &&
-					!s.address.toLowerCase().includes(term)
+					!(
+						s.name.toLowerCase().includes(term) ||
+						s.city.toLowerCase().includes(term) ||
+						s.address.toLowerCase().includes(term)
+					)
 				)
 					return false
 			}

@@ -89,5 +89,4 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		}
 		expect(mismatched, `Array length mismatches: ${mismatched.join(", ")}`).toHaveLength(0)
 	})
-
 })
