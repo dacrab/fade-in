@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
-import { Search, MapPin, Star, ArrowRight, ChevronRight, Scissors } from "lucide-react"
+import { Search, MapPin, Star, ArrowRight, ChevronRight, Scissors, Check } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
@@ -57,7 +57,7 @@ function HomePage() {
 							[
 								["500+", t("home.stats.shops")],
 								["50k+", t("home.stats.clients")],
-								["4.9★", t("home.stats.rating")],
+								["4.9", t("home.stats.rating")],
 							] as [string, string][]
 						).map(([val, label]) => (
 							<div key={label} className="text-center">
@@ -154,7 +154,7 @@ function ShopCard({ shop }: { shop: Barbershop }) {
 				) : (
 					<div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]"><Scissors size={40} /></div>
 				)}
-				{shop.isVerified && <div className="absolute top-3 left-3 badge badge-gold">✓ {t("common.verified")}</div>}
+				{shop.isVerified && <div className="absolute top-3 left-3 badge badge-gold"><Check size={9} /> {t("common.verified")}</div>}
 			</div>
 			<div className="p-4">
 				<div className="flex items-start justify-between gap-2 mb-1">

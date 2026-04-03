@@ -88,7 +88,7 @@ function BusinessProfile() {
 					city: form.city,
 					socialLinks,
 				})
-				showToast("Shop created! Welcome to FadeIn 🎉", "success")
+				showToast("Shop created! Welcome to FadeIn.", "success")
 			}
 		} catch { showToast("Failed to save", "error") }
 		finally { setSaving(false) }

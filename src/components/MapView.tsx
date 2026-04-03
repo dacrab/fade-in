@@ -108,7 +108,7 @@ function placeMarkers(
 	if (shopsWithCoords.length === 0) return
 
 	const goldIcon = L.divIcon({
-		html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,#F59E0B,#D97706);transform:rotate(-45deg);border:2px solid #0A0A0A;box-shadow:0 4px 12px rgba(245,158,11,0.5);display:flex;align-items:center;justify-content:center;"><div style="transform:rotate(45deg);color:#000;font-size:13px;">✂</div></div>`,
+		html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,#F59E0B,#D97706);transform:rotate(-45deg);border:2px solid #0A0A0A;box-shadow:0 4px 12px rgba(245,158,11,0.5);display:flex;align-items:center;justify-content:center;"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' style='transform:rotate(45deg)'><circle cx='6' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><line x1='20' y1='4' x2='8.12' y2='15.88'/><line x1='14.47' y1='14.48' x2='20' y2='20'/><line x1='8.12' y1='8.12' x2='12' y2='12'/></svg></div>`,
 		className: "",
 		iconSize: [32, 32],
 		iconAnchor: [16, 32],
@@ -124,7 +124,7 @@ function placeMarkers(
 				`<div style="font-family:system-ui;min-width:160px;padding:4px;">
 				<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#F5F5F5;">${shop.name}</div>
 				<div style="font-size:12px;color:#888;margin-bottom:6px;">${shop.address}, ${shop.city}</div>
-				<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">★ ${shop.rating.toFixed(1)} (${shop.reviewCount} reviews)</div>
+				<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">${shop.rating.toFixed(1)} / 5 (${shop.reviewCount} reviews)</div>
 				<a href="/barbershops/${shop.slug}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">Book now →</a>
 			</div>`,
 				{ className: "fadein-popup" },

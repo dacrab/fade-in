@@ -25,7 +25,7 @@ function RegisterPage() {
 		setLoading(true)
 		try {
 			await register(email, password, name, role)
-			showToast("Account created! Welcome to FadeIn 🎉", "success")
+			showToast("Account created! Welcome to FadeIn.", "success")
 			void router.navigate({ to: role === "owner" ? "/business" : "/dashboard" })
 		} catch (err: unknown) {
 			const msg = err instanceof Error ? err.message : "Registration failed"

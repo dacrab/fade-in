@@ -31,9 +31,9 @@ function AdminDashboard() {
 	const customers = allUsers?.filter((u) => u.role === "customer").length ?? 0
 
 	const navLinks = [
-		{ to: "/admin", label: "Overview", icon: ShieldCheck },
-		{ to: "/admin/shops", label: "Shops", icon: Building2 },
-		{ to: "/admin/users", label: "Users", icon: Users },
+		{ to: "/admin", label: t("admin.overviewTitle"), icon: ShieldCheck },
+		{ to: "/admin/shops", label: t("admin.shops.title"), icon: Building2 },
+		{ to: "/admin/users", label: t("admin.users.title"), icon: Users },
 	] as const
 
 	return (
@@ -89,8 +89,8 @@ function AdminDashboard() {
 												<div className="text-sm font-medium text-[var(--text)] truncate">{shop.name}</div>
 												<div className="text-xs text-[var(--text-muted)]">{shop.city}</div>
 											</div>
-											<span className={`badge text-[10px] ${shop.isVerified ? "badge-green" : "badge-gold"}`}>{shop.isVerified ? "Verified" : "Pending"}</span>
-											<span className={`badge text-[10px] ${shop.isActive ? "badge-green" : "badge-red"}`}>{shop.isActive ? "Active" : "Suspended"}</span>
+											<span className={`badge text-[10px] ${shop.isVerified ? "badge-green" : "badge-gold"}`}>{shop.isVerified ? t("common.verified") : "Pending"}</span>
+											<span className={`badge text-[10px] ${shop.isActive ? "badge-green" : "badge-red"}`}>{shop.isActive ? t("common.active") : t("common.suspended")}</span>
 										</div>
 									))}
 								</div>

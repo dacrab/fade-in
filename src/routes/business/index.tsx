@@ -4,9 +4,10 @@ import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
-import { Calendar, Users, Star, Scissors, PlusCircle, Settings, BarChart3, MessageSquare, Clock } from "lucide-react"
+import { Calendar, Users, Star, Scissors, PlusCircle, Settings, BarChart3, MessageSquare, Clock, Check } from "lucide-react"
 import { Skeleton } from "../../components/ui/Skeleton"
 import { formatPrice } from "../../lib/format"
+import { StarRating } from "../../components/ui/StarRating"
 import type { Barbershop, Appointment, Review } from "../../types"
 import { STATUS_BADGE } from "../../types"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -72,7 +73,7 @@ function BusinessDashboard() {
 					<div className="mb-6">
 						<h2 className="font-bold text-[var(--text)] truncate">{shop.name}</h2>
 						<p className="text-xs text-[var(--text-muted)]">{shop.city}</p>
-						{shop.isVerified && <span className="badge badge-gold mt-1 text-[10px]">✓ Verified</span>}
+						{shop.isVerified && <span className="badge badge-gold mt-1 text-[10px]"><Check size={9} /> {t("common.verified")}</span>}
 					</div>
 					<nav className="space-y-1">
 						{NAV_LINK_DEFS.map(({ to, key, icon: Icon }) => (
@@ -95,7 +96,7 @@ function BusinessDashboard() {
 								{ label: t("business.stats.todayBookings"), value: todayAppts?.length ?? "—", icon: Calendar },
 								{ label: t("business.stats.totalBookings"), value: allAppts?.length ?? "—", icon: BarChart3 },
 								{ label: t("business.stats.totalReviews"), value: reviews?.length ?? "—", icon: Star },
-								{ label: t("business.stats.avgRating"), value: `${shop.rating.toFixed(1)}★`, icon: Star },
+								{ label: t("business.stats.avgRating"), value: `${shop.rating.toFixed(1)} / 5`, icon: Star },
 							] as const
 						).map(({ label, value, icon: Icon }) => (
 							<div key={label} className="card p-4">
@@ -149,7 +150,7 @@ function BusinessDashboard() {
 							<div className="space-y-3">
 								{reviews.slice(0, 3).map((r) => (
 									<div key={r._id} className="border-b border-[var(--border)] pb-3 last:border-0 last:pb-0">
-										<div className="text-[var(--gold)] text-sm mb-1">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</div>
+										<StarRating rating={r.rating} size={14} />
 										<p className="text-sm text-[var(--text-muted)] line-clamp-2">{r.comment}</p>
 									</div>
 								))}

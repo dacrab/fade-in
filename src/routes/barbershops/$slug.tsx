@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
-import { MapPin, Phone, Clock, Star, Scissors, Instagram, Facebook, Globe, ChevronLeft, Calendar } from "lucide-react"
+import { MapPin, Phone, Clock, Star, Scissors, Instagram, Facebook, Globe, ChevronLeft, Calendar, Check } from "lucide-react"
 import { StarRating } from "../../components/ui/StarRating"
 import { Skeleton } from "../../components/ui/Skeleton"
 import { formatPrice, formatRelative, capitalizeFirst } from "../../lib/format"
@@ -44,7 +44,7 @@ function ShopProfilePage() {
 					) : (
 						<div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]"><Scissors size={60} /></div>
 					)}
-					{shop.isVerified && <div className="absolute top-4 left-4 badge badge-gold">✓ Verified</div>}
+					{shop.isVerified && <div className="absolute top-4 left-4 badge badge-gold"><Check size={10} /> Verified</div>}
 				</div>
 
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

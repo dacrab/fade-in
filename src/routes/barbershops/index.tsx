@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
-import { Search, MapPin, Star, Map, List, Scissors, Filter, X } from "lucide-react"
+import { Search, MapPin, Star, Map, List, Scissors, Filter, X, Check } from "lucide-react"
 import { ShopCardSkeleton } from "../../components/ui/Skeleton"
 import { Slider } from "../../components/ui/Slider"
 import MapView from "../../components/MapView"
@@ -67,7 +67,7 @@ function BarbershopsPage() {
 					<button type="button" onClick={() => setShowFilters(!showFilters)}
 						className={`btn btn-secondary gap-2 ${showFilters ? "border-[var(--gold)]/50 text-[var(--gold)]" : ""}`}>
 						<Filter size={15} />{t("common.filter")}
-						{minRating > 0 && <span className="badge badge-gold py-0 px-1.5 text-[10px]">{minRating}★+</span>}
+						{minRating > 0 && <span className="badge badge-gold py-0 px-1.5 text-[10px]">{minRating}+</span>}
 					</button>
 					<div className="flex rounded-lg overflow-hidden border border-[var(--border)]">
 						{(["list", "map"] as const).map((v) => (
@@ -102,7 +102,7 @@ function BarbershopsPage() {
 							</div>
 							<Slider value={[minRating]} onValueChange={([v]) => setMinRating(v ?? 0)} min={0} max={5} step={0.5} />
 							<div className="flex justify-between text-xs text-[var(--text-subtle)] mt-1">
-								<span>{t("common.anyRating")}</span><span>5★</span>
+								<span>{t("common.anyRating")}</span><span>5</span>
 							</div>
 						</div>
 					</div>
@@ -145,7 +145,7 @@ function ShopCard({ shop }: { shop: Barbershop }) {
 				) : (
 					<div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]"><Scissors size={36} /></div>
 				)}
-				{shop.isVerified && <div className="absolute top-3 left-3 badge badge-gold text-[11px]">✓ {t("common.verified")}</div>}
+				{shop.isVerified && <div className="absolute top-3 left-3 badge badge-gold text-[11px]"><Check size={9} /> {t("common.verified")}</div>}
 				{shop.lat !== undefined && shop.lng !== undefined && (
 					<div className="absolute top-3 right-3 badge badge-gray text-[10px] gap-1"><MapPin size={10} />{t("barbershops.mapped")}</div>
 				)}

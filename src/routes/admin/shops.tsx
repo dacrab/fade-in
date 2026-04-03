@@ -54,10 +54,10 @@ function AdminShops() {
 								<div className="flex-1 min-w-0">
 									<div className="flex items-center gap-2 flex-wrap">
 										<span className="font-medium text-[var(--text)] text-sm">{shop.name}</span>
-										{shop.isVerified && <span className="badge badge-green text-[10px]">✓ Verified</span>}
-										{!shop.isActive && <span className="badge badge-red text-[10px]">Suspended</span>}
+										{shop.isVerified && <span className="badge badge-green text-[10px]"><Check size={9} /> {t("common.verified")}</span>}
+										{!shop.isActive && <span className="badge badge-red text-[10px]">{t("common.suspended")}</span>}
 									</div>
-									<div className="text-xs text-[var(--text-muted)]">{shop.address}, {shop.city} · ★ {shop.rating.toFixed(1)} ({shop.reviewCount})</div>
+									<div className="text-xs text-[var(--text-muted)]">{shop.address}, {shop.city} · {shop.rating.toFixed(1)}/5 ({shop.reviewCount})</div>
 								</div>
 								<div className="flex gap-2 flex-wrap">
 									<button
