@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
+import { useFormState } from "#/hooks/useFormState"
 import type { Barber, Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -22,9 +22,7 @@ const EMPTY: BarberForm = { name: "", bio: "", specializations: "" }
 function BusinessBarbers() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const [showForm, setShowForm] = useState(false)
-	const [editId, setEditId] = useState<Id<"barbers"> | null>(null)
-	const [form, setForm] = useState<BarberForm>(EMPTY)
+	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY)
 
 	const shopsRaw = useQuery(
 		api.barbershops.listByOwner,
@@ -38,15 +36,6 @@ function BusinessBarbers() {
 	const updateBarber = useMutation(api.barbers.update)
 	const removeBarber = useMutation(api.barbers.remove)
 
-	const resetForm = () => {
-		setForm(EMPTY)
-		setEditId(null)
-		setShowForm(false)
-	}
-	const set =
-		(key: keyof BarberForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-			setForm((f) => ({ ...f, [key]: e.target.value }))
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		if (!shop) return
@@ -57,12 +46,11 @@ function BusinessBarbers() {
 		try {
 			if (editId) {
 				await updateBarber({
-					id: editId,
+					id: editId as Id<"barbers">,
 					name: form.name,
 					bio: form.bio || undefined,
 					specializations: specs,
 				})
-				showToast(t("errors.barberSaved"), "success")
 			} else {
 				await createBarber({
 					barbershopId: shop._id,
@@ -70,19 +58,16 @@ function BusinessBarbers() {
 					bio: form.bio || undefined,
 					specializations: specs,
 				})
-				showToast(t("errors.barberSaved"), "success")
 			}
-			resetForm()
+			showToast(t("errors.barberSaved"), "success")
+			reset()
 		} catch {
 			showToast(t("errors.barberFailed"), "error")
 		}
 	}
 
-	const handleEdit = (b: Barber) => {
-		setForm({ name: b.name, bio: b.bio ?? "", specializations: b.specializations.join(", ") })
-		setEditId(b._id)
-		setShowForm(true)
-	}
+	const handleEdit = (b: Barber) =>
+		openEdit({ name: b.name, bio: b.bio ?? "", specializations: b.specializations.join(", ") }, b._id)
 
 	const handleDelete = async (id: Id<"barbers">) => {
 		try {
@@ -107,7 +92,7 @@ function BusinessBarbers() {
 					<button
 						type="button"
 						onClick={() => {
-							resetForm()
+							reset()
 							setShowForm(!showForm)
 						}}
 						className="btn btn-primary gap-2 text-sm"
@@ -166,7 +151,7 @@ function BusinessBarbers() {
 									<Check size={15} />
 									{editId ? t("common.save") : t("business.barbers.addBarber")}
 								</button>
-								<button type="button" onClick={resetForm} className="btn btn-secondary">
+								<button type="button" onClick={reset} className="btn btn-secondary">
 									{t("common.cancel")}
 								</button>
 							</div>

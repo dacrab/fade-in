@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
+import { useFormState } from "#/hooks/useFormState"
 import { formatPrice } from "#/lib/format"
 import type { Barbershop, Service } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -34,9 +34,7 @@ type Category = (typeof CATEGORIES)[number]
 function BusinessServices() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const [showForm, setShowForm] = useState(false)
-	const [editId, setEditId] = useState<Id<"services"> | null>(null)
-	const [form, setForm] = useState<ServiceForm>(EMPTY_FORM)
+	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY_FORM)
 
 	const shopsRaw = useQuery(
 		api.barbershops.listByOwner,
@@ -50,15 +48,6 @@ function BusinessServices() {
 	const updateService = useMutation(api.services.update)
 	const removeService = useMutation(api.services.remove)
 
-	const resetForm = () => {
-		setForm(EMPTY_FORM)
-		setEditId(null)
-		setShowForm(false)
-	}
-	const set =
-		(key: keyof ServiceForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-			setForm((f) => ({ ...f, [key]: e.target.value }))
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		if (!shop) return
@@ -67,14 +56,13 @@ function BusinessServices() {
 		try {
 			if (editId) {
 				await updateService({
-					id: editId,
+					id: editId as Id<"services">,
 					name: form.name,
 					description: form.description || undefined,
 					price,
 					durationMinutes,
 					category: form.category,
 				})
-				showToast(t("errors.serviceSaved"), "success")
 			} else {
 				await createService({
 					barbershopId: shop._id,
@@ -84,25 +72,25 @@ function BusinessServices() {
 					durationMinutes,
 					category: form.category,
 				})
-				showToast(t("errors.serviceSaved"), "success")
 			}
-			resetForm()
+			showToast(t("errors.serviceSaved"), "success")
+			reset()
 		} catch {
 			showToast(t("errors.serviceFailed"), "error")
 		}
 	}
 
-	const handleEdit = (svc: Service) => {
-		setForm({
-			name: svc.name,
-			description: svc.description ?? "",
-			price: (svc.price / 100).toFixed(2),
-			durationMinutes: String(svc.durationMinutes),
-			category: svc.category,
-		})
-		setEditId(svc._id)
-		setShowForm(true)
-	}
+	const handleEdit = (svc: Service) =>
+		openEdit(
+			{
+				name: svc.name,
+				description: svc.description ?? "",
+				price: (svc.price / 100).toFixed(2),
+				durationMinutes: String(svc.durationMinutes),
+				category: svc.category,
+			},
+			svc._id,
+		)
 
 	const handleDelete = async (id: Id<"services">) => {
 		try {
@@ -127,7 +115,7 @@ function BusinessServices() {
 					<button
 						type="button"
 						onClick={() => {
-							resetForm()
+							reset()
 							setShowForm(!showForm)
 						}}
 						className="btn btn-primary gap-2 text-sm"
@@ -222,7 +210,7 @@ function BusinessServices() {
 									<Check size={15} />
 									{editId ? t("common.save") : t("business.services.addService")}
 								</button>
-								<button type="button" onClick={resetForm} className="btn btn-secondary">
+								<button type="button" onClick={reset} className="btn btn-secondary">
 									{t("common.cancel")}
 								</button>
 							</div>
