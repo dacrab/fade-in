@@ -15,21 +15,9 @@ function ForBusinessPage() {
 	] as const
 
 	const plans = [
-		{
-			key: "starter",
-			features: ["1 barber", "Up to 50 bookings/month", "Basic analytics", "Customer reviews"],
-			highlight: false,
-		},
-		{
-			key: "pro",
-			features: ["Up to 5 barbers", "Unlimited bookings", "Advanced analytics", "Priority support", "Custom working hours"],
-			highlight: true,
-		},
-		{
-			key: "enterprise",
-			features: ["Unlimited barbers", "Multi-location", "API access", "Dedicated account manager"],
-			highlight: false,
-		},
+		{ key: "starter", highlight: false },
+		{ key: "pro", highlight: true },
+		{ key: "enterprise", highlight: false },
 	] as const
 
 	return (
@@ -96,7 +84,7 @@ function ForBusinessPage() {
 								<div className="text-3xl font-bold text-[var(--text)] mb-1">{t(`forBusiness.plans.${plan.key}.price`)}</div>
 								<p className="text-sm text-[var(--text-muted)] mb-5">{t(`forBusiness.plans.${plan.key}.desc`)}</p>
 								<ul className="space-y-2 mb-6">
-									{plan.features.map((f) => (
+									{(t(`forBusiness.plans.${plan.key}.features`, { returnObjects: true }) as string[]).map((f) => (
 										<li key={f} className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
 											<Check size={14} className="text-[var(--gold)]" /> {f}
 										</li>

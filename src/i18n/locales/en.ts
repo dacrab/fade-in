@@ -186,9 +186,24 @@ const en = {
 		pricingTitle: "Simple, transparent pricing",
 		pricingSubtitle: "No hidden fees. Cancel anytime.",
 		plans: {
-			starter: { name: "Starter", price: "Free", desc: "Perfect to get started" },
-			pro: { name: "Pro", price: "€29/mo", desc: "For growing shops" },
-			enterprise: { name: "Enterprise", price: "Custom", desc: "For multi-location chains" },
+			starter: {
+				name: "Starter",
+				price: "Free",
+				desc: "Perfect to get started",
+				features: ["1 barber", "Up to 50 bookings/month", "Basic analytics", "Customer reviews"],
+			},
+			pro: {
+				name: "Pro",
+				price: "€29/mo",
+				desc: "For growing shops",
+				features: ["Up to 5 barbers", "Unlimited bookings", "Advanced analytics", "Priority support", "Custom working hours"],
+			},
+			enterprise: {
+				name: "Enterprise",
+				price: "Custom",
+				desc: "For multi-location chains",
+				features: ["Unlimited barbers", "Multi-location", "API access", "Dedicated account manager"],
+			},
 		},
 		mostPopular: "Most popular",
 	},
