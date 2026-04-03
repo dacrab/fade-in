@@ -32,18 +32,18 @@ function AdminShops() {
 	}
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-5xl">
-				<div className="flex items-center gap-3 mb-6">
-					<Link to="/admin" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Admin</Link>
-					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">{t("admin.shops.title")}</h1>
+				<div className="page-header">
+					<Link to="/admin" className="breadcrumb-back">← Admin</Link>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("admin.shops.title")}</h1>
 				</div>
 
 				{allShops === undefined ? (
 					<div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}</div>
 				) : allShops.length === 0 ? (
-					<div className="text-center py-16 text-[var(--text-muted)]">
+					<div className="empty-state">
 						<Building2 size={36} className="mx-auto mb-3 opacity-30" />
 						<p>No shops registered yet.</p>
 					</div>

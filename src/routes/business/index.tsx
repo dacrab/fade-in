@@ -51,7 +51,7 @@ function BusinessDashboard() {
 
 	if (!shop) {
 		return (
-			<main className="px-4 py-8">
+			<main className="page-main">
 				<div className="page-wrap max-w-2xl text-center">
 					<div className="card p-10">
 						<Scissors size={48} className="mx-auto mb-4 text-[var(--gold)]" />
@@ -90,7 +90,7 @@ function BusinessDashboard() {
 						<p className="text-sm text-[var(--text-muted)]">{t("dashboard.welcome", { name: user.name })}</p>
 					</div>
 
-					<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+					<div className="stat-grid stat-grid-4">
 						{(
 							[
 								{ label: t("business.stats.todayBookings"), value: todayAppts?.length ?? "—", icon: Calendar },
@@ -109,14 +109,14 @@ function BusinessDashboard() {
 
 					{/* Today's appointments */}
 					<div className="card p-5 mb-5">
-						<div className="flex items-center justify-between mb-4">
+						<div className="section-header">
 							<h2 className="font-bold text-[var(--text)]">{t("business.todayTitle")}</h2>
-							<Link to="/business/appointments" className="text-xs text-[var(--gold)] no-underline hover:underline">{t("common.viewAll")} →</Link>
+							<Link to="/business/appointments" className="section-link">{t("common.viewAll")} →</Link>
 						</div>
 						{todayAppts === undefined ? (
 							<div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
 						) : todayAppts.length === 0 ? (
-							<div className="text-center py-6 text-[var(--text-muted)]">
+							<div className="empty-state">
 								<Clock size={28} className="mx-auto mb-2 opacity-30" />
 								<p className="text-sm">{t("business.noToday")}</p>
 							</div>
@@ -138,9 +138,9 @@ function BusinessDashboard() {
 
 					{/* Recent reviews */}
 					<div className="card p-5">
-						<div className="flex items-center justify-between mb-4">
+						<div className="section-header">
 							<h2 className="font-bold text-[var(--text)]">{t("business.recentReviews")}</h2>
-							<Link to="/business/reviews" className="text-xs text-[var(--gold)] no-underline hover:underline">{t("common.viewAll")} →</Link>
+							<Link to="/business/reviews" className="section-link">{t("common.viewAll")} →</Link>
 						</div>
 						{reviews === undefined ? (
 							<Skeleton className="h-24 w-full" />
@@ -165,7 +165,7 @@ function BusinessDashboard() {
 
 function DashSkeleton() {
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap space-y-6">
 				<Skeleton className="h-10 w-48" />
 				<div className="grid grid-cols-4 gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}</div>

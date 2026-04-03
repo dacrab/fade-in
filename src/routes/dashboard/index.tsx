@@ -40,9 +40,9 @@ function CustomerDashboard() {
 		) ?? []
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="flex items-center justify-between mb-8">
+				<div className="section-header">
 					<div>
 						<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.title")}</h1>
 						<p className="text-[var(--text-muted)] text-sm">{t("dashboard.welcome", { name: user.name })}</p>
@@ -93,7 +93,7 @@ function CustomerDashboard() {
 							))}
 						</div>
 					) : upcoming.length === 0 ? (
-						<div className="text-center py-8 text-[var(--text-muted)]">
+						<div className="empty-state">
 							<Calendar size={32} className="mx-auto mb-2 opacity-30" />
 							<p className="text-sm">{t("dashboard.noUpcoming")}</p>
 							<Link to="/barbershops" className="btn btn-primary mt-3 inline-flex text-sm">
@@ -157,7 +157,7 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 
 function DashSkeleton() {
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-4xl space-y-6">
 				<Skeleton className="h-10 w-48" />
 				<div className="grid grid-cols-4 gap-4">

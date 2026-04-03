@@ -72,17 +72,17 @@ function HomePage() {
 			{/* Featured */}
 			<section className="px-4 py-16">
 				<div className="page-wrap">
-					<div className="flex items-center justify-between mb-8">
+					<div className="section-header">
 						<div>
 							<h2 className="text-2xl font-bold text-[var(--text)] mb-1">{t("home.featured")}</h2>
 							<p className="text-[var(--text-muted)] text-sm">{t("home.featuredSubtitle")}</p>
 						</div>
-						<Link to="/barbershops" className="flex items-center gap-1 text-sm text-[var(--gold)] hover:underline no-underline font-semibold">
+						<Link to="/barbershops" className="section-link flex items-center gap-1">
 							{t("common.viewAll")} <ArrowRight size={14} />
 						</Link>
 					</div>
 					{featured === undefined ? (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+						<div className="shop-grid">
 							{Array.from({ length: 6 }).map((_, i) => <ShopCardSkeleton key={i} />)}
 						</div>
 					) : featured.length === 0 ? (
@@ -92,7 +92,7 @@ function HomePage() {
 							<Link to="/for-business" className="btn btn-primary mt-4 inline-flex">{t("nav.forBusiness")}</Link>
 						</div>
 					) : (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+						<div className="shop-grid">
 							{featured.map((shop: Doc<"barbershops">) => <ShopCard key={shop._id} shop={shop as Barbershop} />)}
 						</div>
 					)}
@@ -147,8 +147,8 @@ function HomePage() {
 function ShopCard({ shop }: { shop: Barbershop }) {
 	const { t } = useTranslation()
 	return (
-		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="card card-interactive overflow-hidden block no-underline group">
-			<div className="relative h-48 overflow-hidden bg-[var(--bg-card-hover)]">
+		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
+			<div className="shop-card-img">
 				{shop.images[0] ? (
 					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
 				) : (
@@ -156,7 +156,7 @@ function ShopCard({ shop }: { shop: Barbershop }) {
 				)}
 				{shop.isVerified && <div className="absolute top-3 left-3 badge badge-gold"><Check size={9} /> {t("common.verified")}</div>}
 			</div>
-			<div className="p-4">
+			<div className="shop-card-body">
 				<div className="flex items-start justify-between gap-2 mb-1">
 					<h3 className="font-bold text-[var(--text)] text-base leading-tight">{shop.name}</h3>
 					<div className="flex items-center gap-1 flex-shrink-0">

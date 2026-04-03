@@ -33,10 +33,10 @@ function ProfilePage() {
 	}
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-xl">
-				<div className="flex items-center gap-3 mb-8">
-					<Link to="/dashboard" className="text-[var(--text-muted)] hover:text-[var(--text)] text-sm no-underline transition-colors">
+				<div className="page-header">
+					<Link to="/dashboard" className="breadcrumb-back">
 						← {t("nav.dashboard")}
 					</Link>
 					<span className="text-[var(--border)]">/</span>
@@ -57,15 +57,15 @@ function ProfilePage() {
 
 					<form onSubmit={(e) => void handleSave(e)} className="space-y-4">
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("auth.nameLabel")}</label>
+							<label className="form-label">{t("auth.nameLabel")}</label>
 							<input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("auth.namePlaceholder")} />
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.phoneLabel")}</label>
+							<label className="form-label">{t("form.phoneLabel")}</label>
 							<input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("dashboard.phonePlaceholder")} type="tel" />
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("auth.emailLabel")}</label>
+							<label className="form-label">{t("auth.emailLabel")}</label>
 							<input className="input opacity-50 cursor-not-allowed" value={user?.email} disabled />
 							<p className="text-xs text-[var(--text-muted)] mt-1">{t("dashboard.emailNote")}</p>
 						</div>

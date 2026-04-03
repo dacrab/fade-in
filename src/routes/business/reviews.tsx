@@ -36,12 +36,12 @@ function BusinessReviews() {
 	}
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<div className="flex items-center gap-3 mb-6">
-					<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
-					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.reviews.title")}</h1>
+				<div className="page-header">
+					<Link to="/business" className="breadcrumb-back">← {t("nav.business")}</Link>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("business.reviews.title")}</h1>
 				</div>
 
 				{shop && (
@@ -57,7 +57,7 @@ function BusinessReviews() {
 				{reviews === undefined ? (
 					<div className="space-y-4">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)}</div>
 				) : reviews.length === 0 ? (
-					<div className="text-center py-16 text-[var(--text-muted)]">
+					<div className="empty-state">
 						<MessageSquare size={36} className="mx-auto mb-3 opacity-30" />
 						<p className="text-sm">{t("business.reviews.noReviews")}</p>
 					</div>

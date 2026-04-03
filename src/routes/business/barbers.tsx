@@ -63,13 +63,13 @@ function BusinessBarbers() {
 	}
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
-					<div className="flex items-center gap-3">
-						<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
-						<span className="text-[var(--border)]">/</span>
-						<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.barbers.title")}</h1>
+					<div className="page-header">
+						<Link to="/business" className="breadcrumb-back">← {t("nav.business")}</Link>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("business.barbers.title")}</h1>
 					</div>
 					<button type="button" onClick={() => { resetForm(); setShowForm(!showForm) }} className="btn btn-primary gap-2 text-sm">
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
@@ -82,15 +82,15 @@ function BusinessBarbers() {
 						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? t("common.edit") : t("business.barbers.addBarber")}</h2>
 						<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.nameStar")}</label>
+								<label className="form-label">{t("form.nameStar")}</label>
 								<input className="input" placeholder={t("business.barbers.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("business.barbers.title")}</label>
+								<label className="form-label">{t("business.barbers.title")}</label>
 								<input className="input" placeholder={t("business.barbers.specializationsPlaceholder")} value={form.specializations} onChange={set("specializations")} />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.descriptionLabel")}</label>
+								<label className="form-label">{t("form.descriptionLabel")}</label>
 								<textarea className="input resize-none" rows={2} placeholder={t("business.barbers.bioPlaceholder")} value={form.bio} onChange={set("bio")} />
 							</div>
 							<div className="flex gap-2">
@@ -104,7 +104,7 @@ function BusinessBarbers() {
 				{barbers === undefined ? (
 					<div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}</div>
 				) : barbers.length === 0 ? (
-					<div className="text-center py-16 text-[var(--text-muted)]"><p className="text-sm">{t("business.barbers.noBarbers")}</p></div>
+					<div className="empty-state"><p className="text-sm">{t("business.barbers.noBarbers")}</p></div>
 				) : (
 					<div className="space-y-3">
 						{barbers.map((b: Barber) => (
@@ -118,8 +118,8 @@ function BusinessBarbers() {
 									{b.bio && <div className="text-xs text-[var(--text-subtle)] truncate">{b.bio}</div>}
 								</div>
 								<div className="flex gap-1.5">
-									<button type="button" onClick={() => handleEdit(b)} className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-card-hover)] transition-colors" style={{ background: "none", border: "none", cursor: "pointer" }}><Pencil size={14} /></button>
-									<button type="button" onClick={() => void handleDelete(b._id)} className="p-2 rounded-lg text-[var(--error)] hover:bg-red-500/10 transition-colors" style={{ background: "none", border: "none", cursor: "pointer" }}><Trash2 size={14} /></button>
+									<button type="button" onClick={() => handleEdit(b)} className="icon-btn" style={{ background: "none", border: "none", cursor: "pointer" }}><Pencil size={14} /></button>
+									<button type="button" onClick={() => void handleDelete(b._id)} className="icon-btn icon-btn-danger" style={{ background: "none", border: "none", cursor: "pointer" }}><Trash2 size={14} /></button>
 								</div>
 							</div>
 						))}

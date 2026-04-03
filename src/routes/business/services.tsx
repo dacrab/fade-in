@@ -74,13 +74,13 @@ function BusinessServices() {
 	}
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
-					<div className="flex items-center gap-3">
-						<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
-						<span className="text-[var(--border)]">/</span>
-						<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.services.title")}</h1>
+					<div className="page-header">
+						<Link to="/business" className="breadcrumb-back">← {t("nav.business")}</Link>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("business.services.title")}</h1>
 					</div>
 					<button type="button" onClick={() => { resetForm(); setShowForm(!showForm) }} className="btn btn-primary gap-2 text-sm">
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
@@ -93,19 +93,19 @@ function BusinessServices() {
 						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? t("business.services.editService") : t("business.services.newService")}</h2>
 						<form onSubmit={(e) => void handleSubmit(e)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div className="sm:col-span-2">
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.nameStar")}</label>
+								<label className="form-label">{t("form.nameStar")}</label>
 								<input className="input" placeholder={t("business.services.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.priceLabel")} *</label>
+								<label className="form-label">{t("form.priceLabel")} *</label>
 								<input className="input" type="number" step="0.01" min="0" placeholder="15.00" value={form.price} onChange={set("price")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.durationLabel")} *</label>
+								<label className="form-label">{t("form.durationLabel")} *</label>
 								<input className="input" type="number" min="5" step="5" placeholder="30" value={form.durationMinutes} onChange={set("durationMinutes")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.categoryLabel")}</label>
+								<label className="form-label">{t("form.categoryLabel")}</label>
 								<select className="input" value={form.category} onChange={set("category")}>
 									{CATEGORIES.map((c: Category) => (
 										<option key={c} value={c}>{t(`business.services.categories.${c}`)}</option>
@@ -113,7 +113,7 @@ function BusinessServices() {
 								</select>
 							</div>
 							<div className="sm:col-span-2">
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.descriptionLabel")}</label>
+								<label className="form-label">{t("form.descriptionLabel")}</label>
 								<input className="input" placeholder={t("form.optional")} value={form.description} onChange={set("description")} />
 							</div>
 							<div className="sm:col-span-2 flex gap-2">
@@ -129,7 +129,7 @@ function BusinessServices() {
 				{services === undefined ? (
 					<div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}</div>
 				) : services.length === 0 ? (
-					<div className="text-center py-16 text-[var(--text-muted)]"><p className="text-sm">{t("business.services.noServices")}</p></div>
+					<div className="empty-state"><p className="text-sm">{t("business.services.noServices")}</p></div>
 				) : (
 					<div className="space-y-2">
 						{services.map((svc: Service) => (
@@ -142,8 +142,8 @@ function BusinessServices() {
 								</div>
 								<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(svc.price)}</div>
 								<div className="flex gap-1.5">
-									<button type="button" onClick={() => handleEdit(svc)} className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-card-hover)] transition-colors" style={{ background: "none", border: "none", cursor: "pointer" }}><Pencil size={14} /></button>
-									<button type="button" onClick={() => void handleDelete(svc._id)} className="p-2 rounded-lg text-[var(--error)] hover:bg-red-500/10 transition-colors" style={{ background: "none", border: "none", cursor: "pointer" }}><Trash2 size={14} /></button>
+									<button type="button" onClick={() => handleEdit(svc)} className="icon-btn" style={{ background: "none", border: "none", cursor: "pointer" }}><Pencil size={14} /></button>
+									<button type="button" onClick={() => void handleDelete(svc._id)} className="icon-btn icon-btn-danger" style={{ background: "none", border: "none", cursor: "pointer" }}><Trash2 size={14} /></button>
 								</div>
 							</div>
 						))}

@@ -17,10 +17,10 @@ function FavoritesPage() {
 	const favoriteIds = userData?.favoriteShopIds ?? []
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="flex items-center gap-3 mb-8">
-					<Link to="/dashboard" className="text-[var(--text-muted)] hover:text-[var(--text)] text-sm no-underline transition-colors">
+				<div className="page-header">
+					<Link to="/dashboard" className="breadcrumb-back">
 						← {t("nav.dashboard")}
 					</Link>
 					<span className="text-[var(--border)]">/</span>
@@ -28,14 +28,14 @@ function FavoritesPage() {
 				</div>
 
 				{favoriteIds.length === 0 ? (
-					<div className="text-center py-20 text-[var(--text-muted)]">
+					<div className="empty-state">
 						<Heart size={40} className="mx-auto mb-4 opacity-30" />
 						<p className="font-semibold text-[var(--text)] mb-1">{t("dashboard.noFavorites")}</p>
 						<p className="text-sm mb-4">{t("dashboard.noFavoritesHint")}</p>
 						<Link to="/barbershops" className="btn btn-primary inline-flex">{t("nav.barbershops")}</Link>
 					</div>
 				) : (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+					<div className="shop-grid">
 						{favoriteIds.map((shopId) => (
 							<FavoriteShopCard key={shopId} shopId={shopId} />
 						))}
@@ -51,15 +51,15 @@ function FavoriteShopCard({ shopId }: { shopId: Id<"barbershops"> }) {
 	const shop = shopRaw as Barbershop | null | undefined
 	if (!shop) return null
 	return (
-		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="card card-interactive overflow-hidden block no-underline group">
-			<div className="h-36 bg-[var(--bg-card-hover)] flex items-center justify-center overflow-hidden">
+		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
+			<div className="shop-card-img">
 				{shop.images[0] ? (
 					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
 				) : (
 					<Scissors size={32} className="text-[var(--text-subtle)]" />
 				)}
 			</div>
-			<div className="p-4">
+			<div className="shop-card-body">
 				<div className="flex items-start justify-between gap-2 mb-1">
 					<h3 className="font-bold text-[var(--text)] text-sm">{shop.name}</h3>
 					<div className="flex items-center gap-1">

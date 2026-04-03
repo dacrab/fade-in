@@ -62,38 +62,38 @@ function BusinessProfile() {
 	}
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-2xl">
-				<div className="flex items-center gap-3 mb-6">
-					<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
-					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}</h1>
+				<div className="page-header">
+					<Link to="/business" className="breadcrumb-back">← {t("nav.business")}</Link>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}</h1>
 				</div>
 
 				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
 					<div className="card p-5 space-y-4">
 						<h2 className="font-bold text-[var(--text)]">{t("business.profile.basicInfo")}</h2>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.nameStar")}</label>
+							<label className="form-label">{t("form.nameStar")}</label>
 							<input className="input" placeholder={t("business.profile.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							{form.name && <p className="text-xs text-[var(--text-muted)] mt-1">{t("business.profile.urlPreview", { slug: slugify(form.name) })}</p>}
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.descriptionLabel")}</label>
+							<label className="form-label">{t("form.descriptionLabel")}</label>
 							<textarea className="input resize-none" rows={3} placeholder={t("business.profile.descPlaceholder")} value={form.description} onChange={set("description")} />
 						</div>
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.phoneLabel")}</label>
+								<label className="form-label">{t("form.phoneLabel")}</label>
 								<input className="input" placeholder={t("business.profile.phonePlaceholder")} value={form.phone} onChange={set("phone")} type="tel" />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.cityStar")}</label>
+								<label className="form-label">{t("form.cityStar")}</label>
 								<input className="input" placeholder="Athens" value={form.city} onChange={set("city")} required />
 							</div>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.addressStar")}</label>
+							<label className="form-label">{t("form.addressStar")}</label>
 							<input className="input" placeholder={t("business.profile.addressPlaceholder")} value={form.address} onChange={set("address")} required />
 						</div>
 					</div>
@@ -102,7 +102,7 @@ function BusinessProfile() {
 						<h2 className="font-bold text-[var(--text)]">{t("business.profile.socialLinks")}</h2>
 						{(["instagram", "facebook", "website"] as const).map((key) => (
 							<div key={key}>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+								<label className="form-label">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
 								<input className="input" placeholder="https://..." value={form[key]} onChange={set(key)} type="url" />
 							</div>
 						))}

@@ -34,9 +34,9 @@ function ShopProfilePage() {
 	)
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-5xl">
-				<Link to="/barbershops" className="inline-flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline mb-6 transition-colors">
+				<Link to="/barbershops" className="breadcrumb-back">
 					<ChevronLeft size={16} /> {t("shop.back")}
 				</Link>
 
@@ -184,13 +184,13 @@ function ShopProfilePage() {
 								<h3 className="font-bold text-[var(--text)] mb-3">{t("shop.followUs")}</h3>
 								<div className="flex gap-2">
 									{shop.socialLinks.instagram && (
-										<a href={shop.socialLinks.instagram} target="_blank" rel="noreferrer" className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--gold)] hover:bg-[var(--bg-card-hover)] transition-colors"><Instagram size={18} /></a>
+										<a href={shop.socialLinks.instagram} target="_blank" rel="noreferrer" className="icon-btn"><Instagram size={18} /></a>
 									)}
 									{shop.socialLinks.facebook && (
-										<a href={shop.socialLinks.facebook} target="_blank" rel="noreferrer" className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--gold)] hover:bg-[var(--bg-card-hover)] transition-colors"><Facebook size={18} /></a>
+										<a href={shop.socialLinks.facebook} target="_blank" rel="noreferrer" className="icon-btn"><Facebook size={18} /></a>
 									)}
 									{shop.socialLinks.website && (
-										<a href={shop.socialLinks.website} target="_blank" rel="noreferrer" className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--gold)] hover:bg-[var(--bg-card-hover)] transition-colors"><Globe size={18} /></a>
+										<a href={shop.socialLinks.website} target="_blank" rel="noreferrer" className="icon-btn"><Globe size={18} /></a>
 									)}
 								</div>
 							</div>
@@ -205,7 +205,7 @@ function ShopProfilePage() {
 
 function ShopProfileSkeleton() {
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-5xl space-y-6">
 				<Skeleton className="h-6 w-40" />
 				<Skeleton className="h-72 w-full rounded-2xl" />

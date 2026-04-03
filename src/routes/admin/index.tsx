@@ -53,10 +53,10 @@ function AdminDashboard() {
 					</nav>
 				</aside>
 
-				<div className="px-6 py-6">
+				<div className="page-main">
 					<h1 className="text-2xl font-bold text-[var(--text)] mb-6">{t("admin.overviewTitle")}</h1>
 
-					<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+					<div className="stat-grid stat-grid-4">
 						{(
 							[
 								{ label: t("admin.stats.totalShops"), value: allShops?.length ?? "—", icon: Building2 },
@@ -75,9 +75,9 @@ function AdminDashboard() {
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						<div className="card p-5">
-							<div className="flex items-center justify-between mb-4">
+							<div className="section-header">
 								<h2 className="font-bold text-[var(--text)]">{t("admin.recentShops")}</h2>
-								<Link to="/admin/shops" className="text-xs text-[var(--gold)] no-underline hover:underline">{t("admin.shops.title")} →</Link>
+								<Link to="/admin/shops" className="section-link">{t("admin.shops.title")} →</Link>
 							</div>
 							{!allShops ? (
 								<Skeleton className="h-32 w-full" />

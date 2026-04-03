@@ -43,7 +43,7 @@ function BarbershopsPage() {
 	}
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap">
 				<div className="mb-6">
 					<h1 className="text-3xl font-bold text-[var(--text)] mb-1">{t("barbershops.title")}</h1>
@@ -111,11 +111,11 @@ function BarbershopsPage() {
 				{view === "map" ? (
 					<MapView shops={shops ?? []} onShopClick={(slug) => void navigate({ to: "/barbershops/$slug", params: { slug } })} />
 				) : shops === undefined ? (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+					<div className="shop-grid">
 						{Array.from({ length: 6 }).map((_, i) => <ShopCardSkeleton key={i} />)}
 					</div>
 				) : shops.length === 0 ? (
-					<div className="text-center py-20 text-[var(--text-muted)]">
+					<div className="empty-state">
 						<Scissors size={40} className="mx-auto mb-4 opacity-30" />
 						<p className="text-lg font-semibold text-[var(--text)] mb-1">{t("barbershops.noShops")}</p>
 						<p className="text-sm mb-4">{t("barbershops.noShopsHint")}</p>
@@ -126,7 +126,7 @@ function BarbershopsPage() {
 						)}
 					</div>
 				) : (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+					<div className="shop-grid">
 						{shops.map((shop) => <ShopCard key={shop._id} shop={shop} />)}
 					</div>
 				)}
@@ -138,8 +138,8 @@ function BarbershopsPage() {
 function ShopCard({ shop }: { shop: Barbershop }) {
 	const { t } = useTranslation()
 	return (
-		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="card card-interactive overflow-hidden block no-underline group">
-			<div className="relative h-44 overflow-hidden bg-[var(--bg-card-hover)]">
+		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
+			<div className="shop-card-img">
 				{shop.images[0] ? (
 					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
 				) : (
@@ -150,7 +150,7 @@ function ShopCard({ shop }: { shop: Barbershop }) {
 					<div className="absolute top-3 right-3 badge badge-gray text-[10px] gap-1"><MapPin size={10} />{t("barbershops.mapped")}</div>
 				)}
 			</div>
-			<div className="p-4">
+			<div className="shop-card-body">
 				<div className="flex items-start justify-between gap-2 mb-1">
 					<h3 className="font-bold text-[var(--text)] text-sm leading-tight">{shop.name}</h3>
 					<div className="flex items-center gap-1 flex-shrink-0">

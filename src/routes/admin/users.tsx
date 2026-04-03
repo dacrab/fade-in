@@ -21,17 +21,17 @@ function AdminUsers() {
 	const allUsers = allUsersRaw as User[] | undefined
 
 	return (
-		<main className="px-4 py-8">
+		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="flex items-center gap-3 mb-6">
+				<div className="page-header">
 					<Link
 						to="/admin"
-						className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline"
+						className="breadcrumb-back"
 					>
 						← Admin
 					</Link>
-					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">{t("admin.users.title")}</h1>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("admin.users.title")}</h1>
 				</div>
 
 				{allUsers === undefined ? (
@@ -41,7 +41,7 @@ function AdminUsers() {
 						))}
 					</div>
 				) : allUsers.length === 0 ? (
-					<div className="text-center py-16 text-[var(--text-muted)]">
+					<div className="empty-state">
 						<Users size={36} className="mx-auto mb-3 opacity-30" />
 						<p>No users registered yet.</p>
 					</div>
