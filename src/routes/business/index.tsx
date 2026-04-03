@@ -13,6 +13,8 @@ import {
 	Users,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import EmptyState from "#/components/EmptyState"
+import SkeletonList from "#/components/SkeletonList"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
 import { useRequireRole } from "#/hooks/useRequireRole"
@@ -153,17 +155,9 @@ function BusinessDashboard() {
 							</Link>
 						</div>
 						{todayAppts === undefined ? (
-							<div className="space-y-2">
-								{Array.from({ length: 3 }).map((_, i) => (
-									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-									<Skeleton key={i} className="h-14 w-full" />
-								))}
-							</div>
+							<SkeletonList count={3} height="h-14" />
 						) : todayAppts.length === 0 ? (
-							<div className="empty-state">
-								<Clock size={28} className="mx-auto mb-2 opacity-30" />
-								<p className="text-sm">{t("business.noToday")}</p>
-							</div>
+							<EmptyState icon={Clock} message={t("business.noToday")} />
 						) : (
 							<div className="space-y-2">
 								{todayAppts.map((appt) => (

@@ -12,14 +12,12 @@ export const Route = createFileRoute("/admin/")({ component: AdminDashboard })
 
 function AdminDashboard() {
 	const { t } = useTranslation()
-	const { user, loading } = useRequireRole(["admin"])
+	const { loading } = useRequireRole(["admin"])
 
-	const allShopsRaw = useQuery(api.barbershops.listAll)
-	const allUsersRaw = useQuery(api.users.listAll)
-	const allShops = allShopsRaw as Barbershop[] | undefined
-	const allUsers = allUsersRaw as User[] | undefined
+	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined
+	const allUsers = useQuery(api.users.listAll) as User[] | undefined
 
-	if (loading || !user) return <Skeleton className="h-64 m-8 rounded-2xl" />
+	if (loading) return <Skeleton className="h-64 m-8 rounded-2xl" />
 
 	const verified = allShops?.filter((s) => s.isVerified).length ?? 0
 	const owners = allUsers?.filter((u) => u.role === "owner").length ?? 0

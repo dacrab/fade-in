@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
 import EmptyState from "#/components/EmptyState"
 import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
@@ -28,7 +27,13 @@ function FavoritesPage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<Breadcrumb to="/dashboard" label={t("nav.dashboard")} title={t("dashboard.favoritesTitle")} />
+				<div className="page-header">
+					<a href="/dashboard" className="breadcrumb-back">
+						← {t("nav.dashboard")}
+					</a>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("dashboard.favoritesTitle")}</h1>
+				</div>
 
 				{favoriteIds.length === 0 ? (
 					<EmptyState icon={Heart} message={t("dashboard.noFavorites")}>

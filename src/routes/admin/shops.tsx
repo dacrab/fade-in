@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
 import EmptyState from "#/components/EmptyState"
 import SkeletonList from "#/components/SkeletonList"
 import { showToast } from "#/components/ui/Toast"
@@ -16,8 +15,7 @@ export const Route = createFileRoute("/admin/shops")({ component: AdminShops })
 function AdminShops() {
 	const { t } = useTranslation()
 	useRequireRole(["admin"])
-	const allShopsRaw = useQuery(api.barbershops.listAll)
-	const allShops = allShopsRaw as Barbershop[] | undefined
+	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined
 	const verify = useMutation(api.barbershops.verify)
 	const suspend = useMutation(api.barbershops.suspend)
 
@@ -45,7 +43,13 @@ function AdminShops() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-5xl">
-				<Breadcrumb to="/admin" label={t("nav.admin")} title={t("admin.shops.title")} />
+				<div className="page-header">
+					<a href="/admin" className="breadcrumb-back">
+						← {t("nav.admin")}
+					</a>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("admin.shops.title")}</h1>
+				</div>
 
 				{allShops === undefined ? (
 					<SkeletonList count={5} height="h-16" />

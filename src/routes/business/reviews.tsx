@@ -3,8 +3,8 @@ import { useMutation, useQuery } from "convex/react"
 import { MessageSquare, Send } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
-import { Skeleton } from "#/components/ui/Skeleton"
+import EmptyState from "#/components/EmptyState"
+import SkeletonList from "#/components/SkeletonList"
 import { StarRating } from "#/components/ui/StarRating"
 import { showToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
@@ -39,7 +39,13 @@ function BusinessReviews() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<Breadcrumb to="/business" label={t("nav.business")} title={t("business.reviews.title")} />
+				<div className="page-header mb-6">
+					<a href="/business" className="breadcrumb-back">
+						← {t("nav.business")}
+					</a>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("business.reviews.title")}</h1>
+				</div>
 
 				{shop && (
 					<div className="card p-4 mb-6 flex items-center gap-4">
@@ -54,17 +60,9 @@ function BusinessReviews() {
 				)}
 
 				{reviews === undefined ? (
-					<div className="space-y-4">
-						{Array.from({ length: 3 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-28 w-full rounded-xl" />
-						))}
-					</div>
+					<SkeletonList count={3} height="h-28" />
 				) : reviews.length === 0 ? (
-					<div className="empty-state">
-						<MessageSquare size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="text-sm">{t("business.reviews.noReviews")}</p>
-					</div>
+					<EmptyState icon={MessageSquare} message={t("business.reviews.noReviews")} />
 				) : (
 					<div className="space-y-4">
 						{reviews.map((r: Review) => (

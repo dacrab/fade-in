@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
+import { Check, Pencil, PlusCircle, Scissors, Trash2, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
-import { Skeleton } from "#/components/ui/Skeleton"
+import EmptyState from "#/components/EmptyState"
+import SkeletonList from "#/components/SkeletonList"
 import { showToast } from "#/components/ui/Toast"
 import { useFormState } from "#/hooks/useFormState"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
@@ -78,7 +78,13 @@ function BusinessBarbers() {
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
-					<Breadcrumb to="/business" label={t("nav.business")} title={t("business.barbers.title")} />
+					<div className="page-header">
+						<a href="/business" className="breadcrumb-back">
+							← {t("nav.business")}
+						</a>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("business.barbers.title")}</h1>
+					</div>
 					<button
 						type="button"
 						onClick={() => {
@@ -150,16 +156,9 @@ function BusinessBarbers() {
 				)}
 
 				{barbers === undefined ? (
-					<div className="space-y-3">
-						{Array.from({ length: 3 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-20 w-full rounded-xl" />
-						))}
-					</div>
+					<SkeletonList count={3} height="h-20" />
 				) : barbers.length === 0 ? (
-					<div className="empty-state">
-						<p className="text-sm">{t("business.barbers.noBarbers")}</p>
-					</div>
+					<EmptyState icon={Scissors} message={t("business.barbers.noBarbers")} />
 				) : (
 					<div className="space-y-3">
 						{barbers.map((b: Barber) => (

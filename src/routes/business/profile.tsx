@@ -3,7 +3,6 @@ import { useMutation } from "convex/react"
 import { PlusCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { useFormState } from "#/hooks/useFormState"
@@ -103,11 +102,13 @@ function BusinessProfile() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-2xl">
-				<Breadcrumb
-					to="/business"
-					label={t("nav.business")}
-					title={shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}
-				/>
+				<div className="page-header">
+					<a href="/business" className="breadcrumb-back">
+						← {t("nav.business")}
+					</a>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}</h1>
+				</div>
 
 				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
 					<div className="card p-5 space-y-4">
