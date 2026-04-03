@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { ShieldCheck, ShieldOff, PowerOff, Power, Building2 } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { Skeleton } from "../../components/ui/Skeleton"
 import { showToast } from "../../components/ui/Toast"
 import type { Barbershop } from "../../types"
@@ -10,6 +11,7 @@ import type { Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/admin/shops")({ component: AdminShops })
 
 function AdminShops() {
+	const { t } = useTranslation()
 	const allShopsRaw = useQuery(api.barbershops.listAll)
 	const allShops = allShopsRaw as Barbershop[] | undefined
 	const verify = useMutation(api.barbershops.verify)
@@ -35,7 +37,7 @@ function AdminShops() {
 				<div className="flex items-center gap-3 mb-6">
 					<Link to="/admin" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Admin</Link>
 					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">Manage Shops</h1>
+					<h1 className="text-2xl font-bold text-[var(--text)]">{t("admin.shops.title")}</h1>
 				</div>
 
 				{allShops === undefined ? (
@@ -64,7 +66,7 @@ function AdminShops() {
 										className={`btn text-xs py-1.5 px-3 gap-1 ${shop.isVerified ? "btn-secondary" : "btn-primary"}`}
 									>
 										{shop.isVerified ? <ShieldOff size={13} /> : <ShieldCheck size={13} />}
-										{shop.isVerified ? "Unverify" : "Verify"}
+										{shop.isVerified ? t("admin.shops.unverify") : t("admin.shops.verify")}
 									</button>
 									<button
 										type="button"
@@ -72,9 +74,9 @@ function AdminShops() {
 										className={`btn text-xs py-1.5 px-3 gap-1 ${shop.isActive ? "btn-secondary" : "btn-primary"}`}
 									>
 										{shop.isActive ? <PowerOff size={13} /> : <Power size={13} />}
-										{shop.isActive ? "Suspend" : "Reactivate"}
+										{shop.isActive ? t("admin.shops.suspend") : t("admin.shops.reactivate")}
 									</button>
-									<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="btn btn-ghost text-xs py-1.5 px-3">View →</Link>
+									<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="btn btn-ghost text-xs py-1.5 px-3">{t("admin.shops.view")}</Link>
 								</div>
 							</div>
 						))}

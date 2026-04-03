@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
@@ -12,6 +13,7 @@ import type { Doc, Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/dashboard/")({ component: CustomerDashboard })
 
 function CustomerDashboard() {
+	const { t } = useTranslation()
 	const { user, loading } = useAuth()
 	const router = useRouter()
 
@@ -42,15 +44,15 @@ function CustomerDashboard() {
 			<div className="page-wrap max-w-4xl">
 				<div className="flex items-center justify-between mb-8">
 					<div>
-						<h1 className="text-2xl font-bold text-[var(--text)]">My Dashboard</h1>
-						<p className="text-[var(--text-muted)] text-sm">Welcome back, {user.name}!</p>
+						<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.title")}</h1>
+						<p className="text-[var(--text-muted)] text-sm">{t("dashboard.welcome", { name: user.name })}</p>
 					</div>
 					<div className="flex gap-2">
 						<Link to="/dashboard/favorites" className="btn btn-secondary gap-2 text-sm">
-							<Heart size={15} /> Favorites
+							<Heart size={15} /> {t("dashboard.favorites")}
 						</Link>
 						<Link to="/dashboard/profile" className="btn btn-secondary gap-2 text-sm">
-							<User size={15} /> Profile
+							<User size={15} /> {t("dashboard.profile")}
 						</Link>
 					</div>
 				</div>
@@ -59,15 +61,15 @@ function CustomerDashboard() {
 				<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
 					{(
 						[
-							{ label: "Total bookings", value: appointments?.length ?? "—", icon: Calendar },
-							{ label: "Upcoming", value: upcoming.length, icon: Clock },
+							{ label: t("dashboard.stats.total"), value: appointments?.length ?? "—", icon: Calendar },
+							{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
 							{
-								label: "Completed",
+								label: t("dashboard.stats.completed"),
 								value: appointments?.filter((a: Doc<"appointments">) => a.status === "completed").length ?? "—",
 								icon: CheckCircle,
 							},
 							{
-								label: "Cancelled",
+								label: t("dashboard.stats.cancelled"),
 								value: appointments?.filter((a: Doc<"appointments">) => a.status === "cancelled").length ?? "—",
 								icon: XCircle,
 							},
@@ -83,7 +85,7 @@ function CustomerDashboard() {
 
 				{/* Upcoming */}
 				<div className="card p-5 mb-5">
-					<h2 className="font-bold text-[var(--text)] mb-4">Upcoming appointments</h2>
+					<h2 className="font-bold text-[var(--text)] mb-4">{t("dashboard.upcomingTitle")}</h2>
 					{appointments === undefined ? (
 						<div className="space-y-3">
 							{Array.from({ length: 3 }).map((_, i) => (
@@ -93,9 +95,9 @@ function CustomerDashboard() {
 					) : upcoming.length === 0 ? (
 						<div className="text-center py-8 text-[var(--text-muted)]">
 							<Calendar size={32} className="mx-auto mb-2 opacity-30" />
-							<p className="text-sm">No upcoming appointments</p>
+							<p className="text-sm">{t("dashboard.noUpcoming")}</p>
 							<Link to="/barbershops" className="btn btn-primary mt-3 inline-flex text-sm">
-								Book now
+								{t("common.bookNow")}
 							</Link>
 						</div>
 					) : (
@@ -110,7 +112,7 @@ function CustomerDashboard() {
 				{/* Past */}
 				{past.length > 0 && (
 					<div className="card p-5">
-						<h2 className="font-bold text-[var(--text)] mb-4">Past appointments</h2>
+						<h2 className="font-bold text-[var(--text)] mb-4">{t("dashboard.pastTitle")}</h2>
 						<div className="space-y-3">
 							{past.slice(0, 5).map((appt: Doc<"appointments">) => (
 								<AppointmentRow key={appt._id} appt={appt as Appointment} />

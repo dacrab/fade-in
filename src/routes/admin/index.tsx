@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
@@ -10,6 +11,7 @@ import type { Barbershop, User } from "../../types"
 export const Route = createFileRoute("/admin/")({ component: AdminDashboard })
 
 function AdminDashboard() {
+	const { t } = useTranslation()
 	const { user, loading } = useAuth()
 	const router = useRouter()
 
@@ -39,8 +41,8 @@ function AdminDashboard() {
 			<div className="dashboard-layout">
 				<aside className="border-r border-[var(--border)] px-4 py-6 hidden md:block" style={{ background: "var(--bg-card)" }}>
 					<div className="mb-6">
-						<h2 className="font-bold text-[var(--text)]">Admin Panel</h2>
-						<p className="text-xs text-[var(--text-muted)]">Platform management</p>
+						<h2 className="font-bold text-[var(--text)]">{t("admin.title")}</h2>
+						<p className="text-xs text-[var(--text-muted)]">{t("admin.subtitle")}</p>
 					</div>
 					<nav className="space-y-1">
 						{navLinks.map(({ to, label, icon: Icon }) => (
@@ -52,15 +54,15 @@ function AdminDashboard() {
 				</aside>
 
 				<div className="px-6 py-6">
-					<h1 className="text-2xl font-bold text-[var(--text)] mb-6">Platform Overview</h1>
+					<h1 className="text-2xl font-bold text-[var(--text)] mb-6">{t("admin.overviewTitle")}</h1>
 
 					<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 						{(
 							[
-								{ label: "Total shops", value: allShops?.length ?? "—", icon: Building2 },
-								{ label: "Verified shops", value: verified, icon: ShieldCheck },
-								{ label: "Total users", value: allUsers?.length ?? "—", icon: Users },
-								{ label: "Shop owners", value: owners, icon: Star },
+								{ label: t("admin.stats.totalShops"), value: allShops?.length ?? "—", icon: Building2 },
+								{ label: t("admin.stats.verifiedShops"), value: verified, icon: ShieldCheck },
+								{ label: t("admin.stats.totalUsers"), value: allUsers?.length ?? "—", icon: Users },
+								{ label: t("admin.stats.owners"), value: owners, icon: Star },
 							] as const
 						).map(({ label, value, icon: Icon }) => (
 							<div key={label} className="card p-4">
@@ -74,8 +76,8 @@ function AdminDashboard() {
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						<div className="card p-5">
 							<div className="flex items-center justify-between mb-4">
-								<h2 className="font-bold text-[var(--text)]">Recent shops</h2>
-								<Link to="/admin/shops" className="text-xs text-[var(--gold)] no-underline hover:underline">Manage →</Link>
+								<h2 className="font-bold text-[var(--text)]">{t("admin.recentShops")}</h2>
+								<Link to="/admin/shops" className="text-xs text-[var(--gold)] no-underline hover:underline">{t("admin.shops.title")} →</Link>
 							</div>
 							{!allShops ? (
 								<Skeleton className="h-32 w-full" />
@@ -96,17 +98,17 @@ function AdminDashboard() {
 						</div>
 
 						<div className="card p-5">
-							<h2 className="font-bold text-[var(--text)] mb-4">User breakdown</h2>
+							<h2 className="font-bold text-[var(--text)] mb-4">{t("admin.userBreakdown")}</h2>
 							{!allUsers ? (
 								<Skeleton className="h-32 w-full" />
 							) : (
 								<div className="space-y-3">
 									{(
 										[
-											{ role: "Customers", count: customers, color: "var(--gold)" },
-											{ role: "Shop owners", count: owners, color: "var(--success)" },
-											{ role: "Barbers", count: allUsers.filter((u) => u.role === "barber").length, color: "#818CF8" },
-											{ role: "Admins", count: allUsers.filter((u) => u.role === "admin").length, color: "var(--error)" },
+											{ role: t("admin.roles.customers"), count: customers, color: "var(--gold)" },
+											{ role: t("admin.roles.owners"), count: owners, color: "var(--success)" },
+											{ role: t("admin.roles.barbers"), count: allUsers.filter((u) => u.role === "barber").length, color: "#818CF8" },
+											{ role: t("admin.roles.admins"), count: allUsers.filter((u) => u.role === "admin").length, color: "var(--error)" },
 										] as const
 									).map(({ role, count, color }) => (
 										<div key={role}>

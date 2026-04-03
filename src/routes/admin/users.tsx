@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { Users } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { Skeleton } from "../../components/ui/Skeleton"
 import type { User, UserRole } from "../../types"
 
@@ -15,6 +16,7 @@ const ROLE_BADGE: Record<UserRole, string> = {
 }
 
 function AdminUsers() {
+	const { t } = useTranslation()
 	const allUsersRaw = useQuery(api.users.listAll)
 	const allUsers = allUsersRaw as User[] | undefined
 
@@ -29,7 +31,7 @@ function AdminUsers() {
 						← Admin
 					</Link>
 					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">Manage Users</h1>
+					<h1 className="text-2xl font-bold text-[var(--text)]">{t("admin.users.title")}</h1>
 				</div>
 
 				{allUsers === undefined ? (
@@ -46,9 +48,9 @@ function AdminUsers() {
 				) : (
 					<div className="card overflow-hidden">
 						<div className="grid grid-cols-3 gap-4 px-4 py-2 border-b border-[var(--border)] text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">
-							<span>Name</span>
-							<span>Email</span>
-							<span>Role</span>
+							<span>{t("admin.users.colName")}</span>
+							<span>{t("admin.users.colEmail")}</span>
+							<span>{t("admin.users.colRole")}</span>
 						</div>
 						{allUsers.map((u, i) => (
 							<div

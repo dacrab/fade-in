@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { Search, MapPin, Star, Map, List, Scissors, Filter, X } from "lucide-react"
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/barbershops/")({
 })
 
 function BarbershopsPage() {
+	const { t } = useTranslation()
 	const { q, city: cityParam, minRating: minRatingParam } = Route.useSearch()
 	const navigate = useNavigate()
 	const [search, setSearch] = useState(q ?? "")
@@ -29,119 +31,85 @@ function BarbershopsPage() {
 	const [view, setView] = useState<"list" | "map">("list")
 	const [showFilters, setShowFilters] = useState(false)
 
-	const shopsRaw = useQuery(api.barbershops.list, {
+	const shops = useQuery(api.barbershops.list, {
 		city: city || undefined,
 		search: search || undefined,
 		minRating: minRating > 0 ? minRating : undefined,
-	})
-	const shops = shopsRaw as Barbershop[] | undefined
+	}) as Barbershop[] | undefined
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault()
-		void navigate({
-			to: "/barbershops",
-			search: {
-				q: search || undefined,
-				city: city || undefined,
-				minRating: minRating > 0 ? minRating : undefined,
-			},
-		})
+		void navigate({ to: "/barbershops", search: { q: search || undefined, city: city || undefined, minRating: minRating > 0 ? minRating : undefined } })
 	}
 
 	return (
 		<main className="px-4 py-8">
 			<div className="page-wrap">
 				<div className="mb-6">
-					<h1 className="text-3xl font-bold text-[var(--text)] mb-1">Find a barbershop</h1>
+					<h1 className="text-3xl font-bold text-[var(--text)] mb-1">{t("barbershops.title")}</h1>
 					<p className="text-[var(--text-muted)] text-sm">
-						{shops === undefined
-							? "Loading..."
-							: `${shops.length} barbershop${shops.length !== 1 ? "s" : ""} found`}
+						{shops === undefined ? t("common.loading") : t("barbershops.found", { count: shops.length })}
 					</p>
 				</div>
 
-				{/* Search */}
 				<form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 mb-4">
 					<div className="flex-1 relative">
 						<Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-						<input className="input pl-9" placeholder="Barbershop or service..." value={search} onChange={(e) => setSearch(e.target.value)} />
+						<input className="input pl-9" placeholder={t("barbershops.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} />
 					</div>
 					<div className="relative sm:w-44">
 						<MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-						<input className="input pl-9" placeholder="City..." value={city} onChange={(e) => setCity(e.target.value)} />
+						<input className="input pl-9" placeholder={t("home.cityPlaceholder")} value={city} onChange={(e) => setCity(e.target.value)} />
 					</div>
 					<button type="submit" className="btn btn-primary gap-2 whitespace-nowrap">
-						<Search size={15} /> Search
+						<Search size={15} />{t("common.search")}
 					</button>
-					<button
-						type="button"
-						onClick={() => setShowFilters(!showFilters)}
-						className={`btn btn-secondary gap-2 ${showFilters ? "border-[var(--gold)]/50 text-[var(--gold)]" : ""}`}
-					>
-						<Filter size={15} />
-						Filters
+					<button type="button" onClick={() => setShowFilters(!showFilters)}
+						className={`btn btn-secondary gap-2 ${showFilters ? "border-[var(--gold)]/50 text-[var(--gold)]" : ""}`}>
+						<Filter size={15} />{t("common.filter")}
 						{minRating > 0 && <span className="badge badge-gold py-0 px-1.5 text-[10px]">{minRating}★+</span>}
 					</button>
 					<div className="flex rounded-lg overflow-hidden border border-[var(--border)]">
 						{(["list", "map"] as const).map((v) => (
-							<button
-								key={v}
-								type="button"
-								onClick={() => setView(v)}
+							<button key={v} type="button" onClick={() => setView(v)}
 								className="px-3 py-2 flex items-center gap-1.5 text-xs font-medium transition-colors"
-								style={{
-									background: view === v ? "var(--gold)" : "var(--bg-card)",
-									color: view === v ? "#000" : "var(--text-muted)",
-									border: "none",
-									cursor: "pointer",
-								}}
-							>
+								style={{ background: view === v ? "var(--gold)" : "var(--bg-card)", color: view === v ? "#000" : "var(--text-muted)", border: "none", cursor: "pointer" }}>
 								{v === "list" ? <List size={14} /> : <Map size={14} />}
-								<span className="hidden sm:inline">{v === "list" ? "List" : "Map"}</span>
+								<span className="hidden sm:inline">{v === "list" ? t("barbershops.listView") : t("barbershops.mapView")}</span>
 							</button>
 						))}
 					</div>
 				</form>
 
-				{/* Filters */}
 				{showFilters && (
 					<div className="card p-5 mb-5 fade-up">
 						<div className="flex items-center justify-between mb-4">
-							<h3 className="text-sm font-semibold text-[var(--text)]">Filters</h3>
+							<h3 className="text-sm font-semibold text-[var(--text)]">{t("common.filter")}</h3>
 							{minRating > 0 && (
-								<button
-									type="button"
-									onClick={() => setMinRating(0)}
+								<button type="button" onClick={() => setMinRating(0)}
 									className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--error)] transition-colors"
-									style={{ background: "none", border: "none", cursor: "pointer" }}
-								>
-									<X size={12} /> Reset
+									style={{ background: "none", border: "none", cursor: "pointer" }}>
+									<X size={12} />{t("common.reset")}
 								</button>
 							)}
 						</div>
 						<div>
 							<div className="flex items-center justify-between mb-2">
-								<label className="text-xs font-medium text-[var(--text-muted)]">
-									Minimum rating
-								</label>
+								<label className="text-xs font-medium text-[var(--text-muted)]">{t("barbershops.minRating")}</label>
 								<span className="text-sm font-bold text-[var(--gold)]">
-									{minRating === 0 ? "Any" : `${minRating}★ and above`}
+									{minRating === 0 ? t("common.anyRating") : t("barbershops.ratingAbove", { rating: minRating })}
 								</span>
 							</div>
 							<Slider value={[minRating]} onValueChange={([v]) => setMinRating(v ?? 0)} min={0} max={5} step={0.5} />
 							<div className="flex justify-between text-xs text-[var(--text-subtle)] mt-1">
-								<span>Any</span><span>5★</span>
+								<span>{t("common.anyRating")}</span><span>5★</span>
 							</div>
 						</div>
 					</div>
 				)}
 
-				{/* Results */}
 				{view === "map" ? (
-					<MapView
-						shops={shops ?? []}
-						onShopClick={(slug) => void navigate({ to: "/barbershops/$slug", params: { slug } })}
-					/>
+					<MapView shops={shops ?? []} onShopClick={(slug) => void navigate({ to: "/barbershops/$slug", params: { slug } })} />
 				) : shops === undefined ? (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 						{Array.from({ length: 6 }).map((_, i) => <ShopCardSkeleton key={i} />)}
@@ -149,15 +117,11 @@ function BarbershopsPage() {
 				) : shops.length === 0 ? (
 					<div className="text-center py-20 text-[var(--text-muted)]">
 						<Scissors size={40} className="mx-auto mb-4 opacity-30" />
-						<p className="text-lg font-semibold text-[var(--text)] mb-1">No barbershops found</p>
-						<p className="text-sm mb-4">Try adjusting your search or filters</p>
+						<p className="text-lg font-semibold text-[var(--text)] mb-1">{t("barbershops.noShops")}</p>
+						<p className="text-sm mb-4">{t("barbershops.noShopsHint")}</p>
 						{(search || city || minRating > 0) && (
-							<button
-								type="button"
-								onClick={() => { setSearch(""); setCity(""); setMinRating(0) }}
-								className="btn btn-secondary text-sm"
-							>
-								Clear all filters
+							<button type="button" onClick={() => { setSearch(""); setCity(""); setMinRating(0) }} className="btn btn-secondary text-sm">
+								{t("barbershops.clearFilters")}
 							</button>
 						)}
 					</div>
@@ -172,23 +136,18 @@ function BarbershopsPage() {
 }
 
 function ShopCard({ shop }: { shop: Barbershop }) {
+	const { t } = useTranslation()
 	return (
-		<Link
-			to="/barbershops/$slug"
-			params={{ slug: shop.slug }}
-			className="card card-interactive overflow-hidden block no-underline group"
-		>
+		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="card card-interactive overflow-hidden block no-underline group">
 			<div className="relative h-44 overflow-hidden bg-[var(--bg-card-hover)]">
 				{shop.images[0] ? (
 					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
 				) : (
 					<div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]"><Scissors size={36} /></div>
 				)}
-				{shop.isVerified && <div className="absolute top-3 left-3 badge badge-gold text-[11px]">✓ Verified</div>}
+				{shop.isVerified && <div className="absolute top-3 left-3 badge badge-gold text-[11px]">✓ {t("common.verified")}</div>}
 				{shop.lat !== undefined && shop.lng !== undefined && (
-					<div className="absolute top-3 right-3 badge badge-gray text-[10px] gap-1">
-						<MapPin size={10} /> Mapped
-					</div>
+					<div className="absolute top-3 right-3 badge badge-gray text-[10px] gap-1"><MapPin size={10} />{t("barbershops.mapped")}</div>
 				)}
 			</div>
 			<div className="p-4">
@@ -205,7 +164,7 @@ function ShopCard({ shop }: { shop: Barbershop }) {
 				</div>
 				<div className="flex items-center justify-between">
 					<span className="text-xs text-[var(--text-subtle)]">{shop.city}</span>
-					<span className="text-xs font-semibold text-[var(--gold)]">Book now →</span>
+					<span className="text-xs font-semibold text-[var(--gold)]">{t("common.bookNow")} →</span>
 				</div>
 			</div>
 		</Link>
