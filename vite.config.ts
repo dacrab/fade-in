@@ -3,12 +3,12 @@ import tailwindcss from "@tailwindcss/vite"
 import { devtools } from "@tanstack/devtools-vite"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
 import viteReact from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
+import { defineConfig } from "vitest/config"
 
-const isTest = process.env.NODE_ENV === "test" || process.env.VITEST
+const isTest = process.env["NODE_ENV"] === "test" || Boolean(process.env["VITEST"])
 
-const config = defineConfig({
+export default defineConfig({
 	plugins: [
 		// Skip SSR and devtools plugins in test environment
 		...(isTest ? [] : [devtools(), tanstackStart()]),
@@ -29,5 +29,3 @@ const config = defineConfig({
 		include: ["src/**/*.{test,spec}.{ts,tsx}"],
 	},
 })
-
-export default config

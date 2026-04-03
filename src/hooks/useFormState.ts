@@ -4,7 +4,7 @@ import { useState } from "react"
  * Manages a simple object-shaped form with show/edit state.
  * Returns the form value, a field setter factory, and reset/open helpers.
  */
-export function useFormState<T extends Record<string, unknown>>(empty: T) {
+export function useFormState<T extends Record<string, string>>(empty: T) {
 	const [form, setForm] = useState<T>(empty)
 	const [showForm, setShowForm] = useState(false)
 	const [editId, setEditId] = useState<string | null>(null)

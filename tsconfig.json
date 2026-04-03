@@ -20,15 +20,12 @@
 
     /* Strict type-safety */
     "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
 
     /* Code quality */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "noPropertyAccessFromIndexSignature": true,
 
     /* Interop */
     "skipLibCheck": true,

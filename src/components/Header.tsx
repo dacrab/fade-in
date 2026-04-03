@@ -33,7 +33,7 @@ export default function Header() {
 		admin: { label: t("nav.admin"), icon: <ShieldCheck size={14} />, to: "/admin" },
 	}
 
-	const roleItem = user && ROLE_NAV[user.role]
+	const roleItem = user && ROLE_NAV[user.role as "customer" | "owner" | "admin"]
 	const userMenuItems = [
 		...(roleItem
 			? [
