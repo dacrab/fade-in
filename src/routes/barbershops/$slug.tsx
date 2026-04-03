@@ -5,12 +5,12 @@ import {
 	Check,
 	ChevronLeft,
 	Clock,
-	Facebook,
 	Globe,
-	Instagram,
+	Link2,
 	MapPin,
 	Phone,
 	Scissors,
+	Share2,
 	Star,
 } from "lucide-react"
 import { useState } from "react"
@@ -263,12 +263,12 @@ function ShopProfilePage() {
 											rel="noreferrer"
 											className="icon-btn"
 										>
-											<Instagram size={18} />
+											<Link2 size={18} />
 										</a>
 									)}
 									{shop.socialLinks.facebook && (
 										<a href={shop.socialLinks.facebook} target="_blank" rel="noreferrer" className="icon-btn">
-											<Facebook size={18} />
+											<Share2 size={18} />
 										</a>
 									)}
 									{shop.socialLinks.website && (
