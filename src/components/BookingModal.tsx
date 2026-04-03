@@ -59,11 +59,11 @@ export default function BookingModal({ shop, onClose }: Props) {
 	const toggleService = (id: Id<"services">) =>
 		setSelectedServices((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]))
 
-	const getMinDate = () => {
+	const minDate = (() => {
 		const d = new Date()
 		d.setDate(d.getDate() + 1)
 		return d.toISOString().split("T")[0]
-	}
+	})()
 
 	const handleConfirm = async () => {
 		if (!user) {
@@ -134,7 +134,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 					</DialogDescription>
 				</DialogHeader>
 
-				{/* Step indicators */}
 				<div className="flex items-center px-5 py-3 gap-1 border-b border-[var(--border)]">
 					{stepLabels.map((label, i) => (
 						<div key={label} className="flex items-center gap-1 flex-1">
@@ -150,9 +149,7 @@ export default function BookingModal({ shop, onClose }: Props) {
 					))}
 				</div>
 
-				{/* Content */}
 				<div className="p-5 max-h-[55vh] overflow-y-auto">
-					{/* Step 1: Services */}
 					{step === 1 && (
 						<div className="space-y-2">
 							<p className="text-sm text-[var(--text-muted)] mb-3">{t("booking.selectServices")}</p>
@@ -173,7 +170,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 						</div>
 					)}
 
-					{/* Step 2: Barber */}
 					{step === 2 && (
 						<div className="space-y-3">
 							<p className="text-sm text-[var(--text-muted)] mb-3">{t("booking.chooseBarber")}</p>
@@ -194,7 +190,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 						</div>
 					)}
 
-					{/* Step 3: Date & Time */}
 					{step === 3 && (
 						<div className="space-y-4">
 							<div>
@@ -205,7 +200,7 @@ export default function BookingModal({ shop, onClose }: Props) {
 									id="booking-date"
 									type="date"
 									className="input"
-									min={getMinDate()}
+									min={minDate}
 									value={selectedDate}
 									onChange={(e) => {
 										setSelectedDate(e.target.value)
@@ -263,7 +258,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 						</div>
 					)}
 
-					{/* Step 4: Confirm */}
 					{step === 4 && (
 						<div className="space-y-4">
 							<h3 className="font-semibold text-[var(--text)]">{t("booking.summary")}</h3>
@@ -284,7 +278,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 						</div>
 					)}
 
-					{/* Step 5: Done */}
 					{step === 5 && (
 						<div className="text-center py-8">
 							<div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-green-500/15 border-2 border-green-500/30">
@@ -305,7 +298,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 					)}
 				</div>
 
-				{/* Footer */}
 				{step < 5 && (
 					<div className="flex gap-3 px-5 py-4 border-t border-[var(--border)]">
 						{step > 1 && (
