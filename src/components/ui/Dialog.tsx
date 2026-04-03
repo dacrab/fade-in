@@ -39,13 +39,9 @@ interface DialogHeaderProps {
 export function DialogHeader({ children, onClose }: DialogHeaderProps) {
 	return (
 		<div className="dialog-header">
-			<div>{children}</div>
+			{children}
 			{onClose && (
-				<BaseDialog.Close
-					className="icon-btn"
-					style={{ background: "none", border: "none" }}
-					onClick={onClose}
-				>
+				<BaseDialog.Close className="icon-btn bg-transparent border-0" onClick={onClose}>
 					<X size={18} />
 				</BaseDialog.Close>
 			)}
