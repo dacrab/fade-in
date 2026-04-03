@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { ArrowRight, ChevronRight, Scissors, Search, Star } from "lucide-react"
+import { ArrowRight, ChevronRight, MapPin, Scissors, Search, Star } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"

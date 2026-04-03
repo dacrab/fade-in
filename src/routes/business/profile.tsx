@@ -13,7 +13,7 @@ import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/profile")({ component: BusinessProfile })
 
-interface ShopForm {
+interface ShopForm extends Record<string, string> {
 	name: string
 	description: string
 	phone: string

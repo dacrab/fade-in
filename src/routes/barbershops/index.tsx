@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { Filter, List, Map as MapIcon, Scissors, Search, X } from "lucide-react"
+import { Filter, List, Map as MapIcon, MapPin, Scissors, Search, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"

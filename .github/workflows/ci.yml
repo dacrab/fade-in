@@ -7,7 +7,8 @@ on:
     branches: [master]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.user.login == 'dependabot[bot]' && 'dependabot-queue' || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,18 +17,16 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
 
       - uses: oven-sh/setup-bun@v2
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-      - run: bun run check
-
-      - run: bun run test
-
-      - run: bun run build
+      - name: Validate
+        run: bun run validate
         env:
           VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
