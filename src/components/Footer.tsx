@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router"
 import { Globe, Scissors } from "lucide-react"
+import { memo } from "react"
 import { useTranslation } from "react-i18next"
 
-export default function Footer() {
+export default memo(function Footer() {
 	const { t } = useTranslation()
 	const year = new Date().getFullYear()
 	const linkCls = "text-sm text-muted no-underline hover:text-[var(--gold)] transition-colors"
@@ -85,18 +86,11 @@ export default function Footer() {
 				<hr className="divider mb-6" />
 				<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 					<p className="text-sm text-muted m-0">{t("footer.rights", { year })}</p>
-					<div className="flex items-center gap-2">
-						{([Globe] as const).map((Icon) => (
-							<span
-								key={Icon.displayName}
-								className="text-muted p-2 rounded-lg transition-colors hover:bg-[var(--bg-card)]"
-							>
-								<Icon size={18} />
-							</span>
-						))}
-					</div>
+					<span className="text-muted p-2 rounded-lg transition-colors hover:bg-[var(--bg-card)]">
+						<Globe size={18} />
+					</span>
 				</div>
 			</div>
 		</footer>
 	)
-}
+})

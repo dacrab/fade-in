@@ -1,6 +1,5 @@
 import type { Id } from "../../convex/_generated/dataModel"
 
-// ─── User & Auth ────────────────────────────────────────────────────────────
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 
 export interface AuthUser {
@@ -11,24 +10,22 @@ export interface AuthUser {
 	avatarUrl?: string
 }
 
-// ─── Working Hours ───────────────────────────────────────────────────────────
 export interface DayHours {
 	open: string
 	close: string
 	closed: boolean
 }
 
-export interface WorkingHours {
-	monday?: DayHours
-	tuesday?: DayHours
-	wednesday?: DayHours
-	thursday?: DayHours
-	friday?: DayHours
-	saturday?: DayHours
-	sunday?: DayHours
-}
+export type WeekDay =
+	| "monday"
+	| "tuesday"
+	| "wednesday"
+	| "thursday"
+	| "friday"
+	| "saturday"
+	| "sunday"
 
-export type WeekDay = keyof WorkingHours
+export type WorkingHours = Partial<Record<WeekDay, DayHours>>
 
 export interface SocialLinks {
 	instagram?: string
@@ -36,7 +33,6 @@ export interface SocialLinks {
 	website?: string
 }
 
-// ─── Barbershop ──────────────────────────────────────────────────────────────
 export interface Barbershop {
 	_id: Id<"barbershops">
 	_creationTime: number
@@ -58,7 +54,6 @@ export interface Barbershop {
 	socialLinks?: SocialLinks
 }
 
-// ─── Barber ──────────────────────────────────────────────────────────────────
 export interface Barber {
 	_id: Id<"barbers">
 	_creationTime: number
@@ -72,7 +67,6 @@ export interface Barber {
 	isActive: boolean
 }
 
-// ─── Service ─────────────────────────────────────────────────────────────────
 export interface Service {
 	_id: Id<"services">
 	_creationTime: number
@@ -85,7 +79,6 @@ export interface Service {
 	isActive: boolean
 }
 
-// ─── Appointment ─────────────────────────────────────────────────────────────
 export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled"
 
 export interface Appointment {
@@ -95,16 +88,15 @@ export interface Appointment {
 	barbershopId: Id<"barbershops">
 	barberId: Id<"barbers">
 	serviceIds: Id<"services">[]
-	date: string
-	startTime: string
-	endTime: string
-	totalPrice: number
+	date: string // YYYY-MM-DD
+	startTime: string // HH:MM
+	endTime: string // HH:MM
+	totalPrice: number // cents
 	status: AppointmentStatus
 	notes?: string
 	createdAt: number
 }
 
-// ─── Review ──────────────────────────────────────────────────────────────────
 export interface Review {
 	_id: Id<"reviews">
 	_creationTime: number
@@ -117,7 +109,6 @@ export interface Review {
 	createdAt: number
 }
 
-// ─── User ────────────────────────────────────────────────────────────────────
 export interface User {
 	_id: Id<"users">
 	_creationTime: number
@@ -129,7 +120,6 @@ export interface User {
 	favoriteShopIds: Id<"barbershops">[]
 }
 
-// ─── Status badge map ────────────────────────────────────────────────────────
 export const STATUS_BADGE: Record<AppointmentStatus, string> = {
 	pending: "badge-gold",
 	confirmed: "badge-green",
@@ -137,7 +127,6 @@ export const STATUS_BADGE: Record<AppointmentStatus, string> = {
 	cancelled: "badge-red",
 }
 
-// ─── Day of week list ────────────────────────────────────────────────────────
 export const WEEK_DAYS: WeekDay[] = [
 	"monday",
 	"tuesday",

@@ -19,6 +19,9 @@ dist-ssr
 # Convex auto-generated files are committed so CI can build without a dev server
 # convex/_generated/
 
+# TanStack Router generated route tree (regenerated on dev/build)
+src/routeTree.gen.ts
+
 # OS
 .DS_Store
 Thumbs.db
