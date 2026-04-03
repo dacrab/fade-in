@@ -1,10 +1,9 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Building2, ShieldCheck, Star, Users } from "lucide-react"
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { useAuth } from "#/hooks/useAuth"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import type { Barbershop, User } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -12,12 +11,7 @@ export const Route = createFileRoute("/admin/")({ component: AdminDashboard })
 
 function AdminDashboard() {
 	const { t } = useTranslation()
-	const { user, loading } = useAuth()
-	const router = useRouter()
-
-	useEffect(() => {
-		if (!loading && (!user || user.role !== "admin")) void router.navigate({ to: "/" })
-	}, [user, loading, router])
+	const { user, loading } = useRequireRole(["admin"])
 
 	const allShopsRaw = useQuery(api.barbershops.listAll)
 	const allUsersRaw = useQuery(api.users.listAll)

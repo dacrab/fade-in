@@ -4,6 +4,7 @@ import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucid
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/admin/shops")({ component: AdminShops })
 
 function AdminShops() {
 	const { t } = useTranslation()
+	useRequireRole(["admin"])
 	const allShopsRaw = useQuery(api.barbershops.listAll)
 	const allShops = allShopsRaw as Barbershop[] | undefined
 	const verify = useMutation(api.barbershops.verify)

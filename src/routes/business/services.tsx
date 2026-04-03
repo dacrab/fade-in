@@ -107,7 +107,7 @@ function BusinessServices() {
 	const handleDelete = async (id: Id<"services">) => {
 		try {
 			await removeService({ id })
-			showToast(t("errors.serviceSaved").replace("saved", "removed"), "info")
+			showToast(t("errors.serviceRemoved"), "info")
 		} catch {
 			showToast(t("errors.serviceFailed"), "error")
 		}
