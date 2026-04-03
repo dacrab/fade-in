@@ -1,14 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { MessageSquare, Send } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import Breadcrumb from "#/components/Breadcrumb"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatRelative } from "#/lib/format"
-import type { Barbershop, Review } from "#/types"
+import type { Review } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -16,12 +17,7 @@ export const Route = createFileRoute("/business/reviews")({ component: BusinessR
 
 function BusinessReviews() {
 	const { t } = useTranslation()
-	const { user } = useAuth()
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0] as Barbershop | undefined
+	const shop = useOwnerShop()
 	const reviewsRaw = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip")
 	const reviews = reviewsRaw as Review[] | undefined
 	const addReply = useMutation(api.reviews.addOwnerReply)
@@ -43,13 +39,7 @@ function BusinessReviews() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<div className="page-header">
-					<Link to="/business" className="breadcrumb-back">
-						← {t("nav.business")}
-					</Link>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{t("business.reviews.title")}</h1>
-				</div>
+				<Breadcrumb to="/business" label={t("nav.business")} title={t("business.reviews.title")} />
 
 				{shop && (
 					<div className="card p-4 mb-6 flex items-center gap-4">

@@ -1,13 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import Breadcrumb from "#/components/Breadcrumb"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
 import { useFormState } from "#/hooks/useFormState"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
-import type { Barbershop, Service } from "#/types"
+import type { Service } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -33,14 +34,9 @@ type Category = (typeof CATEGORIES)[number]
 
 function BusinessServices() {
 	const { t } = useTranslation()
-	const { user } = useAuth()
 	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY_FORM)
 
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0] as Barbershop | undefined
+	const shop = useOwnerShop()
 	const servicesRaw = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")
 	const services = servicesRaw as Service[] | undefined
 
@@ -105,13 +101,7 @@ function BusinessServices() {
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
-					<div className="page-header">
-						<Link to="/business" className="breadcrumb-back">
-							← {t("nav.business")}
-						</Link>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("business.services.title")}</h1>
-					</div>
+					<Breadcrumb to="/business" label={t("nav.business")} title={t("business.services.title")} />
 					<button
 						type="button"
 						onClick={() => {

@@ -1,13 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Calendar, Check, Clock, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import Breadcrumb from "#/components/Breadcrumb"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatDateShort, formatPrice } from "#/lib/format"
-import { type Appointment, type AppointmentStatus, type Barbershop, STATUS_BADGE } from "#/types"
+import { type Appointment, type AppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -15,14 +16,9 @@ export const Route = createFileRoute("/business/appointments")({ component: Busi
 
 function BusinessAppointments() {
 	const { t } = useTranslation()
-	const { user } = useAuth()
 	const [selectedDate, setSelectedDate] = useState("")
 
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0] as Barbershop | undefined
+	const shop = useOwnerShop()
 	const apptsRaw = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip",
@@ -42,13 +38,7 @@ function BusinessAppointments() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="page-header">
-					<Link to="/business" className="breadcrumb-back">
-						← {t("nav.business")}
-					</Link>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{t("business.appointments.title")}</h1>
-				</div>
+				<Breadcrumb to="/business" label={t("nav.business")} title={t("business.appointments.title")} />
 
 				<div className="flex items-center gap-3 mb-6">
 					<div className="relative">
