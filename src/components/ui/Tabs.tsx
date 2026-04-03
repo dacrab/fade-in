@@ -23,16 +23,12 @@ export function Tabs({ tabs, defaultValue, value, onValueChange, className }: Ta
 			onValueChange={onValueChange}
 			className={cn("w-full", className)}
 		>
-			<BaseTabs.List
-				className="flex gap-1 rounded-xl p-1 mb-4"
-				style={{ background: "var(--bg-card)" }}
-			>
+			<BaseTabs.List className="flex gap-1 rounded-xl p-1 mb-4 bg-[var(--bg-card)]">
 				{tabs.map((tab) => (
 					<BaseTabs.Tab
 						key={tab.value}
 						value={tab.value}
-						className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all cursor-pointer outline-none text-[var(--text-muted)] hover:text-[var(--text)] data-[selected]:text-[var(--gold)] data-[selected]:bg-[var(--bg-card-hover)]"
-						style={{ border: "none", background: "transparent" }}
+						className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all cursor-pointer outline-none border-0 bg-transparent text-[var(--text-muted)] hover:text-[var(--text)] data-[selected]:text-[var(--gold)] data-[selected]:bg-[var(--bg-card-hover)]"
 					>
 						{tab.label}
 					</BaseTabs.Tab>

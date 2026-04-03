@@ -30,8 +30,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 									<BaseMenu.Separator
 										// biome-ignore lint/suspicious/noArrayIndexKey: menu items have no stable id
 										key={i}
-										className="my-1 h-px mx-2"
-										style={{ background: "var(--border)" }}
+										className="my-1 h-px mx-2 bg-[var(--border)]"
 									/>
 								)
 							}

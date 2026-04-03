@@ -1,4 +1,5 @@
 import { Star } from "lucide-react"
+import { cn } from "#/lib/cn"
 
 interface StarRatingProps {
 	rating: number
@@ -25,7 +26,12 @@ export function StarRating({
 						key={i}
 						type="button"
 						onClick={() => interactive && onRate?.(i + 1)}
-						className={`bg-transparent border-0 p-0 ${interactive ? "cursor-pointer hover:scale-110 transition-transform" : "cursor-default pointer-events-none"}`}
+						className={cn(
+							"bg-transparent border-0 p-0",
+							interactive
+								? "cursor-pointer hover:scale-110 transition-transform"
+								: "cursor-default pointer-events-none",
+						)}
 					>
 						<Star
 							size={size}
