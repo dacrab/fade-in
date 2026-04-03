@@ -1,4 +1,4 @@
-import { format, parseISO } from "date-fns"
+import { format, formatDistanceToNow, parseISO } from "date-fns"
 
 /** Formats a price in cents as a euro string, e.g. 1500 → "€15.00" */
 export function formatPrice(cents: number): string {
@@ -22,6 +22,11 @@ export function formatTime(timeStr: string): string {
 	const ampm = hour >= 12 ? "PM" : "AM"
 	const hour12 = hour % 12 || 12
 	return `${hour12}:${m} ${ampm}`
+}
+
+/** Formats a timestamp (ms since epoch) as relative time, e.g. "2 hours ago" */
+export function formatRelative(timestamp: number): string {
+	return formatDistanceToNow(new Date(timestamp), { addSuffix: true })
 }
 
 /** Capitalizes the first character of a string. */
