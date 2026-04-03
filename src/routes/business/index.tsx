@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import {
 	BarChart3,
@@ -12,11 +12,10 @@ import {
 	Star,
 	Users,
 } from "lucide-react"
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
-import { useAuth } from "#/hooks/useAuth"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop, Review } from "#/types"
 import { STATUS_BADGE } from "#/types"
@@ -38,17 +37,7 @@ const NAV_LINK_DEFS = [
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: business dashboard has multiple data sources
 function BusinessDashboard() {
 	const { t } = useTranslation()
-	const { user, loading } = useAuth()
-	const router = useRouter()
-
-	useEffect(() => {
-		if (!(loading || user)) {
-			void router.navigate({ to: "/login" })
-			return
-		}
-		if (!loading && user && user.role !== "owner" && user.role !== "admin")
-			void router.navigate({ to: "/" })
-	}, [user, loading, router])
+	const { user, loading } = useRequireRole(["owner", "admin"], "/login")
 
 	const shopsRaw = useQuery(
 		api.barbershops.listByOwner,

@@ -429,6 +429,7 @@ const en = {
 		barberFailed: "Failed to save barber.",
 		barberRemoved: "Barber removed.",
 		serviceSaved: "Service saved!",
+		serviceRemoved: "Service removed.",
 		serviceFailed: "Failed to save service.",
 		shopSaved: "Shop saved!",
 		shopCreated: "Shop created! Welcome to FadeIn.",

@@ -3,6 +3,7 @@ import { useQuery } from "convex/react"
 import { Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import type { User, UserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -17,6 +18,7 @@ const ROLE_BADGE: Record<UserRole, string> = {
 
 function AdminUsers() {
 	const { t } = useTranslation()
+	useRequireRole(["admin"])
 	const allUsersRaw = useQuery(api.users.listAll)
 	const allUsers = allUsersRaw as User[] | undefined
 
