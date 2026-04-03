@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router"
-import { Facebook, Globe, Instagram, Scissors } from "lucide-react"
+import { Facebook, Globe, Instagram } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import Logo from "./Logo"
 
 export default function Footer() {
 	const { t } = useTranslation()
@@ -12,14 +13,9 @@ export default function Footer() {
 			<div className="page-wrap">
 				<div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 mb-10">
 					<div>
-						<Link to="/" className="flex items-center gap-2 no-underline mb-3">
-							<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
-								<Scissors size={16} color="#000" />
-							</div>
-							<span className="font-bold text-lg text-[var(--text)]">
-								Fade<span className="gold-text">In</span>
-							</span>
-						</Link>
+						<div className="mb-3">
+							<Logo />
+						</div>
 						<p className="text-sm text-muted">{t("footer.tagline")}</p>
 					</div>
 

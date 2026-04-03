@@ -1,17 +1,10 @@
 import { Link, useRouter } from "@tanstack/react-router"
-import {
-	Building2,
-	LayoutDashboard,
-	LogOut,
-	Menu as MenuIcon,
-	Scissors,
-	ShieldCheck,
-	X,
-} from "lucide-react"
+import { Building2, LayoutDashboard, LogOut, Menu as MenuIcon, ShieldCheck, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "#/hooks/useAuth"
 import LanguageToggle from "./LanguageToggle"
+import Logo from "./Logo"
 import { Menu } from "./ui/Menu"
 
 export default function Header() {
@@ -51,14 +44,7 @@ export default function Header() {
 	return (
 		<header className="sticky top-0 z-50 border-b border-[var(--border)] backdrop-blur-lg bg-[var(--header-bg)]">
 			<nav className="page-wrap px-4 flex items-center gap-4 h-16">
-				<Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
-					<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
-						<Scissors size={16} className="text-black" />
-					</div>
-					<span className="font-bold text-lg tracking-tight text-[var(--text)]">
-						Fade<span className="gold-text">In</span>
-					</span>
-				</Link>
+				<Logo />
 
 				<div className="hidden md:flex items-center gap-1 ml-4">
 					<Link to="/" className="nav-link" activeProps={{ className: "nav-link active" }}>

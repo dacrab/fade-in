@@ -41,14 +41,15 @@
 				"noConstantCondition": "error"
 			},
 			"suspicious": {
-				"noExplicitAny": "warn",
+				"noExplicitAny": "error",
 				"noConsole": "warn",
 				"noDoubleEquals": "error",
 				"noConfusingVoidType": "error",
-				"noMisleadingInstantiator": "error"
+				"noMisleadingInstantiator": "error",
+				"noAssignInExpressions": "error"
 			},
 			"style": {
-				"noNonNullAssertion": "warn",
+				"noNonNullAssertion": "error",
 				"useConst": "error",
 				"useTemplate": "error",
 				"useSingleVarDeclarator": "error",
