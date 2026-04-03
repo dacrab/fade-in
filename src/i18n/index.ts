@@ -46,5 +46,4 @@ export function setLanguage(lang: Language): void {
 	}
 }
 
-export { i18n }
 export default i18n

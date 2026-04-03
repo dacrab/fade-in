@@ -1,7 +1,4 @@
-/**
- * Unit tests for the useAuth hook's non-React logic helpers.
- */
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 type Role = "customer" | "owner" | "barber" | "admin"
 
@@ -27,27 +24,6 @@ function isBarber(user: AuthUser | null): boolean {
 function canManageShop(user: AuthUser | null): boolean {
 	return user?.role === "owner" || user?.role === "admin"
 }
-
-const localStorageMock = (() => {
-	let store: Record<string, string> = {}
-	return {
-		getItem: vi.fn((key: string) => store[key] ?? null),
-		setItem: vi.fn((key: string, val: string) => {
-			store[key] = val
-		}),
-		removeItem: vi.fn((key: string) => {
-			delete store[key]
-		}),
-		clear: vi.fn(() => {
-			store = {}
-		}),
-	}
-})()
-
-beforeEach(() => {
-	Object.defineProperty(globalThis, "localStorage", { value: localStorageMock, writable: true })
-	localStorageMock.clear()
-})
 
 afterEach(() => {
 	vi.restoreAllMocks()

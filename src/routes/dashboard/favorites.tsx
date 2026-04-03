@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { Heart, MapPin, Scissors, Star } from "lucide-react"
+import { Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop, User } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -55,33 +56,3 @@ function FavoritesPage() {
 	)
 }
 
-function ShopCard({ shop }: { shop: Barbershop }) {
-	return (
-		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
-			<div className="shop-card-img">
-				{shop.images[0] ? (
-					<img
-						src={shop.images[0]}
-						alt={shop.name}
-						className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-					/>
-				) : (
-					<Scissors size={32} className="text-[var(--text-subtle)]" />
-				)}
-			</div>
-			<div className="shop-card-body">
-				<div className="flex items-start justify-between gap-2 mb-1">
-					<h3 className="font-bold text-[var(--text)] text-sm">{shop.name}</h3>
-					<div className="flex items-center gap-1">
-						<Star size={13} fill="currentColor" className="text-[var(--gold)]" />
-						<span className="text-xs font-semibold text-[var(--text)]">{shop.rating.toFixed(1)}</span>
-					</div>
-				</div>
-				<div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
-					<MapPin size={12} />
-					{shop.address}, {shop.city}
-				</div>
-			</div>
-		</Link>
-	)
-}
