@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
@@ -9,6 +10,7 @@ import type { Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/dashboard/favorites")({ component: FavoritesPage })
 
 function FavoritesPage() {
+	const { t } = useTranslation()
 	const { user } = useAuth()
 	const userDataRaw = useQuery(api.users.getMe, user ? { userId: user.id as Id<"users"> } : "skip")
 	const userData = userDataRaw as User | null | undefined
@@ -18,17 +20,19 @@ function FavoritesPage() {
 		<main className="px-4 py-8">
 			<div className="page-wrap max-w-4xl">
 				<div className="flex items-center gap-3 mb-8">
-					<Link to="/dashboard" className="text-[var(--text-muted)] hover:text-[var(--text)] text-sm no-underline transition-colors">← Dashboard</Link>
+					<Link to="/dashboard" className="text-[var(--text-muted)] hover:text-[var(--text)] text-sm no-underline transition-colors">
+						← {t("nav.dashboard")}
+					</Link>
 					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">Favorite Shops</h1>
+					<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.favoritesTitle")}</h1>
 				</div>
 
 				{favoriteIds.length === 0 ? (
 					<div className="text-center py-20 text-[var(--text-muted)]">
 						<Heart size={40} className="mx-auto mb-4 opacity-30" />
-						<p className="font-semibold text-[var(--text)] mb-1">No favorites yet</p>
-						<p className="text-sm mb-4">Save your go-to barbershops for quick access</p>
-						<Link to="/barbershops" className="btn btn-primary inline-flex">Browse barbershops</Link>
+						<p className="font-semibold text-[var(--text)] mb-1">{t("dashboard.noFavorites")}</p>
+						<p className="text-sm mb-4">{t("dashboard.noFavoritesHint")}</p>
+						<Link to="/barbershops" className="btn btn-primary inline-flex">{t("nav.barbershops")}</Link>
 					</div>
 				) : (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -47,11 +51,7 @@ function FavoriteShopCard({ shopId }: { shopId: Id<"barbershops"> }) {
 	const shop = shopRaw as Barbershop | null | undefined
 	if (!shop) return null
 	return (
-		<Link
-			to="/barbershops/$slug"
-			params={{ slug: shop.slug }}
-			className="card card-interactive overflow-hidden block no-underline group"
-		>
+		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="card card-interactive overflow-hidden block no-underline group">
 			<div className="h-36 bg-[var(--bg-card-hover)] flex items-center justify-center overflow-hidden">
 				{shop.images[0] ? (
 					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

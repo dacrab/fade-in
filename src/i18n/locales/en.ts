@@ -348,6 +348,17 @@ const en = {
 		},
 	},
 
+	// ─── Map ─────────────────────────────────────────────────────────────────
+	map: {
+		noLocations: "No mapped locations",
+		noLocationsHint: "Shops need coordinates (lat/lng) to appear on map",
+		shopsOnMap: "{{count}} shops on map",
+		bookNowArrow: "Book now",
+		switchTo: "Switch to {{lang}}",
+		reviewsCount: "{{count}} reviews",
+		ratingOf: "{{rating}} / 5",
+	},
+
 	// ─── Status ────────────────────────────────────────────────────────────────
 	status: {
 		pending: "Pending",

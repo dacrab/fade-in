@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
@@ -14,6 +15,7 @@ import type { Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/business/reviews")({ component: BusinessReviews })
 
 function BusinessReviews() {
+	const { t } = useTranslation()
 	const { user } = useAuth()
 	const shopsRaw = useQuery(api.barbershops.listByOwner, user ? { ownerId: user.id as Id<"users"> } : "skip")
 	const shop = shopsRaw?.[0] as Barbershop | undefined
@@ -37,9 +39,9 @@ function BusinessReviews() {
 		<main className="px-4 py-8">
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center gap-3 mb-6">
-					<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Dashboard</Link>
+					<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
 					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">Reviews</h1>
+					<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.reviews.title")}</h1>
 				</div>
 
 				{shop && (
@@ -47,7 +49,7 @@ function BusinessReviews() {
 						<div className="text-4xl font-bold text-[var(--gold)]">{shop.rating.toFixed(1)}</div>
 						<div>
 							<StarRating rating={shop.rating} size={18} />
-							<p className="text-sm text-[var(--text-muted)] mt-0.5">{shop.reviewCount} reviews</p>
+							<p className="text-sm text-[var(--text-muted)] mt-0.5">{t("map.reviewsCount", { count: shop.reviewCount })}</p>
 						</div>
 					</div>
 				)}
@@ -57,7 +59,7 @@ function BusinessReviews() {
 				) : reviews.length === 0 ? (
 					<div className="text-center py-16 text-[var(--text-muted)]">
 						<MessageSquare size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="text-sm">No reviews yet. Keep providing great service!</p>
+						<p className="text-sm">{t("business.reviews.noReviews")}</p>
 					</div>
 				) : (
 					<div className="space-y-4">
@@ -70,28 +72,17 @@ function BusinessReviews() {
 								<p className="text-sm text-[var(--text-muted)] mb-3">{r.comment}</p>
 								{r.ownerReply ? (
 									<div className="pl-3 border-l-2 border-[var(--gold)]/30 text-xs text-[var(--text-muted)]">
-										<span className="text-[var(--gold)] font-semibold">Your reply: </span>{r.ownerReply}
+										<span className="text-[var(--gold)] font-semibold">{t("business.reviews.yourReply")}</span>{r.ownerReply}
 									</div>
 								) : replyId === r._id ? (
 									<div className="flex gap-2 mt-2">
-										<input
-											className="input text-sm"
-											placeholder="Write a reply..."
-											value={replyText}
-											onChange={(e) => setReplyText(e.target.value)}
-											onKeyDown={(e) => { if (e.key === "Enter") void handleReply(r._id) }}
-										/>
-										<button type="button" onClick={() => void handleReply(r._id)} className="btn btn-primary text-sm px-3 gap-1"><Send size={13} />Reply</button>
-										<button type="button" onClick={() => setReplyId(null)} className="btn btn-ghost text-sm">Cancel</button>
+										<input className="input text-sm" placeholder={t("business.reviews.replyPlaceholder")} value={replyText} onChange={(e) => setReplyText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void handleReply(r._id) }} />
+										<button type="button" onClick={() => void handleReply(r._id)} className="btn btn-primary text-sm px-3 gap-1"><Send size={13} />{t("business.reviews.replyButton")}</button>
+										<button type="button" onClick={() => setReplyId(null)} className="btn btn-ghost text-sm">{t("common.cancel")}</button>
 									</div>
 								) : (
-									<button
-										type="button"
-										onClick={() => { setReplyId(r._id); setReplyText("") }}
-										className="text-xs text-[var(--gold)] hover:underline"
-										style={{ background: "none", border: "none", cursor: "pointer" }}
-									>
-										Reply to this review
+									<button type="button" onClick={() => { setReplyId(r._id); setReplyText("") }} className="text-xs text-[var(--gold)] hover:underline" style={{ background: "none", border: "none", cursor: "pointer" }}>
+										{t("business.reviews.replyAction")}
 									</button>
 								)}
 							</div>

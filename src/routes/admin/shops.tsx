@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
-import { ShieldCheck, ShieldOff, PowerOff, Power, Building2 } from "lucide-react"
+import { ShieldCheck, ShieldOff, PowerOff, Power, Building2, Check } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "../../components/ui/Skeleton"
 import { showToast } from "../../components/ui/Toast"

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
@@ -11,15 +12,11 @@ import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/barbers")({ component: BusinessBarbers })
 
-interface BarberForm {
-	name: string
-	bio: string
-	specializations: string
-}
-
+interface BarberForm { name: string; bio: string; specializations: string }
 const EMPTY: BarberForm = { name: "", bio: "", specializations: "" }
 
 function BusinessBarbers() {
+	const { t } = useTranslation()
 	const { user } = useAuth()
 	const [showForm, setShowForm] = useState(false)
 	const [editId, setEditId] = useState<Id<"barbers"> | null>(null)
@@ -61,7 +58,7 @@ function BusinessBarbers() {
 	}
 
 	const handleDelete = async (id: Id<"barbers">) => {
-		try { await removeBarber({ id }); showToast("Barber removed", "info") }
+		try { await removeBarber({ id }); showToast("Removed", "info") }
 		catch { showToast("Failed to remove", "error") }
 	}
 
@@ -70,35 +67,35 @@ function BusinessBarbers() {
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
 					<div className="flex items-center gap-3">
-						<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Dashboard</Link>
+						<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
 						<span className="text-[var(--border)]">/</span>
-						<h1 className="text-2xl font-bold text-[var(--text)]">Barbers</h1>
+						<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.barbers.title")}</h1>
 					</div>
 					<button type="button" onClick={() => { resetForm(); setShowForm(!showForm) }} className="btn btn-primary gap-2 text-sm">
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
-						{showForm ? "Cancel" : "Add barber"}
+						{showForm ? t("common.cancel") : t("business.barbers.addBarber")}
 					</button>
 				</div>
 
 				{showForm && (
 					<div className="card p-5 mb-6 fade-up">
-						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? "Edit barber" : "New barber"}</h2>
+						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? t("common.edit") : t("business.barbers.addBarber")}</h2>
 						<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
 							<div>
 								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Name *</label>
-								<input className="input" placeholder="e.g. Nikos" value={form.name} onChange={set("name")} required />
+								<input className="input" placeholder={t("business.barbers.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Specializations (comma-separated)</label>
-								<input className="input" placeholder="Fades, Beards, Classic cuts" value={form.specializations} onChange={set("specializations")} />
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Specializations</label>
+								<input className="input" placeholder={t("business.barbers.specializationsPlaceholder")} value={form.specializations} onChange={set("specializations")} />
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Bio</label>
-								<textarea className="input resize-none" rows={2} placeholder="Short bio..." value={form.bio} onChange={set("bio")} />
+								<textarea className="input resize-none" rows={2} placeholder={t("business.barbers.bioPlaceholder")} value={form.bio} onChange={set("bio")} />
 							</div>
 							<div className="flex gap-2">
-								<button type="submit" className="btn btn-primary gap-1"><Check size={15} />{editId ? "Save" : "Add barber"}</button>
-								<button type="button" onClick={resetForm} className="btn btn-secondary">Cancel</button>
+								<button type="submit" className="btn btn-primary gap-1"><Check size={15} />{editId ? t("common.save") : t("business.barbers.addBarber")}</button>
+								<button type="button" onClick={resetForm} className="btn btn-secondary">{t("common.cancel")}</button>
 							</div>
 						</form>
 					</div>
@@ -107,7 +104,7 @@ function BusinessBarbers() {
 				{barbers === undefined ? (
 					<div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}</div>
 				) : barbers.length === 0 ? (
-					<div className="text-center py-16 text-[var(--text-muted)]"><p className="text-sm">No barbers yet.</p></div>
+					<div className="text-center py-16 text-[var(--text-muted)]"><p className="text-sm">{t("business.barbers.noBarbers")}</p></div>
 				) : (
 					<div className="space-y-3">
 						{barbers.map((b: Barber) => (

@@ -324,6 +324,15 @@ const el = {
 			businessLogin: "Σύνδεση επιχείρησης",
 		},
 	},
+	map: {
+		noLocations: "Χωρίς τοποθεσίες στον χάρτη",
+		noLocationsHint: "Τα καταστήματα χρειάζονται συντεταγμένες για να εμφανιστούν",
+		shopsOnMap: "{{count}} καταστήματα στον χάρτη",
+		bookNowArrow: "Κράτηση τώρα",
+		switchTo: "Αλλαγή σε {{lang}}",
+		reviewsCount: "{{count}} αξιολογήσεις",
+		ratingOf: "{{rating}} / 5",
+	},
 	status: {
 		pending: "Σε αναμονή",
 		confirmed: "Επιβεβαιωμένο",

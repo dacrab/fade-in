@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react"
 import { MapPin } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import type { Barbershop } from "../types"
 
 interface MapViewProps {
@@ -11,6 +12,7 @@ const DEFAULT_CENTER: [number, number] = [37.9838, 23.7275]
 const DEFAULT_ZOOM = 12
 
 export default function MapView({ shops, onShopClick }: MapViewProps) {
+	const { t } = useTranslation()
 	const mapRef = useRef<L.Map | null>(null)
 	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const markersRef = useRef<L.Marker[]>([])
@@ -19,20 +21,13 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 		if (!mapContainerRef.current || mapRef.current) return
 
 		import("leaflet").then((L) => {
-			// Fix bundler icon resolution
-			const iconProto = L.Icon.Default.prototype as L.Icon.Default & {
-				_getIconUrl?: unknown
-			}
+			const iconProto = L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown }
 			delete iconProto._getIconUrl
 			L.Icon.Default.mergeOptions({
-				iconRetinaUrl:
-					"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-				iconUrl:
-					"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-				shadowUrl:
-					"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+				iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+				iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+				shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 			})
-
 			if (!mapContainerRef.current) return
 			const map = L.map(mapContainerRef.current, {
 				center: DEFAULT_CENTER,
@@ -40,21 +35,16 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 				zoomControl: true,
 				scrollWheelZoom: false,
 			})
-
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 				attribution: "© OpenStreetMap contributors",
 				maxZoom: 19,
 			}).addTo(map)
-
 			mapRef.current = map
-			placeMarkers(L, map, shops, markersRef, onShopClick)
+			placeMarkers(L, map, shops, markersRef, onShopClick, t)
 		})
 
 		return () => {
-			if (mapRef.current) {
-				mapRef.current.remove()
-				mapRef.current = null
-			}
+			if (mapRef.current) { mapRef.current.remove(); mapRef.current = null }
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -62,29 +52,24 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	useEffect(() => {
 		if (!mapRef.current) return
 		import("leaflet").then((L) => {
-			if (mapRef.current) {
-				placeMarkers(L, mapRef.current, shops, markersRef, onShopClick)
-			}
+			if (mapRef.current) placeMarkers(L, mapRef.current, shops, markersRef, onShopClick, t)
 		})
-	}, [shops, onShopClick])
+	}, [shops, onShopClick, t])
 
 	const shopsWithCoords = shops.filter((s) => s.lat !== undefined && s.lng !== undefined)
 
 	return (
-		<div
-			className="relative rounded-2xl overflow-hidden border border-[var(--border)]"
-			style={{ height: "500px" }}
-		>
+		<div className="relative rounded-2xl overflow-hidden border border-[var(--border)]" style={{ height: "500px" }}>
 			<div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
 			{shopsWithCoords.length === 0 && (
 				<div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-muted)] pointer-events-none">
 					<MapPin size={36} className="mb-2 opacity-30" />
-					<p className="text-sm font-medium text-[var(--text)]">No mapped locations</p>
-					<p className="text-xs mt-1">Shops need coordinates (lat/lng) to appear on map</p>
+					<p className="text-sm font-medium text-[var(--text)]">{t("map.noLocations")}</p>
+					<p className="text-xs mt-1">{t("map.noLocationsHint")}</p>
 				</div>
 			)}
 			<div className="absolute bottom-3 right-3 badge badge-gold text-[11px] z-[1000]">
-				{shopsWithCoords.length} shops on map
+				{t("map.shopsOnMap", { count: shopsWithCoords.length })}
 			</div>
 		</div>
 	)
@@ -96,15 +81,14 @@ function placeMarkers(
 	shops: Barbershop[],
 	markersRef: React.MutableRefObject<L.Marker[]>,
 	onShopClick?: (slug: string) => void,
+	t?: (key: string, opts?: Record<string, unknown>) => string,
 ) {
 	markersRef.current.forEach((m) => m.remove())
 	markersRef.current = []
 
 	const shopsWithCoords = shops.filter(
-		(s): s is Barbershop & { lat: number; lng: number } =>
-			s.lat !== undefined && s.lng !== undefined,
+		(s): s is Barbershop & { lat: number; lng: number } => s.lat !== undefined && s.lng !== undefined,
 	)
-
 	if (shopsWithCoords.length === 0) return
 
 	const goldIcon = L.divIcon({
@@ -118,27 +102,25 @@ function placeMarkers(
 	const bounds: [number, number][] = []
 
 	for (const shop of shopsWithCoords) {
+		const bookLabel = t ? t("map.bookNowArrow") : "Book now"
+		const reviewsLabel = t ? t("map.reviewsCount", { count: shop.reviewCount }) : `${shop.reviewCount} reviews`
+
 		const marker = L.marker([shop.lat, shop.lng], { icon: goldIcon })
 			.addTo(map)
 			.bindPopup(
 				`<div style="font-family:system-ui;min-width:160px;padding:4px;">
 				<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#F5F5F5;">${shop.name}</div>
 				<div style="font-size:12px;color:#888;margin-bottom:6px;">${shop.address}, ${shop.city}</div>
-				<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">${shop.rating.toFixed(1)} / 5 (${shop.reviewCount} reviews)</div>
-				<a href="/barbershops/${shop.slug}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">Book now →</a>
+				<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">${shop.rating.toFixed(1)} / 5 (${reviewsLabel})</div>
+				<a href="/barbershops/${shop.slug}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">${bookLabel} →</a>
 			</div>`,
 				{ className: "fadein-popup" },
 			)
 
-		if (onShopClick) {
-			marker.on("click", () => onShopClick(shop.slug))
-		}
-
+		if (onShopClick) marker.on("click", () => onShopClick(shop.slug))
 		markersRef.current.push(marker)
 		bounds.push([shop.lat, shop.lng])
 	}
 
-	if (bounds.length > 0) {
-		map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 })
-	}
+	if (bounds.length > 0) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 })
 }

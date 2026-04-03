@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { MapPin, Phone, Clock, Star, Scissors, Instagram, Facebook, Globe, ChevronLeft, Calendar, Check } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { StarRating } from "../../components/ui/StarRating"
 import { Skeleton } from "../../components/ui/Skeleton"
 import { formatPrice, formatRelative, capitalizeFirst } from "../../lib/format"
@@ -13,6 +14,7 @@ import { WEEK_DAYS } from "../../types"
 export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProfilePage })
 
 function ShopProfilePage() {
+	const { t } = useTranslation()
 	const { slug } = Route.useParams()
 	const shopRaw = useQuery(api.barbershops.getBySlug, { slug })
 	const [bookingOpen, setBookingOpen] = useState(false)
@@ -26,8 +28,8 @@ function ShopProfilePage() {
 	if (!shop) return (
 		<main className="px-4 py-16 text-center page-wrap">
 			<Scissors size={40} className="mx-auto mb-4 text-[var(--text-subtle)]" />
-			<h1 className="text-2xl font-bold text-[var(--text)] mb-2">Shop not found</h1>
-			<Link to="/barbershops" className="btn btn-primary mt-4 inline-flex">Browse barbershops</Link>
+			<h1 className="text-2xl font-bold text-[var(--text)] mb-2">{t("shop.notFound")}</h1>
+			<Link to="/barbershops" className="btn btn-primary mt-4 inline-flex">{t("shop.notFoundHint")}</Link>
 		</main>
 	)
 
@@ -35,7 +37,7 @@ function ShopProfilePage() {
 		<main className="px-4 py-8">
 			<div className="page-wrap max-w-5xl">
 				<Link to="/barbershops" className="inline-flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline mb-6 transition-colors">
-					<ChevronLeft size={16} /> Back to barbershops
+					<ChevronLeft size={16} /> {t("shop.back")}
 				</Link>
 
 				<div className="rounded-2xl overflow-hidden mb-6 h-64 sm:h-80 bg-[var(--bg-card-hover)] relative">
@@ -44,7 +46,9 @@ function ShopProfilePage() {
 					) : (
 						<div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]"><Scissors size={60} /></div>
 					)}
-					{shop.isVerified && <div className="absolute top-4 left-4 badge badge-gold"><Check size={10} /> Verified</div>}
+					{shop.isVerified && (
+						<div className="absolute top-4 left-4 badge badge-gold"><Check size={10} /> {t("common.verified")}</div>
+					)}
 				</div>
 
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -55,7 +59,7 @@ function ShopProfilePage() {
 								<div className="flex items-center gap-1.5 flex-shrink-0">
 									<Star size={18} fill="currentColor" className="text-[var(--gold)]" />
 									<span className="text-xl font-bold text-[var(--text)]">{shop.rating.toFixed(1)}</span>
-									<span className="text-sm text-[var(--text-muted)]">({shop.reviewCount} reviews)</span>
+									<span className="text-sm text-[var(--text-muted)]">({t("map.reviewsCount", { count: shop.reviewCount })})</span>
 								</div>
 							</div>
 							<div className="flex items-center gap-1.5 text-[var(--text-muted)] mb-2">
@@ -72,11 +76,11 @@ function ShopProfilePage() {
 
 						{/* Services */}
 						<div className="card p-5">
-							<h2 className="text-lg font-bold text-[var(--text)] mb-4">Services</h2>
+							<h2 className="text-lg font-bold text-[var(--text)] mb-4">{t("shop.services")}</h2>
 							{!services ? (
 								<div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
 							) : services.length === 0 ? (
-								<p className="text-sm text-[var(--text-muted)]">No services listed yet.</p>
+								<p className="text-sm text-[var(--text-muted)]">{t("shop.noServices")}</p>
 							) : (
 								<div className="divide-y divide-[var(--border)]">
 									{services.map((svc: Service) => (
@@ -95,11 +99,11 @@ function ShopProfilePage() {
 
 						{/* Barbers */}
 						<div className="card p-5">
-							<h2 className="text-lg font-bold text-[var(--text)] mb-4">Our Barbers</h2>
+							<h2 className="text-lg font-bold text-[var(--text)] mb-4">{t("shop.ourBarbers")}</h2>
 							{!barbers ? (
 								<div className="flex gap-4">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 w-20 rounded-full" />)}</div>
 							) : barbers.length === 0 ? (
-								<p className="text-sm text-[var(--text-muted)]">No barbers listed yet.</p>
+								<p className="text-sm text-[var(--text-muted)]">{t("shop.noBarbers")}</p>
 							) : (
 								<div className="flex flex-wrap gap-4">
 									{barbers.map((b: Barber) => (
@@ -119,11 +123,11 @@ function ShopProfilePage() {
 
 						{/* Reviews */}
 						<div className="card p-5">
-							<h2 className="text-lg font-bold text-[var(--text)] mb-4">Reviews</h2>
+							<h2 className="text-lg font-bold text-[var(--text)] mb-4">{t("shop.reviewsTitle")}</h2>
 							{!reviews ? (
 								<div className="space-y-4">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}</div>
 							) : reviews.length === 0 ? (
-								<p className="text-sm text-[var(--text-muted)]">No reviews yet.</p>
+								<p className="text-sm text-[var(--text-muted)]">{t("shop.noReviews")}</p>
 							) : (
 								<div className="space-y-4">
 									{reviews.map((r: Review) => (
@@ -135,7 +139,9 @@ function ShopProfilePage() {
 											<p className="text-sm text-[var(--text-muted)]">{r.comment}</p>
 											{r.ownerReply && (
 												<div className="mt-2 pl-3 border-l-2 border-[var(--gold)]/30">
-													<p className="text-xs text-[var(--text-muted)]"><span className="text-[var(--gold)] font-semibold">Owner reply:</span> {r.ownerReply}</p>
+													<p className="text-xs text-[var(--text-muted)]">
+														<span className="text-[var(--gold)] font-semibold">{t("shop.ownerReply")}</span> {r.ownerReply}
+													</p>
 												</div>
 											)}
 										</div>
@@ -148,15 +154,15 @@ function ShopProfilePage() {
 					{/* Sidebar */}
 					<div className="space-y-4">
 						<div className="card p-5">
-							<h3 className="font-bold text-[var(--text)] mb-3">Book an appointment</h3>
+							<h3 className="font-bold text-[var(--text)] mb-3">{t("shop.bookAppointment")}</h3>
 							<button type="button" onClick={() => setBookingOpen(true)} className="btn btn-primary w-full justify-center py-3 text-base">
-								<Calendar size={18} /> Book now
+								<Calendar size={18} /> {t("common.bookNow")}
 							</button>
 						</div>
 
 						{shop.workingHours && (
 							<div className="card p-5">
-								<h3 className="font-bold text-[var(--text)] mb-3 flex items-center gap-2"><Clock size={16} /> Hours</h3>
+								<h3 className="font-bold text-[var(--text)] mb-3 flex items-center gap-2"><Clock size={16} /> {t("shop.hours")}</h3>
 								<div className="space-y-1.5">
 									{WEEK_DAYS.map((day: WeekDay) => {
 										const h = shop.workingHours?.[day]
@@ -164,7 +170,7 @@ function ShopProfilePage() {
 											<div key={day} className="flex justify-between text-sm">
 												<span className="text-[var(--text-muted)]">{capitalizeFirst(day)}</span>
 												<span className={h?.closed ? "text-[var(--error)]" : "text-[var(--text)]"}>
-													{h?.closed ? "Closed" : h ? `${h.open} – ${h.close}` : "–"}
+													{h?.closed ? t("shop.closed") : h ? `${h.open} – ${h.close}` : "–"}
 												</span>
 											</div>
 										)
@@ -175,7 +181,7 @@ function ShopProfilePage() {
 
 						{shop.socialLinks && (
 							<div className="card p-5">
-								<h3 className="font-bold text-[var(--text)] mb-3">Follow us</h3>
+								<h3 className="font-bold text-[var(--text)] mb-3">{t("shop.followUs")}</h3>
 								<div className="flex gap-2">
 									{shop.socialLinks.instagram && (
 										<a href={shop.socialLinks.instagram} target="_blank" rel="noreferrer" className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--gold)] hover:bg-[var(--bg-card-hover)] transition-colors"><Instagram size={18} /></a>
@@ -192,7 +198,6 @@ function ShopProfilePage() {
 					</div>
 				</div>
 			</div>
-
 			{bookingOpen && <BookingModal shop={shop} onClose={() => setBookingOpen(false)} />}
 		</main>
 	)

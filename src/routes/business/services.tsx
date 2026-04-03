@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
@@ -25,6 +26,7 @@ const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other
 type Category = (typeof CATEGORIES)[number]
 
 function BusinessServices() {
+	const { t } = useTranslation()
 	const { user } = useAuth()
 	const [showForm, setShowForm] = useState(false)
 	const [editId, setEditId] = useState<Id<"services"> | null>(null)
@@ -51,10 +53,10 @@ function BusinessServices() {
 		try {
 			if (editId) {
 				await updateService({ id: editId, name: form.name, description: form.description || undefined, price, durationMinutes, category: form.category })
-				showToast("Service updated!", "success")
+				showToast(t("business.services.editService") + "d!", "success")
 			} else {
 				await createService({ barbershopId: shop._id, name: form.name, description: form.description || undefined, price, durationMinutes, category: form.category })
-				showToast("Service added!", "success")
+				showToast(t("business.services.addService") + "d!", "success")
 			}
 			resetForm()
 		} catch { showToast("Failed to save service", "error") }
@@ -67,7 +69,7 @@ function BusinessServices() {
 	}
 
 	const handleDelete = async (id: Id<"services">) => {
-		try { await removeService({ id }); showToast("Service removed", "info") }
+		try { await removeService({ id }); showToast("Removed", "info") }
 		catch { showToast("Failed to remove", "error") }
 	}
 
@@ -76,23 +78,23 @@ function BusinessServices() {
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
 					<div className="flex items-center gap-3">
-						<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Dashboard</Link>
+						<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
 						<span className="text-[var(--border)]">/</span>
-						<h1 className="text-2xl font-bold text-[var(--text)]">Services</h1>
+						<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.services.title")}</h1>
 					</div>
 					<button type="button" onClick={() => { resetForm(); setShowForm(!showForm) }} className="btn btn-primary gap-2 text-sm">
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
-						{showForm ? "Cancel" : "Add service"}
+						{showForm ? t("common.cancel") : t("business.services.addService")}
 					</button>
 				</div>
 
 				{showForm && (
 					<div className="card p-5 mb-6 fade-up">
-						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? "Edit service" : "New service"}</h2>
+						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? t("business.services.editService") : t("business.services.newService")}</h2>
 						<form onSubmit={(e) => void handleSubmit(e)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div className="sm:col-span-2">
 								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Name *</label>
-								<input className="input" placeholder="e.g. Classic Haircut" value={form.name} onChange={set("name")} required />
+								<input className="input" placeholder={t("business.services.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Price (€) *</label>
@@ -105,7 +107,9 @@ function BusinessServices() {
 							<div>
 								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Category</label>
 								<select className="input" value={form.category} onChange={set("category")}>
-									{CATEGORIES.map((c: Category) => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+									{CATEGORIES.map((c: Category) => (
+										<option key={c} value={c}>{t(`business.services.categories.${c}`)}</option>
+									))}
 								</select>
 							</div>
 							<div className="sm:col-span-2">
@@ -113,8 +117,10 @@ function BusinessServices() {
 								<input className="input" placeholder="Optional..." value={form.description} onChange={set("description")} />
 							</div>
 							<div className="sm:col-span-2 flex gap-2">
-								<button type="submit" className="btn btn-primary gap-1"><Check size={15} />{editId ? "Save changes" : "Add service"}</button>
-								<button type="button" onClick={resetForm} className="btn btn-secondary">Cancel</button>
+								<button type="submit" className="btn btn-primary gap-1">
+									<Check size={15} />{editId ? t("common.save") : t("business.services.addService")}
+								</button>
+								<button type="button" onClick={resetForm} className="btn btn-secondary">{t("common.cancel")}</button>
 							</div>
 						</form>
 					</div>
@@ -123,14 +129,16 @@ function BusinessServices() {
 				{services === undefined ? (
 					<div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}</div>
 				) : services.length === 0 ? (
-					<div className="text-center py-16 text-[var(--text-muted)]"><p className="text-sm">No services yet.</p></div>
+					<div className="text-center py-16 text-[var(--text-muted)]"><p className="text-sm">{t("business.services.noServices")}</p></div>
 				) : (
 					<div className="space-y-2">
 						{services.map((svc: Service) => (
 							<div key={svc._id} className="card p-4 flex items-center gap-4">
 								<div className="flex-1 min-w-0">
 									<div className="font-medium text-[var(--text)] text-sm">{svc.name}</div>
-									<div className="text-xs text-[var(--text-muted)]">{svc.durationMinutes} min · <span className="badge badge-gray">{svc.category}</span></div>
+									<div className="text-xs text-[var(--text-muted)]">
+										{svc.durationMinutes} min · <span className="badge badge-gray">{t(`business.services.categories.${svc.category}` as const)}</span>
+									</div>
 								</div>
 								<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(svc.price)}</div>
 								<div className="flex gap-1.5">

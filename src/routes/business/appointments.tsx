@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuth } from "../../hooks/useAuth"
@@ -13,24 +14,20 @@ import type { Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/business/appointments")({ component: BusinessAppointments })
 
 function BusinessAppointments() {
+	const { t } = useTranslation()
 	const { user } = useAuth()
 	const [selectedDate, setSelectedDate] = useState("")
 
 	const shopsRaw = useQuery(api.barbershops.listByOwner, user ? { ownerId: user.id as Id<"users"> } : "skip")
 	const shop = shopsRaw?.[0] as Barbershop | undefined
-
-	const apptsRaw = useQuery(
-		api.appointments.listByShop,
-		shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip",
-	)
+	const apptsRaw = useQuery(api.appointments.listByShop, shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip")
 	const appointments = apptsRaw as Appointment[] | undefined
-
 	const updateStatus = useMutation(api.appointments.updateStatus)
 
 	const handleStatus = async (id: Id<"appointments">, status: AppointmentStatus) => {
 		try {
 			await updateStatus({ id, status })
-			showToast(`Appointment ${status}`, "success")
+			showToast(`${t(`status.${status}`)}`, "success")
 		} catch { showToast("Failed to update status", "error") }
 	}
 
@@ -38,9 +35,9 @@ function BusinessAppointments() {
 		<main className="px-4 py-8">
 			<div className="page-wrap max-w-4xl">
 				<div className="flex items-center gap-3 mb-6">
-					<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Dashboard</Link>
+					<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← {t("nav.business")}</Link>
 					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">Appointments</h1>
+					<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.appointments.title")}</h1>
 				</div>
 
 				<div className="flex items-center gap-3 mb-6">
@@ -49,7 +46,7 @@ function BusinessAppointments() {
 						<input type="date" className="input pl-9 w-48" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
 					</div>
 					{selectedDate && (
-						<button type="button" onClick={() => setSelectedDate("")} className="btn btn-ghost text-sm">Clear</button>
+						<button type="button" onClick={() => setSelectedDate("")} className="btn btn-ghost text-sm">{t("business.appointments.clearFilter")}</button>
 					)}
 				</div>
 
@@ -58,7 +55,7 @@ function BusinessAppointments() {
 				) : appointments.length === 0 ? (
 					<div className="text-center py-16 text-[var(--text-muted)]">
 						<Clock size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="font-semibold text-[var(--text)] mb-1">No appointments found</p>
+						<p className="font-semibold text-[var(--text)] mb-1">{t("business.appointments.noAppointments")}</p>
 					</div>
 				) : (
 					<div className="space-y-3">
@@ -70,20 +67,20 @@ function BusinessAppointments() {
 										<div className="text-xs text-[var(--text-muted)]">{formatDateShort(appt.date)}</div>
 									</div>
 									<div className="min-w-0">
-										<div className="text-sm font-medium text-[var(--text)] truncate">{appt.notes ?? "No notes"}</div>
-										<div className="text-xs text-[var(--text-muted)]">Until {appt.endTime} · {formatPrice(appt.totalPrice)}</div>
+										<div className="text-sm font-medium text-[var(--text)] truncate">{appt.notes ?? "—"}</div>
+										<div className="text-xs text-[var(--text-muted)]">{appt.endTime} · {formatPrice(appt.totalPrice)}</div>
 									</div>
 								</div>
 								<div className="flex items-center gap-2 flex-shrink-0">
-									<span className={`badge ${STATUS_BADGE[appt.status]}`}>{appt.status}</span>
+									<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
 									{appt.status === "pending" && (
 										<>
-											<button type="button" onClick={() => void handleStatus(appt._id, "confirmed")} className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors" title="Confirm" style={{ border: "none", cursor: "pointer" }}><Check size={14} /></button>
-											<button type="button" onClick={() => void handleStatus(appt._id, "cancelled")} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" title="Cancel" style={{ border: "none", cursor: "pointer" }}><X size={14} /></button>
+											<button type="button" onClick={() => void handleStatus(appt._id, "confirmed")} className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors" title={t("business.appointments.confirm")} style={{ border: "none", cursor: "pointer" }}><Check size={14} /></button>
+											<button type="button" onClick={() => void handleStatus(appt._id, "cancelled")} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" title={t("business.appointments.cancel")} style={{ border: "none", cursor: "pointer" }}><X size={14} /></button>
 										</>
 									)}
 									{appt.status === "confirmed" && (
-										<button type="button" onClick={() => void handleStatus(appt._id, "completed")} className="btn btn-secondary text-xs py-1 px-2">Complete</button>
+										<button type="button" onClick={() => void handleStatus(appt._id, "completed")} className="btn btn-secondary text-xs py-1 px-2">{t("business.appointments.complete")}</button>
 									)}
 								</div>
 							</div>
