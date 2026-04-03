@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "#/components/ui/Skeleton"
 import PageHeader from "#/components/PageHeader"
+import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
 import { useFormState } from "#/hooks/useFormState"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
@@ -39,7 +39,9 @@ function BusinessServices() {
 	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY_FORM)
 
 	const shop = useOwnerShop()
-	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as Service[] | undefined
+	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as
+		| Service[]
+		| undefined
 
 	const createService = useMutation(api.services.create)
 	const updateService = useMutation(api.services.update)
@@ -104,7 +106,10 @@ function BusinessServices() {
 				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.services.title")}>
 					<button
 						type="button"
-						onClick={() => { reset(); setShowForm(!showForm) }}
+						onClick={() => {
+							reset()
+							setShowForm(!showForm)
+						}}
 						className="btn btn-primary gap-2 text-sm"
 					>
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}

@@ -20,7 +20,9 @@ function BusinessReviews() {
 	useRequireRole(["owner", "admin"])
 	const { t } = useTranslation()
 	const shop = useOwnerShop()
-	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as Review[] | undefined
+	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as
+		| Review[]
+		| undefined
 	const addReply = useMutation(api.reviews.addOwnerReply)
 	const [replyId, setReplyId] = useState<string | null>(null)
 	const [replyText, setReplyText] = useState("")
@@ -39,7 +41,11 @@ function BusinessReviews() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.reviews.title")} />
+				<PageHeader
+					back="/business"
+					backLabel={t("nav.business")}
+					title={t("business.reviews.title")}
+				/>
 
 				{shop && (
 					<div className="card p-4 mb-6 flex items-center gap-4">
@@ -59,59 +65,59 @@ function BusinessReviews() {
 					empty={{ icon: MessageSquare, message: t("business.reviews.noReviews") }}
 				>
 					{(reviews) => (
-					<div className="space-y-4">
-						{reviews.map((r: Review) => (
-							<div key={r._id} className="card p-5">
-								<div className="flex items-center justify-between mb-2">
-									<StarRating rating={r.rating} size={16} />
-									<span className="text-xs text-[var(--text-muted)]">{formatRelative(r.createdAt)}</span>
-								</div>
-								<p className="text-sm text-[var(--text-muted)] mb-3">{r.comment}</p>
-								{r.ownerReply ? (
-									<div className="pl-3 border-l-2 border-[var(--gold)]/30 text-xs text-[var(--text-muted)]">
-										<span className="text-[var(--gold)] font-semibold">
-											{t("business.reviews.yourReply")}
-										</span>
-										{r.ownerReply}
+						<div className="space-y-4">
+							{reviews.map((r: Review) => (
+								<div key={r._id} className="card p-5">
+									<div className="flex items-center justify-between mb-2">
+										<StarRating rating={r.rating} size={16} />
+										<span className="text-xs text-[var(--text-muted)]">{formatRelative(r.createdAt)}</span>
 									</div>
-								) : replyId === r._id ? (
-									<div className="flex gap-2 mt-2">
-										<input
-											className="input text-sm"
-											placeholder={t("business.reviews.replyPlaceholder")}
-											value={replyText}
-											onChange={(e) => setReplyText(e.target.value)}
-											onKeyDown={(e) => {
-												if (e.key === "Enter") void handleReply(r._id)
-											}}
-										/>
+									<p className="text-sm text-[var(--text-muted)] mb-3">{r.comment}</p>
+									{r.ownerReply ? (
+										<div className="pl-3 border-l-2 border-[var(--gold)]/30 text-xs text-[var(--text-muted)]">
+											<span className="text-[var(--gold)] font-semibold">
+												{t("business.reviews.yourReply")}
+											</span>
+											{r.ownerReply}
+										</div>
+									) : replyId === r._id ? (
+										<div className="flex gap-2 mt-2">
+											<input
+												className="input text-sm"
+												placeholder={t("business.reviews.replyPlaceholder")}
+												value={replyText}
+												onChange={(e) => setReplyText(e.target.value)}
+												onKeyDown={(e) => {
+													if (e.key === "Enter") void handleReply(r._id)
+												}}
+											/>
+											<button
+												type="button"
+												onClick={() => void handleReply(r._id)}
+												className="btn btn-primary text-sm px-3 gap-1"
+											>
+												<Send size={13} />
+												{t("business.reviews.replyButton")}
+											</button>
+											<button type="button" onClick={() => setReplyId(null)} className="btn btn-ghost text-sm">
+												{t("common.cancel")}
+											</button>
+										</div>
+									) : (
 										<button
 											type="button"
-											onClick={() => void handleReply(r._id)}
-											className="btn btn-primary text-sm px-3 gap-1"
+											onClick={() => {
+												setReplyId(r._id)
+												setReplyText("")
+											}}
+											className="text-xs text-[var(--gold)] hover:underline btn-bare"
 										>
-											<Send size={13} />
-											{t("business.reviews.replyButton")}
+											{t("business.reviews.replyAction")}
 										</button>
-										<button type="button" onClick={() => setReplyId(null)} className="btn btn-ghost text-sm">
-											{t("common.cancel")}
-										</button>
-									</div>
-								) : (
-									<button
-										type="button"
-										onClick={() => {
-											setReplyId(r._id)
-											setReplyText("")
-										}}
-										className="text-xs text-[var(--gold)] hover:underline btn-bare"
-									>
-										{t("business.reviews.replyAction")}
-									</button>
-								)}
-							</div>
-						))}
-					</div>
+									)}
+								</div>
+							))}
+						</div>
 					)}
 				</AsyncList>
 			</div>

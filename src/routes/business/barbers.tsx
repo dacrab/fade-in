@@ -27,7 +27,9 @@ function BusinessBarbers() {
 	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY)
 
 	const shop = useOwnerShop()
-	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip") as Barber[] | undefined
+	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip") as
+		| Barber[]
+		| undefined
 
 	const createBarber = useMutation(api.barbers.create)
 	const updateBarber = useMutation(api.barbers.update)
@@ -81,7 +83,10 @@ function BusinessBarbers() {
 				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.barbers.title")}>
 					<button
 						type="button"
-						onClick={() => { reset(); setShowForm(!showForm) }}
+						onClick={() => {
+							reset()
+							setShowForm(!showForm)
+						}}
 						className="btn btn-primary gap-2 text-sm"
 					>
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
@@ -146,36 +151,40 @@ function BusinessBarbers() {
 					</div>
 				)}
 
-				<AsyncList data={barbers} skeleton={{ count: 3, height: "h-20" }} empty={{ icon: Scissors, message: t("business.barbers.noBarbers") }}>
+				<AsyncList
+					data={barbers}
+					skeleton={{ count: 3, height: "h-20" }}
+					empty={{ icon: Scissors, message: t("business.barbers.noBarbers") }}
+				>
 					{(barbers) => (
-					<div className="space-y-3">
-						{barbers.map((b: Barber) => (
-							<div key={b._id} className="card p-4 flex items-center gap-4">
-								<div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
-									{b.name.charAt(0)}
+						<div className="space-y-3">
+							{barbers.map((b: Barber) => (
+								<div key={b._id} className="card p-4 flex items-center gap-4">
+									<div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
+										{b.name.charAt(0)}
+									</div>
+									<div className="flex-1 min-w-0">
+										<div className="font-medium text-[var(--text)] text-sm">{b.name}</div>
+										{b.specializations.length > 0 && (
+											<div className="text-xs text-[var(--text-muted)]">{b.specializations.join(", ")}</div>
+										)}
+										{b.bio && <div className="text-xs text-[var(--text-subtle)] truncate">{b.bio}</div>}
+									</div>
+									<div className="flex gap-1.5">
+										<button type="button" onClick={() => handleEdit(b)} className="icon-btn btn-bare">
+											<Pencil size={14} />
+										</button>
+										<button
+											type="button"
+											onClick={() => void handleDelete(b._id)}
+											className="icon-btn icon-btn-danger btn-bare"
+										>
+											<Trash2 size={14} />
+										</button>
+									</div>
 								</div>
-								<div className="flex-1 min-w-0">
-									<div className="font-medium text-[var(--text)] text-sm">{b.name}</div>
-									{b.specializations.length > 0 && (
-										<div className="text-xs text-[var(--text-muted)]">{b.specializations.join(", ")}</div>
-									)}
-									{b.bio && <div className="text-xs text-[var(--text-subtle)] truncate">{b.bio}</div>}
-								</div>
-								<div className="flex gap-1.5">
-									<button type="button" onClick={() => handleEdit(b)} className="icon-btn btn-bare">
-										<Pencil size={14} />
-									</button>
-									<button
-										type="button"
-										onClick={() => void handleDelete(b._id)}
-										className="icon-btn icon-btn-danger btn-bare"
-									>
-										<Trash2 size={14} />
-									</button>
-								</div>
-							</div>
-						))}
-					</div>
+							))}
+						</div>
 					)}
 				</AsyncList>
 			</div>

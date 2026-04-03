@@ -29,8 +29,8 @@ export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProf
 function ShopProfilePage() {
 	const { t } = useTranslation()
 	const { slug } = Route.useParams()
-	const shop = useQuery(api.barbershops.getBySlug, { slug })
-	const [bookingOpen, setBookingOpen] = useState(false) as Barbershop | null | undefined
+	const shop = useQuery(api.barbershops.getBySlug, { slug }) as Barbershop | null | undefined
+	const [bookingOpen, setBookingOpen] = useState(false)
 	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Service[]
 		| undefined

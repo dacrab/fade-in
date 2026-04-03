@@ -98,7 +98,10 @@ function LoginPage() {
 
 					<div className="mt-6 text-center text-sm text-[var(--text-muted)]">
 						{t("auth.noAccount")}{" "}
-						<Link to="/register" className="text-[var(--gold)] hover:underline no-underline font-semibold">
+						<Link
+							to="/register"
+							className="text-[var(--gold)] hover:underline no-underline font-semibold"
+						>
 							{t("common.createAccount")}
 						</Link>
 					</div>

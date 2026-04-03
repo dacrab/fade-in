@@ -24,7 +24,8 @@ function ProfilePage() {
 		if (!user) return
 		setSaving(true)
 		await withToast(
-			() => updateProfile({ id: user.id as Id<"users">, name: form.name, phone: form.phone || undefined }),
+			() =>
+				updateProfile({ id: user.id as Id<"users">, name: form.name, phone: form.phone || undefined }),
 			t("errors.profileSaved"),
 			t("errors.profileFailed"),
 		)
@@ -34,7 +35,11 @@ function ProfilePage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-xl">
-				<PageHeader back="/dashboard" backLabel={t("nav.dashboard")} title={t("dashboard.profileTitle")} />
+				<PageHeader
+					back="/dashboard"
+					backLabel={t("nav.dashboard")}
+					title={t("dashboard.profileTitle")}
+				/>
 
 				<div className="card p-6">
 					<div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border)]">

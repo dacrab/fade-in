@@ -35,20 +35,52 @@ export default memo(function Footer() {
 					</div>
 
 					<FooterSection title={t("footer.discover")}>
-						<li><Link to="/barbershops" className={linkCls}>{t("nav.barbershops")}</Link></li>
-						<li><Link to="/for-business" className={linkCls}>{t("nav.forBusiness")}</Link></li>
+						<li>
+							<Link to="/barbershops" className={linkCls}>
+								{t("nav.barbershops")}
+							</Link>
+						</li>
+						<li>
+							<Link to="/for-business" className={linkCls}>
+								{t("nav.forBusiness")}
+							</Link>
+						</li>
 					</FooterSection>
 
 					<FooterSection title={t("footer.account")}>
-						<li><Link to="/login" className={linkCls}>{t("footer.links.login")}</Link></li>
-						<li><Link to="/register" className={linkCls}>{t("footer.links.register")}</Link></li>
-						<li><Link to="/login" className={linkCls}>{t("footer.links.businessLogin")}</Link></li>
+						<li>
+							<Link to="/login" className={linkCls}>
+								{t("footer.links.login")}
+							</Link>
+						</li>
+						<li>
+							<Link to="/register" className={linkCls}>
+								{t("footer.links.register")}
+							</Link>
+						</li>
+						<li>
+							<Link to="/login" className={linkCls}>
+								{t("footer.links.businessLogin")}
+							</Link>
+						</li>
 					</FooterSection>
 
 					<FooterSection title={t("footer.company")}>
-						<li><a href="/about" className={linkCls}>{t("footer.links.about")}</a></li>
-						<li><a href="/privacy" className={linkCls}>{t("footer.links.privacy")}</a></li>
-						<li><a href="/terms" className={linkCls}>{t("footer.links.terms")}</a></li>
+						<li>
+							<a href="/about" className={linkCls}>
+								{t("footer.links.about")}
+							</a>
+						</li>
+						<li>
+							<a href="/privacy" className={linkCls}>
+								{t("footer.links.privacy")}
+							</a>
+						</li>
+						<li>
+							<a href="/terms" className={linkCls}>
+								{t("footer.links.terms")}
+							</a>
+						</li>
 					</FooterSection>
 				</div>
 
