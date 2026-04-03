@@ -27,10 +27,6 @@ const config = defineConfig({
 		globals: true,
 		setupFiles: ["./src/test/setup.ts"],
 		include: ["src/**/*.{test,spec}.{ts,tsx}"],
-		alias: {
-			react: path.resolve("./node_modules/react"),
-			"react-dom": path.resolve("./node_modules/react-dom"),
-		},
 	},
 })
 

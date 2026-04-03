@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import Breadcrumb from "#/components/Breadcrumb"
+import EmptyState from "#/components/EmptyState"
 import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop, User } from "#/types"
@@ -17,7 +19,6 @@ function FavoritesPage() {
 	const userData = userDataRaw as User | null | undefined
 	const favoriteIds = userData?.favoriteShopIds ?? []
 
-	// Single query fetches all favorite shops at once instead of one query per shop.
 	const shopsRaw = useQuery(
 		api.barbershops.listByIds,
 		favoriteIds.length > 0 ? { ids: favoriteIds } : "skip",
@@ -27,23 +28,15 @@ function FavoritesPage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="page-header">
-					<Link to="/dashboard" className="breadcrumb-back">
-						← {t("nav.dashboard")}
-					</Link>
-					<span className="text-[var(--border)]">/</span>
-					<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.favoritesTitle")}</h1>
-				</div>
+				<Breadcrumb to="/dashboard" label={t("nav.dashboard")} title={t("dashboard.favoritesTitle")} />
 
 				{favoriteIds.length === 0 ? (
-					<div className="empty-state">
-						<Heart size={40} className="mx-auto mb-4 opacity-30" />
-						<p className="font-semibold text-[var(--text)] mb-1">{t("dashboard.noFavorites")}</p>
+					<EmptyState icon={Heart} message={t("dashboard.noFavorites")}>
 						<p className="text-sm mb-4">{t("dashboard.noFavoritesHint")}</p>
 						<Link to="/barbershops" className="btn btn-primary inline-flex">
 							{t("nav.barbershops")}
 						</Link>
-					</div>
+					</EmptyState>
 				) : (
 					<div className="shop-grid">
 						{shops.map((shop) => (

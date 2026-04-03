@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "#/components/ui/Skeleton"
+import Breadcrumb from "#/components/Breadcrumb"
+import EmptyState from "#/components/EmptyState"
+import SkeletonList from "#/components/SkeletonList"
 import { showToast } from "#/components/ui/Toast"
 import { useRequireRole } from "#/hooks/useRequireRole"
 import type { Barbershop } from "#/types"
@@ -43,26 +45,12 @@ function AdminShops() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-5xl">
-				<div className="page-header">
-					<Link to="/admin" className="breadcrumb-back">
-						← {t("nav.admin")}
-					</Link>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{t("admin.shops.title")}</h1>
-				</div>
+				<Breadcrumb to="/admin" label={t("nav.admin")} title={t("admin.shops.title")} />
 
 				{allShops === undefined ? (
-					<div className="space-y-3">
-						{Array.from({ length: 5 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-16 w-full rounded-xl" />
-						))}
-					</div>
+					<SkeletonList count={5} height="h-16" />
 				) : allShops.length === 0 ? (
-					<div className="empty-state">
-						<Building2 size={36} className="mx-auto mb-3 opacity-30" />
-						<p>{t("admin.shops.noShops")}</p>
-					</div>
+					<EmptyState icon={Building2} message={t("admin.shops.noShops")} />
 				) : (
 					<div className="space-y-2">
 						{/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: admin shop management */}

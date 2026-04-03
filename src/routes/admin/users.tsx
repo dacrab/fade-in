@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "#/components/ui/Skeleton"
+import Breadcrumb from "#/components/Breadcrumb"
+import EmptyState from "#/components/EmptyState"
+import SkeletonList from "#/components/SkeletonList"
 import { useRequireRole } from "#/hooks/useRequireRole"
 import type { User, UserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -25,26 +27,12 @@ function AdminUsers() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="page-header">
-					<Link to="/admin" className="breadcrumb-back">
-						← {t("nav.admin")}
-					</Link>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{t("admin.users.title")}</h1>
-				</div>
+				<Breadcrumb to="/admin" label={t("nav.admin")} title={t("admin.users.title")} />
 
 				{allUsers === undefined ? (
-					<div className="space-y-3">
-						{Array.from({ length: 6 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders
-							<Skeleton key={i} className="h-14 w-full rounded-xl" />
-						))}
-					</div>
+					<SkeletonList count={6} height="h-14" />
 				) : allUsers.length === 0 ? (
-					<div className="empty-state">
-						<Users size={36} className="mx-auto mb-3 opacity-30" />
-						<p>{t("admin.users.noUsers")}</p>
-					</div>
+					<EmptyState icon={Users} message={t("admin.users.noUsers")} />
 				) : (
 					<div className="card overflow-hidden">
 						<div className="grid grid-cols-3 gap-4 px-4 py-2 border-b border-[var(--border)] text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">
