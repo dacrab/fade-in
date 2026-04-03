@@ -1,0 +1,31 @@
+name: Sync Lockfile
+
+on:
+  pull_request:
+    paths: ["package.json"]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.state == 'open'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: sync bun.lock"
+          file_pattern: bun.lock
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com

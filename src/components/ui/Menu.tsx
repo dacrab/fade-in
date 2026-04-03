@@ -1,6 +1,6 @@
-import type * as React from "react"
 import { Menu as BaseMenu } from "@base-ui/react/menu"
-import { cn } from "../../lib/cn"
+import type * as React from "react"
+import { cn } from "#/lib/cn"
 
 export interface MenuItem {
 	label: React.ReactNode
@@ -28,6 +28,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 							if (item.separator) {
 								return (
 									<BaseMenu.Separator
+										// biome-ignore lint/suspicious/noArrayIndexKey: menu items have no stable id
 										key={i}
 										className="my-1 h-px mx-2"
 										style={{ background: "var(--border)" }}
@@ -36,6 +37,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 							}
 							return (
 								<BaseMenu.Item
+									// biome-ignore lint/suspicious/noArrayIndexKey: menu items have no stable id
 									key={i}
 									disabled={item.disabled}
 									onClick={item.onClick}
@@ -45,9 +47,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 										item.disabled && "opacity-40 cursor-not-allowed",
 									)}
 								>
-									{item.icon && (
-										<span className="flex-shrink-0 opacity-70">{item.icon}</span>
-									)}
+									{item.icon && <span className="flex-shrink-0 opacity-70">{item.icon}</span>}
 									{item.label}
 								</BaseMenu.Item>
 							)

@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { useTranslation } from "react-i18next"
 import { useQuery } from "convex/react"
+import { Heart, MapPin, Scissors, Star } from "lucide-react"
+import { useTranslation } from "react-i18next"
+import { useAuth } from "#/hooks/useAuth"
+import type { Barbershop, User } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import { useAuth } from "../../hooks/useAuth"
-import { Heart, MapPin, Star, Scissors } from "lucide-react"
-import type { Barbershop, User } from "../../types"
 import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/favorites")({ component: FavoritesPage })
@@ -32,7 +32,9 @@ function FavoritesPage() {
 						<Heart size={40} className="mx-auto mb-4 opacity-30" />
 						<p className="font-semibold text-[var(--text)] mb-1">{t("dashboard.noFavorites")}</p>
 						<p className="text-sm mb-4">{t("dashboard.noFavoritesHint")}</p>
-						<Link to="/barbershops" className="btn btn-primary inline-flex">{t("nav.barbershops")}</Link>
+						<Link to="/barbershops" className="btn btn-primary inline-flex">
+							{t("nav.barbershops")}
+						</Link>
 					</div>
 				) : (
 					<div className="shop-grid">
@@ -54,7 +56,11 @@ function FavoriteShopCard({ shopId }: { shopId: Id<"barbershops"> }) {
 		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
 			<div className="shop-card-img">
 				{shop.images[0] ? (
-					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+					<img
+						src={shop.images[0]}
+						alt={shop.name}
+						className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+					/>
 				) : (
 					<Scissors size={32} className="text-[var(--text-subtle)]" />
 				)}
@@ -68,7 +74,8 @@ function FavoriteShopCard({ shopId }: { shopId: Id<"barbershops"> }) {
 					</div>
 				</div>
 				<div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
-					<MapPin size={12} />{shop.address}, {shop.city}
+					<MapPin size={12} />
+					{shop.address}, {shop.city}
 				</div>
 			</div>
 		</Link>

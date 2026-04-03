@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react"
 import { MapPin } from "lucide-react"
+import { useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
-import type { Barbershop } from "../types"
+import type { Barbershop } from "#/types"
 
 interface MapViewProps {
 	shops: Barbershop[]
@@ -17,12 +17,13 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const markersRef = useRef<L.Marker[]>([])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: map initializes once on mount
 	useEffect(() => {
 		if (!mapContainerRef.current || mapRef.current) return
 
 		import("leaflet").then((L) => {
 			const iconProto = L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown }
-			delete iconProto._getIconUrl
+			iconProto._getIconUrl = undefined
 			L.Icon.Default.mergeOptions({
 				iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
 				iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
@@ -44,7 +45,10 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 		})
 
 		return () => {
-			if (mapRef.current) { mapRef.current.remove(); mapRef.current = null }
+			if (mapRef.current) {
+				mapRef.current.remove()
+				mapRef.current = null
+			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -59,8 +63,8 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	const shopsWithCoords = shops.filter((s) => s.lat !== undefined && s.lng !== undefined)
 
 	return (
-		<div className="relative rounded-2xl overflow-hidden border border-[var(--border)]" style={{ height: "500px" }}>
-			<div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
+		<div className="relative rounded-2xl overflow-hidden border border-[var(--border)] h-[500px]">
+			<div ref={mapContainerRef} className="w-full h-full" />
 			{shopsWithCoords.length === 0 && (
 				<div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-muted)] pointer-events-none">
 					<MapPin size={36} className="mb-2 opacity-30" />
@@ -83,7 +87,7 @@ function placeMarkers(
 	onShopClick?: (slug: string) => void,
 	t?: (key: string, opts?: Record<string, unknown>) => string,
 ) {
-	markersRef.current.forEach((m) => m.remove())
+	for (const m of markersRef.current) m.remove()
 	markersRef.current = []
 
 	const shopsWithCoords = shops.filter(
@@ -103,7 +107,9 @@ function placeMarkers(
 
 	for (const shop of shopsWithCoords) {
 		const bookLabel = t ? t("map.bookNowArrow") : "Book now"
-		const reviewsLabel = t ? t("map.reviewsCount", { count: shop.reviewCount }) : `${shop.reviewCount} reviews`
+		const reviewsLabel = t
+			? t("map.reviewsCount", { count: shop.reviewCount })
+			: `${shop.reviewCount} reviews`
 
 		const marker = L.marker([shop.lat, shop.lng], { icon: goldIcon })
 			.addTo(map)

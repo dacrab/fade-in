@@ -1,71 +1,71 @@
-import { mutation, query } from './_generated/server'
-import { v } from 'convex/values'
+import { v } from "convex/values"
+import { mutation, query } from "./_generated/server"
 
 export const listByShop = query({
-  args: { barbershopId: v.id('barbershops') },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query('barbers')
-      .withIndex('by_shop', (q) => q.eq('barbershopId', args.barbershopId))
-      .filter((q) => q.eq(q.field('isActive'), true))
-      .collect()
-  },
+	args: { barbershopId: v.id("barbershops") },
+	handler: async (ctx, args) => {
+		return await ctx.db
+			.query("barbers")
+			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
+			.filter((q) => q.eq(q.field("isActive"), true))
+			.collect()
+	},
 })
 
 export const getById = query({
-  args: { id: v.id('barbers') },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id)
-  },
+	args: { id: v.id("barbers") },
+	handler: async (ctx, args) => {
+		return await ctx.db.get(args.id)
+	},
 })
 
 export const create = mutation({
-  args: {
-    barbershopId: v.id('barbershops'),
-    name: v.string(),
-    bio: v.optional(v.string()),
-    specializations: v.optional(v.array(v.string())),
-    avatarUrl: v.optional(v.string()),
-    userId: v.optional(v.id('users')),
-    workingHours: v.optional(v.any()),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert('barbers', {
-      barbershopId: args.barbershopId,
-      name: args.name,
-      bio: args.bio,
-      specializations: args.specializations ?? [],
-      avatarUrl: args.avatarUrl,
-      userId: args.userId,
-      workingHours: args.workingHours,
-      isActive: true,
-    })
-  },
+	args: {
+		barbershopId: v.id("barbershops"),
+		name: v.string(),
+		bio: v.optional(v.string()),
+		specializations: v.optional(v.array(v.string())),
+		avatarUrl: v.optional(v.string()),
+		userId: v.optional(v.id("users")),
+		workingHours: v.optional(v.any()),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db.insert("barbers", {
+			barbershopId: args.barbershopId,
+			name: args.name,
+			bio: args.bio,
+			specializations: args.specializations ?? [],
+			avatarUrl: args.avatarUrl,
+			userId: args.userId,
+			workingHours: args.workingHours,
+			isActive: true,
+		})
+	},
 })
 
 export const update = mutation({
-  args: {
-    id: v.id('barbers'),
-    name: v.optional(v.string()),
-    bio: v.optional(v.string()),
-    specializations: v.optional(v.array(v.string())),
-    avatarUrl: v.optional(v.string()),
-    workingHours: v.optional(v.any()),
-    isActive: v.optional(v.boolean()),
-  },
-  handler: async (ctx, args) => {
-    const { id, ...fields } = args
-    const updates: Record<string, unknown> = {}
-    for (const [k, val] of Object.entries(fields)) {
-      if (val !== undefined) updates[k] = val
-    }
-    return await ctx.db.patch(id, updates)
-  },
+	args: {
+		id: v.id("barbers"),
+		name: v.optional(v.string()),
+		bio: v.optional(v.string()),
+		specializations: v.optional(v.array(v.string())),
+		avatarUrl: v.optional(v.string()),
+		workingHours: v.optional(v.any()),
+		isActive: v.optional(v.boolean()),
+	},
+	handler: async (ctx, args) => {
+		const { id, ...fields } = args
+		const updates: Record<string, unknown> = {}
+		for (const [k, val] of Object.entries(fields)) {
+			if (val !== undefined) updates[k] = val
+		}
+		return await ctx.db.patch(id, updates)
+	},
 })
 
 export const remove = mutation({
-  args: { id: v.id('barbers') },
-  handler: async (ctx, args) => {
-    return await ctx.db.patch(args.id, { isActive: false })
-  },
+	args: { id: v.id("barbers") },
+	handler: async (ctx, args) => {
+		return await ctx.db.patch(args.id, { isActive: false })
+	},
 })

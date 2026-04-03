@@ -1,6 +1,6 @@
 import { Select as BaseSelect } from "@base-ui/react/select"
-import { cn } from "../../lib/cn"
-import { ChevronDown, Check } from "lucide-react"
+import { Check, ChevronDown } from "lucide-react"
+import { cn } from "#/lib/cn"
 
 interface SelectOption {
 	value: string
@@ -48,7 +48,9 @@ export function Select({
 			<BaseSelect.Portal>
 				<BaseSelect.Positioner sideOffset={4}>
 					<BaseSelect.Popup className="popup min-w-[8rem]">
-						<BaseSelect.ScrollUpArrow className="flex justify-center py-1 text-[var(--text-muted)] text-xs">▲</BaseSelect.ScrollUpArrow>
+						<BaseSelect.ScrollUpArrow className="flex justify-center py-1 text-[var(--text-muted)] text-xs">
+							▲
+						</BaseSelect.ScrollUpArrow>
 						{options.map((opt) => (
 							<BaseSelect.Item key={opt.value} value={opt.value} className="popup-item">
 								<BaseSelect.ItemIndicator className="flex-shrink-0">
@@ -57,7 +59,9 @@ export function Select({
 								<BaseSelect.ItemText>{opt.label}</BaseSelect.ItemText>
 							</BaseSelect.Item>
 						))}
-						<BaseSelect.ScrollDownArrow className="flex justify-center py-1 text-[var(--text-muted)] text-xs">▼</BaseSelect.ScrollDownArrow>
+						<BaseSelect.ScrollDownArrow className="flex justify-center py-1 text-[var(--text-muted)] text-xs">
+							▼
+						</BaseSelect.ScrollDownArrow>
 					</BaseSelect.Popup>
 				</BaseSelect.Positioner>
 			</BaseSelect.Portal>

@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { useQuery } from "convex/react"
+import { Building2, ShieldCheck, Star, Users } from "lucide-react"
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useQuery } from "convex/react"
+import { Skeleton } from "#/components/ui/Skeleton"
+import { useAuth } from "#/hooks/useAuth"
+import type { Barbershop, User } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import { useAuth } from "../../hooks/useAuth"
-import { Users, Building2, Star, ShieldCheck } from "lucide-react"
-import { Skeleton } from "../../components/ui/Skeleton"
-import type { Barbershop, User } from "../../types"
 
 export const Route = createFileRoute("/admin/")({ component: AdminDashboard })
 
@@ -39,15 +39,21 @@ function AdminDashboard() {
 	return (
 		<main>
 			<div className="dashboard-layout">
-				<aside className="border-r border-[var(--border)] px-4 py-6 hidden md:block" style={{ background: "var(--bg-card)" }}>
+				<aside className="bg-card border-r border-[var(--border)] px-4 py-6 hidden md:block">
 					<div className="mb-6">
 						<h2 className="font-bold text-[var(--text)]">{t("admin.title")}</h2>
 						<p className="text-xs text-[var(--text-muted)]">{t("admin.subtitle")}</p>
 					</div>
 					<nav className="space-y-1">
 						{navLinks.map(({ to, label, icon: Icon }) => (
-							<Link key={to} to={to} className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium no-underline transition-colors text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-card-hover)]" activeProps={{ style: { color: "var(--gold)", background: "rgba(245,158,11,0.08)" } }}>
-								<Icon size={16} />{label}
+							<Link
+								key={to}
+								to={to}
+								className="sidebar-link"
+								activeProps={{ className: "sidebar-link active" }}
+							>
+								<Icon size={16} />
+								{label}
 							</Link>
 						))}
 					</nav>
@@ -77,20 +83,29 @@ function AdminDashboard() {
 						<div className="card p-5">
 							<div className="section-header">
 								<h2 className="font-bold text-[var(--text)]">{t("admin.recentShops")}</h2>
-								<Link to="/admin/shops" className="section-link">{t("admin.shops.title")} →</Link>
+								<Link to="/admin/shops" className="section-link">
+									{t("admin.shops.title")} →
+								</Link>
 							</div>
 							{!allShops ? (
 								<Skeleton className="h-32 w-full" />
 							) : (
 								<div className="space-y-2">
 									{allShops.slice(0, 5).map((shop) => (
-										<div key={shop._id} className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0">
+										<div
+											key={shop._id}
+											className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0"
+										>
 											<div className="flex-1 min-w-0">
 												<div className="text-sm font-medium text-[var(--text)] truncate">{shop.name}</div>
 												<div className="text-xs text-[var(--text-muted)]">{shop.city}</div>
 											</div>
-											<span className={`badge text-[10px] ${shop.isVerified ? "badge-green" : "badge-gold"}`}>{shop.isVerified ? t("common.verified") : "Pending"}</span>
-											<span className={`badge text-[10px] ${shop.isActive ? "badge-green" : "badge-red"}`}>{shop.isActive ? t("common.active") : t("common.suspended")}</span>
+											<span className={`badge text-[10px] ${shop.isVerified ? "badge-green" : "badge-gold"}`}>
+												{shop.isVerified ? t("common.verified") : t("admin.shops.pending")}
+											</span>
+											<span className={`badge text-[10px] ${shop.isActive ? "badge-green" : "badge-red"}`}>
+												{shop.isActive ? t("common.active") : t("common.suspended")}
+											</span>
 										</div>
 									))}
 								</div>
@@ -107,8 +122,16 @@ function AdminDashboard() {
 										[
 											{ role: t("admin.roles.customers"), count: customers, color: "var(--gold)" },
 											{ role: t("admin.roles.owners"), count: owners, color: "var(--success)" },
-											{ role: t("admin.roles.barbers"), count: allUsers.filter((u) => u.role === "barber").length, color: "#818CF8" },
-											{ role: t("admin.roles.admins"), count: allUsers.filter((u) => u.role === "admin").length, color: "var(--error)" },
+											{
+												role: t("admin.roles.barbers"),
+												count: allUsers.filter((u) => u.role === "barber").length,
+												color: "#818CF8",
+											},
+											{
+												role: t("admin.roles.admins"),
+												count: allUsers.filter((u) => u.role === "admin").length,
+												color: "var(--error)",
+											},
 										] as const
 									).map(({ role, count, color }) => (
 										<div key={role}>
@@ -117,7 +140,13 @@ function AdminDashboard() {
 												<span className="font-semibold text-[var(--text)]">{count}</span>
 											</div>
 											<div className="h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
-												<div className="h-full rounded-full transition-all" style={{ width: allUsers.length ? `${(count / allUsers.length) * 100}%` : "0%", background: color }} />
+												<div
+													className="h-full rounded-full transition-all"
+													style={{
+														width: allUsers.length ? `${(count / allUsers.length) * 100}%` : "0%",
+														background: color,
+													}}
+												/>
 											</div>
 										</div>
 									))}

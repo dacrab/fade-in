@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useMutation } from "convex/react"
+import { Save } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useMutation } from "convex/react"
+import { showToast } from "#/components/ui/Toast"
+import { useAuth } from "#/hooks/useAuth"
 import { api } from "../../../convex/_generated/api"
-import { useAuth } from "../../hooks/useAuth"
-import { showToast } from "../../components/ui/Toast"
-import { Save } from "lucide-react"
 import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/profile")({ component: ProfilePage })
@@ -45,9 +45,7 @@ function ProfilePage() {
 
 				<div className="card p-6">
 					<div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border)]">
-						<div className="avatar avatar-lg">
-							{user?.name.charAt(0).toUpperCase()}
-						</div>
+						<div className="avatar avatar-lg">{user?.name.charAt(0).toUpperCase()}</div>
 						<div>
 							<h2 className="font-bold text-[var(--text)]">{user?.name}</h2>
 							<p className="text-sm text-[var(--text-muted)]">{user?.email}</p>
@@ -57,20 +55,43 @@ function ProfilePage() {
 
 					<form onSubmit={(e) => void handleSave(e)} className="space-y-4">
 						<div>
-							<label className="form-label">{t("auth.nameLabel")}</label>
-							<input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("auth.namePlaceholder")} />
+							<label className="form-label" htmlFor="profile-name">
+								{t("auth.nameLabel")}
+							</label>
+							<input
+								className="input"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+								placeholder={t("auth.namePlaceholder")}
+							/>
 						</div>
 						<div>
-							<label className="form-label">{t("form.phoneLabel")}</label>
-							<input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("dashboard.phonePlaceholder")} type="tel" />
+							<label className="form-label" htmlFor="profile-phone">
+								{t("form.phoneLabel")}
+							</label>
+							<input
+								className="input"
+								value={phone}
+								onChange={(e) => setPhone(e.target.value)}
+								placeholder={t("dashboard.phonePlaceholder")}
+								type="tel"
+							/>
 						</div>
 						<div>
-							<label className="form-label">{t("auth.emailLabel")}</label>
-							<input className="input opacity-50 cursor-not-allowed" value={user?.email} disabled />
+							<label className="form-label" htmlFor="profile-email">
+								{t("auth.emailLabel")}
+							</label>
+							<input
+								id="profile-email"
+								className="input opacity-50 cursor-not-allowed"
+								value={user?.email}
+								disabled
+							/>
 							<p className="text-xs text-[var(--text-muted)] mt-1">{t("dashboard.emailNote")}</p>
 						</div>
 						<button type="submit" disabled={saving} className="btn btn-primary gap-2">
-							<Save size={15} />{saving ? t("common.loading") : t("common.save")}
+							<Save size={15} />
+							{saving ? t("common.loading") : t("common.save")}
 						</button>
 					</form>
 				</div>

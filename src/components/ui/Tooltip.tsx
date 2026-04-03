@@ -1,5 +1,5 @@
-import type * as React from "react"
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip"
+import type * as React from "react"
 
 interface TooltipProps {
 	children: React.ReactElement

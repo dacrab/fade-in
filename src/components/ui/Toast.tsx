@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react"
-import { X, CheckCircle, AlertCircle, Info } from "lucide-react"
+import { AlertCircle, CheckCircle, Info, X } from "lucide-react"
+import { useCallback, useEffect, useState } from "react"
 
 type ToastType = "success" | "error" | "info"
 
@@ -39,7 +39,9 @@ export function ToastContainer() {
 
 	useEffect(() => {
 		globalSetToasts = setToasts
-		return () => { globalSetToasts = null }
+		return () => {
+			globalSetToasts = null
+		}
 	}, [])
 
 	const dismiss = useCallback((id: number) => {
@@ -53,16 +55,14 @@ export function ToastContainer() {
 				return (
 					<div
 						key={toast.id}
-						className={`fade-up flex items-start gap-3 p-4 rounded-xl border backdrop-blur-lg ${COLORS[toast.type]}`}
-						style={{ background: "rgba(10,10,10,0.9)" }}
+						className={`fade-up flex items-start gap-3 p-4 rounded-xl border backdrop-blur-lg bg-black/90 ${COLORS[toast.type]}`}
 					>
 						<Icon size={18} className="flex-shrink-0 mt-0.5" />
 						<span className="text-sm text-[var(--text)] flex-1">{toast.message}</span>
 						<button
 							type="button"
 							onClick={() => dismiss(toast.id)}
-							className="icon-btn flex-shrink-0"
-							style={{ background: "none", border: "none", color: "var(--text-muted)" }}
+							className="icon-btn flex-shrink-0 bg-transparent border-0 text-app-muted"
 						>
 							<X size={14} />
 						</button>

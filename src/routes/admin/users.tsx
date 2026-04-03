@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { api } from "../../../convex/_generated/api"
 import { Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "../../components/ui/Skeleton"
-import type { User, UserRole } from "../../types"
+import { Skeleton } from "#/components/ui/Skeleton"
+import type { User, UserRole } from "#/types"
+import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/admin/users")({ component: AdminUsers })
 
@@ -24,11 +24,8 @@ function AdminUsers() {
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
 				<div className="page-header">
-					<Link
-						to="/admin"
-						className="breadcrumb-back"
-					>
-						← Admin
+					<Link to="/admin" className="breadcrumb-back">
+						← {t("nav.admin")}
 					</Link>
 					<span className="breadcrumb-sep">/</span>
 					<h1>{t("admin.users.title")}</h1>
@@ -37,13 +34,14 @@ function AdminUsers() {
 				{allUsers === undefined ? (
 					<div className="space-y-3">
 						{Array.from({ length: 6 }).map((_, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders
 							<Skeleton key={i} className="h-14 w-full rounded-xl" />
 						))}
 					</div>
 				) : allUsers.length === 0 ? (
 					<div className="empty-state">
 						<Users size={36} className="mx-auto mb-3 opacity-30" />
-						<p>No users registered yet.</p>
+						<p>{t("admin.users.noUsers")}</p>
 					</div>
 				) : (
 					<div className="card overflow-hidden">

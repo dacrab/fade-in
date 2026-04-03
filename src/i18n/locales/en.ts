@@ -27,6 +27,9 @@ const en = {
 		suspended: "Suspended",
 		anyRating: "Any",
 		noResults: "No results found",
+		at: "at",
+		min: "min",
+		pending: "Pending",
 	},
 
 	// ─── Navigation ────────────────────────────────────────────────────────────
@@ -68,7 +71,8 @@ const en = {
 		badge: "The #1 barbershop booking platform",
 		heroTitle: "Look sharp,",
 		heroTitleHighlight: "book fast",
-		heroSubtitle: "Discover top-rated barbershops near you and book your next appointment in seconds.",
+		heroSubtitle:
+			"Discover top-rated barbershops near you and book your next appointment in seconds.",
 		searchPlaceholder: "Barbershop name or service...",
 		cityPlaceholder: "City...",
 		stats: {
@@ -82,9 +86,18 @@ const en = {
 		howTitle: "How FadeIn works",
 		howSubtitle: "Book your barbershop in 3 simple steps",
 		steps: {
-			discover: { title: "Discover", desc: "Search barbershops in your city. Filter by rating, price, or services." },
-			book: { title: "Book", desc: "Choose your barber, pick a time slot, and confirm — in under 60 seconds." },
-			enjoy: { title: "Enjoy & Review", desc: "Get groomed, then leave a review to help others find great barbers." },
+			discover: {
+				title: "Discover",
+				desc: "Search barbershops in your city. Filter by rating, price, or services.",
+			},
+			book: {
+				title: "Book",
+				desc: "Choose your barber, pick a time slot, and confirm — in under 60 seconds.",
+			},
+			enjoy: {
+				title: "Enjoy & Review",
+				desc: "Get groomed, then leave a review to help others find great barbers.",
+			},
 		},
 		ctaTitle: "Own a barbershop?",
 		ctaSubtitle: "Join hundreds of barbershops already using FadeIn to grow their business.",
@@ -174,14 +187,27 @@ const en = {
 		badge: "For barbershop owners",
 		title: "Grow your barbershop",
 		titleHighlight: "with FadeIn",
-		subtitle: "Join hundreds of barbershops already using FadeIn to manage appointments, attract new clients, and build their online reputation.",
+		subtitle:
+			"Join hundreds of barbershops already using FadeIn to manage appointments, attract new clients, and build their online reputation.",
 		featuresTitle: "Everything you need to run your shop",
 		featuresSubtitle: "Powerful tools built for modern barbershops",
 		features: {
-			calendar: { title: "Smart Booking Calendar", desc: "Manage all your appointments in one place. Real-time updates, no double bookings." },
-			team: { title: "Team Management", desc: "Add barbers, set their working hours, and track their schedules effortlessly." },
-			analytics: { title: "Business Analytics", desc: "See your revenue, top services, and busiest hours at a glance." },
-			reviews: { title: "Reviews & Reputation", desc: "Collect genuine reviews from customers and reply directly from your dashboard." },
+			calendar: {
+				title: "Smart Booking Calendar",
+				desc: "Manage all your appointments in one place. Real-time updates, no double bookings.",
+			},
+			team: {
+				title: "Team Management",
+				desc: "Add barbers, set their working hours, and track their schedules effortlessly.",
+			},
+			analytics: {
+				title: "Business Analytics",
+				desc: "See your revenue, top services, and busiest hours at a glance.",
+			},
+			reviews: {
+				title: "Reviews & Reputation",
+				desc: "Collect genuine reviews from customers and reply directly from your dashboard.",
+			},
 		},
 		pricingTitle: "Simple, transparent pricing",
 		pricingSubtitle: "No hidden fees. Cancel anytime.",
@@ -196,7 +222,13 @@ const en = {
 				name: "Pro",
 				price: "€29/mo",
 				desc: "For growing shops",
-				features: ["Up to 5 barbers", "Unlimited bookings", "Advanced analytics", "Priority support", "Custom working hours"],
+				features: [
+					"Up to 5 barbers",
+					"Unlimited bookings",
+					"Advanced analytics",
+					"Priority support",
+					"Custom working hours",
+				],
 			},
 			enterprise: {
 				name: "Enterprise",
@@ -243,6 +275,8 @@ const en = {
 		},
 		setupTitle: "Set up your barbershop",
 		setupHint: "You haven't listed a barbershop yet.",
+		noReviewsYet: "No reviews yet.",
+		defaultAppointmentNote: "Appointment",
 		createShop: "Create your shop",
 		overviewTitle: "Overview",
 		stats: {
@@ -330,6 +364,12 @@ const en = {
 		shops: {
 			title: "Manage Shops",
 			noShops: "No shops registered yet.",
+			pending: "Pending",
+			verified: "Shop verified!",
+			verificationRemoved: "Verification removed",
+			reactivated: "Shop reactivated",
+			suspended: "Shop suspended",
+			failed: "Action failed",
 			verify: "Verify",
 			unverify: "Unverify",
 			suspend: "Suspend",
@@ -376,6 +416,7 @@ const en = {
 
 	// ─── Errors / Toasts ────────────────────────────────────────────────────────
 	errors: {
+		updateStatusFailed: "Failed to update status",
 		fillAllFields: "Please fill in all fields",
 		passwordLength: "Password must be at least 8 characters",
 		registrationFailed: "Registration failed. Please try again.",
@@ -411,6 +452,10 @@ const en = {
 		cityStar: "City *",
 		addressStar: "Address *",
 		andSeparator: " & ",
+		instagramLabel: "Instagram",
+		facebookLabel: "Facebook",
+		websiteLabel: "Website",
+		cityPlaceholder: "Athens",
 	},
 
 	// ─── Status ────────────────────────────────────────────────────────────────

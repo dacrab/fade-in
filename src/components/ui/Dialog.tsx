@@ -1,7 +1,7 @@
-import type * as React from "react"
 import { Dialog as BaseDialog } from "@base-ui/react/dialog"
-import { cn } from "../../lib/cn"
 import { X } from "lucide-react"
+import type * as React from "react"
+import { cn } from "#/lib/cn"
 
 interface DialogProps {
 	open: boolean
@@ -26,9 +26,7 @@ export function DialogContent({ children, className }: DialogContentProps) {
 	return (
 		<BaseDialog.Portal>
 			<BaseDialog.Backdrop className="dialog-backdrop" />
-			<BaseDialog.Popup className={cn("dialog-popup", className)}>
-				{children}
-			</BaseDialog.Popup>
+			<BaseDialog.Popup className={cn("dialog-popup", className)}>{children}</BaseDialog.Popup>
 		</BaseDialog.Portal>
 	)
 }
@@ -88,10 +86,7 @@ interface DialogCloseProps {
 
 export function DialogClose({ children, className }: DialogCloseProps) {
 	return (
-		<BaseDialog.Close
-			className={cn("icon-btn", className)}
-			style={{ background: "none", border: "none" }}
-		>
+		<BaseDialog.Close className={cn("icon-btn bg-transparent border-0", className)}>
 			{children}
 		</BaseDialog.Close>
 	)

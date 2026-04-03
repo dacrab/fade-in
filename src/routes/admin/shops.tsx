@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { useQuery, useMutation } from "convex/react"
-import { api } from "../../../convex/_generated/api"
-import { ShieldCheck, ShieldOff, PowerOff, Power, Building2, Check } from "lucide-react"
+import { useMutation, useQuery } from "convex/react"
+import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "../../components/ui/Skeleton"
-import { showToast } from "../../components/ui/Toast"
-import type { Barbershop } from "../../types"
+import { Skeleton } from "#/components/ui/Skeleton"
+import { showToast } from "#/components/ui/Toast"
+import type { Barbershop } from "#/types"
+import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/admin/shops")({ component: AdminShops })
@@ -20,44 +20,67 @@ function AdminShops() {
 	const handleVerify = async (id: Id<"barbershops">, val: boolean) => {
 		try {
 			await verify({ id, isVerified: val })
-			showToast(val ? "Shop verified!" : "Verification removed", "success")
-		} catch { showToast("Failed", "error") }
+			showToast(val ? t("admin.shops.verified") : t("admin.shops.verificationRemoved"), "success")
+		} catch {
+			showToast(t("admin.shops.failed"), "error")
+		}
 	}
 
 	const handleSuspend = async (id: Id<"barbershops">, val: boolean) => {
 		try {
 			await suspend({ id, isActive: val })
-			showToast(val ? "Shop reactivated" : "Shop suspended", val ? "success" : "info")
-		} catch { showToast("Failed", "error") }
+			showToast(
+				val ? t("admin.shops.reactivated") : t("admin.shops.suspended"),
+				val ? "success" : "info",
+			)
+		} catch {
+			showToast(t("admin.shops.failed"), "error")
+		}
 	}
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-5xl">
 				<div className="page-header">
-					<Link to="/admin" className="breadcrumb-back">← Admin</Link>
+					<Link to="/admin" className="breadcrumb-back">
+						← {t("nav.admin")}
+					</Link>
 					<span className="breadcrumb-sep">/</span>
 					<h1>{t("admin.shops.title")}</h1>
 				</div>
 
 				{allShops === undefined ? (
-					<div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}</div>
+					<div className="space-y-3">
+						{Array.from({ length: 5 }).map((_, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+							<Skeleton key={i} className="h-16 w-full rounded-xl" />
+						))}
+					</div>
 				) : allShops.length === 0 ? (
 					<div className="empty-state">
 						<Building2 size={36} className="mx-auto mb-3 opacity-30" />
-						<p>No shops registered yet.</p>
+						<p>{t("admin.shops.noShops")}</p>
 					</div>
 				) : (
 					<div className="space-y-2">
+						{/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: admin shop management */}
 						{allShops.map((shop) => (
 							<div key={shop._id} className="card p-4 flex flex-col sm:flex-row sm:items-center gap-3">
 								<div className="flex-1 min-w-0">
 									<div className="flex items-center gap-2 flex-wrap">
 										<span className="font-medium text-[var(--text)] text-sm">{shop.name}</span>
-										{shop.isVerified && <span className="badge badge-green text-[10px]"><Check size={9} /> {t("common.verified")}</span>}
-										{!shop.isActive && <span className="badge badge-red text-[10px]">{t("common.suspended")}</span>}
+										{shop.isVerified && (
+											<span className="badge badge-green text-[10px]">
+												<Check size={9} /> {t("common.verified")}
+											</span>
+										)}
+										{!shop.isActive && (
+											<span className="badge badge-red text-[10px]">{t("common.suspended")}</span>
+										)}
 									</div>
-									<div className="text-xs text-[var(--text-muted)]">{shop.address}, {shop.city} · {shop.rating.toFixed(1)}/5 ({shop.reviewCount})</div>
+									<div className="text-xs text-[var(--text-muted)]">
+										{shop.address}, {shop.city} · {shop.rating.toFixed(1)}/5 ({shop.reviewCount})
+									</div>
 								</div>
 								<div className="flex gap-2 flex-wrap">
 									<button
@@ -76,7 +99,13 @@ function AdminShops() {
 										{shop.isActive ? <PowerOff size={13} /> : <Power size={13} />}
 										{shop.isActive ? t("admin.shops.suspend") : t("admin.shops.reactivate")}
 									</button>
-									<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="btn btn-ghost text-xs py-1.5 px-3">{t("admin.shops.view")}</Link>
+									<Link
+										to="/barbershops/$slug"
+										params={{ slug: shop.slug }}
+										className="btn btn-ghost text-xs py-1.5 px-3"
+									>
+										{t("admin.shops.view")}
+									</Link>
 								</div>
 							</div>
 						))}

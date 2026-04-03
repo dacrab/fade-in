@@ -21,15 +21,11 @@ export function StarRating({
 				const filled = i < Math.floor(rating)
 				return (
 					<button
+						// biome-ignore lint/suspicious/noArrayIndexKey: star rating index is positional
 						key={i}
 						type="button"
 						onClick={() => interactive && onRate?.(i + 1)}
-						className={
-							interactive
-								? "cursor-pointer hover:scale-110 transition-transform"
-								: "cursor-default pointer-events-none"
-						}
-						style={{ background: "none", border: "none", padding: 0 }}
+						className={`bg-transparent border-0 p-0 ${interactive ? "cursor-pointer hover:scale-110 transition-transform" : "cursor-default pointer-events-none"}`}
 					>
 						<Star
 							size={size}

@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { useQuery } from "convex/react"
+import { Calendar, CheckCircle, Clock, Heart, Scissors, User, XCircle } from "lucide-react"
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useQuery } from "convex/react"
+import { Skeleton } from "#/components/ui/Skeleton"
+import { useAuth } from "#/hooks/useAuth"
+import { formatDateShort, formatPrice } from "#/lib/format"
+import { type Appointment, type Barbershop, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import { useAuth } from "../../hooks/useAuth"
-import { Calendar, Heart, User, Clock, CheckCircle, XCircle, Scissors } from "lucide-react"
-import { Skeleton } from "../../components/ui/Skeleton"
-import { formatPrice, formatDateShort } from "../../lib/format"
-import { STATUS_BADGE, type Appointment, type Barbershop } from "../../types"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/")({ component: CustomerDashboard })
@@ -18,7 +18,10 @@ function CustomerDashboard() {
 	const router = useRouter()
 
 	useEffect(() => {
-		if (!loading && !user) { void router.navigate({ to: "/login" }); return }
+		if (!(loading || user)) {
+			void router.navigate({ to: "/login" })
+			return
+		}
 		if (!loading && user && user.role !== "customer" && user.role !== "admin")
 			void router.navigate({ to: "/" })
 	}, [user, loading, router])
@@ -45,7 +48,9 @@ function CustomerDashboard() {
 				<div className="section-header">
 					<div>
 						<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.title")}</h1>
-						<p className="text-[var(--text-muted)] text-sm">{t("dashboard.welcome", { name: user.name })}</p>
+						<p className="text-[var(--text-muted)] text-sm">
+							{t("dashboard.welcome", { name: user.name })}
+						</p>
 					</div>
 					<div className="flex gap-2">
 						<Link to="/dashboard/favorites" className="btn btn-secondary gap-2 text-sm">
@@ -65,12 +70,14 @@ function CustomerDashboard() {
 							{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
 							{
 								label: t("dashboard.stats.completed"),
-								value: appointments?.filter((a: Doc<"appointments">) => a.status === "completed").length ?? "—",
+								value:
+									appointments?.filter((a: Doc<"appointments">) => a.status === "completed").length ?? "—",
 								icon: CheckCircle,
 							},
 							{
 								label: t("dashboard.stats.cancelled"),
-								value: appointments?.filter((a: Doc<"appointments">) => a.status === "cancelled").length ?? "—",
+								value:
+									appointments?.filter((a: Doc<"appointments">) => a.status === "cancelled").length ?? "—",
 								icon: XCircle,
 							},
 						] as const
@@ -89,6 +96,7 @@ function CustomerDashboard() {
 					{appointments === undefined ? (
 						<div className="space-y-3">
 							{Array.from({ length: 3 }).map((_, i) => (
+								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
 								<Skeleton key={i} className="h-16 w-full" />
 							))}
 						</div>
@@ -126,6 +134,7 @@ function CustomerDashboard() {
 }
 
 function AppointmentRow({ appt }: { appt: Appointment }) {
+	const { t } = useTranslation()
 	const shop = useQuery(api.barbershops.getById, { id: appt.barbershopId }) as
 		| Barbershop
 		| null
@@ -142,11 +151,9 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 				<Scissors size={18} className="text-[var(--gold)]" />
 			</div>
 			<div className="flex-1 min-w-0">
-				<div className="font-medium text-[var(--text)] text-sm truncate">
-					{shop?.name ?? "..."}
-				</div>
+				<div className="font-medium text-[var(--text)] text-sm truncate">{shop?.name ?? "..."}</div>
 				<div className="text-xs text-[var(--text-muted)]">
-					{formatDateShort(appt.date)} at {appt.startTime}
+					{formatDateShort(appt.date)} {t("common.at")} {appt.startTime}
 				</div>
 			</div>
 			<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(appt.totalPrice)}</div>
@@ -162,6 +169,7 @@ function DashSkeleton() {
 				<Skeleton className="h-10 w-48" />
 				<div className="grid grid-cols-4 gap-4">
 					{Array.from({ length: 4 }).map((_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
 						<Skeleton key={i} className="h-24 rounded-xl" />
 					))}
 				</div>
