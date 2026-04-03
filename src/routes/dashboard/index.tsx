@@ -1,10 +1,11 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Calendar, CheckCircle, Clock, Heart, Scissors, User, XCircle } from "lucide-react"
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
+import SkeletonList from "#/components/SkeletonList"
+import StatsGrid from "#/components/StatsGrid"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { useAuth } from "#/hooks/useAuth"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import { type Appointment, type Barbershop, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -14,17 +15,7 @@ export const Route = createFileRoute("/dashboard/")({ component: CustomerDashboa
 
 function CustomerDashboard() {
 	const { t } = useTranslation()
-	const { user, loading } = useAuth()
-	const router = useRouter()
-
-	useEffect(() => {
-		if (!(loading || user)) {
-			void router.navigate({ to: "/login" })
-			return
-		}
-		if (!loading && user && user.role !== "customer" && user.role !== "admin")
-			void router.navigate({ to: "/" })
-	}, [user, loading, router])
+	const { user, loading } = useRequireRole(["customer", "admin"], "/login")
 
 	const appointments = useQuery(
 		api.appointments.listByCustomer,
@@ -63,10 +54,15 @@ function CustomerDashboard() {
 				</div>
 
 				{/* Stats */}
-				<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-					{(
-						[
-							{ label: t("dashboard.stats.total"), value: appointments?.length ?? "—", icon: Calendar },
+				<div className="mb-8">
+					<StatsGrid
+						cols={4}
+						stats={[
+							{
+								label: t("dashboard.stats.total"),
+								value: appointments?.length ?? "—",
+								icon: Calendar,
+							},
 							{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
 							{
 								label: t("dashboard.stats.completed"),
@@ -80,26 +76,15 @@ function CustomerDashboard() {
 									appointments?.filter((a: Doc<"appointments">) => a.status === "cancelled").length ?? "—",
 								icon: XCircle,
 							},
-						] as const
-					).map(({ label, value, icon: Icon }) => (
-						<div key={label} className="card p-4">
-							<Icon size={18} className="text-[var(--gold)] mb-2" />
-							<div className="text-2xl font-bold text-[var(--text)]">{value}</div>
-							<div className="text-xs text-[var(--text-muted)]">{label}</div>
-						</div>
-					))}
+						]}
+					/>
 				</div>
 
 				{/* Upcoming */}
 				<div className="card p-5 mb-5">
 					<h2 className="font-bold text-[var(--text)] mb-4">{t("dashboard.upcomingTitle")}</h2>
 					{appointments === undefined ? (
-						<div className="space-y-3">
-							{Array.from({ length: 3 }).map((_, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-								<Skeleton key={i} className="h-16 w-full" />
-							))}
-						</div>
+						<SkeletonList count={3} height="h-16" />
 					) : upcoming.length === 0 ? (
 						<div className="empty-state">
 							<Calendar size={32} className="mx-auto mb-2 opacity-30" />

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Building2, ShieldCheck, Star, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import StatsGrid from "#/components/StatsGrid"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useRequireRole } from "#/hooks/useRequireRole"
 import type { Barbershop, User } from "#/types"
@@ -56,22 +57,15 @@ function AdminDashboard() {
 				<div className="page-main">
 					<h1 className="text-2xl font-bold text-[var(--text)] mb-6">{t("admin.overviewTitle")}</h1>
 
-					<div className="stat-grid stat-grid-4">
-						{(
-							[
-								{ label: t("admin.stats.totalShops"), value: allShops?.length ?? "—", icon: Building2 },
-								{ label: t("admin.stats.verifiedShops"), value: verified, icon: ShieldCheck },
-								{ label: t("admin.stats.totalUsers"), value: allUsers?.length ?? "—", icon: Users },
-								{ label: t("admin.stats.owners"), value: owners, icon: Star },
-							] as const
-						).map(({ label, value, icon: Icon }) => (
-							<div key={label} className="card p-4">
-								<Icon size={18} className="text-[var(--gold)] mb-2" />
-								<div className="text-2xl font-bold text-[var(--text)]">{value}</div>
-								<div className="text-xs text-[var(--text-muted)]">{label}</div>
-							</div>
-						))}
-					</div>
+					<StatsGrid
+						cols={4}
+						stats={[
+							{ label: t("admin.stats.totalShops"), value: allShops?.length ?? "—", icon: Building2 },
+							{ label: t("admin.stats.verifiedShops"), value: verified, icon: ShieldCheck },
+							{ label: t("admin.stats.totalUsers"), value: allUsers?.length ?? "—", icon: Users },
+							{ label: t("admin.stats.owners"), value: owners, icon: Star },
+						]}
+					/>
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						<div className="card p-5">

@@ -1,13 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
-import { useMutation, useQuery } from "convex/react"
+import { createFileRoute } from "@tanstack/react-router"
+import { useMutation } from "convex/react"
 import { PlusCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
+import Breadcrumb from "#/components/Breadcrumb"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { useFormState } from "#/hooks/useFormState"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { slugify } from "#/lib/format"
-import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -37,11 +38,7 @@ const EMPTY: ShopForm = {
 function BusinessProfile() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0] as Barbershop | undefined
+	const shop = useOwnerShop()
 	const { form, setForm, set } = useFormState(EMPTY)
 	const [saving, setSaving] = useState(false)
 
@@ -106,13 +103,11 @@ function BusinessProfile() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-2xl">
-				<div className="page-header">
-					<Link to="/business" className="breadcrumb-back">
-						← {t("nav.business")}
-					</Link>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}</h1>
-				</div>
+				<Breadcrumb
+					to="/business"
+					label={t("nav.business")}
+					title={shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}
+				/>
 
 				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
 					<div className="card p-5 space-y-4">
