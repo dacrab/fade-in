@@ -1,0 +1,88 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": [
+			"src/**/*",
+			"convex/**/*",
+			"vite.config.ts",
+			"!src/routeTree.gen.ts",
+			"!src/styles.css",
+			"!convex/_generated/**"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 1,
+		"lineWidth": 100,
+		"lineEnding": "lf"
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": "error",
+				"noUnusedImports": "error",
+				"useExhaustiveDependencies": "warn",
+				"noConstantCondition": "error",
+				"useArrayLiterals": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn",
+				"noConsole": "warn",
+				"noDoubleEquals": "error",
+				"noConfusingVoidType": "error",
+				"noMisleadingInstantiator": "error"
+			},
+			"style": {
+				"noNonNullAssertion": "warn",
+				"useConst": "error",
+				"useTemplate": "error",
+				"useSingleVarDeclarator": "error",
+				"noParameterAssign": "error",
+				"useShorthandAssign": "error",
+				"useDefaultParameterLast": "error",
+				"noUselessElse": "error",
+				"useImportType": "error"
+			},
+			"complexity": {
+				"noForEach": "off",
+				"noBannedTypes": "error",
+				"useSimplifiedLogicExpression": "warn",
+				"noExcessiveCognitiveComplexity": "warn"
+			},
+			"performance": {
+				"noAccumulatingSpread": "warn",
+				"noDelete": "warn"
+			},
+			"security": {
+				"noDangerouslySetInnerHtmlWithChildren": "error"
+			},
+			"a11y": {
+				"useButtonType": "error",
+				"useAltText": "error",
+				"noSvgWithoutTitle": "off"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"trailingCommas": "all",
+			"semicolons": "never",
+			"arrowParentheses": "always",
+			"bracketSameLine": false
+		},
+		"globals": ["React"]
+	}
+}

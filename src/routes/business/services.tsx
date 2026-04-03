@@ -1,0 +1,147 @@
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { useState } from "react"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "../../../convex/_generated/api"
+import { useAuth } from "../../hooks/useAuth"
+import { PlusCircle, Pencil, Trash2, X, Check } from "lucide-react"
+import { Skeleton } from "../../components/ui/Skeleton"
+import { formatPrice } from "../../lib/format"
+import { showToast } from "../../components/ui/Toast"
+import type { Barbershop, Service } from "../../types"
+import type { Id } from "../../../convex/_generated/dataModel"
+
+export const Route = createFileRoute("/business/services")({ component: BusinessServices })
+
+interface ServiceForm {
+	name: string
+	description: string
+	price: string
+	durationMinutes: string
+	category: string
+}
+
+const EMPTY_FORM: ServiceForm = { name: "", description: "", price: "", durationMinutes: "30", category: "haircut" }
+const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other"] as const
+type Category = (typeof CATEGORIES)[number]
+
+function BusinessServices() {
+	const { user } = useAuth()
+	const [showForm, setShowForm] = useState(false)
+	const [editId, setEditId] = useState<Id<"services"> | null>(null)
+	const [form, setForm] = useState<ServiceForm>(EMPTY_FORM)
+
+	const shopsRaw = useQuery(api.barbershops.listByOwner, user ? { ownerId: user.id as Id<"users"> } : "skip")
+	const shop = shopsRaw?.[0] as Barbershop | undefined
+	const servicesRaw = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")
+	const services = servicesRaw as Service[] | undefined
+
+	const createService = useMutation(api.services.create)
+	const updateService = useMutation(api.services.update)
+	const removeService = useMutation(api.services.remove)
+
+	const resetForm = () => { setForm(EMPTY_FORM); setEditId(null); setShowForm(false) }
+	const set = (key: keyof ServiceForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+		setForm((f) => ({ ...f, [key]: e.target.value }))
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		if (!shop) return
+		const price = Math.round(parseFloat(form.price) * 100)
+		const durationMinutes = parseInt(form.durationMinutes, 10)
+		try {
+			if (editId) {
+				await updateService({ id: editId, name: form.name, description: form.description || undefined, price, durationMinutes, category: form.category })
+				showToast("Service updated!", "success")
+			} else {
+				await createService({ barbershopId: shop._id, name: form.name, description: form.description || undefined, price, durationMinutes, category: form.category })
+				showToast("Service added!", "success")
+			}
+			resetForm()
+		} catch { showToast("Failed to save service", "error") }
+	}
+
+	const handleEdit = (svc: Service) => {
+		setForm({ name: svc.name, description: svc.description ?? "", price: (svc.price / 100).toFixed(2), durationMinutes: String(svc.durationMinutes), category: svc.category })
+		setEditId(svc._id)
+		setShowForm(true)
+	}
+
+	const handleDelete = async (id: Id<"services">) => {
+		try { await removeService({ id }); showToast("Service removed", "info") }
+		catch { showToast("Failed to remove", "error") }
+	}
+
+	return (
+		<main className="px-4 py-8">
+			<div className="page-wrap max-w-3xl">
+				<div className="flex items-center justify-between mb-6">
+					<div className="flex items-center gap-3">
+						<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Dashboard</Link>
+						<span className="text-[var(--border)]">/</span>
+						<h1 className="text-2xl font-bold text-[var(--text)]">Services</h1>
+					</div>
+					<button type="button" onClick={() => { resetForm(); setShowForm(!showForm) }} className="btn btn-primary gap-2 text-sm">
+						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
+						{showForm ? "Cancel" : "Add service"}
+					</button>
+				</div>
+
+				{showForm && (
+					<div className="card p-5 mb-6 fade-up">
+						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? "Edit service" : "New service"}</h2>
+						<form onSubmit={(e) => void handleSubmit(e)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="sm:col-span-2">
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Name *</label>
+								<input className="input" placeholder="e.g. Classic Haircut" value={form.name} onChange={set("name")} required />
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Price (€) *</label>
+								<input className="input" type="number" step="0.01" min="0" placeholder="15.00" value={form.price} onChange={set("price")} required />
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Duration (min) *</label>
+								<input className="input" type="number" min="5" step="5" placeholder="30" value={form.durationMinutes} onChange={set("durationMinutes")} required />
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Category</label>
+								<select className="input" value={form.category} onChange={set("category")}>
+									{CATEGORIES.map((c: Category) => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+								</select>
+							</div>
+							<div className="sm:col-span-2">
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Description</label>
+								<input className="input" placeholder="Optional..." value={form.description} onChange={set("description")} />
+							</div>
+							<div className="sm:col-span-2 flex gap-2">
+								<button type="submit" className="btn btn-primary gap-1"><Check size={15} />{editId ? "Save changes" : "Add service"}</button>
+								<button type="button" onClick={resetForm} className="btn btn-secondary">Cancel</button>
+							</div>
+						</form>
+					</div>
+				)}
+
+				{services === undefined ? (
+					<div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}</div>
+				) : services.length === 0 ? (
+					<div className="text-center py-16 text-[var(--text-muted)]"><p className="text-sm">No services yet.</p></div>
+				) : (
+					<div className="space-y-2">
+						{services.map((svc: Service) => (
+							<div key={svc._id} className="card p-4 flex items-center gap-4">
+								<div className="flex-1 min-w-0">
+									<div className="font-medium text-[var(--text)] text-sm">{svc.name}</div>
+									<div className="text-xs text-[var(--text-muted)]">{svc.durationMinutes} min · <span className="badge badge-gray">{svc.category}</span></div>
+								</div>
+								<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(svc.price)}</div>
+								<div className="flex gap-1.5">
+									<button type="button" onClick={() => handleEdit(svc)} className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-card-hover)] transition-colors" style={{ background: "none", border: "none", cursor: "pointer" }}><Pencil size={14} /></button>
+									<button type="button" onClick={() => void handleDelete(svc._id)} className="p-2 rounded-lg text-[var(--error)] hover:bg-red-500/10 transition-colors" style={{ background: "none", border: "none", cursor: "pointer" }}><Trash2 size={14} /></button>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
+			</div>
+		</main>
+	)
+}

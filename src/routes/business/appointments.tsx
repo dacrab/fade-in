@@ -1,0 +1,96 @@
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { useState } from "react"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "../../../convex/_generated/api"
+import { useAuth } from "../../hooks/useAuth"
+import { Calendar, Check, X, Clock } from "lucide-react"
+import { Skeleton } from "../../components/ui/Skeleton"
+import { formatPrice, formatDateShort } from "../../lib/format"
+import { showToast } from "../../components/ui/Toast"
+import { STATUS_BADGE, type Appointment, type AppointmentStatus, type Barbershop } from "../../types"
+import type { Id } from "../../../convex/_generated/dataModel"
+
+export const Route = createFileRoute("/business/appointments")({ component: BusinessAppointments })
+
+function BusinessAppointments() {
+	const { user } = useAuth()
+	const [selectedDate, setSelectedDate] = useState("")
+
+	const shopsRaw = useQuery(api.barbershops.listByOwner, user ? { ownerId: user.id as Id<"users"> } : "skip")
+	const shop = shopsRaw?.[0] as Barbershop | undefined
+
+	const apptsRaw = useQuery(
+		api.appointments.listByShop,
+		shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip",
+	)
+	const appointments = apptsRaw as Appointment[] | undefined
+
+	const updateStatus = useMutation(api.appointments.updateStatus)
+
+	const handleStatus = async (id: Id<"appointments">, status: AppointmentStatus) => {
+		try {
+			await updateStatus({ id, status })
+			showToast(`Appointment ${status}`, "success")
+		} catch { showToast("Failed to update status", "error") }
+	}
+
+	return (
+		<main className="px-4 py-8">
+			<div className="page-wrap max-w-4xl">
+				<div className="flex items-center gap-3 mb-6">
+					<Link to="/business" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] no-underline">← Dashboard</Link>
+					<span className="text-[var(--border)]">/</span>
+					<h1 className="text-2xl font-bold text-[var(--text)]">Appointments</h1>
+				</div>
+
+				<div className="flex items-center gap-3 mb-6">
+					<div className="relative">
+						<Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
+						<input type="date" className="input pl-9 w-48" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+					</div>
+					{selectedDate && (
+						<button type="button" onClick={() => setSelectedDate("")} className="btn btn-ghost text-sm">Clear</button>
+					)}
+				</div>
+
+				{appointments === undefined ? (
+					<div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}</div>
+				) : appointments.length === 0 ? (
+					<div className="text-center py-16 text-[var(--text-muted)]">
+						<Clock size={36} className="mx-auto mb-3 opacity-30" />
+						<p className="font-semibold text-[var(--text)] mb-1">No appointments found</p>
+					</div>
+				) : (
+					<div className="space-y-3">
+						{appointments.map((appt) => (
+							<div key={appt._id} className="card p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+								<div className="flex items-center gap-3 flex-1 min-w-0">
+									<div className="text-center flex-shrink-0">
+										<div className="text-lg font-bold text-[var(--gold)]">{appt.startTime}</div>
+										<div className="text-xs text-[var(--text-muted)]">{formatDateShort(appt.date)}</div>
+									</div>
+									<div className="min-w-0">
+										<div className="text-sm font-medium text-[var(--text)] truncate">{appt.notes ?? "No notes"}</div>
+										<div className="text-xs text-[var(--text-muted)]">Until {appt.endTime} · {formatPrice(appt.totalPrice)}</div>
+									</div>
+								</div>
+								<div className="flex items-center gap-2 flex-shrink-0">
+									<span className={`badge ${STATUS_BADGE[appt.status]}`}>{appt.status}</span>
+									{appt.status === "pending" && (
+										<>
+											<button type="button" onClick={() => void handleStatus(appt._id, "confirmed")} className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors" title="Confirm" style={{ border: "none", cursor: "pointer" }}><Check size={14} /></button>
+											<button type="button" onClick={() => void handleStatus(appt._id, "cancelled")} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" title="Cancel" style={{ border: "none", cursor: "pointer" }}><X size={14} /></button>
+										</>
+									)}
+									{appt.status === "confirmed" && (
+										<button type="button" onClick={() => void handleStatus(appt._id, "completed")} className="btn btn-secondary text-xs py-1 px-2">Complete</button>
+									)}
+								</div>
+							</div>
+						))}
+					</div>
+				)}
+			</div>
+		</main>
+	)
+}

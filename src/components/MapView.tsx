@@ -1,0 +1,144 @@
+import { useEffect, useRef } from "react"
+import { MapPin } from "lucide-react"
+import type { Barbershop } from "../types"
+
+interface MapViewProps {
+	shops: Barbershop[]
+	onShopClick?: (slug: string) => void
+}
+
+const DEFAULT_CENTER: [number, number] = [37.9838, 23.7275]
+const DEFAULT_ZOOM = 12
+
+export default function MapView({ shops, onShopClick }: MapViewProps) {
+	const mapRef = useRef<L.Map | null>(null)
+	const mapContainerRef = useRef<HTMLDivElement>(null)
+	const markersRef = useRef<L.Marker[]>([])
+
+	useEffect(() => {
+		if (!mapContainerRef.current || mapRef.current) return
+
+		import("leaflet").then((L) => {
+			// Fix bundler icon resolution
+			const iconProto = L.Icon.Default.prototype as L.Icon.Default & {
+				_getIconUrl?: unknown
+			}
+			delete iconProto._getIconUrl
+			L.Icon.Default.mergeOptions({
+				iconRetinaUrl:
+					"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+				iconUrl:
+					"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+				shadowUrl:
+					"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+			})
+
+			if (!mapContainerRef.current) return
+			const map = L.map(mapContainerRef.current, {
+				center: DEFAULT_CENTER,
+				zoom: DEFAULT_ZOOM,
+				zoomControl: true,
+				scrollWheelZoom: false,
+			})
+
+			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+				attribution: "© OpenStreetMap contributors",
+				maxZoom: 19,
+			}).addTo(map)
+
+			mapRef.current = map
+			placeMarkers(L, map, shops, markersRef, onShopClick)
+		})
+
+		return () => {
+			if (mapRef.current) {
+				mapRef.current.remove()
+				mapRef.current = null
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	useEffect(() => {
+		if (!mapRef.current) return
+		import("leaflet").then((L) => {
+			if (mapRef.current) {
+				placeMarkers(L, mapRef.current, shops, markersRef, onShopClick)
+			}
+		})
+	}, [shops, onShopClick])
+
+	const shopsWithCoords = shops.filter((s) => s.lat !== undefined && s.lng !== undefined)
+
+	return (
+		<div
+			className="relative rounded-2xl overflow-hidden border border-[var(--border)]"
+			style={{ height: "500px" }}
+		>
+			<div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
+			{shopsWithCoords.length === 0 && (
+				<div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-muted)] pointer-events-none">
+					<MapPin size={36} className="mb-2 opacity-30" />
+					<p className="text-sm font-medium text-[var(--text)]">No mapped locations</p>
+					<p className="text-xs mt-1">Shops need coordinates (lat/lng) to appear on map</p>
+				</div>
+			)}
+			<div className="absolute bottom-3 right-3 badge badge-gold text-[11px] z-[1000]">
+				{shopsWithCoords.length} shops on map
+			</div>
+		</div>
+	)
+}
+
+function placeMarkers(
+	L: typeof import("leaflet"),
+	map: L.Map,
+	shops: Barbershop[],
+	markersRef: React.MutableRefObject<L.Marker[]>,
+	onShopClick?: (slug: string) => void,
+) {
+	markersRef.current.forEach((m) => m.remove())
+	markersRef.current = []
+
+	const shopsWithCoords = shops.filter(
+		(s): s is Barbershop & { lat: number; lng: number } =>
+			s.lat !== undefined && s.lng !== undefined,
+	)
+
+	if (shopsWithCoords.length === 0) return
+
+	const goldIcon = L.divIcon({
+		html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,#F59E0B,#D97706);transform:rotate(-45deg);border:2px solid #0A0A0A;box-shadow:0 4px 12px rgba(245,158,11,0.5);display:flex;align-items:center;justify-content:center;"><div style="transform:rotate(45deg);color:#000;font-size:13px;">✂</div></div>`,
+		className: "",
+		iconSize: [32, 32],
+		iconAnchor: [16, 32],
+		popupAnchor: [0, -36],
+	})
+
+	const bounds: [number, number][] = []
+
+	for (const shop of shopsWithCoords) {
+		const marker = L.marker([shop.lat, shop.lng], { icon: goldIcon })
+			.addTo(map)
+			.bindPopup(
+				`<div style="font-family:system-ui;min-width:160px;padding:4px;">
+				<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#F5F5F5;">${shop.name}</div>
+				<div style="font-size:12px;color:#888;margin-bottom:6px;">${shop.address}, ${shop.city}</div>
+				<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">★ ${shop.rating.toFixed(1)} (${shop.reviewCount} reviews)</div>
+				<a href="/barbershops/${shop.slug}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">Book now →</a>
+			</div>`,
+				{ className: "fadein-popup" },
+			)
+
+		if (onShopClick) {
+			marker.on("click", () => onShopClick(shop.slug))
+		}
+
+		markersRef.current.push(marker)
+		bounds.push([shop.lat, shop.lng])
+	}
+
+	if (bounds.length > 0) {
+		map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 })
+	}
+}
