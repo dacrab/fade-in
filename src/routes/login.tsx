@@ -18,15 +18,14 @@ function LoginPage() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (!email || !password) { showToast(t("auth.emailLabel") + " required", "error"); return }
+		if (!email || !password) { showToast(t("errors.fillAllFields"), "error"); return }
 		setLoading(true)
 		try {
 			await login(email, password)
-			showToast("Welcome back!", "success")
+			showToast(t("errors.welcomeBack"), "success")
 			void router.navigate({ to: "/dashboard" })
-		} catch (err: unknown) {
-			const msg = err instanceof Error ? err.message : t("auth.signingIn")
-			showToast(msg, "error")
+		} catch {
+			showToast(t("errors.loginFailed"), "error")
 		} finally {
 			setLoading(false)
 		}
@@ -55,7 +54,7 @@ function LoginPage() {
 						<div>
 							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("auth.passwordLabel")}</label>
 							<div className="relative">
-								<input type={showPass ? "text" : "password"} className="input pr-10" placeholder={t("auth.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+								<input type={showPass ? "text" : "password"} className="input pr-10" placeholder={t("auth.passwordPlaceholder")} value={password}   onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
 								<button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]" style={{ background: "none", border: "none", cursor: "pointer" }}>
 									{showPass ? <EyeOff size={16} /> : <Eye size={16} />}
 								</button>

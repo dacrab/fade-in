@@ -89,7 +89,7 @@ function HomePage() {
 						<div className="text-center py-16 text-[var(--text-muted)]">
 							<Scissors size={40} className="mx-auto mb-4 opacity-30" />
 							<p>{t("home.noFeatured")}</p>
-							<Link to="/for-business" className="btn btn-primary mt-4 inline-flex">List your shop</Link>
+							<Link to="/for-business" className="btn btn-primary mt-4 inline-flex">{t("nav.forBusiness")}</Link>
 						</div>
 					) : (
 						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

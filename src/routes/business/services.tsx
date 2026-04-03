@@ -53,13 +53,13 @@ function BusinessServices() {
 		try {
 			if (editId) {
 				await updateService({ id: editId, name: form.name, description: form.description || undefined, price, durationMinutes, category: form.category })
-				showToast(t("business.services.editService") + "d!", "success")
+				showToast(t("errors.serviceSaved"), "success")
 			} else {
 				await createService({ barbershopId: shop._id, name: form.name, description: form.description || undefined, price, durationMinutes, category: form.category })
-				showToast(t("business.services.addService") + "d!", "success")
+				showToast(t("errors.serviceSaved"), "success")
 			}
 			resetForm()
-		} catch { showToast("Failed to save service", "error") }
+		} catch { showToast(t("errors.serviceFailed"), "error") }
 	}
 
 	const handleEdit = (svc: Service) => {
@@ -69,8 +69,8 @@ function BusinessServices() {
 	}
 
 	const handleDelete = async (id: Id<"services">) => {
-		try { await removeService({ id }); showToast("Removed", "info") }
-		catch { showToast("Failed to remove", "error") }
+		try { await removeService({ id }); showToast(t("errors.serviceSaved").replace("saved", "removed"), "info") }
+		catch { showToast(t("errors.serviceFailed"), "error") }
 	}
 
 	return (
@@ -93,19 +93,19 @@ function BusinessServices() {
 						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? t("business.services.editService") : t("business.services.newService")}</h2>
 						<form onSubmit={(e) => void handleSubmit(e)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div className="sm:col-span-2">
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Name *</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.nameStar")}</label>
 								<input className="input" placeholder={t("business.services.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Price (€) *</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.priceLabel")} *</label>
 								<input className="input" type="number" step="0.01" min="0" placeholder="15.00" value={form.price} onChange={set("price")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Duration (min) *</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.durationLabel")} *</label>
 								<input className="input" type="number" min="5" step="5" placeholder="30" value={form.durationMinutes} onChange={set("durationMinutes")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Category</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.categoryLabel")}</label>
 								<select className="input" value={form.category} onChange={set("category")}>
 									{CATEGORIES.map((c: Category) => (
 										<option key={c} value={c}>{t(`business.services.categories.${c}`)}</option>
@@ -113,8 +113,8 @@ function BusinessServices() {
 								</select>
 							</div>
 							<div className="sm:col-span-2">
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Description</label>
-								<input className="input" placeholder="Optional..." value={form.description} onChange={set("description")} />
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.descriptionLabel")}</label>
+								<input className="input" placeholder={t("form.optional")} value={form.description} onChange={set("description")} />
 							</div>
 							<div className="sm:col-span-2 flex gap-2">
 								<button type="submit" className="btn btn-primary gap-1">

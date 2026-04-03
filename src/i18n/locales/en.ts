@@ -374,6 +374,45 @@ const en = {
 		ratingOf: "{{rating}} / 5",
 	},
 
+	// ─── Errors / Toasts ────────────────────────────────────────────────────────
+	errors: {
+		fillAllFields: "Please fill in all fields",
+		passwordLength: "Password must be at least 8 characters",
+		registrationFailed: "Registration failed. Please try again.",
+		loginFailed: "Sign in failed. Check your credentials.",
+		profileSaved: "Profile saved!",
+		profileFailed: "Failed to update profile.",
+		replyAdded: "Reply added!",
+		replyFailed: "Failed to add reply.",
+		barberSaved: "Barber saved!",
+		barberFailed: "Failed to save barber.",
+		barberRemoved: "Barber removed.",
+		serviceSaved: "Service saved!",
+		serviceFailed: "Failed to save service.",
+		shopSaved: "Shop saved!",
+		shopCreated: "Shop created! Welcome to FadeIn.",
+		shopFailed: "Failed to save.",
+		welcomeBack: "Welcome back!",
+		accountCreated: "Account created! Welcome to FadeIn.",
+	},
+
+	// ─── Forms ─────────────────────────────────────────────────────────────────
+	form: {
+		phoneLabel: "Phone number",
+		cityLabel: "City",
+		addressLabel: "Address",
+		descriptionLabel: "Description",
+		passwordMin: "Min. 8 characters",
+		optional: "Optional...",
+		priceLabel: "Price (€)",
+		durationLabel: "Duration (min)",
+		categoryLabel: "Category",
+		nameStar: "Name *",
+		cityStar: "City *",
+		addressStar: "Address *",
+		andSeparator: " & ",
+	},
+
 	// ─── Status ────────────────────────────────────────────────────────────────
 	status: {
 		pending: "Pending",

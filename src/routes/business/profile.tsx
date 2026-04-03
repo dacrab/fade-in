@@ -52,12 +52,12 @@ function BusinessProfile() {
 		try {
 			if (shop) {
 				await updateShop({ id: shop._id, name: form.name, description: form.description || undefined, phone: form.phone || undefined, address: form.address, city: form.city, socialLinks })
-				showToast(t("common.save") + "d!", "success")
+				showToast(t("errors.shopSaved"), "success")
 			} else {
 				await createShop({ name: form.name, slug: slugify(form.name), ownerId: user.id as Id<"users">, description: form.description || undefined, phone: form.phone || undefined, address: form.address, city: form.city, socialLinks })
-				showToast("Shop created!", "success")
+				showToast(t("errors.shopCreated"), "success")
 			}
-		} catch { showToast("Failed to save", "error") }
+		} catch { showToast(t("errors.shopFailed"), "error") }
 		finally { setSaving(false) }
 	}
 
@@ -74,26 +74,26 @@ function BusinessProfile() {
 					<div className="card p-5 space-y-4">
 						<h2 className="font-bold text-[var(--text)]">{t("business.profile.basicInfo")}</h2>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Name *</label>
+							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.nameStar")}</label>
 							<input className="input" placeholder={t("business.profile.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							{form.name && <p className="text-xs text-[var(--text-muted)] mt-1">{t("business.profile.urlPreview", { slug: slugify(form.name) })}</p>}
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Description</label>
+							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.descriptionLabel")}</label>
 							<textarea className="input resize-none" rows={3} placeholder={t("business.profile.descPlaceholder")} value={form.description} onChange={set("description")} />
 						</div>
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Phone</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.phoneLabel")}</label>
 								<input className="input" placeholder={t("business.profile.phonePlaceholder")} value={form.phone} onChange={set("phone")} type="tel" />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">City *</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.cityStar")}</label>
 								<input className="input" placeholder="Athens" value={form.city} onChange={set("city")} required />
 							</div>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Address *</label>
+							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.addressStar")}</label>
 							<input className="input" placeholder={t("business.profile.addressPlaceholder")} value={form.address} onChange={set("address")} required />
 						</div>
 					</div>

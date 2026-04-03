@@ -42,13 +42,13 @@ function BusinessBarbers() {
 		try {
 			if (editId) {
 				await updateBarber({ id: editId, name: form.name, bio: form.bio || undefined, specializations: specs })
-				showToast("Barber updated!", "success")
+				showToast(t("errors.barberSaved"), "success")
 			} else {
 				await createBarber({ barbershopId: shop._id, name: form.name, bio: form.bio || undefined, specializations: specs })
-				showToast("Barber added!", "success")
+				showToast(t("errors.barberSaved"), "success")
 			}
 			resetForm()
-		} catch { showToast("Failed to save barber", "error") }
+		} catch { showToast(t("errors.barberFailed"), "error") }
 	}
 
 	const handleEdit = (b: Barber) => {
@@ -58,8 +58,8 @@ function BusinessBarbers() {
 	}
 
 	const handleDelete = async (id: Id<"barbers">) => {
-		try { await removeBarber({ id }); showToast("Removed", "info") }
-		catch { showToast("Failed to remove", "error") }
+		try { await removeBarber({ id }); showToast(t("errors.barberRemoved"), "info") }
+		catch { showToast(t("errors.barberFailed"), "error") }
 	}
 
 	return (
@@ -82,15 +82,15 @@ function BusinessBarbers() {
 						<h2 className="font-bold text-[var(--text)] mb-4">{editId ? t("common.edit") : t("business.barbers.addBarber")}</h2>
 						<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Name *</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.nameStar")}</label>
 								<input className="input" placeholder={t("business.barbers.namePlaceholder")} value={form.name} onChange={set("name")} required />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Specializations</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("business.barbers.title")}</label>
 								<input className="input" placeholder={t("business.barbers.specializationsPlaceholder")} value={form.specializations} onChange={set("specializations")} />
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">Bio</label>
+								<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.descriptionLabel")}</label>
 								<textarea className="input resize-none" rows={2} placeholder={t("business.barbers.bioPlaceholder")} value={form.bio} onChange={set("bio")} />
 							</div>
 							<div className="flex gap-2">

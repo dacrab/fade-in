@@ -29,10 +29,10 @@ function BusinessReviews() {
 		if (!replyText.trim()) return
 		try {
 			await addReply({ id, ownerReply: replyText })
-			showToast("Reply added!", "success")
+			showToast(t("errors.replyAdded"), "success")
 			setReplyId(null)
 			setReplyText("")
-		} catch { showToast("Failed to add reply", "error") }
+		} catch { showToast(t("errors.replyFailed"), "error") }
 	}
 
 	return (

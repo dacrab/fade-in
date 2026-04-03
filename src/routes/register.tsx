@@ -20,16 +20,15 @@ function RegisterPage() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (!name || !email || !password) { showToast("Please fill in all fields", "error"); return }
-		if (password.length < 8) { showToast("Password must be at least 8 characters", "error"); return }
+		if (!name || !email || !password) { showToast(t("errors.fillAllFields"), "error"); return }
+		if (password.length < 8) { showToast(t("errors.passwordLength"), "error"); return }
 		setLoading(true)
 		try {
 			await register(email, password, name, role)
-			showToast("Account created! Welcome to FadeIn.", "success")
+			showToast(t("errors.accountCreated"), "success")
 			void router.navigate({ to: role === "owner" ? "/business" : "/dashboard" })
-		} catch (err: unknown) {
-			const msg = err instanceof Error ? err.message : "Registration failed"
-			showToast(msg, "error")
+		} catch {
+			showToast(t("errors.registrationFailed"), "error")
 		} finally {
 			setLoading(false)
 		}
@@ -72,7 +71,7 @@ function RegisterPage() {
 						<div>
 							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("auth.passwordLabel")}</label>
 							<div className="relative">
-								<input type={showPass ? "text" : "password"} className="input pr-10" placeholder="Min. 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" />
+								<input type={showPass ? "text" : "password"} className="input pr-10" placeholder={t("form.passwordMin")} value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" />
 								<button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" style={{ background: "none", border: "none", cursor: "pointer" }}>
 									{showPass ? <EyeOff size={16} /> : <Eye size={16} />}
 								</button>
@@ -86,7 +85,7 @@ function RegisterPage() {
 					<p className="mt-4 text-xs text-center text-[var(--text-subtle)]">
 						{t("auth.agreeTerms")}{" "}
 						<a href="/terms" className="text-[var(--gold)] hover:underline">{t("auth.terms")}</a>
-						{" & "}
+						{t("form.andSeparator")}
 						<a href="/privacy" className="text-[var(--gold)] hover:underline">{t("auth.privacy")}</a>
 					</p>
 

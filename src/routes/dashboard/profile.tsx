@@ -24,9 +24,9 @@ function ProfilePage() {
 		setSaving(true)
 		try {
 			await updateProfile({ id: user.id as Id<"users">, name, phone: phone || undefined })
-			showToast(t("common.save") + "d!", "success")
+			showToast(t("errors.profileSaved"), "success")
 		} catch {
-			showToast("Failed to update profile", "error")
+			showToast(t("errors.profileFailed"), "error")
 		} finally {
 			setSaving(false)
 		}
@@ -61,7 +61,7 @@ function ProfilePage() {
 							<input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("auth.namePlaceholder")} />
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("common.signIn").replace("Sign in", "Phone number")}</label>
+							<label className="block text-sm font-medium text-[var(--text)] mb-1.5">{t("form.phoneLabel")}</label>
 							<input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("dashboard.phonePlaceholder")} type="tel" />
 						</div>
 						<div>
