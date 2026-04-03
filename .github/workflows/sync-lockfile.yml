@@ -2,6 +2,7 @@ name: Sync Lockfile
 
 on:
   pull_request:
+    branches: [master]
     paths: ["package.json"]
 
 permissions:
