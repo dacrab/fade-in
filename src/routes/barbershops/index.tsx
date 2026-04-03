@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Filter, List, Map as MapIcon, Scissors, Search, X } from "lucide-react"
 import { useState } from "react"

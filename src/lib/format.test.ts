@@ -65,7 +65,6 @@ describe("formatTime", () => {
 	it("converts 23:59 → 11:59 PM", () => {
 		expect(formatTime("23:59")).toBe("11:59 PM")
 	})
-
 })
 
 describe("formatDateShort", () => {
@@ -140,5 +139,4 @@ describe("slugify", () => {
 	it("handles a single word with no special chars", () => {
 		expect(slugify("Athens")).toBe("athens")
 	})
-
 })

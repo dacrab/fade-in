@@ -31,7 +31,8 @@ export const create = mutation({
 		const shop = await ctx.db.get(args.barbershopId)
 		if (shop) {
 			const newCount = shop.reviewCount + 1
-			const newRating = Math.round(((shop.rating * shop.reviewCount + args.rating) / newCount) * 10) / 10
+			const newRating =
+				Math.round(((shop.rating * shop.reviewCount + args.rating) / newCount) * 10) / 10
 			await ctx.db.patch(args.barbershopId, { rating: newRating, reviewCount: newCount })
 		}
 
