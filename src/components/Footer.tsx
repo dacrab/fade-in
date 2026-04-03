@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { Facebook, Globe, Instagram, Scissors } from "lucide-react"
+import { Facebook, Globe, Scissors } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export default function Footer() {
@@ -86,7 +86,7 @@ export default function Footer() {
 				<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 					<p className="text-sm text-muted m-0">{t("footer.rights", { year })}</p>
 					<div className="flex items-center gap-2">
-						{([Instagram, Facebook, Globe] as const).map((Icon) => (
+						{([Facebook, Globe] as const).map((Icon) => (
 							<span
 								key={Icon.displayName}
 								className="text-muted p-2 rounded-lg transition-colors hover:bg-[var(--bg-card)]"
