@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
 import EmptyState from "#/components/EmptyState"
 import SkeletonList from "#/components/SkeletonList"
 import { useRequireRole } from "#/hooks/useRequireRole"
@@ -21,13 +20,18 @@ const ROLE_BADGE: Record<UserRole, string> = {
 function AdminUsers() {
 	const { t } = useTranslation()
 	useRequireRole(["admin"])
-	const allUsersRaw = useQuery(api.users.listAll)
-	const allUsers = allUsersRaw as User[] | undefined
+	const allUsers = useQuery(api.users.listAll) as User[] | undefined
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<Breadcrumb to="/admin" label={t("nav.admin")} title={t("admin.users.title")} />
+				<div className="page-header">
+					<a href="/admin" className="breadcrumb-back">
+						← {t("nav.admin")}
+					</a>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("admin.users.title")}</h1>
+				</div>
 
 				{allUsers === undefined ? (
 					<SkeletonList count={6} height="h-14" />

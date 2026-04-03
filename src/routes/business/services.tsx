@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
 import { useFormState } from "#/hooks/useFormState"
@@ -101,7 +100,13 @@ function BusinessServices() {
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
-					<Breadcrumb to="/business" label={t("nav.business")} title={t("business.services.title")} />
+					<div className="page-header">
+						<a href="/business" className="breadcrumb-back">
+							← {t("nav.business")}
+						</a>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("business.services.title")}</h1>
+					</div>
 					<button
 						type="button"
 						onClick={() => {

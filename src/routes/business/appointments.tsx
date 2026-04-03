@@ -3,8 +3,8 @@ import { useMutation, useQuery } from "convex/react"
 import { Calendar, Check, Clock, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import Breadcrumb from "#/components/Breadcrumb"
-import { Skeleton } from "#/components/ui/Skeleton"
+import EmptyState from "#/components/EmptyState"
+import SkeletonList from "#/components/SkeletonList"
 import { showToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatDateShort, formatPrice } from "#/lib/format"
@@ -38,7 +38,13 @@ function BusinessAppointments() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<Breadcrumb to="/business" label={t("nav.business")} title={t("business.appointments.title")} />
+				<div className="page-header mb-6">
+					<a href="/business" className="breadcrumb-back">
+						← {t("nav.business")}
+					</a>
+					<span className="breadcrumb-sep">/</span>
+					<h1>{t("business.appointments.title")}</h1>
+				</div>
 
 				<div className="flex items-center gap-3 mb-6">
 					<div className="relative">
@@ -61,19 +67,9 @@ function BusinessAppointments() {
 				</div>
 
 				{appointments === undefined ? (
-					<div className="space-y-3">
-						{Array.from({ length: 5 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-20 w-full rounded-xl" />
-						))}
-					</div>
+					<SkeletonList count={5} height="h-20" />
 				) : appointments.length === 0 ? (
-					<div className="empty-state">
-						<Clock size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="font-semibold text-[var(--text)] mb-1">
-							{t("business.appointments.noAppointments")}
-						</p>
-					</div>
+					<EmptyState icon={Clock} message={t("business.appointments.noAppointments")} />
 				) : (
 					<div className="space-y-3">
 						{appointments.map((appt) => (
