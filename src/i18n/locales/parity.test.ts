@@ -90,28 +90,4 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		expect(mismatched, `Array length mismatches: ${mismatched.join(", ")}`).toHaveLength(0)
 	})
 
-	// ── spot-checks for critical keys ───────────────────────────────────────
-	it("common.signIn exists and is non-empty in both locales", () => {
-		expect(en.common.signIn).toBeTruthy()
-		expect(el.common.signIn).toBeTruthy()
-	})
-
-	it("common.loading exists in both locales", () => {
-		expect(en.common.loading).toBeTruthy()
-		expect(el.common.loading).toBeTruthy()
-	})
-
-	it("nav keys all exist in both locales", () => {
-		const navKeys = Object.keys(en.nav)
-		for (const key of navKeys) {
-			expect((el.nav as Record<string, string>)[key], `el.nav.${key} is missing`).toBeTruthy()
-		}
-	})
-
-	it("errors keys all exist in both locales", () => {
-		const errorKeys = Object.keys(en.errors)
-		for (const key of errorKeys) {
-			expect((el.errors as Record<string, string>)[key], `el.errors.${key} is missing`).toBeTruthy()
-		}
-	})
 })

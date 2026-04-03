@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { ArrowRight, BarChart3, Calendar, Check, Star, Users } from "lucide-react"
+import { ArrowRight, BarChart3, Calendar, Star, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export const Route = createFileRoute("/for-business")({ component: ForBusinessPage })
@@ -12,12 +12,6 @@ function ForBusinessPage() {
 		{ icon: Users, key: "team" },
 		{ icon: BarChart3, key: "analytics" },
 		{ icon: Star, key: "reviews" },
-	] as const
-
-	const plans = [
-		{ key: "starter", highlight: false },
-		{ key: "pro", highlight: true },
-		{ key: "enterprise", highlight: false },
 	] as const
 
 	return (
@@ -74,54 +68,6 @@ function ForBusinessPage() {
 									</h3>
 									<p className="text-sm text-[var(--text-muted)]">{t(`forBusiness.features.${key}.desc`)}</p>
 								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			</section>
-
-			{/* Pricing */}
-			<section className="px-4 py-16 border-t border-[var(--border)]">
-				<div className="page-wrap">
-					<div className="text-center mb-12">
-						<h2 className="text-2xl font-bold text-[var(--text)] mb-2">
-							{t("forBusiness.pricingTitle")}
-						</h2>
-						<p className="text-[var(--text-muted)]">{t("forBusiness.pricingSubtitle")}</p>
-					</div>
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-						{plans.map((plan) => (
-							<div
-								key={plan.key}
-								className={`card p-6 ${plan.highlight ? "border-[var(--gold)]/40 bg-brand/[0.04]" : ""}`}
-							>
-								{plan.highlight && (
-									<div className="badge badge-gold mb-3">{t("forBusiness.mostPopular")}</div>
-								)}
-								<h3 className="font-bold text-[var(--text)] text-lg mb-1">
-									{t(`forBusiness.plans.${plan.key}.name`)}
-								</h3>
-								<div className="text-3xl font-bold text-[var(--text)] mb-1">
-									{t(`forBusiness.plans.${plan.key}.price`)}
-								</div>
-								<p className="text-sm text-[var(--text-muted)] mb-5">
-									{t(`forBusiness.plans.${plan.key}.desc`)}
-								</p>
-								<ul className="space-y-2 mb-6">
-									{(t(`forBusiness.plans.${plan.key}.features`, { returnObjects: true }) as string[]).map(
-										(f) => (
-											<li key={f} className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-												<Check size={14} className="text-[var(--gold)]" /> {f}
-											</li>
-										),
-									)}
-								</ul>
-								<Link
-									to="/register"
-									className={`btn w-full justify-center ${plan.highlight ? "btn-primary" : "btn-secondary"}`}
-								>
-									{t("common.getStarted")}
-								</Link>
 							</div>
 						))}
 					</div>

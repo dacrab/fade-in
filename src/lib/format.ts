@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow, parseISO } from "date-fns"
+import { format, parseISO } from "date-fns"
 
 /**
  * Formats a price in cents as a euro string.
@@ -38,23 +38,6 @@ export function formatTime(timeStr: string): string {
 	const ampm = hour >= 12 ? "PM" : "AM"
 	const hour12 = hour % 12 || 12
 	return `${hour12}:${m} ${ampm}`
-}
-
-/**
- * Formats a timestamp as a relative time string.
- * @param timestamp - Milliseconds since epoch
- * @returns Relative time string, e.g., "2 hours ago"
- */
-export function formatRelative(timestamp: number): string {
-	return formatDistanceToNow(new Date(timestamp), { addSuffix: true })
-}
-
-/**
- * Returns the days of the week in lowercase.
- * @returns Array of day names
- */
-export function getDaysOfWeek() {
-	return ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const
 }
 
 /**

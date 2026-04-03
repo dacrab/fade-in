@@ -12,9 +12,16 @@ export const Route = createFileRoute("/dashboard/favorites")({ component: Favori
 function FavoritesPage() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const userDataRaw = useQuery(api.users.getMe, user ? { userId: user.id as Id<"users"> } : "skip")
+	const userDataRaw = useQuery(api.users.getById, user ? { id: user.id as Id<"users"> } : "skip")
 	const userData = userDataRaw as User | null | undefined
 	const favoriteIds = userData?.favoriteShopIds ?? []
+
+	// Single query fetches all favorite shops at once instead of one query per shop.
+	const shopsRaw = useQuery(
+		api.barbershops.listByIds,
+		favoriteIds.length > 0 ? { ids: favoriteIds } : "skip",
+	)
+	const shops = (shopsRaw ?? []) as Barbershop[]
 
 	return (
 		<main className="page-main">
@@ -38,8 +45,8 @@ function FavoritesPage() {
 					</div>
 				) : (
 					<div className="shop-grid">
-						{favoriteIds.map((shopId) => (
-							<FavoriteShopCard key={shopId} shopId={shopId} />
+						{shops.map((shop) => (
+							<ShopCard key={shop._id} shop={shop} />
 						))}
 					</div>
 				)}
@@ -48,10 +55,7 @@ function FavoritesPage() {
 	)
 }
 
-function FavoriteShopCard({ shopId }: { shopId: Id<"barbershops"> }) {
-	const shopRaw = useQuery(api.barbershops.getById, { id: shopId })
-	const shop = shopRaw as Barbershop | null | undefined
-	if (!shop) return null
+function ShopCard({ shop }: { shop: Barbershop }) {
 	return (
 		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
 			<div className="shop-card-img">

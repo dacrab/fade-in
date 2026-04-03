@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import MapView from "#/components/MapView"
 import { ShopCardSkeleton } from "#/components/ui/Skeleton"
-import { Slider } from "#/components/ui/Slider"
 import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -155,12 +154,14 @@ function BarbershopsPage() {
 										: t("barbershops.ratingAbove", { rating: minRating })}
 								</span>
 							</div>
-							<Slider
-								value={[minRating]}
-								onValueChange={([v]) => setMinRating(v ?? 0)}
+							<input
+								type="range"
 								min={0}
 								max={5}
 								step={0.5}
+								value={minRating}
+								onChange={(e) => setMinRating(Number(e.target.value))}
+								className="w-full accent-[var(--gold)]"
 							/>
 							<div className="flex justify-between text-xs text-[var(--text-subtle)] mt-1">
 								<span>{t("common.anyRating")}</span>

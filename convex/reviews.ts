@@ -26,22 +26,14 @@ export const create = mutation({
 			createdAt: Date.now(),
 		})
 
-		// Recalculate the shop's average rating after inserting the new review.
-		// We re-fetch all reviews to get an accurate count (including the just-inserted one).
-		// Rating is rounded to 1 decimal place.
-		const reviews = await ctx.db
-			.query("reviews")
-			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
-			.collect()
-
-		const totalRating = reviews.reduce((sum, r) => sum + r.rating, args.rating)
-		const newCount = reviews.length + 1
-		const avgRating = Math.round((totalRating / newCount) * 10) / 10
-
-		await ctx.db.patch(args.barbershopId, {
-			rating: avgRating,
-			reviewCount: newCount,
-		})
+		// Incrementally update the shop's rating using the existing denormalized
+		// rating and reviewCount — no need to re-fetch all reviews.
+		const shop = await ctx.db.get(args.barbershopId)
+		if (shop) {
+			const newCount = shop.reviewCount + 1
+			const newRating = Math.round(((shop.rating * shop.reviewCount + args.rating) / newCount) * 10) / 10
+			await ctx.db.patch(args.barbershopId, { rating: newRating, reviewCount: newCount })
+		}
 
 		return reviewId
 	},
