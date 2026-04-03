@@ -333,6 +333,100 @@ body {
 }
 .empty-state p { font-size: 0.875rem; }
 
+/* ─── Base UI component classes ─────────────────────────────────────────── */
+
+/* Shared popup container (Menu, Select, Tooltip) */
+.popup {
+	z-index: 50;
+	overflow: hidden;
+	border-radius: 0.75rem;
+	border: 1px solid var(--border);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+	background: var(--bg-card);
+	padding-block: 0.25rem;
+}
+
+/* Shared dropdown item (Menu + Select) */
+.popup-item {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	padding: 0.5rem 0.75rem;
+	font-size: 0.875rem;
+	cursor: pointer;
+	outline: none;
+	transition: background 0.1s;
+	color: var(--text);
+}
+.popup-item:hover,
+.popup-item[data-highlighted] { background: var(--bg-card-hover); }
+.popup-item[data-disabled] { opacity: 0.4; cursor: not-allowed; }
+.popup-item.danger { color: var(--error); }
+
+/* Dialog header row */
+.dialog-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1rem 1.25rem;
+	border-bottom: 1px solid var(--border);
+}
+
+/* Dialog backdrop */
+.dialog-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	background: rgba(0, 0, 0, 0.8);
+	backdrop-filter: blur(4px);
+}
+
+/* Dialog popup */
+.dialog-popup {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	z-index: 50;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	max-width: 32rem;
+	max-height: 90vh;
+	overflow-y: auto;
+	border-radius: 1rem;
+	border: 1px solid var(--border);
+	box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+	background: var(--bg-card);
+	transition: all 0.2s;
+}
+
+/* Toast container */
+.toast-container {
+	position: fixed;
+	bottom: 1rem;
+	right: 1rem;
+	z-index: 9999;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	max-width: 24rem;
+	width: 100%;
+}
+
+/* User avatar circle */
+.avatar {
+	border-radius: 9999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	background: var(--gold);
+	color: #000;
+	flex-shrink: 0;
+}
+.avatar-sm { width: 1.5rem; height: 1.5rem; font-size: 0.75rem; }
+.avatar-md { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+.avatar-lg { width: 4rem; height: 4rem; font-size: 1.5rem; }
+
 /* Base UI popup dark overrides */
 [data-base-ui-dialog-popup] {
   background: var(--bg-card) !important;

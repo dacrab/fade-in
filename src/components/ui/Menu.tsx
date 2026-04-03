@@ -23,10 +23,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 			<BaseMenu.Trigger render={trigger} />
 			<BaseMenu.Portal>
 				<BaseMenu.Positioner align={align} sideOffset={6}>
-					<BaseMenu.Popup
-						className="z-50 min-w-[10rem] overflow-hidden rounded-xl border border-[var(--border)] py-1 shadow-2xl"
-						style={{ background: "var(--bg-card)" }}
-					>
+					<BaseMenu.Popup className="popup min-w-[10rem]">
 						{items.map((item, i) => {
 							if (item.separator) {
 								return (
@@ -43,9 +40,8 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 									disabled={item.disabled}
 									onClick={item.onClick}
 									className={cn(
-										"flex items-center gap-2.5 px-3 py-2 text-sm cursor-pointer outline-none transition-colors",
-										"data-[highlighted]:bg-[var(--bg-card-hover)]",
-										item.danger ? "text-[var(--error)]" : "text-[var(--text)]",
+										"popup-item",
+										item.danger && "danger",
 										item.disabled && "opacity-40 cursor-not-allowed",
 									)}
 								>

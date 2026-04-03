@@ -22,39 +22,38 @@ export function showToast(message: string, type: ToastType = "info"): void {
 	}
 }
 
+const ICONS: Record<ToastType, typeof CheckCircle> = {
+	success: CheckCircle,
+	error: AlertCircle,
+	info: Info,
+}
+
+const COLORS: Record<ToastType, string> = {
+	success: "border-green-500/30 bg-green-500/10 text-green-400",
+	error: "border-red-500/30 bg-red-500/10 text-red-400",
+	info: "border-[var(--gold)]/30 bg-[var(--gold)]/10 text-[var(--gold)]",
+}
+
 export function ToastContainer() {
 	const [toasts, setToasts] = useState<Toast[]>([])
 
 	useEffect(() => {
 		globalSetToasts = setToasts
-		return () => {
-			globalSetToasts = null
-		}
+		return () => { globalSetToasts = null }
 	}, [])
 
 	const dismiss = useCallback((id: number) => {
 		setToasts((prev) => prev.filter((t) => t.id !== id))
 	}, [])
 
-	const icons: Record<ToastType, typeof CheckCircle> = {
-		success: CheckCircle,
-		error: AlertCircle,
-		info: Info,
-	}
-	const colors: Record<ToastType, string> = {
-		success: "border-green-500/30 bg-green-500/10 text-green-400",
-		error: "border-red-500/30 bg-red-500/10 text-red-400",
-		info: "border-[var(--gold)]/30 bg-[var(--gold)]/10 text-[var(--gold)]",
-	}
-
 	return (
-		<div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full">
+		<div className="toast-container">
 			{toasts.map((toast) => {
-				const Icon = icons[toast.type]
+				const Icon = ICONS[toast.type]
 				return (
 					<div
 						key={toast.id}
-						className={`fade-up flex items-start gap-3 p-4 rounded-xl border backdrop-blur-lg ${colors[toast.type]}`}
+						className={`fade-up flex items-start gap-3 p-4 rounded-xl border backdrop-blur-lg ${COLORS[toast.type]}`}
 						style={{ background: "rgba(10,10,10,0.9)" }}
 					>
 						<Icon size={18} className="flex-shrink-0 mt-0.5" />
@@ -62,8 +61,8 @@ export function ToastContainer() {
 						<button
 							type="button"
 							onClick={() => dismiss(toast.id)}
-							className="text-[var(--text-muted)] hover:text-[var(--text)] flex-shrink-0"
-							style={{ background: "none", border: "none", cursor: "pointer" }}
+							className="icon-btn flex-shrink-0"
+							style={{ background: "none", border: "none", color: "var(--text-muted)" }}
 						>
 							<X size={14} />
 						</button>

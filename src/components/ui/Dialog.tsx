@@ -25,20 +25,8 @@ interface DialogContentProps {
 export function DialogContent({ children, className }: DialogContentProps) {
 	return (
 		<BaseDialog.Portal>
-			<BaseDialog.Backdrop
-				style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" }}
-				className="fixed inset-0 z-50"
-			/>
-			<BaseDialog.Popup
-				className={cn(
-					"fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
-					"w-full max-w-lg max-h-[90vh] overflow-y-auto",
-					"rounded-2xl border border-[var(--border)] shadow-2xl",
-					"transition-all duration-200",
-					className,
-				)}
-				style={{ background: "var(--bg-card)" }}
-			>
+			<BaseDialog.Backdrop className="dialog-backdrop" />
+			<BaseDialog.Popup className={cn("dialog-popup", className)}>
 				{children}
 			</BaseDialog.Popup>
 		</BaseDialog.Portal>
@@ -52,12 +40,12 @@ interface DialogHeaderProps {
 
 export function DialogHeader({ children, onClose }: DialogHeaderProps) {
 	return (
-		<div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+		<div className="dialog-header">
 			<div>{children}</div>
 			{onClose && (
 				<BaseDialog.Close
-					className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-card-hover)] transition-colors"
-					style={{ background: "none", border: "none", cursor: "pointer" }}
+					className="icon-btn"
+					style={{ background: "none", border: "none" }}
 					onClick={onClose}
 				>
 					<X size={18} />
@@ -101,8 +89,8 @@ interface DialogCloseProps {
 export function DialogClose({ children, className }: DialogCloseProps) {
 	return (
 		<BaseDialog.Close
-			className={cn(className)}
-			style={{ background: "none", border: "none", cursor: "pointer" }}
+			className={cn("icon-btn", className)}
+			style={{ background: "none", border: "none" }}
 		>
 			{children}
 		</BaseDialog.Close>
