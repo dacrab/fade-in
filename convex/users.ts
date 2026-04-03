@@ -13,14 +13,6 @@ export const getViewer = query({
 })
 
 /** Fetches a user by ID. */
-export const getMe = query({
-	args: { userId: v.id("users") },
-	handler: async (ctx, args) => {
-		return await ctx.db.get(args.userId)
-	},
-})
-
-/** Fetches a user by ID. */
 export const getById = query({
 	args: { id: v.id("users") },
 	handler: async (ctx, args) => {
@@ -65,11 +57,10 @@ export const updateProfile = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { id, ...fields } = args
-		const updates: Record<string, unknown> = {}
-		for (const [k, val] of Object.entries(fields)) {
-			if (val !== undefined) updates[k] = val
-		}
-		return await ctx.db.patch(id, updates)
+		return await ctx.db.patch(
+			id,
+			Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)),
+		)
 	},
 })
 
@@ -82,11 +73,12 @@ export const toggleFavorite = mutation({
 	handler: async (ctx, args) => {
 		const user = await ctx.db.get(args.userId)
 		if (!user) throw new Error("User not found")
-		const favorites = [...user.favoriteShopIds]
-		const idx = favorites.indexOf(args.shopId)
-		if (idx === -1) favorites.push(args.shopId)
-		else favorites.splice(idx, 1)
-		return await ctx.db.patch(args.userId, { favoriteShopIds: favorites })
+		const already = user.favoriteShopIds.includes(args.shopId)
+		return await ctx.db.patch(args.userId, {
+			favoriteShopIds: already
+				? user.favoriteShopIds.filter((id) => id !== args.shopId)
+				: [...user.favoriteShopIds, args.shopId],
+		})
 	},
 })
 

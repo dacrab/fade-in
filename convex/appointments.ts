@@ -1,9 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 
-const filterByDate = <T extends { date: string }>(appts: T[], date?: string) =>
-	date ? appts.filter((a) => a.date === date) : appts
-
 export const getAvailableSlots = query({
 	args: {
 		barbershopId: v.id("barbershops"),
@@ -115,7 +112,7 @@ export const listByShop = query({
 			.order("desc")
 			.collect()
 
-		return filterByDate(appts, args.date)
+		return args.date ? appts.filter((a) => a.date === args.date) : appts
 	},
 })
 
@@ -129,7 +126,7 @@ export const listByBarber = query({
 			.order("desc")
 			.collect()
 
-		return filterByDate(appts, args.date)
+		return args.date ? appts.filter((a) => a.date === args.date) : appts
 	},
 })
 

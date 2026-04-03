@@ -48,11 +48,10 @@ export const update = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { id, ...fields } = args
-		const updates: Record<string, unknown> = {}
-		for (const [k, val] of Object.entries(fields)) {
-			if (val !== undefined) updates[k] = val
-		}
-		return await ctx.db.patch(id, updates)
+		return await ctx.db.patch(
+			id,
+			Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)),
+		)
 	},
 })
 

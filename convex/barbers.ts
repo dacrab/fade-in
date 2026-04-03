@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { workingHoursValidator } from "./validators"
 
 export const listByShop = query({
 	args: { barbershopId: v.id("barbershops") },
@@ -27,7 +28,7 @@ export const create = mutation({
 		specializations: v.optional(v.array(v.string())),
 		avatarUrl: v.optional(v.string()),
 		userId: v.optional(v.id("users")),
-		workingHours: v.optional(v.any()),
+		workingHours: workingHoursValidator,
 	},
 	handler: async (ctx, args) => {
 		return await ctx.db.insert("barbers", {
@@ -50,16 +51,15 @@ export const update = mutation({
 		bio: v.optional(v.string()),
 		specializations: v.optional(v.array(v.string())),
 		avatarUrl: v.optional(v.string()),
-		workingHours: v.optional(v.any()),
+		workingHours: workingHoursValidator,
 		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
 		const { id, ...fields } = args
-		const updates: Record<string, unknown> = {}
-		for (const [k, val] of Object.entries(fields)) {
-			if (val !== undefined) updates[k] = val
-		}
-		return await ctx.db.patch(id, updates)
+		return await ctx.db.patch(
+			id,
+			Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)),
+		)
 	},
 })
 

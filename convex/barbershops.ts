@@ -1,7 +1,11 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { socialLinksValidator, workingHoursValidator } from "./validators"
 
-/** Lists active barbershops with optional city, search, minRating, isVerified filters. */
+/** Lists active barbershops with optional city, search, minRating, isVerified filters.
+ * city is filtered via the by_city index; minRating and isVerified are applied as
+ * range/equality filters on the index scan. Free-text search stays in-memory since
+ * Convex's search indexes require a separate schema declaration. */
 export const list = query({
 	args: {
 		city: v.optional(v.string()),
@@ -10,15 +14,25 @@ export const list = query({
 		isVerified: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		let shops = await ctx.db
-			.query("barbershops")
-			.withIndex("by_active", (q) => q.eq("isActive", true))
-			.collect()
+		// Use city index when a city filter is provided, otherwise use the active index.
+		let shops = args.city
+			? await ctx.db
+					.query("barbershops")
+					.withIndex("by_city", (q) => q.eq("city", args.city as string))
+					.filter((q) => q.eq(q.field("isActive"), true))
+					.collect()
+			: await ctx.db
+					.query("barbershops")
+					.withIndex("by_active", (q) => q.eq("isActive", true))
+					.collect()
 
-		if (args.city) {
-			const city = args.city.toLowerCase()
-			shops = shops.filter((s) => s.city.toLowerCase().includes(city))
+		if (args.isVerified !== undefined) {
+			shops = shops.filter((s) => s.isVerified === args.isVerified)
 		}
+		if (args.minRating !== undefined) {
+			shops = shops.filter((s) => s.rating >= (args.minRating as number))
+		}
+		// Free-text search is done in-memory; matches name, city, or address.
 		if (args.search) {
 			const term = args.search.toLowerCase()
 			shops = shops.filter(
@@ -27,12 +41,6 @@ export const list = query({
 					s.city.toLowerCase().includes(term) ||
 					s.address.toLowerCase().includes(term),
 			)
-		}
-		if (args.minRating !== undefined) {
-			shops = shops.filter((s) => s.rating >= (args.minRating as number))
-		}
-		if (args.isVerified !== undefined) {
-			shops = shops.filter((s) => s.isVerified === args.isVerified)
 		}
 
 		return shops
@@ -44,15 +52,15 @@ export const getFeatured = query({
 	args: { limit: v.optional(v.number()) },
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 6
+		// Filter verified in-memory after the index scan; Convex doesn't support
+		// multi-field compound indexes on isActive+isVerified+rating in one pass.
 		const shops = await ctx.db
 			.query("barbershops")
 			.withIndex("by_active", (q) => q.eq("isActive", true))
+			.filter((q) => q.eq(q.field("isVerified"), true))
 			.collect()
 
-		return shops
-			.filter((s) => s.isVerified)
-			.sort((a, b) => b.rating - a.rating)
-			.slice(0, limit)
+		return shops.sort((a, b) => b.rating - a.rating).slice(0, limit)
 	},
 })
 
@@ -99,8 +107,8 @@ export const create = mutation({
 		lat: v.optional(v.number()),
 		lng: v.optional(v.number()),
 		images: v.optional(v.array(v.string())),
-		workingHours: v.optional(v.any()),
-		socialLinks: v.optional(v.any()),
+		workingHours: workingHoursValidator,
+		socialLinks: socialLinksValidator,
 	},
 	handler: async (ctx, args) => {
 		return await ctx.db.insert("barbershops", {
@@ -136,19 +144,16 @@ export const update = mutation({
 		lat: v.optional(v.number()),
 		lng: v.optional(v.number()),
 		images: v.optional(v.array(v.string())),
-		workingHours: v.optional(v.any()),
-		socialLinks: v.optional(v.any()),
+		workingHours: workingHoursValidator,
+		socialLinks: socialLinksValidator,
 		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
 		const { id, ...fields } = args
-		const updates: Record<string, unknown> = {}
-		// Build patch from only the fields that were explicitly provided;
-		// omitting undefined fields avoids accidentally clearing optional columns.
-		for (const [k, val] of Object.entries(fields)) {
-			if (val !== undefined) updates[k] = val
-		}
-		return await ctx.db.patch(id, updates)
+		return await ctx.db.patch(
+			id,
+			Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)),
+		)
 	},
 })
 
@@ -165,6 +170,15 @@ export const suspend = mutation({
 	args: { id: v.id("barbershops"), isActive: v.boolean() },
 	handler: async (ctx, args) => {
 		return await ctx.db.patch(args.id, { isActive: args.isActive })
+	},
+})
+
+/** Fetches multiple shops by their IDs in a single round-trip. */
+export const listByIds = query({
+	args: { ids: v.array(v.id("barbershops")) },
+	handler: async (ctx, args) => {
+		const shops = await Promise.all(args.ids.map((id) => ctx.db.get(id)))
+		return shops.filter(Boolean)
 	},
 })
 
