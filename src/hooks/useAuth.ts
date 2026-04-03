@@ -3,7 +3,7 @@ import { useQuery } from "convex/react"
 import type { AuthUser, UserRole } from "#/types"
 import { api } from "../../convex/_generated/api"
 
-export type { UserRole, AuthUser }
+export type { AuthUser, UserRole }
 
 /**
  * Provides the current authenticated user and auth actions.
