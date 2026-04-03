@@ -125,14 +125,8 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 		| null
 		| undefined
 	return (
-		<div
-			className="flex items-center gap-4 p-3 rounded-xl border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors"
-			style={{ background: "var(--bg-input)" }}
-		>
-			<div
-				className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-				style={{ background: "rgba(245,158,11,0.1)" }}
-			>
+		<div className="flex items-center gap-4 p-3 rounded-xl border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors bg-[var(--bg-input)]">
+			<div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
 				<Scissors size={18} className="text-[var(--gold)]" />
 			</div>
 			<div className="flex-1 min-w-0">

@@ -11,8 +11,7 @@ export default function LanguageToggle() {
 		<button
 			type="button"
 			onClick={() => setLanguage(next)}
-			className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-[var(--bg-card-hover)] border border-[var(--border)]"
-			style={{ background: "var(--bg-card)", color: "var(--text-muted)" }}
+			className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors hover:bg-[var(--bg-card-hover)] border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)]"
 			title={t("map.switchTo", { lang: nextLang.label })}
 		>
 			<span>{nextLang.flag}</span>

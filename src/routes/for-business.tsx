@@ -19,10 +19,7 @@ function ForBusinessPage() {
 			{/* Hero */}
 			<section className="px-4 py-20 text-center relative overflow-hidden">
 				<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-					<div
-						className="h-96 w-96 rounded-full opacity-5"
-						style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 70%)" }}
-					/>
+					<div className="h-96 w-96 rounded-full opacity-5 bg-[radial-gradient(circle,var(--gold)_0%,transparent_70%)]" />
 				</div>
 				<div className="page-wrap relative">
 					<div className="inline-flex items-center gap-2 badge badge-gold mb-6">

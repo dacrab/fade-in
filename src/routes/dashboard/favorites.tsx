@@ -3,6 +3,7 @@ import { useQuery } from "convex/react"
 import { Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import EmptyState from "#/components/EmptyState"
+import PageHeader from "#/components/PageHeader"
 import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop, User } from "#/types"
@@ -14,8 +15,7 @@ export const Route = createFileRoute("/dashboard/favorites")({ component: Favori
 function FavoritesPage() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const userDataRaw = useQuery(api.users.getById, user ? { id: user.id as Id<"users"> } : "skip")
-	const userData = userDataRaw as User | null | undefined
+	const userData = useQuery(api.users.getById, user ? { id: user.id as Id<"users"> } : "skip") as User | null | undefined
 	const favoriteIds = userData?.favoriteShopIds ?? []
 
 	const shopsRaw = useQuery(
@@ -27,13 +27,7 @@ function FavoritesPage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="page-header">
-					<a href="/dashboard" className="breadcrumb-back">
-						← {t("nav.dashboard")}
-					</a>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{t("dashboard.favoritesTitle")}</h1>
-				</div>
+				<PageHeader back="/dashboard" backLabel={t("nav.dashboard")} title={t("dashboard.favoritesTitle")} />
 
 				{favoriteIds.length === 0 ? (
 					<EmptyState icon={Heart} message={t("dashboard.noFavorites")}>

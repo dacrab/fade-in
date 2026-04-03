@@ -3,11 +3,12 @@ import { useMutation, useQuery } from "convex/react"
 import { MessageSquare, Send } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import EmptyState from "#/components/EmptyState"
-import SkeletonList from "#/components/SkeletonList"
+import AsyncList from "#/components/AsyncList"
+import PageHeader from "#/components/PageHeader"
 import { StarRating } from "#/components/ui/StarRating"
-import { showToast } from "#/components/ui/Toast"
+import { withToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatRelative } from "#/lib/format"
 import type { Review } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -16,36 +17,29 @@ import type { Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/business/reviews")({ component: BusinessReviews })
 
 function BusinessReviews() {
+	useRequireRole(["owner", "admin"])
 	const { t } = useTranslation()
 	const shop = useOwnerShop()
-	const reviewsRaw = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip")
-	const reviews = reviewsRaw as Review[] | undefined
+	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as Review[] | undefined
 	const addReply = useMutation(api.reviews.addOwnerReply)
 	const [replyId, setReplyId] = useState<string | null>(null)
 	const [replyText, setReplyText] = useState("")
 
 	const handleReply = async (id: Id<"reviews">) => {
 		if (!replyText.trim()) return
-		try {
-			await addReply({ id, ownerReply: replyText })
-			showToast(t("errors.replyAdded"), "success")
-			setReplyId(null)
-			setReplyText("")
-		} catch {
-			showToast(t("errors.replyFailed"), "error")
-		}
+		await withToast(
+			() => addReply({ id, ownerReply: replyText }),
+			t("errors.replyAdded"),
+			t("errors.replyFailed"),
+		)
+		setReplyId(null)
+		setReplyText("")
 	}
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<div className="page-header mb-6">
-					<a href="/business" className="breadcrumb-back">
-						← {t("nav.business")}
-					</a>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{t("business.reviews.title")}</h1>
-				</div>
+				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.reviews.title")} />
 
 				{shop && (
 					<div className="card p-4 mb-6 flex items-center gap-4">
@@ -59,11 +53,12 @@ function BusinessReviews() {
 					</div>
 				)}
 
-				{reviews === undefined ? (
-					<SkeletonList count={3} height="h-28" />
-				) : reviews.length === 0 ? (
-					<EmptyState icon={MessageSquare} message={t("business.reviews.noReviews")} />
-				) : (
+				<AsyncList
+					data={reviews}
+					skeleton={{ count: 3, height: "h-28" }}
+					empty={{ icon: MessageSquare, message: t("business.reviews.noReviews") }}
+				>
+					{(reviews) => (
 					<div className="space-y-4">
 						{reviews.map((r: Review) => (
 							<div key={r._id} className="card p-5">
@@ -117,7 +112,8 @@ function BusinessReviews() {
 							</div>
 						))}
 					</div>
-				)}
+					)}
+				</AsyncList>
 			</div>
 		</main>
 	)

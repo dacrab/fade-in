@@ -106,11 +106,7 @@ function BarbershopsPage() {
 								key={v}
 								type="button"
 								onClick={() => setView(v)}
-								className="btn-bare px-3 py-2 flex items-center gap-1.5 text-xs font-medium transition-colors"
-								style={{
-									background: view === v ? "var(--gold)" : "var(--bg-card)",
-									color: view === v ? "#000" : "var(--text-muted)",
-								}}
+								className={`btn-bare px-3 py-2 flex items-center gap-1.5 text-xs font-medium transition-colors ${view === v ? "bg-[var(--gold)] text-black" : "bg-[var(--bg-card)] text-[var(--text-muted)]"}`}
 							>
 								{v === "list" ? <List size={14} /> : <MapIcon size={14} />}
 								<span className="hidden sm:inline">

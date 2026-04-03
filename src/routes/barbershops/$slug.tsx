@@ -29,10 +29,8 @@ export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProf
 function ShopProfilePage() {
 	const { t } = useTranslation()
 	const { slug } = Route.useParams()
-	const shopRaw = useQuery(api.barbershops.getBySlug, { slug })
-	const [bookingOpen, setBookingOpen] = useState(false)
-
-	const shop = shopRaw as Barbershop | null | undefined
+	const shop = useQuery(api.barbershops.getBySlug, { slug })
+	const [bookingOpen, setBookingOpen] = useState(false) as Barbershop | null | undefined
 	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Service[]
 		| undefined
@@ -160,10 +158,7 @@ function ShopProfilePage() {
 								<div className="flex flex-wrap gap-4">
 									{barbers.map((b: Barber) => (
 										<div key={b._id} className="flex flex-col items-center gap-2 text-center">
-											<div
-												className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-card-hover)] flex items-center justify-center"
-												style={{ border: "2px solid var(--border)" }}
-											>
+											<div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-card-hover)] flex items-center justify-center border-2 border-[var(--border)]">
 												{b.avatarUrl ? (
 													<img src={b.avatarUrl} alt={b.name} className="w-full h-full object-cover" />
 												) : (

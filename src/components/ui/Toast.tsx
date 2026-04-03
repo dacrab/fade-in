@@ -22,6 +22,20 @@ export function showToast(message: string, type: ToastType = "info"): void {
 	}
 }
 
+export async function withToast<T>(
+	fn: () => Promise<T>,
+	success: string,
+	error: string,
+): Promise<T | undefined> {
+	try {
+		const result = await fn()
+		showToast(success, "success")
+		return result
+	} catch {
+		showToast(error, "error")
+	}
+}
+
 const ICONS: Record<ToastType, typeof CheckCircle> = {
 	success: CheckCircle,
 	error: AlertCircle,

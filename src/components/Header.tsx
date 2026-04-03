@@ -28,6 +28,19 @@ const ROLE_NAV: Partial<
 	admin: { labelKey: "nav.admin", icon: <ShieldCheck size={14} />, to: "/admin" },
 }
 
+function Logo() {
+	return (
+		<Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
+			<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
+				<Scissors size={16} className="text-black" />
+			</div>
+			<span className="font-bold text-lg tracking-tight text-[var(--text)]">
+				Fade<span className="gold-text">In</span>
+			</span>
+		</Link>
+	)
+}
+
 export default function Header() {
 	const [mobileOpen, setMobileOpen] = useState(false)
 	const { user, logout } = useAuth()
@@ -54,17 +67,12 @@ export default function Header() {
 		{ label: t("common.signOut"), icon: <LogOut size={14} />, onClick: handleLogout, danger: true },
 	]
 
+	const closeMobile = () => setMobileOpen(false)
+
 	return (
 		<header className="sticky top-0 z-50 border-b border-[var(--border)] backdrop-blur-lg bg-[var(--header-bg)]">
 			<nav className="page-wrap px-4 flex items-center gap-4 h-16">
-				<Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
-					<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
-						<Scissors size={16} className="text-black" />
-					</div>
-					<span className="font-bold text-lg tracking-tight text-[var(--text)]">
-						Fade<span className="gold-text">In</span>
-					</span>
-				</Link>
+				<Logo />
 
 				<div className="hidden md:flex items-center gap-1 ml-4">
 					{NAV_LINKS.map(({ to, labelKey }) => (
@@ -105,7 +113,7 @@ export default function Header() {
 					<button
 						type="button"
 						className="md:hidden icon-btn btn-bare"
-						onClick={() => setMobileOpen(!mobileOpen)}
+						onClick={() => setMobileOpen((o) => !o)}
 					>
 						{mobileOpen ? <X size={20} /> : <MenuIcon size={20} />}
 					</button>
@@ -115,7 +123,7 @@ export default function Header() {
 			{mobileOpen && (
 				<div className="md:hidden bg-card border-t border-[var(--border)] px-4 py-4 flex flex-col gap-2">
 					{NAV_LINKS.map(({ to, labelKey }) => (
-						<Link key={to} to={to} className="nav-link" onClick={() => setMobileOpen(false)}>
+						<Link key={to} to={to} className="nav-link" onClick={closeMobile}>
 							{t(labelKey)}
 						</Link>
 					))}
@@ -123,16 +131,13 @@ export default function Header() {
 						<>
 							<hr className="divider my-1" />
 							{roleItem && (
-								<Link to={roleItem.to} className="nav-link" onClick={() => setMobileOpen(false)}>
+								<Link to={roleItem.to} className="nav-link" onClick={closeMobile}>
 									{t(roleItem.labelKey)}
 								</Link>
 							)}
 							<button
 								type="button"
-								onClick={() => {
-									handleLogout()
-									setMobileOpen(false)
-								}}
+								onClick={() => { handleLogout(); closeMobile() }}
 								className="nav-link text-left text-[var(--error)] btn-bare"
 							>
 								{t("common.signOut")}
@@ -141,14 +146,10 @@ export default function Header() {
 					) : (
 						<>
 							<hr className="divider my-1" />
-							<Link to="/login" className="nav-link" onClick={() => setMobileOpen(false)}>
+							<Link to="/login" className="nav-link" onClick={closeMobile}>
 								{t("common.signIn")}
 							</Link>
-							<Link
-								to="/register"
-								className="btn btn-primary justify-center mt-1"
-								onClick={() => setMobileOpen(false)}
-							>
+							<Link to="/register" className="btn btn-primary justify-center mt-1" onClick={closeMobile}>
 								{t("common.getStarted")}
 							</Link>
 						</>

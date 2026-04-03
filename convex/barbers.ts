@@ -31,14 +31,10 @@ export const create = mutation({
 		workingHours: workingHoursValidator,
 	},
 	handler: async (ctx, args) => {
+		const { specializations, ...rest } = args
 		return await ctx.db.insert("barbers", {
-			barbershopId: args.barbershopId,
-			name: args.name,
-			bio: args.bio,
-			specializations: args.specializations ?? [],
-			avatarUrl: args.avatarUrl,
-			userId: args.userId,
-			workingHours: args.workingHours,
+			...rest,
+			specializations: specializations ?? [],
 			isActive: true,
 		})
 	},

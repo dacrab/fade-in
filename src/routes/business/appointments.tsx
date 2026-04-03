@@ -3,10 +3,11 @@ import { useMutation, useQuery } from "convex/react"
 import { Calendar, Check, Clock, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import EmptyState from "#/components/EmptyState"
-import SkeletonList from "#/components/SkeletonList"
-import { showToast } from "#/components/ui/Toast"
+import AsyncList from "#/components/AsyncList"
+import PageHeader from "#/components/PageHeader"
+import { withToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import { type Appointment, type AppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -16,35 +17,23 @@ export const Route = createFileRoute("/business/appointments")({ component: Busi
 
 function BusinessAppointments() {
 	const { t } = useTranslation()
+	useRequireRole(["owner", "admin"])
 	const [selectedDate, setSelectedDate] = useState("")
 
 	const shop = useOwnerShop()
-	const apptsRaw = useQuery(
+	const appointments = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip",
-	)
-	const appointments = apptsRaw as Appointment[] | undefined
+	) as Appointment[] | undefined
 	const updateStatus = useMutation(api.appointments.updateStatus)
 
-	const handleStatus = async (id: Id<"appointments">, status: AppointmentStatus) => {
-		try {
-			await updateStatus({ id, status })
-			showToast(`${t(`status.${status}`)}`, "success")
-		} catch {
-			showToast(t("errors.updateStatusFailed"), "error")
-		}
-	}
+	const handleStatus = (id: Id<"appointments">, status: AppointmentStatus) =>
+		withToast(() => updateStatus({ id, status }), t(`status.${status}`), t("errors.updateStatusFailed"))
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="page-header mb-6">
-					<a href="/business" className="breadcrumb-back">
-						← {t("nav.business")}
-					</a>
-					<span className="breadcrumb-sep">/</span>
-					<h1>{t("business.appointments.title")}</h1>
-				</div>
+				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.appointments.title")} />
 
 				<div className="flex items-center gap-3 mb-6">
 					<div className="relative">
@@ -66,11 +55,12 @@ function BusinessAppointments() {
 					)}
 				</div>
 
-				{appointments === undefined ? (
-					<SkeletonList count={5} height="h-20" />
-				) : appointments.length === 0 ? (
-					<EmptyState icon={Clock} message={t("business.appointments.noAppointments")} />
-				) : (
+				<AsyncList
+					data={appointments}
+					skeleton={{ count: 5, height: "h-20" }}
+					empty={{ icon: Clock, message: t("business.appointments.noAppointments") }}
+				>
+					{(appointments) => (
 					<div className="space-y-3">
 						{appointments.map((appt) => (
 							<div key={appt._id} className="card p-4 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -95,8 +85,7 @@ function BusinessAppointments() {
 												onClick={() => void handleStatus(appt._id, "confirmed")}
 												className="p-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
 												title={t("business.appointments.confirm")}
-												style={{ border: "none", cursor: "pointer" }}
-											>
+	>
 												<Check size={14} />
 											</button>
 											<button
@@ -104,8 +93,7 @@ function BusinessAppointments() {
 												onClick={() => void handleStatus(appt._id, "cancelled")}
 												className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
 												title={t("business.appointments.cancel")}
-												style={{ border: "none", cursor: "pointer" }}
-											>
+	>
 												<X size={14} />
 											</button>
 										</>
@@ -123,7 +111,8 @@ function BusinessAppointments() {
 							</div>
 						))}
 					</div>
-				)}
+					)}
+				</AsyncList>
 			</div>
 		</main>
 	)
