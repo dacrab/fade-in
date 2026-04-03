@@ -124,19 +124,9 @@ export default function Header() {
 					{user ? (
 						<>
 							<hr className="divider my-1" />
-							{user.role === "customer" && (
-								<Link to="/dashboard" className="nav-link" onClick={() => setMobileOpen(false)}>
-									{t("nav.dashboard")}
-								</Link>
-							)}
-							{user.role === "owner" && (
-								<Link to="/business" className="nav-link" onClick={() => setMobileOpen(false)}>
-									{t("nav.business")}
-								</Link>
-							)}
-							{user.role === "admin" && (
-								<Link to="/admin" className="nav-link" onClick={() => setMobileOpen(false)}>
-									{t("nav.admin")}
+							{roleItem && (
+								<Link to={roleItem.to} className="nav-link" onClick={() => setMobileOpen(false)}>
+									{roleItem.label}
 								</Link>
 							)}
 							<button

@@ -1,6 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { socialLinksValidator, workingHoursValidator } from "./validators"
+import { filterDefined, socialLinksValidator, workingHoursValidator } from "./validators"
 
 /** Lists active barbershops with optional city, search, minRating, isVerified filters.
  * city is filtered via the by_city index; minRating and isVerified are applied as
@@ -26,24 +26,22 @@ export const list = query({
 					.withIndex("by_active", (q) => q.eq("isActive", true))
 					.collect()
 
-		if (args.isVerified !== undefined) {
-			shops = shops.filter((s) => s.isVerified === args.isVerified)
-		}
-		if (args.minRating !== undefined) {
-			shops = shops.filter((s) => s.rating >= (args.minRating as number))
-		}
-		// Free-text search is done in-memory; matches name, city, or address.
-		if (args.search) {
-			const term = args.search.toLowerCase()
-			shops = shops.filter(
-				(s) =>
-					s.name.toLowerCase().includes(term) ||
-					s.city.toLowerCase().includes(term) ||
-					s.address.toLowerCase().includes(term),
-			)
-		}
-
-		return shops
+		// Apply remaining filters in a single pass.
+		// Free-text search (name/city/address) stays in-memory — no full-text index.
+		return shops.filter((s) => {
+			if (args.isVerified !== undefined && s.isVerified !== args.isVerified) return false
+			if (args.minRating !== undefined && s.rating < args.minRating) return false
+			if (args.search) {
+				const term = args.search.toLowerCase()
+				if (
+					!s.name.toLowerCase().includes(term) &&
+					!s.city.toLowerCase().includes(term) &&
+					!s.address.toLowerCase().includes(term)
+				)
+					return false
+			}
+			return true
+		})
 	},
 })
 
@@ -150,10 +148,7 @@ export const update = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { id, ...fields } = args
-		return await ctx.db.patch(
-			id,
-			Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)),
-		)
+		return await ctx.db.patch(id, filterDefined(fields))
 	},
 })
 

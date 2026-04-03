@@ -66,9 +66,6 @@ describe("formatTime", () => {
 		expect(formatTime("23:59")).toBe("11:59 PM")
 	})
 
-	it("returns string type", () => {
-		expect(typeof formatTime("08:00")).toBe("string")
-	})
 })
 
 describe("formatDateShort", () => {
@@ -144,7 +141,4 @@ describe("slugify", () => {
 		expect(slugify("Athens")).toBe("athens")
 	})
 
-	it("returns a string type", () => {
-		expect(typeof slugify("Test")).toBe("string")
-	})
 })

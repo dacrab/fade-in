@@ -1,13 +1,7 @@
 import { v } from "convex/values"
 
-/** Validator for a single day's working hours entry. */
-const dayHours = v.object({
-	open: v.string(),
-	close: v.string(),
-	closed: v.boolean(),
-})
+const dayHours = v.object({ open: v.string(), close: v.string(), closed: v.boolean() })
 
-/** Typed validator for the workingHours field, matching the schema definition. */
 export const workingHoursValidator = v.optional(
 	v.object({
 		monday: v.optional(dayHours),
@@ -20,7 +14,6 @@ export const workingHoursValidator = v.optional(
 	}),
 )
 
-/** Typed validator for social links. */
 export const socialLinksValidator = v.optional(
 	v.object({
 		instagram: v.optional(v.string()),
@@ -28,3 +21,8 @@ export const socialLinksValidator = v.optional(
 		website: v.optional(v.string()),
 	}),
 )
+
+/** Strips undefined fields from a partial update object before patching. */
+export function filterDefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
+	return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>
+}

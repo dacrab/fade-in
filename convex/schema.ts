@@ -81,8 +81,7 @@ export default defineSchema({
 		barbershopId: v.id("barbershops"),
 		name: v.string(),
 		description: v.optional(v.string()),
-		// Monetary values are stored in cents (integer) to avoid floating-point errors.
-		price: v.number(),
+		price: v.number(), // cents
 		durationMinutes: v.number(),
 		category: v.string(),
 		isActive: v.boolean(),
@@ -98,8 +97,7 @@ export default defineSchema({
 		date: v.string(), // YYYY-MM-DD
 		startTime: v.string(), // HH:MM
 		endTime: v.string(), // HH:MM
-		// Monetary total is stored in cents.
-		totalPrice: v.number(),
+		totalPrice: v.number(), // cents
 		status: v.union(
 			v.literal("pending"),
 			v.literal("confirmed"),
@@ -119,7 +117,7 @@ export default defineSchema({
 		customerId: v.id("users"),
 		barbershopId: v.id("barbershops"),
 		appointmentId: v.id("appointments"),
-		rating: v.number(), // 1-5
+		rating: v.number(),
 		comment: v.string(),
 		ownerReply: v.optional(v.string()),
 		createdAt: v.number(),
