@@ -177,12 +177,11 @@ bun install
 
 ### Environment
 
-Copy `.env.local.example` to `.env.local`:
-
 ```bash
-CONVEX_DEPLOYMENT=your-deployment-name
-VITE_CONVEX_URL=https://your-deployment.convex.cloud/
+cp .env.example .env.local
 ```
+
+Then fill in your values in `.env.local` (see `.env.example` for details).
 
 ### Run
 
@@ -250,4 +249,4 @@ bun run format   # Biome format only
 
 ## 📝 License
 
-MIT — built with ❤️ in Athens.
+MIT — built with ❤️ in Thessaloniki.
