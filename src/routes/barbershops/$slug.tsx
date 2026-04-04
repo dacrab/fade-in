@@ -5,19 +5,23 @@ import {
 	Check,
 	ChevronLeft,
 	Clock,
+	Copy,
 	Globe,
 	Link2,
 	MapPin,
 	Phone,
+	QrCode,
 	Scissors,
 	Share2,
 	Star,
 } from "lucide-react"
 import { useState } from "react"
+import { QRCodeSVG } from "qrcode.react"
 import { useTranslation } from "react-i18next"
 import BookingModal from "#/components/BookingModal"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
+import { withToast } from "#/components/ui/Toast"
 import { capitalizeFirst, formatPrice, formatRelative } from "#/lib/format"
 import type { Barber, Barbershop, Review, Service, WeekDay } from "#/types"
 import { WEEK_DAYS } from "#/types"
@@ -31,6 +35,15 @@ function ShopProfilePage() {
 	const { slug } = Route.useParams()
 	const shop = useQuery(api.barbershops.getBySlug, { slug }) as Barbershop | null | undefined
 	const [bookingOpen, setBookingOpen] = useState(false)
+	const [showQr, setShowQr] = useState(false)
+	const bookingUrl = typeof window !== "undefined" ? `${window.location.origin}/barbershops/${slug}` : ""
+
+	const handleCopyLink = () =>
+		withToast(
+			() => navigator.clipboard.writeText(bookingUrl),
+			t("shop.linkCopied"),
+			t("shop.linkCopyFailed"),
+		)
 	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Service[]
 		| undefined
@@ -224,6 +237,40 @@ function ShopProfilePage() {
 							>
 								<Calendar size={18} /> {t("common.bookNow")}
 							</button>
+						</div>
+
+						{/* Shareable booking link + QR code */}
+						<div className="card p-5">
+							<h3 className="font-bold text-[var(--text)] mb-3 flex items-center gap-2">
+								<QrCode size={16} /> {t("shop.shareTitle")}
+							</h3>
+							<div className="flex gap-2 mb-3">
+								<input
+									readOnly
+									value={bookingUrl}
+									className="input text-xs flex-1 min-w-0"
+								/>
+								<button
+									type="button"
+									onClick={() => void handleCopyLink()}
+									className="btn btn-secondary px-3 flex-shrink-0"
+									title={t("shop.copyLink")}
+								>
+									<Copy size={14} />
+								</button>
+							</div>
+							<button
+								type="button"
+								onClick={() => setShowQr((v) => !v)}
+								className="btn btn-ghost text-xs w-full justify-center"
+							>
+								<QrCode size={13} /> {showQr ? t("shop.hideQr") : t("shop.showQr")}
+							</button>
+							{showQr && (
+								<div className="flex justify-center mt-3 p-3 bg-white rounded-xl">
+									<QRCodeSVG value={bookingUrl} size={160} />
+								</div>
+							)}
 						</div>
 
 						{shop.workingHours && (

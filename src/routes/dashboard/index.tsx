@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { useQuery } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { Calendar, CheckCircle, Clock, Heart, Scissors, User, XCircle } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import SkeletonList from "#/components/SkeletonList"
 import StatsGrid from "#/components/StatsGrid"
 import { Skeleton } from "#/components/ui/Skeleton"
+import { withToast } from "#/components/ui/Toast"
 import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import { type Appointment, type Barbershop, STATUS_BADGE } from "#/types"
@@ -124,6 +125,16 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 		| Barbershop
 		| null
 		| undefined
+	const updateStatus = useMutation(api.appointments.updateStatus)
+	const canCancel = appt.status === "pending" || appt.status === "confirmed"
+
+	const handleCancel = () =>
+		withToast(
+			() => updateStatus({ id: appt._id, status: "cancelled" }),
+			t("status.cancelled"),
+			t("errors.updateStatusFailed"),
+		)
+
 	return (
 		<div className="flex items-center gap-4 p-3 rounded-xl border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors bg-[var(--bg-input)]">
 			<div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
@@ -136,7 +147,17 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 				</div>
 			</div>
 			<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(appt.totalPrice)}</div>
-			<span className={`badge ${STATUS_BADGE[appt.status]}`}>{appt.status}</span>
+			<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
+			{canCancel && (
+				<button
+					type="button"
+					onClick={() => void handleCancel()}
+					className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors flex-shrink-0"
+					title={t("common.cancel")}
+				>
+					<XCircle size={14} />
+				</button>
+			)}
 		</div>
 	)
 }

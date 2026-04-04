@@ -17,10 +17,17 @@ export const Route = createRootRoute({
 				content:
 					"Discover and book top barbershops near you. FadeIn is the modern platform for premium grooming experiences.",
 			},
+			{ name: "theme-color", content: "#f59e0b" },
+			{ name: "mobile-web-app-capable", content: "yes" },
+			{ name: "apple-mobile-web-app-capable", content: "yes" },
+			{ name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+			{ name: "apple-mobile-web-app-title", content: "FadeIn" },
 		],
 		links: [
 			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
 			{ rel: "stylesheet", href: appCss },
+			{ rel: "manifest", href: "/manifest.json" },
+			{ rel: "apple-touch-icon", href: "/favicon.svg" },
 		],
 	}),
 	component: RootDocument,
@@ -40,6 +47,12 @@ function RootDocument() {
 					<ToastContainer />
 				</ConvexProvider>
 				<Scripts />
+				<script
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: SW registration
+					dangerouslySetInnerHTML={{
+						__html: `if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js')); }`,
+					}}
+				/>
 			</body>
 		</html>
 	)

@@ -1,0 +1,18 @@
+{
+  "name": "FadeIn — Barbershop Booking",
+  "short_name": "FadeIn",
+  "description": "Discover and book top-rated barbershops near you.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
