@@ -46,3 +46,6 @@ __unconfig*
 todos.json
 mcp-todos.json
 PLAN.md
+
+# Research reports (AI-generated, not part of the app)
+research-reports/
