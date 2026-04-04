@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router"
 import { Globe, Scissors } from "lucide-react"
-import { memo } from "react"
 import { useTranslation } from "react-i18next"
 
 const linkCls = "text-sm text-muted no-underline hover:text-[var(--gold)] transition-colors"
@@ -14,7 +13,7 @@ function FooterSection({ title, children }: { title: string; children: React.Rea
 	)
 }
 
-export default memo(function Footer() {
+export default function Footer() {
 	const { t } = useTranslation()
 	const year = new Date().getFullYear()
 
@@ -94,4 +93,4 @@ export default memo(function Footer() {
 			</div>
 		</footer>
 	)
-})
+}

@@ -26,7 +26,7 @@ const en = {
 		active: "Active",
 		suspended: "Suspended",
 		anyRating: "Any",
-		noResults: "No results found",
+
 		at: "at",
 		min: "min",
 		pending: "Pending",
@@ -58,7 +58,7 @@ const en = {
 		roleOwner: "Shop Owner",
 		noAccount: "Don't have an account?",
 		haveAccount: "Already have an account?",
-		forgotPassword: "Forgot password?",
+
 		agreeTerms: "By signing up you agree to our",
 		terms: "Terms",
 		privacy: "Privacy Policy",
@@ -215,35 +215,6 @@ const en = {
 				desc: "Collect genuine reviews from customers and reply directly from your dashboard.",
 			},
 		},
-		pricingTitle: "Simple, transparent pricing",
-		pricingSubtitle: "No hidden fees. Cancel anytime.",
-		plans: {
-			starter: {
-				name: "Starter",
-				price: "Free",
-				desc: "Perfect to get started",
-				features: ["1 barber", "Up to 50 bookings/month", "Basic analytics", "Customer reviews"],
-			},
-			pro: {
-				name: "Pro",
-				price: "€29/mo",
-				desc: "For growing shops",
-				features: [
-					"Up to 5 barbers",
-					"Unlimited bookings",
-					"Advanced analytics",
-					"Priority support",
-					"Custom working hours",
-				],
-			},
-			enterprise: {
-				name: "Enterprise",
-				price: "Custom",
-				desc: "For multi-location chains",
-				features: ["Unlimited barbers", "Multi-location", "API access", "Dedicated account manager"],
-			},
-		},
-		mostPopular: "Most popular",
 	},
 
 	// ─── Dashboard ─────────────────────────────────────────────────────────────
@@ -342,6 +313,7 @@ const en = {
 			title: "Barbers",
 			addBarber: "Add barber",
 			namePlaceholder: "e.g. Nikos",
+			specializationsLabel: "Specializations",
 			specializationsPlaceholder: "Fades, Beards, Classic cuts",
 			bioPlaceholder: "Short bio...",
 			noBarbers: "No barbers yet.",
@@ -417,7 +389,7 @@ const en = {
 		account: "Account",
 		company: "Company",
 		rights: "© {{year}} FadeIn. All rights reserved.",
-		builtWith: "Built in Athens",
+
 		links: {
 			about: "About",
 			privacy: "Privacy",

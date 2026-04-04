@@ -12,9 +12,7 @@ export default defineSchema({
 		role: v.union(v.literal("customer"), v.literal("owner"), v.literal("barber"), v.literal("admin")),
 		avatarUrl: v.optional(v.string()),
 		favoriteShopIds: v.array(v.id("barbershops")),
-	})
-		.index("by_email", ["email"])
-		.index("by_role", ["role"]),
+	}).index("by_email", ["email"]),
 
 	barbershops: defineTable({
 		name: v.string(),
@@ -60,9 +58,7 @@ export default defineSchema({
 		durationMinutes: v.number(),
 		category: v.string(),
 		isActive: v.boolean(),
-	})
-		.index("by_shop", ["barbershopId"])
-		.index("by_category", ["category"]),
+	}).index("by_shop", ["barbershopId"]),
 
 	appointments: defineTable({
 		customerId: v.id("users"),
@@ -84,9 +80,7 @@ export default defineSchema({
 	})
 		.index("by_customer", ["customerId"])
 		.index("by_shop", ["barbershopId"])
-		.index("by_barber", ["barberId"])
-		.index("by_date", ["date"])
-		.index("by_status", ["status"]),
+		.index("by_barber", ["barberId"]),
 
 	reviews: defineTable({
 		customerId: v.id("users"),
