@@ -1,10 +1,9 @@
 import { Link } from "@tanstack/react-router"
 import { Check, MapPin, Scissors, Star } from "lucide-react"
-import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import type { Barbershop } from "#/types"
 
-export default memo(function ShopCard({ shop }: { shop: Barbershop }) {
+export default function ShopCard({ shop }: { shop: Barbershop }) {
 	const { t } = useTranslation()
 	return (
 		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
@@ -46,4 +45,4 @@ export default memo(function ShopCard({ shop }: { shop: Barbershop }) {
 			</div>
 		</Link>
 	)
-})
+}

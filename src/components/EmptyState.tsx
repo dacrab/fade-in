@@ -1,5 +1,4 @@
 import type { LucideIcon } from "lucide-react"
-import { memo } from "react"
 
 interface Props {
 	icon: LucideIcon
@@ -7,8 +6,7 @@ interface Props {
 	children?: React.ReactNode
 }
 
-/** Displays a centered empty state with an icon, message, and optional CTA. */
-export default memo(function EmptyState({ icon: Icon, message, children }: Props) {
+export default function EmptyState({ icon: Icon, message, children }: Props) {
 	return (
 		<div className="empty-state">
 			<Icon size={36} className="mx-auto mb-3 opacity-30" />
@@ -16,4 +14,4 @@ export default memo(function EmptyState({ icon: Icon, message, children }: Props
 			{children}
 		</div>
 	)
-})
+}

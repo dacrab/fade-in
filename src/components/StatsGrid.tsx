@@ -1,5 +1,4 @@
 import type { LucideIcon } from "lucide-react"
-import { memo } from "react"
 
 interface StatItem {
 	label: string
@@ -19,7 +18,7 @@ const COL_CLASS: Record<2 | 3 | 4, string> = {
 }
 
 /** Renders a responsive grid of stat cards. */
-export default memo(function StatsGrid({ stats, cols = 4 }: Props) {
+export default function StatsGrid({ stats, cols = 4 }: Props) {
 	return (
 		<div className={`grid ${COL_CLASS[cols]} gap-4`}>
 			{stats.map(({ label, value, icon: Icon }) => (
@@ -31,4 +30,4 @@ export default memo(function StatsGrid({ stats, cols = 4 }: Props) {
 			))}
 		</div>
 	)
-})
+}
