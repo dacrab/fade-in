@@ -15,8 +15,8 @@ import {
 	Share2,
 	Star,
 } from "lucide-react"
-import { useState } from "react"
 import { QRCodeSVG } from "qrcode.react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import BookingModal from "#/components/BookingModal"
 import { Skeleton } from "#/components/ui/Skeleton"
@@ -36,7 +36,8 @@ function ShopProfilePage() {
 	const shop = useQuery(api.barbershops.getBySlug, { slug }) as Barbershop | null | undefined
 	const [bookingOpen, setBookingOpen] = useState(false)
 	const [showQr, setShowQr] = useState(false)
-	const bookingUrl = typeof window !== "undefined" ? `${window.location.origin}/barbershops/${slug}` : ""
+	const bookingUrl =
+		typeof window !== "undefined" ? `${window.location.origin}/barbershops/${slug}` : ""
 
 	const handleCopyLink = () =>
 		withToast(
@@ -245,11 +246,7 @@ function ShopProfilePage() {
 								<QrCode size={16} /> {t("shop.shareTitle")}
 							</h3>
 							<div className="flex gap-2 mb-3">
-								<input
-									readOnly
-									value={bookingUrl}
-									className="input text-xs flex-1 min-w-0"
-								/>
+								<input readOnly value={bookingUrl} className="input text-xs flex-1 min-w-0" />
 								<button
 									type="button"
 									onClick={() => void handleCopyLink()}

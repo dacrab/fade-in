@@ -70,15 +70,10 @@ function BusinessDashboard() {
 		.filter((a) => a.date.startsWith(thisMonthStr))
 		.reduce((sum, a) => sum + a.totalPrice, 0)
 	const completionRate =
-		allAppts && allAppts.length > 0
-			? Math.round((completedAppts.length / allAppts.length) * 100)
-			: 0
+		allAppts && allAppts.length > 0 ? Math.round((completedAppts.length / allAppts.length) * 100) : 0
 
 	// CRM: deduplicate customers from all appointments
-	const customerMap = new Map<
-		string,
-		{ visits: number; totalSpent: number; lastDate: string }
-	>()
+	const customerMap = new Map<string, { visits: number; totalSpent: number; lastDate: string }>()
 	for (const appt of allAppts ?? []) {
 		const id = appt.customerId as string
 		const existing = customerMap.get(id)
@@ -90,8 +85,8 @@ function BusinessDashboard() {
 			customerMap.set(id, { visits: 1, totalSpent: appt.totalPrice, lastDate: appt.date })
 		}
 	}
-	const customerEntries = [...customerMap.entries()].sort(
-		(a, b) => (b[1].lastDate > a[1].lastDate ? 1 : -1),
+	const customerEntries = [...customerMap.entries()].sort((a, b) =>
+		b[1].lastDate > a[1].lastDate ? 1 : -1,
 	)
 
 	if (loading || !user) return <DashSkeleton />
@@ -244,9 +239,22 @@ function BusinessDashboard() {
 								<div className="grid grid-cols-3 gap-3 pt-1">
 									{(
 										[
-											{ label: t("business.revenue.completed"), count: completedAppts.length, color: "text-green-400" },
-											{ label: t("business.revenue.pending"), count: allAppts.filter((a) => a.status === "pending" || a.status === "confirmed").length, color: "text-[var(--gold)]" },
-											{ label: t("business.revenue.cancelled"), count: allAppts.filter((a) => a.status === "cancelled").length, color: "text-red-400" },
+											{
+												label: t("business.revenue.completed"),
+												count: completedAppts.length,
+												color: "text-green-400",
+											},
+											{
+												label: t("business.revenue.pending"),
+												count: allAppts.filter((a) => a.status === "pending" || a.status === "confirmed")
+													.length,
+												color: "text-[var(--gold)]",
+											},
+											{
+												label: t("business.revenue.cancelled"),
+												count: allAppts.filter((a) => a.status === "cancelled").length,
+												color: "text-red-400",
+											},
 										] as const
 									).map(({ label, count, color }) => (
 										<div key={label} className="text-center p-2 rounded-xl bg-[var(--bg-input)]">
