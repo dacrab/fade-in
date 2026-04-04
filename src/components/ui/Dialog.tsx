@@ -1,12 +1,12 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog"
 import { X } from "lucide-react"
-import type * as React from "react"
+import type { ReactNode } from "react"
 import { cn } from "#/lib/cn"
 
 interface DialogProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
@@ -18,7 +18,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
 }
 
 interface DialogContentProps {
-	children: React.ReactNode
+	children: ReactNode
 	className?: string
 }
 
@@ -32,7 +32,7 @@ export function DialogContent({ children, className }: DialogContentProps) {
 }
 
 interface DialogHeaderProps {
-	children?: React.ReactNode
+	children?: ReactNode
 	onClose?: () => void
 }
 
@@ -50,7 +50,7 @@ export function DialogHeader({ children, onClose }: DialogHeaderProps) {
 }
 
 interface DialogTitleProps {
-	children: React.ReactNode
+	children: ReactNode
 	className?: string
 }
 
@@ -63,7 +63,7 @@ export function DialogTitle({ children, className }: DialogTitleProps) {
 }
 
 interface DialogDescriptionProps {
-	children: React.ReactNode
+	children: ReactNode
 	className?: string
 }
 
@@ -76,7 +76,7 @@ export function DialogDescription({ children, className }: DialogDescriptionProp
 }
 
 interface DialogCloseProps {
-	children: React.ReactNode
+	children: ReactNode
 	className?: string
 }
 

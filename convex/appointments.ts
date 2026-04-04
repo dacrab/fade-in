@@ -129,11 +129,3 @@ export const listByBarber = query({
 		return args.date ? appts.filter((a) => a.date === args.date) : appts
 	},
 })
-
-/** Fetches a single appointment by its ID. */
-export const getById = query({
-	args: { id: v.id("appointments") },
-	handler: async (ctx, args) => {
-		return await ctx.db.get(args.id)
-	},
-})

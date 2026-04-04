@@ -1,18 +1,18 @@
 import { Menu as BaseMenu } from "@base-ui/react/menu"
-import type * as React from "react"
+import type { ReactElement, ReactNode } from "react"
 import { cn } from "#/lib/cn"
 
 export interface MenuItem {
-	label: React.ReactNode
+	label: ReactNode
 	onClick?: () => void
 	danger?: boolean
 	disabled?: boolean
 	separator?: boolean
-	icon?: React.ReactNode
+	icon?: ReactNode
 }
 
 interface MenuProps {
-	trigger: React.ReactElement
+	trigger: ReactElement
 	items: MenuItem[]
 	align?: "start" | "end" | "center"
 }

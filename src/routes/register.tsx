@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
-import { Eye, EyeOff, Scissors } from "lucide-react"
+import { Scissors } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
 import { type UserRole, useAuth } from "#/hooks/useAuth"
 
@@ -13,7 +14,6 @@ function RegisterPage() {
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [role, setRole] = useState<UserRole>("customer")
-	const [showPass, setShowPass] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const { register } = useAuth()
 	const router = useRouter()
@@ -103,24 +103,13 @@ function RegisterPage() {
 							<label className="form-label" htmlFor="reg-password">
 								{t("auth.passwordLabel")}
 							</label>
-							<div className="relative">
-								<input
-									type={showPass ? "text" : "password"}
-									className="input pr-10"
-									placeholder={t("form.passwordMin")}
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-									required
-									autoComplete="new-password"
-								/>
-								<button
-									type="button"
-									onClick={() => setShowPass((v) => !v)}
-									className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] btn-bare"
-								>
-									{showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-								</button>
-							</div>
+							<PasswordInput
+								id="reg-password"
+								value={password}
+								onChange={setPassword}
+								placeholder={t("form.passwordMin")}
+								autoComplete="new-password"
+							/>
 						</div>
 						<button
 							type="submit"

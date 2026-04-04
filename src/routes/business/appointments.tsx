@@ -5,11 +5,12 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import AsyncList from "#/components/AsyncList"
 import PageHeader from "#/components/PageHeader"
+import StatusBadge from "#/components/ui/StatusBadge"
 import { withToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatDateShort, formatPrice } from "#/lib/format"
-import { type Appointment, type AppointmentStatus, STATUS_BADGE } from "#/types"
+import type { Appointment, AppointmentStatus } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -87,7 +88,7 @@ function BusinessAppointments() {
 										</div>
 									</div>
 									<div className="flex items-center gap-2 flex-shrink-0">
-										<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
+										<StatusBadge status={appt.status} />
 										{appt.status === "pending" && (
 											<>
 												<button
