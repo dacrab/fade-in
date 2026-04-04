@@ -315,7 +315,7 @@ const el = {
 			namePlaceholder: "π.χ. Κουρείο Νίκου",
 			descPlaceholder: "Πείτε στους πελάτες για το κατάστημά σας...",
 			phonePlaceholder: "+30 210 0000000",
-			addressPlaceholder: "Ερμού 10, Αθήνα",
+			addressPlaceholder: "Τσιμισκή 10, Θεσσαλονίκη",
 			urlPreview: "URL: /barbershops/{{slug}}",
 		},
 	},
@@ -424,7 +424,7 @@ const el = {
 		instagramLabel: "Instagram",
 		facebookLabel: "Facebook",
 		websiteLabel: "Website",
-		cityPlaceholder: "Αθήνα",
+		cityPlaceholder: "Θεσσαλονίκη",
 	},
 	status: {
 		pending: "Σε αναμονή",

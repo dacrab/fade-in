@@ -334,7 +334,7 @@ const en = {
 			namePlaceholder: "e.g. Nikos Barbershop",
 			descPlaceholder: "Tell customers about your shop...",
 			phonePlaceholder: "+30 210 0000000",
-			addressPlaceholder: "Ermou 10, Athens",
+			addressPlaceholder: "Tsimiski 10, Thessaloniki",
 			urlPreview: "URL: /barbershops/{{slug}}",
 		},
 	},
@@ -453,7 +453,7 @@ const en = {
 		instagramLabel: "Instagram",
 		facebookLabel: "Facebook",
 		websiteLabel: "Website",
-		cityPlaceholder: "Athens",
+		cityPlaceholder: "Thessaloniki",
 	},
 
 	// ─── Status ────────────────────────────────────────────────────────────────
