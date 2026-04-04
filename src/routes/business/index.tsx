@@ -5,11 +5,13 @@ import {
 	Calendar,
 	Check,
 	Clock,
+	DollarSign,
 	MessageSquare,
 	PlusCircle,
 	Scissors,
 	Settings,
 	Star,
+	TrendingUp,
 	Users,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -48,6 +50,7 @@ function BusinessDashboard() {
 	const shop = shopsRaw?.[0] as Barbershop | undefined
 
 	const todayStr = new Date().toISOString().slice(0, 10)
+	const thisMonthStr = new Date().toISOString().slice(0, 7) // YYYY-MM
 	const todayAppts = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: todayStr } : "skip",
@@ -59,6 +62,37 @@ function BusinessDashboard() {
 	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Review[]
 		| undefined
+
+	// Revenue analytics derived from appointments
+	const completedAppts = allAppts?.filter((a) => a.status === "completed") ?? []
+	const totalRevenue = completedAppts.reduce((sum, a) => sum + a.totalPrice, 0)
+	const monthRevenue = completedAppts
+		.filter((a) => a.date.startsWith(thisMonthStr))
+		.reduce((sum, a) => sum + a.totalPrice, 0)
+	const completionRate =
+		allAppts && allAppts.length > 0
+			? Math.round((completedAppts.length / allAppts.length) * 100)
+			: 0
+
+	// CRM: deduplicate customers from all appointments
+	const customerMap = new Map<
+		string,
+		{ visits: number; totalSpent: number; lastDate: string }
+	>()
+	for (const appt of allAppts ?? []) {
+		const id = appt.customerId as string
+		const existing = customerMap.get(id)
+		if (existing) {
+			existing.visits += 1
+			existing.totalSpent += appt.totalPrice
+			if (appt.date > existing.lastDate) existing.lastDate = appt.date
+		} else {
+			customerMap.set(id, { visits: 1, totalSpent: appt.totalPrice, lastDate: appt.date })
+		}
+	}
+	const customerEntries = [...customerMap.entries()].sort(
+		(a, b) => (b[1].lastDate > a[1].lastDate ? 1 : -1),
+	)
 
 	if (loading || !user) return <DashSkeleton />
 
@@ -124,11 +158,15 @@ function BusinessDashboard() {
 									icon: Calendar,
 								},
 								{
-									label: t("business.stats.totalBookings"),
-									value: allAppts?.length ?? "—",
-									icon: BarChart3,
+									label: t("business.stats.totalRevenue"),
+									value: allAppts ? formatPrice(totalRevenue) : "—",
+									icon: DollarSign,
 								},
-								{ label: t("business.stats.totalReviews"), value: reviews?.length ?? "—", icon: Star },
+								{
+									label: t("business.stats.monthRevenue"),
+									value: allAppts ? formatPrice(monthRevenue) : "—",
+									icon: TrendingUp,
+								},
 								{
 									label: t("business.stats.avgRating"),
 									value: `${shop.rating.toFixed(1)} / 5`,
@@ -173,6 +211,87 @@ function BusinessDashboard() {
 											</div>
 										</div>
 										<span className={`badge text-xs ${STATUS_BADGE[appt.status]}`}>{appt.status}</span>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+
+					{/* Revenue Analytics */}
+					<div className="card p-5 mb-5">
+						<h2 className="font-bold text-[var(--text)] mb-4 flex items-center gap-2">
+							<TrendingUp size={16} className="text-[var(--gold)]" />
+							{t("business.revenue.title")}
+						</h2>
+						{allAppts === undefined ? (
+							<Skeleton className="h-24 w-full" />
+						) : allAppts.length === 0 ? (
+							<p className="text-sm text-[var(--text-muted)]">{t("business.revenue.noData")}</p>
+						) : (
+							<div className="space-y-3">
+								<div>
+									<div className="flex justify-between text-xs text-[var(--text-muted)] mb-1">
+										<span>{t("business.stats.completionRate")}</span>
+										<span className="font-bold text-[var(--text)]">{completionRate}%</span>
+									</div>
+									<div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
+										<div
+											className="h-full rounded-full bg-[var(--gold)] transition-all"
+											style={{ width: `${completionRate}%` }}
+										/>
+									</div>
+								</div>
+								<div className="grid grid-cols-3 gap-3 pt-1">
+									{(
+										[
+											{ label: t("business.revenue.completed"), count: completedAppts.length, color: "text-green-400" },
+											{ label: t("business.revenue.pending"), count: allAppts.filter((a) => a.status === "pending" || a.status === "confirmed").length, color: "text-[var(--gold)]" },
+											{ label: t("business.revenue.cancelled"), count: allAppts.filter((a) => a.status === "cancelled").length, color: "text-red-400" },
+										] as const
+									).map(({ label, count, color }) => (
+										<div key={label} className="text-center p-2 rounded-xl bg-[var(--bg-input)]">
+											<div className={`text-lg font-bold ${color}`}>{count}</div>
+											<div className="text-xs text-[var(--text-muted)]">{label}</div>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* CRM: Customer list */}
+					<div className="card p-5 mb-5">
+						<h2 className="font-bold text-[var(--text)] mb-4 flex items-center gap-2">
+							<Users size={16} className="text-[var(--gold)]" />
+							{t("business.crm.title")}
+							{customerEntries.length > 0 && (
+								<span className="ml-auto text-xs font-normal text-[var(--text-muted)]">
+									{t("business.crm.totalCustomers")}: {customerEntries.length}
+								</span>
+							)}
+						</h2>
+						{allAppts === undefined ? (
+							<SkeletonList count={3} height="h-12" />
+						) : customerEntries.length === 0 ? (
+							<EmptyState icon={Users} message={t("business.crm.noCustomers")} />
+						) : (
+							<div className="divide-y divide-[var(--border)]">
+								{customerEntries.slice(0, 10).map(([customerId, data]) => (
+									<div key={customerId} className="flex items-center justify-between py-3 gap-4">
+										<div className="w-8 h-8 rounded-full bg-[rgba(245,158,11,0.1)] flex items-center justify-center flex-shrink-0">
+											<Users size={14} className="text-[var(--gold)]" />
+										</div>
+										<div className="flex-1 min-w-0">
+											<div className="text-xs text-[var(--text-muted)]">
+												{t("business.crm.visits", { count: data.visits })}
+											</div>
+											<div className="text-xs text-[var(--text-subtle)]">
+												{t("business.crm.lastVisit", { date: data.lastDate })}
+											</div>
+										</div>
+										<div className="text-sm font-bold text-[var(--gold)] flex-shrink-0">
+											{formatPrice(data.totalSpent)}
+										</div>
 									</div>
 								))}
 							</div>
