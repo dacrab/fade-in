@@ -5,10 +5,11 @@ import { useTranslation } from "react-i18next"
 import SkeletonList from "#/components/SkeletonList"
 import StatsGrid from "#/components/StatsGrid"
 import { Skeleton } from "#/components/ui/Skeleton"
+import StatusBadge from "#/components/ui/StatusBadge"
 import { withToast } from "#/components/ui/Toast"
 import { useRequireRole } from "#/hooks/useRequireRole"
 import { formatDateShort, formatPrice } from "#/lib/format"
-import { type Appointment, type Barbershop, STATUS_BADGE } from "#/types"
+import type { Appointment, Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
@@ -147,7 +148,7 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 				</div>
 			</div>
 			<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(appt.totalPrice)}</div>
-			<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
+			<StatusBadge status={appt.status} />
 			{canCancel && (
 				<button
 					type="button"

@@ -13,13 +13,6 @@ export const listByShop = query({
 	},
 })
 
-export const getById = query({
-	args: { id: v.id("services") },
-	handler: async (ctx, args) => {
-		return await ctx.db.get(args.id)
-	},
-})
-
 export const create = mutation({
 	args: {
 		barbershopId: v.id("barbershops"),
