@@ -14,7 +14,7 @@ export function useAuth() {
 	const { signIn, signOut } = useAuthActions()
 	const viewer = useQuery(api.users.getViewer)
 
-	const user: AuthUser | null = viewer
+	const user = viewer
 		? {
 				id: viewer._id,
 				name: viewer.name,
@@ -24,20 +24,16 @@ export function useAuth() {
 			}
 		: null
 
-	const loading = viewer === undefined
-
 	return {
 		user,
-		loading,
+		loading: viewer === undefined,
 		isLoggedIn: !!user,
 		signIn,
 		signOut,
-		login: async (email: string, password: string) => {
-			await signIn("password", { email, password, flow: "signIn" })
-		},
-		register: async (email: string, password: string, name: string, role: UserRole) => {
-			await signIn("password", { email, password, flow: "signUp", name, role })
-		},
+		login: (email: string, password: string) =>
+			signIn("password", { email, password, flow: "signIn" }),
+		register: (email: string, password: string, name: string, role: UserRole) =>
+			signIn("password", { email, password, flow: "signUp", name, role }),
 		logout: () => signOut(),
 	}
 }

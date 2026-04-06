@@ -15,7 +15,10 @@ export default function AsyncList<T>({
 	empty,
 	children,
 }: Props<T>) {
-	if (data === undefined) return <SkeletonList count={skeleton.count} height={skeleton.height} />
-	if (data.length === 0) return <EmptyState icon={empty.icon} message={empty.message} />
-	return <>{children(data)}</>
+	if (!data) return <SkeletonList count={skeleton.count} height={skeleton.height} />
+	return data.length === 0 ? (
+		<EmptyState icon={empty.icon} message={empty.message} />
+	) : (
+		children(data)
+	)
 }

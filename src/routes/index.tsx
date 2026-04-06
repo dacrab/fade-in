@@ -36,52 +36,58 @@ function HomePage() {
 						{t("home.badge")}
 					</div>
 					<h1 className="text-5xl sm:text-7xl font-bold tracking-tight mb-6 fade-up [animation-delay:60ms]">
-						{t("home.heroTitle")} <span className="gold-text">{t("home.heroTitleHighlight")}</span>
+						{t("home.title")}
 					</h1>
-					<p className="text-lg sm:text-xl text-[var(--text-muted)] max-w-xl mx-auto mb-10 fade-up [animation-delay:120ms]">
-						{t("home.heroSubtitle")}
+					<p className="text-lg text-[var(--text-muted)] mb-8 max-w-2xl mx-auto fade-up [animation-delay:120ms]">
+						{t("home.subtitle")}
 					</p>
+
+					{/* Search form */}
 					<form
 						onSubmit={handleSearch}
-						className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto fade-up [animation-delay:180ms]"
+						className="flex flex-col sm:flex-row gap-2 max-w-2xl mx-auto mb-8 fade-up [animation-delay:180ms]"
 					>
 						<div className="flex-1 relative">
 							<Search
 								size={16}
-								className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]"
+								className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
 							/>
 							<input
-								className="input pl-9"
+								type="text"
 								placeholder={t("home.searchPlaceholder")}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
+								className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/50"
 							/>
 						</div>
-						<div className="relative sm:w-48">
+						<div className="flex-1 relative">
 							<MapPin
 								size={16}
-								className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]"
+								className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
 							/>
 							<input
-								className="input pl-9"
+								type="text"
 								placeholder={t("home.cityPlaceholder")}
 								value={city}
 								onChange={(e) => setCity(e.target.value)}
+								className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/50"
 							/>
 						</div>
-						<button type="submit" className="btn btn-primary whitespace-nowrap">
-							<Search size={15} />
+						<button
+							type="submit"
+							className="px-6 py-2.5 bg-[var(--gold)] hover:bg-[var(--gold)]/90 transition-colors text-black font-semibold rounded-lg whitespace-nowrap"
+						>
 							{t("common.search")}
 						</button>
 					</form>
+
+					{/* Stats */}
 					<div className="flex flex-wrap justify-center gap-8 mt-14 fade-up [animation-delay:240ms]">
-						{(
-							[
-								["500+", t("home.stats.shops")],
-								["50k+", t("home.stats.clients")],
-								["4.9", t("home.stats.rating")],
-							] as [string, string][]
-						).map(([val, label]) => (
+						{[
+							["500+", t("home.stats.shops")],
+							["50k+", t("home.stats.clients")],
+							["4.9", t("home.stats.rating")],
+						].map(([val, label]) => (
 							<div key={label} className="text-center">
 								<div className="text-2xl font-bold gold-text">{val}</div>
 								<div className="text-sm text-[var(--text-muted)]">{label}</div>
@@ -103,11 +109,13 @@ function HomePage() {
 							{t("common.viewAll")} <ArrowRight size={14} />
 						</Link>
 					</div>
-					{featured === undefined ? (
+					{!featured ? (
 						<div className="shop-grid">
-							{Array.from({ length: 6 }).map((_, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders have no stable id
-								<ShopCardSkeleton key={i} />
+							{Array.from({ length: 6 }, (_, i) => (
+								<ShopCardSkeleton
+									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders have no id
+									key={i}
+								/>
 							))}
 						</div>
 					) : featured.length === 0 ? (
@@ -121,7 +129,7 @@ function HomePage() {
 					) : (
 						<div className="shop-grid">
 							{featured.map((shop: Doc<"barbershops">) => (
-								<ShopCard key={shop._id} shop={shop as unknown as Barbershop} />
+								<ShopCard key={shop._id} shop={shop as Barbershop} />
 							))}
 						</div>
 					)}
@@ -136,13 +144,11 @@ function HomePage() {
 						<p className="text-[var(--text-muted)]">{t("home.howSubtitle")}</p>
 					</div>
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-						{(
-							[
-								{ icon: Search, step: "01", key: "discover" },
-								{ icon: Star, step: "02", key: "book" },
-								{ icon: Scissors, step: "03", key: "enjoy" },
-							] as const
-						).map(({ icon: Icon, step, key }) => (
+						{[
+							{ icon: Search, step: "01" as const, key: "discover" },
+							{ icon: Star, step: "02" as const, key: "book" },
+							{ icon: Scissors, step: "03" as const, key: "enjoy" },
+						].map(({ icon: Icon, step, key }) => (
 							<div key={step} className="text-center">
 								<div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 text-[var(--gold)] bg-[rgba(245,158,11,0.1)] border border-[rgba(245,158,11,0.2)]">
 									<Icon size={24} />

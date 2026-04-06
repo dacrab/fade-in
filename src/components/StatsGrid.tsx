@@ -11,16 +11,15 @@ interface Props {
 	cols?: 2 | 3 | 4
 }
 
-const COL_CLASS: Record<2 | 3 | 4, string> = {
+const GRID_COLS = {
 	2: "grid-cols-2",
 	3: "grid-cols-3",
 	4: "grid-cols-2 sm:grid-cols-4",
-}
+} as const
 
-/** Renders a responsive grid of stat cards. */
 export default function StatsGrid({ stats, cols = 4 }: Props) {
 	return (
-		<div className={`grid ${COL_CLASS[cols]} gap-4`}>
+		<div className={`grid ${GRID_COLS[cols]} gap-4`}>
 			{stats.map(({ label, value, icon: Icon }) => (
 				<div key={label} className="card p-4">
 					<Icon size={18} className="text-[var(--gold)] mb-2" />
