@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { generateSlots } from "../src/lib/slots"
 
 export const getAvailableSlots = query({
 	args: {
@@ -9,43 +10,13 @@ export const getAvailableSlots = query({
 		durationMinutes: v.number(),
 	},
 	handler: async (ctx, args) => {
-		// Get existing appointments for this barber on this date
 		const existing = await ctx.db
 			.query("appointments")
 			.withIndex("by_barber", (q) => q.eq("barberId", args.barberId))
 			.filter((q) => q.and(q.eq(q.field("date"), args.date), q.neq(q.field("status"), "cancelled")))
 			.collect()
 
-		// Slots run from 09:00 to 19:00 in 30-minute increments.
-		// A slot is excluded if it overlaps any existing non-cancelled appointment
-		// using half-open interval logic: slotStart < apptEnd && slotEnd > apptStart.
-		// A slot is also excluded if its end time would exceed 19:00.
-		const slots: string[] = []
-		const startHour = 9
-		const endHour = 19
-		const intervalMinutes = 30
-
-		for (let h = startHour; h < endHour; h++) {
-			for (let m = 0; m < 60; m += intervalMinutes) {
-				const slotStart = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
-				const slotEndMinutes = h * 60 + m + args.durationMinutes
-				const slotEndH = Math.floor(slotEndMinutes / 60)
-				const slotEndM = slotEndMinutes % 60
-				if (slotEndH > endHour) break
-				const slotEnd = `${String(slotEndH).padStart(2, "0")}:${String(slotEndM).padStart(2, "0")}`
-
-				// Check for conflicts
-				const hasConflict = existing.some((appt) => {
-					const apptStart = appt.startTime
-					const apptEnd = appt.endTime
-					return slotStart < apptEnd && slotEnd > apptStart
-				})
-
-				if (!hasConflict) slots.push(slotStart)
-			}
-		}
-
-		return slots
+		return generateSlots(args.durationMinutes, existing)
 	},
 })
 
