@@ -36,17 +36,11 @@ export async function withToast<T>(
 	}
 }
 
-const ICONS: Record<ToastType, typeof CheckCircle> = {
-	success: CheckCircle,
-	error: AlertCircle,
-	info: Info,
-}
-
-const COLORS: Record<ToastType, string> = {
-	success: "border-green-500/30 bg-green-500/10 text-green-400",
-	error: "border-red-500/30 bg-red-500/10 text-red-400",
-	info: "border-[var(--gold)]/30 bg-[var(--gold)]/10 text-[var(--gold)]",
-}
+const TOAST_CONFIG = {
+	success: { icon: CheckCircle, color: "border-green-500/30 bg-green-500/10 text-green-400" },
+	error: { icon: AlertCircle, color: "border-red-500/30 bg-red-500/10 text-red-400" },
+	info: { icon: Info, color: "border-[var(--gold)]/30 bg-[var(--gold)]/10 text-[var(--gold)]" },
+} as const
 
 export function ToastContainer() {
 	const [toasts, setToasts] = useState<Toast[]>([])
@@ -65,11 +59,11 @@ export function ToastContainer() {
 	return (
 		<div className="toast-container">
 			{toasts.map((toast) => {
-				const Icon = ICONS[toast.type]
+				const { icon: Icon, color } = TOAST_CONFIG[toast.type]
 				return (
 					<div
 						key={toast.id}
-						className={`fade-up flex items-start gap-3 p-4 rounded-xl border backdrop-blur-lg bg-black/90 ${COLORS[toast.type]}`}
+						className={`fade-up flex items-start gap-3 p-4 rounded-xl border backdrop-blur-lg bg-black/90 ${color}`}
 					>
 						<Icon size={18} className="flex-shrink-0 mt-0.5" />
 						<span className="text-sm text-[var(--text)] flex-1">{toast.message}</span>

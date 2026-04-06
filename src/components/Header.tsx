@@ -20,13 +20,11 @@ const NAV_LINKS = [
 	{ to: "/for-business" as const, labelKey: "nav.forBusiness" },
 ]
 
-const ROLE_NAV: Partial<
-	Record<"customer" | "owner" | "admin", { labelKey: string; icon: React.ReactNode; to: string }>
-> = {
+const ROLE_NAV = {
 	customer: { labelKey: "nav.dashboard", icon: <LayoutDashboard size={14} />, to: "/dashboard" },
 	owner: { labelKey: "nav.business", icon: <Building2 size={14} />, to: "/business" },
 	admin: { labelKey: "nav.admin", icon: <ShieldCheck size={14} />, to: "/admin" },
-}
+} as const
 
 function Logo() {
 	return (
@@ -52,7 +50,7 @@ export default function Header() {
 		void router.navigate({ to: "/" })
 	}
 
-	const roleItem = user ? ROLE_NAV[user.role as "customer" | "owner" | "admin"] : undefined
+	const roleItem = user ? ROLE_NAV[user.role as keyof typeof ROLE_NAV] : undefined
 	const userMenuItems = [
 		...(roleItem
 			? [
@@ -66,8 +64,6 @@ export default function Header() {
 		{ separator: true as const, label: "" },
 		{ label: t("common.signOut"), icon: <LogOut size={14} />, onClick: handleLogout, danger: true },
 	]
-
-	const closeMobile = () => setMobileOpen(false)
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-[var(--border)] backdrop-blur-lg bg-[var(--header-bg)]">
@@ -123,7 +119,7 @@ export default function Header() {
 			{mobileOpen && (
 				<div className="md:hidden bg-card border-t border-[var(--border)] px-4 py-4 flex flex-col gap-2">
 					{NAV_LINKS.map(({ to, labelKey }) => (
-						<Link key={to} to={to} className="nav-link" onClick={closeMobile}>
+						<Link key={to} to={to} className="nav-link" onClick={() => setMobileOpen(false)}>
 							{t(labelKey)}
 						</Link>
 					))}
@@ -131,7 +127,7 @@ export default function Header() {
 						<>
 							<hr className="divider my-1" />
 							{roleItem && (
-								<Link to={roleItem.to} className="nav-link" onClick={closeMobile}>
+								<Link to={roleItem.to} className="nav-link" onClick={() => setMobileOpen(false)}>
 									{t(roleItem.labelKey)}
 								</Link>
 							)}
@@ -139,7 +135,7 @@ export default function Header() {
 								type="button"
 								onClick={() => {
 									handleLogout()
-									closeMobile()
+									setMobileOpen(false)
 								}}
 								className="nav-link text-left text-[var(--error)] btn-bare"
 							>
@@ -149,10 +145,14 @@ export default function Header() {
 					) : (
 						<>
 							<hr className="divider my-1" />
-							<Link to="/login" className="nav-link" onClick={closeMobile}>
+							<Link to="/login" className="nav-link" onClick={() => setMobileOpen(false)}>
 								{t("common.signIn")}
 							</Link>
-							<Link to="/register" className="btn btn-primary justify-center mt-1" onClick={closeMobile}>
+							<Link
+								to="/register"
+								className="btn btn-primary justify-center mt-1"
+								onClick={() => setMobileOpen(false)}
+							>
 								{t("common.getStarted")}
 							</Link>
 						</>

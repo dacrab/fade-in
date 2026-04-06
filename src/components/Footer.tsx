@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router"
 import { Globe, Scissors } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-const linkCls = "text-sm text-muted no-underline hover:text-[var(--gold)] transition-colors"
+const LINK_CLASS = "text-sm text-muted no-underline hover:text-[var(--gold)] transition-colors"
 
 function FooterSection({ title, children }: { title: string; children: React.ReactNode }) {
 	return (
@@ -15,7 +15,6 @@ function FooterSection({ title, children }: { title: string; children: React.Rea
 
 export default function Footer() {
 	const { t } = useTranslation()
-	const year = new Date().getFullYear()
 
 	return (
 		<footer className="border-t border-[var(--border)] px-4 pt-12 pb-8 mt-20">
@@ -35,12 +34,12 @@ export default function Footer() {
 
 					<FooterSection title={t("footer.discover")}>
 						<li>
-							<Link to="/barbershops" className={linkCls}>
+							<Link to="/barbershops" className={LINK_CLASS}>
 								{t("nav.barbershops")}
 							</Link>
 						</li>
 						<li>
-							<Link to="/for-business" className={linkCls}>
+							<Link to="/for-business" className={LINK_CLASS}>
 								{t("nav.forBusiness")}
 							</Link>
 						</li>
@@ -48,17 +47,17 @@ export default function Footer() {
 
 					<FooterSection title={t("footer.account")}>
 						<li>
-							<Link to="/login" className={linkCls}>
+							<Link to="/login" className={LINK_CLASS}>
 								{t("footer.links.login")}
 							</Link>
 						</li>
 						<li>
-							<Link to="/register" className={linkCls}>
+							<Link to="/register" className={LINK_CLASS}>
 								{t("footer.links.register")}
 							</Link>
 						</li>
 						<li>
-							<Link to="/login" className={linkCls}>
+							<Link to="/login" className={LINK_CLASS}>
 								{t("footer.links.businessLogin")}
 							</Link>
 						</li>
@@ -66,17 +65,17 @@ export default function Footer() {
 
 					<FooterSection title={t("footer.company")}>
 						<li>
-							<a href="/about" className={linkCls}>
+							<a href="/about" className={LINK_CLASS}>
 								{t("footer.links.about")}
 							</a>
 						</li>
 						<li>
-							<a href="/privacy" className={linkCls}>
+							<a href="/privacy" className={LINK_CLASS}>
 								{t("footer.links.privacy")}
 							</a>
 						</li>
 						<li>
-							<a href="/terms" className={linkCls}>
+							<a href="/terms" className={LINK_CLASS}>
 								{t("footer.links.terms")}
 							</a>
 						</li>
@@ -85,7 +84,9 @@ export default function Footer() {
 
 				<hr className="divider mb-6" />
 				<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-					<p className="text-sm text-muted m-0">{t("footer.rights", { year })}</p>
+					<p className="text-sm text-muted m-0">
+						{t("footer.rights", { year: new Date().getFullYear() })}
+					</p>
 					<span className="text-muted p-2 rounded-lg transition-colors hover:bg-[var(--bg-card)]">
 						<Globe size={18} />
 					</span>

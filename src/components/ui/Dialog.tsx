@@ -17,12 +17,13 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
 	)
 }
 
-interface DialogContentProps {
+export function DialogContent({
+	children,
+	className,
+}: {
 	children: ReactNode
 	className?: string
-}
-
-export function DialogContent({ children, className }: DialogContentProps) {
+}) {
 	return (
 		<BaseDialog.Portal>
 			<BaseDialog.Backdrop className="dialog-backdrop" />
@@ -31,12 +32,13 @@ export function DialogContent({ children, className }: DialogContentProps) {
 	)
 }
 
-interface DialogHeaderProps {
+export function DialogHeader({
+	children,
+	onClose,
+}: {
 	children?: ReactNode
 	onClose?: () => void
-}
-
-export function DialogHeader({ children, onClose }: DialogHeaderProps) {
+}) {
 	return (
 		<div className="dialog-header">
 			{children}
@@ -49,12 +51,7 @@ export function DialogHeader({ children, onClose }: DialogHeaderProps) {
 	)
 }
 
-interface DialogTitleProps {
-	children: ReactNode
-	className?: string
-}
-
-export function DialogTitle({ children, className }: DialogTitleProps) {
+export function DialogTitle({ children, className }: { children: ReactNode; className?: string }) {
 	return (
 		<BaseDialog.Title className={cn("font-bold text-[var(--text)]", className)}>
 			{children}
@@ -62,12 +59,13 @@ export function DialogTitle({ children, className }: DialogTitleProps) {
 	)
 }
 
-interface DialogDescriptionProps {
+export function DialogDescription({
+	children,
+	className,
+}: {
 	children: ReactNode
 	className?: string
-}
-
-export function DialogDescription({ children, className }: DialogDescriptionProps) {
+}) {
 	return (
 		<BaseDialog.Description className={cn("text-sm text-[var(--text-muted)]", className)}>
 			{children}
@@ -75,12 +73,7 @@ export function DialogDescription({ children, className }: DialogDescriptionProp
 	)
 }
 
-interface DialogCloseProps {
-	children: ReactNode
-	className?: string
-}
-
-export function DialogClose({ children, className }: DialogCloseProps) {
+export function DialogClose({ children, className }: { children: ReactNode; className?: string }) {
 	return (
 		<BaseDialog.Close className={cn("icon-btn bg-transparent border-0", className)}>
 			{children}

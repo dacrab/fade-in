@@ -24,19 +24,16 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 			<BaseMenu.Portal>
 				<BaseMenu.Positioner align={align} sideOffset={6}>
 					<BaseMenu.Popup className="popup min-w-[10rem]">
-						{items.map((item, i) => {
-							if (item.separator) {
-								return (
-									<BaseMenu.Separator
-										// biome-ignore lint/suspicious/noArrayIndexKey: menu items have no stable id
-										key={i}
-										className="my-1 h-px mx-2 bg-[var(--border)]"
-									/>
-								)
-							}
-							return (
+						{items.map((item, i) =>
+							item.separator ? (
+								<BaseMenu.Separator
+									// biome-ignore lint/suspicious/noArrayIndexKey: separators have no id
+									key={i}
+									className="my-1 h-px mx-2 bg-[var(--border)]"
+								/>
+							) : (
 								<BaseMenu.Item
-									// biome-ignore lint/suspicious/noArrayIndexKey: menu items have no stable id
+									// biome-ignore lint/suspicious/noArrayIndexKey: menu items may lack stable id
 									key={i}
 									disabled={item.disabled}
 									onClick={item.onClick}
@@ -49,8 +46,8 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 									{item.icon && <span className="flex-shrink-0 opacity-70">{item.icon}</span>}
 									{item.label}
 								</BaseMenu.Item>
-							)
-						})}
+							),
+						)}
 					</BaseMenu.Popup>
 				</BaseMenu.Positioner>
 			</BaseMenu.Portal>
