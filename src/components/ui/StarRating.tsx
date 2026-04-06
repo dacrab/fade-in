@@ -9,6 +9,20 @@ interface StarRatingProps {
 	onRate?: (rating: number) => void
 }
 
+// Pre-generated stable keys for stars (up to 10 stars)
+const STAR_KEYS = [
+	"star-a",
+	"star-b",
+	"star-c",
+	"star-d",
+	"star-e",
+	"star-f",
+	"star-g",
+	"star-h",
+	"star-i",
+	"star-j",
+]
+
 export function StarRating({
 	rating,
 	max = 5,
@@ -16,12 +30,13 @@ export function StarRating({
 	interactive = false,
 	onRate,
 }: StarRatingProps) {
+	const stars = STAR_KEYS.slice(0, max)
+
 	return (
 		<div className="flex items-center gap-0.5">
-			{Array.from({ length: max }, (_, i) => (
+			{stars.map((key, i) => (
 				<button
-					// biome-ignore lint/suspicious/noArrayIndexKey: star positions are inherently index-based
-					key={i}
+					key={key}
 					type="button"
 					onClick={() => interactive && onRate?.(i + 1)}
 					className={cn(

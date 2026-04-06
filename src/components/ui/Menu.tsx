@@ -9,6 +9,7 @@ export interface MenuItem {
 	disabled?: boolean
 	separator?: boolean
 	icon?: ReactNode
+	id?: string
 }
 
 interface MenuProps {
@@ -24,17 +25,15 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 			<BaseMenu.Portal>
 				<BaseMenu.Positioner align={align} sideOffset={6}>
 					<BaseMenu.Popup className="popup min-w-[10rem]">
-						{items.map((item, i) =>
+						{items.map((item) =>
 							item.separator ? (
 								<BaseMenu.Separator
-									// biome-ignore lint/suspicious/noArrayIndexKey: separators have no id
-									key={i}
+									key={item.id || `sep-${Math.random()}`}
 									className="my-1 h-px mx-2 bg-[var(--border)]"
 								/>
 							) : (
 								<BaseMenu.Item
-									// biome-ignore lint/suspicious/noArrayIndexKey: menu items may lack stable id
-									key={i}
+									key={item.id || (typeof item.label === "string" ? item.label : `item-${Math.random()}`)}
 									disabled={item.disabled}
 									onClick={item.onClick}
 									className={cn(
