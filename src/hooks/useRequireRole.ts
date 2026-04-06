@@ -12,7 +12,8 @@ export function useRequireRole(allowedRoles: UserRole[], redirectTo = "/") {
 	const router = useRouter()
 
 	useEffect(() => {
-		if (!auth.loading && !(auth.user && allowedRoles.includes(auth.user.role))) {
+		const isUnauthorized = !(auth.loading || (auth.user && allowedRoles.includes(auth.user.role)))
+		if (isUnauthorized) {
 			void router.navigate({ to: redirectTo })
 		}
 	}, [auth.user, auth.loading, router, allowedRoles, redirectTo])
