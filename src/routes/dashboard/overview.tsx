@@ -12,7 +12,7 @@ import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
-export const Route = createFileRoute("/dashboard/")({ component: CustomerDashboard })
+export const Route = createFileRoute("/dashboard/overview")({ component: CustomerDashboard })
 
 function CustomerDashboard() {
 	const { t } = useTranslation()

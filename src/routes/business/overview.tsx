@@ -25,7 +25,7 @@ import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
-export const Route = createFileRoute("/business/")({ component: BusinessDashboard })
+export const Route = createFileRoute("/business/overview")({ component: BusinessDashboard })
 
 // Navigation links - icons defined here, labels from i18n
 const NAV_LINK_DEFS = [

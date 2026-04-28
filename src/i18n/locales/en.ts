@@ -30,6 +30,8 @@ const en = {
 		at: "at",
 		min: "min",
 		pending: "Pending",
+		characters: "characters",
+		submitting: "Submitting...",
 	},
 
 	// Navigation
@@ -38,6 +40,7 @@ const en = {
 		barbershops: "Barbershops",
 		forBusiness: "For Business",
 		dashboard: "My Dashboard",
+		barber: "My Schedule",
 		business: "Business Dashboard",
 		admin: "Admin Panel",
 	},
@@ -411,6 +414,25 @@ const en = {
 		ratingOf: "{{rating}} / 5",
 	},
 
+	// Barber
+	barber: {
+		title: "My Schedule",
+		subtitle: "View your upcoming appointments",
+		selectDate: "Select date",
+		schedule: "Schedule",
+		noAppointments: "No appointments for this date",
+	},
+
+	// Review
+	review: {
+		title: "Rate your experience",
+		subtitle: "How was your visit to {{shop}}?",
+		ratingLabel: "Your rating",
+		commentLabel: "Your review",
+		commentPlaceholder: "Share your experience with others...",
+		submit: "Submit review",
+	},
+
 	// Errors / Toasts
 	errors: {
 		updateStatusFailed: "Failed to update status",
@@ -422,6 +444,10 @@ const en = {
 		profileFailed: "Failed to update profile.",
 		replyAdded: "Reply added!",
 		replyFailed: "Failed to add reply.",
+		ratingRequired: "Please select a rating",
+		commentRequired: "Please write a review",
+		reviewSubmitted: "Review submitted successfully!",
+		reviewFailed: "Failed to submit review",
 		barberSaved: "Barber saved!",
 		barberFailed: "Failed to save barber.",
 		barberRemoved: "Barber removed.",
