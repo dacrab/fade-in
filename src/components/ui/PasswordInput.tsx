@@ -1,28 +1,14 @@
 import { Eye, EyeOff } from "lucide-react"
+import type { InputHTMLAttributes } from "react"
 import { useState } from "react"
 
-interface Props {
-	id: string
-	value: string
-	onChange: (v: string) => void
-	placeholder?: string
-	autoComplete?: string
-}
+interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {}
 
-export default function PasswordInput({ id, value, onChange, placeholder, autoComplete }: Props) {
+export default function PasswordInput({ className = "input pr-10", ...props }: Props) {
 	const [show, setShow] = useState(false)
 	return (
 		<div className="relative">
-			<input
-				id={id}
-				type={show ? "text" : "password"}
-				className="input pr-10"
-				placeholder={placeholder}
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-				required
-				autoComplete={autoComplete}
-			/>
+			<input type={show ? "text" : "password"} className={className} {...props} />
 			<button
 				type="button"
 				onClick={() => setShow((v) => !v)}

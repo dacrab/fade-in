@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Building2, ShieldCheck, Star, Users } from "lucide-react"
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import AdminNav from "#/components/AdminNav"
-import StatsGrid from "#/components/StatsGrid"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop, User } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -13,12 +13,18 @@ export const Route = createFileRoute("/admin/")({ component: AdminDashboard })
 
 function AdminDashboard() {
 	const { t } = useTranslation()
-	const { loading } = useRequireRole(["admin"])
+	const { user } = useAuth()
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (!user) return
+		if (user.role !== "admin") navigate({ to: "/" })
+	}, [user, navigate])
 
 	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined
 	const allUsers = useQuery(api.users.listAll) as User[] | undefined
 
-	if (loading) return <Skeleton className="h-64 m-8 rounded-2xl" />
+	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
 
 	const verified = allShops?.filter((s) => s.isVerified).length ?? 0
 	const owners = allUsers?.filter((u) => u.role === "owner").length ?? 0
@@ -32,15 +38,20 @@ function AdminDashboard() {
 				<div className="page-main">
 					<h1 className="text-2xl font-bold text-[var(--text)] mb-6">{t("admin.overviewTitle")}</h1>
 
-					<StatsGrid
-						cols={4}
-						stats={[
+					<div className="stat-grid stat-grid-4">
+						{[
 							{ label: t("admin.stats.totalShops"), value: allShops?.length ?? "—", icon: Building2 },
 							{ label: t("admin.stats.verifiedShops"), value: verified, icon: ShieldCheck },
 							{ label: t("admin.stats.totalUsers"), value: allUsers?.length ?? "—", icon: Users },
 							{ label: t("admin.stats.owners"), value: owners, icon: Star },
-						]}
-					/>
+						].map(({ label, value, icon: Icon }) => (
+							<div key={label} className="card p-4">
+								<Icon size={18} className="text-[var(--gold)] mb-2" />
+								<div className="text-2xl font-bold text-[var(--text)]">{value}</div>
+								<div className="text-xs text-[var(--text-muted)]">{label}</div>
+							</div>
+						))}
+					</div>
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						<div className="card p-5">

@@ -1,15 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Calendar, CheckCircle, Clock, Heart, Scissors, User, XCircle } from "lucide-react"
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import SkeletonList from "#/components/SkeletonList"
-import StatsGrid from "#/components/StatsGrid"
 import { Skeleton } from "#/components/ui/Skeleton"
-import StatusBadge from "#/components/ui/StatusBadge"
 import { withToast } from "#/components/ui/Toast"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop } from "#/types"
+import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
@@ -17,14 +16,20 @@ export const Route = createFileRoute("/dashboard/")({ component: CustomerDashboa
 
 function CustomerDashboard() {
 	const { t } = useTranslation()
-	const { user, loading } = useRequireRole(["customer", "admin"], "/login")
+	const { user } = useAuth()
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (!user) return
+		if (user.role !== "customer" && user.role !== "admin") navigate({ to: "/" })
+	}, [user, navigate])
 
 	const appointments = useQuery(
 		api.appointments.listByCustomer,
 		user ? { customerId: user.id as Id<"users"> } : "skip",
 	)
 
-	if (loading || !user) return <DashSkeleton />
+	if (!user) return <DashSkeleton />
 
 	const upcoming =
 		appointments?.filter(
@@ -56,37 +61,45 @@ function CustomerDashboard() {
 				</div>
 
 				{/* Stats */}
-				<div className="mb-8">
-					<StatsGrid
-						cols={4}
-						stats={[
-							{
-								label: t("dashboard.stats.total"),
-								value: appointments?.length ?? "—",
-								icon: Calendar,
-							},
-							{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
-							{
-								label: t("dashboard.stats.completed"),
-								value:
-									appointments?.filter((a: Doc<"appointments">) => a.status === "completed").length ?? "—",
-								icon: CheckCircle,
-							},
-							{
-								label: t("dashboard.stats.cancelled"),
-								value:
-									appointments?.filter((a: Doc<"appointments">) => a.status === "cancelled").length ?? "—",
-								icon: XCircle,
-							},
-						]}
-					/>
+				<div className="stat-grid stat-grid-4 mb-8">
+					{[
+						{
+							label: t("dashboard.stats.total"),
+							value: appointments?.length ?? "—",
+							icon: Calendar,
+						},
+						{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
+						{
+							label: t("dashboard.stats.completed"),
+							value:
+								appointments?.filter((a: Doc<"appointments">) => a.status === "completed").length ?? "—",
+							icon: CheckCircle,
+						},
+						{
+							label: t("dashboard.stats.cancelled"),
+							value:
+								appointments?.filter((a: Doc<"appointments">) => a.status === "cancelled").length ?? "—",
+							icon: XCircle,
+						},
+					].map(({ label, value, icon: Icon }) => (
+						<div key={label} className="card p-4">
+							<Icon size={18} className="text-[var(--gold)] mb-2" />
+							<div className="text-2xl font-bold text-[var(--text)]">{value}</div>
+							<div className="text-xs text-[var(--text-muted)]">{label}</div>
+						</div>
+					))}
 				</div>
 
 				{/* Upcoming */}
 				<div className="card p-5 mb-5">
 					<h2 className="font-bold text-[var(--text)] mb-4">{t("dashboard.upcomingTitle")}</h2>
 					{appointments === undefined ? (
-						<SkeletonList count={3} height="h-16" />
+						<div className="space-y-3">
+							{Array.from({ length: 3 }).map((_, i) => (
+								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+								<Skeleton key={i} className="h-16 w-full rounded-xl" />
+							))}
+						</div>
 					) : upcoming.length === 0 ? (
 						<div className="empty-state">
 							<Calendar size={32} className="mx-auto mb-2 opacity-30" />
@@ -148,7 +161,7 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 				</div>
 			</div>
 			<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(appt.totalPrice)}</div>
-			<StatusBadge status={appt.status} />
+			<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
 			{canCancel && (
 				<button
 					type="button"

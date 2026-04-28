@@ -1,7 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { filterDefined } from "./validators"
 
 /** Returns the currently authenticated user, or null if not logged in. */
 export const getViewer = query({
@@ -30,8 +29,12 @@ export const updateProfile = mutation({
 		avatarUrl: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
-		const { id, ...fields } = args
-		return await ctx.db.patch(id, filterDefined(fields))
+		const { id, name, phone, avatarUrl } = args
+		return await ctx.db.patch(id, {
+			...(name !== undefined && { name }),
+			...(phone !== undefined && { phone }),
+			...(avatarUrl !== undefined && { avatarUrl }),
+		})
 	},
 })
 

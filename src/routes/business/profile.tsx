@@ -1,14 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useMutation } from "convex/react"
-import { PlusCircle, Save } from "lucide-react"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { useMutation, useQuery } from "convex/react"
+import { ArrowLeft, PlusCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import PageHeader from "#/components/PageHeader"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
-import { useFormState } from "#/hooks/useFormState"
-import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { useRequireRole } from "#/hooks/useRequireRole"
 import { slugify } from "#/lib/format"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -37,11 +33,24 @@ const EMPTY: ShopForm = {
 }
 
 function BusinessProfile() {
-	useRequireRole(["owner", "admin"])
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const shop = useOwnerShop()
-	const { form, setForm, set } = useFormState(EMPTY)
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (user && user.role !== "owner" && user.role !== "admin") navigate({ to: "/" })
+	}, [user, navigate])
+
+	const [form, setForm] = useState(EMPTY)
+	const set =
+		(key: keyof ShopForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+			setForm((prev) => ({ ...prev, [key]: e.target.value }))
+
+	const shopsRaw = useQuery(
+		api.barbershops.listByOwner,
+		user ? { ownerId: user.id as Id<"users"> } : "skip",
+	)
+	const shop = shopsRaw?.[0]
 	const [saving, setSaving] = useState(false)
 
 	useEffect(() => {
@@ -56,7 +65,7 @@ function BusinessProfile() {
 			facebook: shop.socialLinks?.facebook ?? "",
 			website: shop.socialLinks?.website ?? "",
 		})
-	}, [shop, setForm])
+	}, [shop])
 
 	const createShop = useMutation(api.barbershops.create)
 	const updateShop = useMutation(api.barbershops.update)
@@ -105,11 +114,18 @@ function BusinessProfile() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-2xl">
-				<PageHeader
-					back="/business"
-					backLabel={t("nav.business")}
-					title={shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}
-				/>
+				<div className="mb-6">
+					<Link
+						to="/business"
+						className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
+					>
+						<ArrowLeft size={14} />
+						{t("nav.business")}
+					</Link>
+					<h1 className="text-2xl font-bold text-[var(--text)]">
+						{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}
+					</h1>
+				</div>
 
 				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
 					<div className="card p-5 space-y-4">

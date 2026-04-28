@@ -1,20 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Scissors, Trash2, X } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import AsyncList from "#/components/AsyncList"
-import PageHeader from "#/components/PageHeader"
+import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
-import { useFormState } from "#/hooks/useFormState"
-import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { useAuth } from "#/hooks/useAuth"
 import type { Barber } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/barbers")({ component: BusinessBarbers })
 
-interface BarberForm extends Record<string, string> {
+interface BarberForm {
 	name: string
 	bio: string
 	specializations: string
@@ -23,10 +21,24 @@ const EMPTY: BarberForm = { name: "", bio: "", specializations: "" }
 
 function BusinessBarbers() {
 	const { t } = useTranslation()
-	useRequireRole(["owner", "admin"])
-	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY)
+	const { user, loading } = useAuth()
+	const router = useRouter()
 
-	const shop = useOwnerShop()
+	useEffect(() => {
+		if (!(loading || (user && ["owner", "admin"].includes(user.role)))) {
+			void router.navigate({ to: "/" })
+		}
+	}, [user, loading, router])
+
+	const [form, setForm] = useState<BarberForm>(EMPTY)
+	const [showForm, setShowForm] = useState(false)
+	const [editId, setEditId] = useState<string | null>(null)
+
+	const shopsRaw = useQuery(
+		api.barbershops.listByOwner,
+		user ? { ownerId: user.id as Id<"users"> } : "skip",
+	)
+	const shop = shopsRaw?.[0]
 	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Barber[]
 		| undefined
@@ -34,6 +46,12 @@ function BusinessBarbers() {
 	const createBarber = useMutation(api.barbers.create)
 	const updateBarber = useMutation(api.barbers.update)
 	const removeBarber = useMutation(api.barbers.remove)
+
+	const reset = () => {
+		setForm(EMPTY)
+		setEditId(null)
+		setShowForm(false)
+	}
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -65,8 +83,11 @@ function BusinessBarbers() {
 		}
 	}
 
-	const handleEdit = (b: Barber) =>
-		openEdit({ name: b.name, bio: b.bio ?? "", specializations: b.specializations.join(", ") }, b._id)
+	const handleEdit = (b: Barber) => {
+		setForm({ name: b.name, bio: b.bio ?? "", specializations: b.specializations.join(", ") })
+		setEditId(b._id)
+		setShowForm(true)
+	}
 
 	const handleDelete = async (id: Id<"barbers">) => {
 		try {
@@ -80,7 +101,14 @@ function BusinessBarbers() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.barbers.title")}>
+				<div className="flex items-center justify-between mb-6">
+					<div className="page-header">
+						<Link to="/business" className="breadcrumb-back">
+							← {t("nav.business")}
+						</Link>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("business.barbers.title")}</h1>
+					</div>
 					<button
 						type="button"
 						onClick={() => {
@@ -92,7 +120,7 @@ function BusinessBarbers() {
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
 						{showForm ? t("common.cancel") : t("business.barbers.addBarber")}
 					</button>
-				</PageHeader>
+				</div>
 
 				{showForm && (
 					<div className="card p-5 mb-6 fade-up">
@@ -109,7 +137,7 @@ function BusinessBarbers() {
 									className="input"
 									placeholder={t("business.barbers.namePlaceholder")}
 									value={form.name}
-									onChange={set("name")}
+									onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
 									required
 								/>
 							</div>
@@ -122,7 +150,7 @@ function BusinessBarbers() {
 									className="input"
 									placeholder={t("business.barbers.specializationsPlaceholder")}
 									value={form.specializations}
-									onChange={set("specializations")}
+									onChange={(e) => setForm((f) => ({ ...f, specializations: e.target.value }))}
 								/>
 							</div>
 							<div>
@@ -135,7 +163,7 @@ function BusinessBarbers() {
 									rows={2}
 									placeholder={t("business.barbers.bioPlaceholder")}
 									value={form.bio}
-									onChange={set("bio")}
+									onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
 								/>
 							</div>
 							<div className="flex gap-2">
@@ -151,42 +179,47 @@ function BusinessBarbers() {
 					</div>
 				)}
 
-				<AsyncList
-					data={barbers}
-					skeleton={{ count: 3, height: "h-20" }}
-					empty={{ icon: Scissors, message: t("business.barbers.noBarbers") }}
-				>
-					{(barbers) => (
-						<div className="space-y-3">
-							{barbers.map((b: Barber) => (
-								<div key={b._id} className="card p-4 flex items-center gap-4">
-									<div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
-										{b.name.charAt(0)}
-									</div>
-									<div className="flex-1 min-w-0">
-										<div className="font-medium text-[var(--text)] text-sm">{b.name}</div>
-										{b.specializations.length > 0 && (
-											<div className="text-xs text-[var(--text-muted)]">{b.specializations.join(", ")}</div>
-										)}
-										{b.bio && <div className="text-xs text-[var(--text-subtle)] truncate">{b.bio}</div>}
-									</div>
-									<div className="flex gap-1.5">
-										<button type="button" onClick={() => handleEdit(b)} className="icon-btn btn-bare">
-											<Pencil size={14} />
-										</button>
-										<button
-											type="button"
-											onClick={() => void handleDelete(b._id)}
-											className="icon-btn icon-btn-danger btn-bare"
-										>
-											<Trash2 size={14} />
-										</button>
-									</div>
+				{!barbers ? (
+					<div className="space-y-3">
+						{Array.from({ length: 3 }, (_, i) => (
+							<Skeleton key={i} className="h-20 w-full rounded-xl" />
+						))}
+					</div>
+				) : barbers.length === 0 ? (
+					<div className="empty-state">
+						<Scissors size={36} className="mx-auto mb-3 opacity-30" />
+						<p className="text-sm">{t("business.barbers.noBarbers")}</p>
+					</div>
+				) : (
+					<div className="space-y-3">
+						{barbers.map((b: Barber) => (
+							<div key={b._id} className="card p-4 flex items-center gap-4">
+								<div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
+									{b.name.charAt(0)}
 								</div>
-							))}
-						</div>
-					)}
-				</AsyncList>
+								<div className="flex-1 min-w-0">
+									<div className="font-medium text-[var(--text)] text-sm">{b.name}</div>
+									{b.specializations.length > 0 && (
+										<div className="text-xs text-[var(--text-muted)]">{b.specializations.join(", ")}</div>
+									)}
+									{b.bio && <div className="text-xs text-[var(--text-subtle)] truncate">{b.bio}</div>}
+								</div>
+								<div className="flex gap-1.5">
+									<button type="button" onClick={() => handleEdit(b)} className="icon-btn btn-bare">
+										<Pencil size={14} />
+									</button>
+									<button
+										type="button"
+										onClick={() => void handleDelete(b._id)}
+										className="icon-btn icon-btn-danger btn-bare"
+									>
+										<Trash2 size={14} />
+									</button>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		</main>
 	)

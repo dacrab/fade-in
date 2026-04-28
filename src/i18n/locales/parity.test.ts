@@ -37,7 +37,7 @@ const enKeys = extractKeys(en as unknown as Record<string, unknown>)
 const elKeys = extractKeys(el as unknown as Record<string, unknown>)
 
 describe("i18n locale parity — English ↔ Greek", () => {
-	// ── key existence ───────────────────────────────────────────────────────
+	// Key existence
 	it("every English key exists in the Greek locale", () => {
 		const missing = enKeys.filter((k) => !elKeys.includes(k))
 		expect(missing, `Keys in EN missing from EL: ${missing.join(", ")}`).toHaveLength(0)
@@ -48,7 +48,7 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		expect(extra, `Keys in EL missing from EN: ${extra.join(", ")}`).toHaveLength(0)
 	})
 
-	// ── value completeness ──────────────────────────────────────────────────
+	// value completeness
 	it("no English value is an empty string", () => {
 		const empty = enKeys.filter((k) => getByPath(en as unknown as Record<string, unknown>, k) === "")
 		expect(empty, `EN keys with empty values: ${empty.join(", ")}`).toHaveLength(0)
@@ -59,7 +59,7 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		expect(empty, `EL keys with empty values: ${empty.join(", ")}`).toHaveLength(0)
 	})
 
-	// ── value types match ───────────────────────────────────────────────────
+	// value types match
 	// Arrays are valid i18n values (e.g. feature lists), so we only flag
 	// non-string, non-array leaf values.
 	it("all leaf values are strings or arrays (no unexpected object leaves)", () => {

@@ -1,6 +1,5 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { filterDefined } from "./validators"
 
 export const listByShop = query({
 	args: { barbershopId: v.id("barbershops") },
@@ -41,8 +40,15 @@ export const update = mutation({
 		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		const { id, ...fields } = args
-		return await ctx.db.patch(id, filterDefined(fields))
+		const { id, name, description, price, durationMinutes, category, isActive } = args
+		return await ctx.db.patch(id, {
+			...(name !== undefined && { name }),
+			...(description !== undefined && { description }),
+			...(price !== undefined && { price }),
+			...(durationMinutes !== undefined && { durationMinutes }),
+			...(category !== undefined && { category }),
+			...(isActive !== undefined && { isActive }),
+		})
 	},
 })
 

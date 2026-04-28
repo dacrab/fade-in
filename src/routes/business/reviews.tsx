@@ -1,14 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { MessageSquare, Send } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import AsyncList from "#/components/AsyncList"
-import PageHeader from "#/components/PageHeader"
+import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
 import { withToast } from "#/components/ui/Toast"
-import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { useAuth } from "#/hooks/useAuth"
 import { formatRelative } from "#/lib/format"
 import type { Review } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -17,9 +15,21 @@ import type { Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/business/reviews")({ component: BusinessReviews })
 
 function BusinessReviews() {
-	useRequireRole(["owner", "admin"])
+	const { user, loading } = useAuth()
 	const { t } = useTranslation()
-	const shop = useOwnerShop()
+	const router = useRouter()
+
+	useEffect(() => {
+		if (!(loading || (user && ["owner", "admin"].includes(user.role)))) {
+			void router.navigate({ to: "/" })
+		}
+	}, [user, loading, router])
+
+	const shopsRaw = useQuery(
+		api.barbershops.listByOwner,
+		user ? { ownerId: user.id as Id<"users"> } : "skip",
+	)
+	const shop = shopsRaw?.[0]
 	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Review[]
 		| undefined
@@ -41,11 +51,15 @@ function BusinessReviews() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<PageHeader
-					back="/business"
-					backLabel={t("nav.business")}
-					title={t("business.reviews.title")}
-				/>
+				<div className="flex items-center justify-between mb-6">
+					<div className="page-header">
+						<Link to="/business" className="breadcrumb-back">
+							← {t("nav.business")}
+						</Link>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("business.reviews.title")}</h1>
+					</div>
+				</div>
 
 				{shop && (
 					<div className="card p-4 mb-6 flex items-center gap-4">
@@ -59,67 +73,72 @@ function BusinessReviews() {
 					</div>
 				)}
 
-				<AsyncList
-					data={reviews}
-					skeleton={{ count: 3, height: "h-28" }}
-					empty={{ icon: MessageSquare, message: t("business.reviews.noReviews") }}
-				>
-					{(reviews) => (
-						<div className="space-y-4">
-							{reviews.map((r: Review) => (
-								<div key={r._id} className="card p-5">
-									<div className="flex items-center justify-between mb-2">
-										<StarRating rating={r.rating} size={16} />
-										<span className="text-xs text-[var(--text-muted)]">{formatRelative(r.createdAt)}</span>
+				{!reviews ? (
+					<div className="space-y-3">
+						{Array.from({ length: 3 }, (_, i) => (
+							<Skeleton key={i} className="h-28 w-full rounded-xl" />
+						))}
+					</div>
+				) : reviews.length === 0 ? (
+					<div className="empty-state">
+						<MessageSquare size={36} className="mx-auto mb-3 opacity-30" />
+						<p className="text-sm">{t("business.reviews.noReviews")}</p>
+					</div>
+				) : (
+					<div className="space-y-4">
+						{reviews.map((r: Review) => (
+							<div key={r._id} className="card p-5">
+								<div className="flex items-center justify-between mb-2">
+									<StarRating rating={r.rating} size={16} />
+									<span className="text-xs text-[var(--text-muted)]">{formatRelative(r.createdAt)}</span>
+								</div>
+								<p className="text-sm text-[var(--text-muted)] mb-3">{r.comment}</p>
+								{r.ownerReply ? (
+									<div className="pl-3 border-l-2 border-[var(--gold)]/30 text-xs text-[var(--text-muted)]">
+										<span className="text-[var(--gold)] font-semibold">
+											{t("business.reviews.yourReply")}
+										</span>
+										{r.ownerReply}
 									</div>
-									<p className="text-sm text-[var(--text-muted)] mb-3">{r.comment}</p>
-									{r.ownerReply ? (
-										<div className="pl-3 border-l-2 border-[var(--gold)]/30 text-xs text-[var(--text-muted)]">
-											<span className="text-[var(--gold)] font-semibold">
-												{t("business.reviews.yourReply")}
-											</span>
-											{r.ownerReply}
-										</div>
-									) : replyId === r._id ? (
-										<div className="flex gap-2 mt-2">
-											<input
-												className="input text-sm"
-												placeholder={t("business.reviews.replyPlaceholder")}
-												value={replyText}
-												onChange={(e) => setReplyText(e.target.value)}
-												onKeyDown={(e) => {
-													if (e.key === "Enter") void handleReply(r._id)
-												}}
-											/>
-											<button
-												type="button"
-												onClick={() => void handleReply(r._id)}
-												className="btn btn-primary text-sm px-3 gap-1"
-											>
-												<Send size={13} />
-												{t("business.reviews.replyButton")}
-											</button>
-											<button type="button" onClick={() => setReplyId(null)} className="btn btn-ghost text-sm">
-												{t("common.cancel")}
-											</button>
-										</div>
-									) : (
+								) : replyId === r._id ? (
+									<div className="flex gap-2 mt-2">
+										<input
+											className="input text-sm"
+											placeholder={t("business.reviews.replyPlaceholder")}
+											value={replyText}
+											onChange={(e) => setReplyText(e.target.value)}
+											onKeyDown={(e) => {
+												if (e.key === "Enter") void handleReply(r._id)
+											}}
+										/>
 										<button
 											type="button"
-											onClick={() => {
-												setReplyId(r._id)
-												setReplyText("")
-											}}
-											className="text-xs text-[var(--gold)] hover:underline btn-bare"
+											onClick={() => void handleReply(r._id)}
+											className="btn btn-primary text-sm px-3 gap-1"
 										>
-											{t("business.reviews.replyAction")}
+											<Send size={13} />
+											{t("business.reviews.replyButton")}
 										</button>
-									)}
-								</div>
-							))}
-						</div>
-					)}
-				</AsyncList>
+										<button type="button" onClick={() => setReplyId(null)} className="btn btn-ghost text-sm">
+											{t("common.cancel")}
+										</button>
+									</div>
+								) : (
+									<button
+										type="button"
+										onClick={() => {
+											setReplyId(r._id)
+											setReplyText("")
+										}}
+										className="text-xs text-[var(--gold)] hover:underline btn-bare"
+									>
+										{t("business.reviews.replyAction")}
+									</button>
+								)}
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		</main>
 	)

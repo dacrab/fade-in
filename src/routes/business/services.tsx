@@ -1,13 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
+import { ArrowLeft, Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import PageHeader from "#/components/PageHeader"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
-import { useFormState } from "#/hooks/useFormState"
-import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { useAuth } from "#/hooks/useAuth"
 import { formatPrice } from "#/lib/format"
 import type { Service } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -34,11 +32,39 @@ const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other
 type Category = (typeof CATEGORIES)[number]
 
 function BusinessServices() {
-	useRequireRole(["owner", "admin"])
 	const { t } = useTranslation()
-	const { form, showForm, setShowForm, editId, set, reset, openEdit } = useFormState(EMPTY_FORM)
+	const { user } = useAuth()
+	const navigate = useNavigate()
 
-	const shop = useOwnerShop()
+	useEffect(() => {
+		if (user && user.role !== "owner" && user.role !== "admin") navigate({ to: "/" })
+	}, [user, navigate])
+
+	const [form, setForm] = useState(EMPTY_FORM)
+	const [showForm, setShowForm] = useState(false)
+	const [editId, setEditId] = useState<Id<"services"> | null>(null)
+
+	const set =
+		(key: keyof ServiceForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+			setForm((prev) => ({ ...prev, [key]: e.target.value }))
+
+	const reset = () => {
+		setForm(EMPTY_FORM)
+		setShowForm(false)
+		setEditId(null)
+	}
+
+	const openEdit = (data: ServiceForm, id: Id<"services">) => {
+		setForm(data)
+		setEditId(id)
+		setShowForm(true)
+	}
+
+	const shopsRaw = useQuery(
+		api.barbershops.listByOwner,
+		user ? { ownerId: user.id as Id<"users"> } : "skip",
+	)
+	const shop = shopsRaw?.[0]
 	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Service[]
 		| undefined
@@ -103,7 +129,17 @@ function BusinessServices() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl">
-				<PageHeader back="/business" backLabel={t("nav.business")} title={t("business.services.title")}>
+				<div className="section-header mb-6">
+					<div>
+						<Link
+							to="/business"
+							className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
+						>
+							<ArrowLeft size={14} />
+							{t("nav.business")}
+						</Link>
+						<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.services.title")}</h1>
+					</div>
 					<button
 						type="button"
 						onClick={() => {
@@ -115,7 +151,7 @@ function BusinessServices() {
 						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
 						{showForm ? t("common.cancel") : t("business.services.addService")}
 					</button>
-				</PageHeader>
+				</div>
 
 				{showForm && (
 					<div className="card p-5 mb-6 fade-up">

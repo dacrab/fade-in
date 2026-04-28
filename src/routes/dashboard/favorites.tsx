@@ -2,8 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import EmptyState from "#/components/EmptyState"
-import PageHeader from "#/components/PageHeader"
 import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop, User } from "#/types"
@@ -30,19 +28,25 @@ function FavoritesPage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<PageHeader
-					back="/dashboard"
-					backLabel={t("nav.dashboard")}
-					title={t("dashboard.favoritesTitle")}
-				/>
+				<div className="flex items-center justify-between mb-6">
+					<div className="page-header">
+						<Link to="/dashboard" className="breadcrumb-back">
+							← {t("nav.dashboard")}
+						</Link>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("dashboard.favoritesTitle")}</h1>
+					</div>
+				</div>
 
 				{favoriteIds.length === 0 ? (
-					<EmptyState icon={Heart} message={t("dashboard.noFavorites")}>
+					<div className="empty-state">
+						<Heart size={36} className="mx-auto mb-3 opacity-30" />
+						<p className="text-sm">{t("dashboard.noFavorites")}</p>
 						<p className="text-sm mb-4">{t("dashboard.noFavoritesHint")}</p>
 						<Link to="/barbershops" className="btn btn-primary inline-flex">
 							{t("nav.barbershops")}
 						</Link>
-					</EmptyState>
+					</div>
 				) : (
 					<div className="shop-grid">
 						{shops.map((shop) => (

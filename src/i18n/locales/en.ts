@@ -1,5 +1,5 @@
 const en = {
-	// ─── Common ────────────────────────────────────────────────────────────────
+	// Common
 	common: {
 		loading: "Loading...",
 		save: "Save changes",
@@ -32,7 +32,7 @@ const en = {
 		pending: "Pending",
 	},
 
-	// ─── Navigation ────────────────────────────────────────────────────────────
+	// Navigation
 	nav: {
 		home: "Home",
 		barbershops: "Barbershops",
@@ -42,7 +42,7 @@ const en = {
 		admin: "Admin Panel",
 	},
 
-	// ─── Auth ──────────────────────────────────────────────────────────────────
+	// Auth
 	auth: {
 		loginTitle: "Welcome back",
 		loginSubtitle: "Sign in to your FadeIn account",
@@ -66,7 +66,7 @@ const en = {
 		creatingAccount: "Creating account...",
 	},
 
-	// ─── Home ──────────────────────────────────────────────────────────────────
+	// Home
 	home: {
 		badge: "The #1 barbershop booking platform",
 		heroTitle: "Look sharp,",
@@ -103,7 +103,7 @@ const en = {
 		ctaSubtitle: "Join hundreds of barbershops already using FadeIn to grow their business.",
 	},
 
-	// ─── Barbershops ───────────────────────────────────────────────────────────
+	// Barbershops
 	barbershops: {
 		title: "Find a barbershop",
 		subtitle: "Discover top-rated barbershops in your area",
@@ -123,7 +123,7 @@ const en = {
 		shopsOnMap: "{{count}} shops on map",
 	},
 
-	// ─── Shop Profile ──────────────────────────────────────────────────────────
+	// Shop Profile
 	shop: {
 		back: "Back to barbershops",
 		notFound: "Shop not found",
@@ -148,7 +148,7 @@ const en = {
 		hideQr: "Hide QR code",
 	},
 
-	// ─── Booking ───────────────────────────────────────────────────────────────
+	// Booking
 	booking: {
 		title: "Book at {{name}}",
 		step: "Step {{current}} of {{total}}",
@@ -188,7 +188,7 @@ const en = {
 		failed: "Booking failed. Please try again.",
 	},
 
-	// ─── For Business ──────────────────────────────────────────────────────────
+	// For Business
 	forBusiness: {
 		badge: "For barbershop owners",
 		title: "Grow your barbershop",
@@ -217,7 +217,7 @@ const en = {
 		},
 	},
 
-	// ─── Dashboard ─────────────────────────────────────────────────────────────
+	// Dashboard
 	dashboard: {
 		title: "My Dashboard",
 		welcome: "Welcome back, {{name}}!",
@@ -240,7 +240,7 @@ const en = {
 		emailNote: "Email cannot be changed",
 	},
 
-	// ─── Business Dashboard ────────────────────────────────────────────────────
+	// Business Dashboard
 	business: {
 		nav: {
 			overview: "Overview",
@@ -339,7 +339,7 @@ const en = {
 		},
 	},
 
-	// ─── Admin ─────────────────────────────────────────────────────────────────
+	// Admin
 	admin: {
 		title: "Admin Panel",
 		subtitle: "Platform management",
@@ -382,7 +382,7 @@ const en = {
 		},
 	},
 
-	// ─── Footer ────────────────────────────────────────────────────────────────
+	// Footer
 	footer: {
 		tagline: "The modern platform for discovering and booking top barbershops near you.",
 		discover: "Discover",
@@ -400,7 +400,7 @@ const en = {
 		},
 	},
 
-	// ─── Map ─────────────────────────────────────────────────────────────────
+	// Map
 	map: {
 		noLocations: "No mapped locations",
 		noLocationsHint: "Shops need coordinates (lat/lng) to appear on map",
@@ -411,7 +411,7 @@ const en = {
 		ratingOf: "{{rating}} / 5",
 	},
 
-	// ─── Errors / Toasts ────────────────────────────────────────────────────────
+	// Errors / Toasts
 	errors: {
 		updateStatusFailed: "Failed to update status",
 		fillAllFields: "Please fill in all fields",
@@ -435,7 +435,7 @@ const en = {
 		accountCreated: "Account created! Welcome to FadeIn.",
 	},
 
-	// ─── Forms ─────────────────────────────────────────────────────────────────
+	// Forms
 	form: {
 		phoneLabel: "Phone number",
 		cityLabel: "City",
@@ -456,7 +456,7 @@ const en = {
 		cityPlaceholder: "Thessaloniki",
 	},
 
-	// ─── Status ────────────────────────────────────────────────────────────────
+	// Status
 	status: {
 		pending: "Pending",
 		confirmed: "Confirmed",

@@ -21,8 +21,3 @@ export const socialLinksValidator = v.optional(
 		website: v.optional(v.string()),
 	}),
 )
-
-/** Strips undefined fields from a partial update object before patching. */
-export function filterDefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
-	return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>
-}

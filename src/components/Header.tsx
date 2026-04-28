@@ -14,30 +14,11 @@ import { useAuth } from "#/hooks/useAuth"
 import LanguageToggle from "./LanguageToggle"
 import { Menu } from "./ui/Menu"
 
-const NAV_LINKS = [
-	{ to: "/" as const, labelKey: "nav.home" },
-	{ to: "/barbershops" as const, labelKey: "nav.barbershops" },
-	{ to: "/for-business" as const, labelKey: "nav.forBusiness" },
-]
-
 const ROLE_NAV = {
 	customer: { labelKey: "nav.dashboard", icon: <LayoutDashboard size={14} />, to: "/dashboard" },
 	owner: { labelKey: "nav.business", icon: <Building2 size={14} />, to: "/business" },
 	admin: { labelKey: "nav.admin", icon: <ShieldCheck size={14} />, to: "/admin" },
 } as const
-
-function Logo() {
-	return (
-		<Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
-			<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
-				<Scissors size={16} className="text-black" />
-			</div>
-			<span className="font-bold text-lg tracking-tight text-[var(--text)]">
-				Fade<span className="gold-text">In</span>
-			</span>
-		</Link>
-	)
-}
 
 export default function Header() {
 	const [mobileOpen, setMobileOpen] = useState(false)
@@ -55,27 +36,45 @@ export default function Header() {
 		...(roleItem
 			? [
 					{
+						id: "role-nav",
 						label: t(roleItem.labelKey),
 						icon: roleItem.icon,
 						onClick: () => void router.navigate({ to: roleItem.to }),
 					},
 				]
 			: []),
-		{ separator: true as const, label: "" },
-		{ label: t("common.signOut"), icon: <LogOut size={14} />, onClick: handleLogout, danger: true },
+		{ id: "sep", separator: true as const },
+		{
+			id: "logout",
+			label: t("common.signOut"),
+			icon: <LogOut size={14} />,
+			onClick: handleLogout,
+			danger: true,
+		},
 	]
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-[var(--border)] backdrop-blur-lg bg-[var(--header-bg)]">
 			<nav className="page-wrap px-4 flex items-center gap-4 h-16">
-				<Logo />
+				<Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
+					<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
+						<Scissors size={16} className="text-black" />
+					</div>
+					<span className="font-bold text-lg tracking-tight text-[var(--text)]">
+						Fade<span className="gold-text">In</span>
+					</span>
+				</Link>
 
 				<div className="hidden md:flex items-center gap-1 ml-4">
-					{NAV_LINKS.map(({ to, labelKey }) => (
-						<Link key={to} to={to} className="nav-link" activeProps={{ className: "nav-link active" }}>
-							{t(labelKey)}
-						</Link>
-					))}
+					<Link to="/" className="nav-link" activeProps={{ className: "nav-link active" }}>
+						{t("nav.home")}
+					</Link>
+					<Link to="/barbershops" className="nav-link" activeProps={{ className: "nav-link active" }}>
+						{t("nav.barbershops")}
+					</Link>
+					<Link to="/for-business" className="nav-link" activeProps={{ className: "nav-link active" }}>
+						{t("nav.forBusiness")}
+					</Link>
 				</div>
 
 				<div className="flex items-center gap-2 ml-auto">
@@ -118,11 +117,15 @@ export default function Header() {
 
 			{mobileOpen && (
 				<div className="md:hidden bg-card border-t border-[var(--border)] px-4 py-4 flex flex-col gap-2">
-					{NAV_LINKS.map(({ to, labelKey }) => (
-						<Link key={to} to={to} className="nav-link" onClick={() => setMobileOpen(false)}>
-							{t(labelKey)}
-						</Link>
-					))}
+					<Link to="/" className="nav-link" onClick={() => setMobileOpen(false)}>
+						{t("nav.home")}
+					</Link>
+					<Link to="/barbershops" className="nav-link" onClick={() => setMobileOpen(false)}>
+						{t("nav.barbershops")}
+					</Link>
+					<Link to="/for-business" className="nav-link" onClick={() => setMobileOpen(false)}>
+						{t("nav.forBusiness")}
+					</Link>
 					{user ? (
 						<>
 							<hr className="divider my-1" />

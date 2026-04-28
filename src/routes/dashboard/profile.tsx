@@ -1,12 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
-import { Save } from "lucide-react"
+import { ArrowLeft, Save } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import PageHeader from "#/components/PageHeader"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
-import { useFormState } from "#/hooks/useFormState"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -15,7 +13,9 @@ export const Route = createFileRoute("/dashboard/profile")({ component: ProfileP
 function ProfilePage() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const { form, set } = useFormState({ name: user?.name ?? "", phone: "" })
+	const [form, setForm] = useState({ name: user?.name ?? "", phone: "" })
+	const set = (key: "name" | "phone") => (e: React.ChangeEvent<HTMLInputElement>) =>
+		setForm((prev) => ({ ...prev, [key]: e.target.value }))
 	const [saving, setSaving] = useState(false)
 	const updateProfile = useMutation(api.users.updateProfile)
 
@@ -35,11 +35,16 @@ function ProfilePage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-xl">
-				<PageHeader
-					back="/dashboard"
-					backLabel={t("nav.dashboard")}
-					title={t("dashboard.profileTitle")}
-				/>
+				<div className="mb-6">
+					<Link
+						to="/dashboard"
+						className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
+					>
+						<ArrowLeft size={14} />
+						{t("nav.dashboard")}
+					</Link>
+					<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.profileTitle")}</h1>
+				</div>
 
 				<div className="card p-6">
 					<div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border)]">
