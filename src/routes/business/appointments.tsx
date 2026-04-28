@@ -80,6 +80,7 @@ function BusinessAppointments() {
 				{!appointments ? (
 					<div className="space-y-3">
 						{Array.from({ length: 5 }, (_, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
 							<Skeleton key={i} className="h-20 w-full rounded-xl" />
 						))}
 					</div>

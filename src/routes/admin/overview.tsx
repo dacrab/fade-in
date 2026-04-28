@@ -9,7 +9,7 @@ import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop, User } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
-export const Route = createFileRoute("/admin/")({ component: AdminDashboard })
+export const Route = createFileRoute("/admin/overview")({ component: AdminDashboard })
 
 function AdminDashboard() {
 	const { t } = useTranslation()

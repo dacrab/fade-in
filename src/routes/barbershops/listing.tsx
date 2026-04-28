@@ -16,7 +16,7 @@ const searchSchema = z.object({
 	minRating: z.coerce.number().optional(),
 })
 
-export const Route = createFileRoute("/barbershops/")({
+export const Route = createFileRoute("/barbershops/listing")({
 	validateSearch: searchSchema,
 	component: BarbershopsPage,
 })

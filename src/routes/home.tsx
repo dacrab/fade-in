@@ -9,7 +9,7 @@ import type { Barbershop } from "#/types"
 import { api } from "../../convex/_generated/api"
 import type { Doc } from "../../convex/_generated/dataModel"
 
-export const Route = createFileRoute("/")({ component: HomePage })
+export const Route = createFileRoute("/home")({ component: HomePage })
 
 function HomePage() {
 	const { t } = useTranslation()
