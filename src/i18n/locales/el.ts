@@ -29,12 +29,15 @@ const el = {
 		at: "στις",
 		min: "λεπτά",
 		pending: "Σε αναμονή",
+		characters: "χαρακτήρες",
+		submitting: "Υποβολή...",
 	},
 	nav: {
 		home: "Αρχική",
 		barbershops: "Κουρεία",
 		forBusiness: "Για Επιχειρήσεις",
 		dashboard: "Ο Πίνακάς μου",
+		barber: "Το Πρόγραμμά μου",
 		business: "Επαγγελματικός Πίνακας",
 		admin: "Πάνελ Διαχειριστή",
 	},
@@ -222,6 +225,16 @@ const el = {
 		phonePlaceholder: "+30 6900 000000",
 		emailNote: "Το email δεν μπορεί να αλλαχθεί",
 	},
+
+	// Barber
+	barber: {
+		title: "Το Πρόγραμμά μου",
+		subtitle: "Δείτε τα επερχόμενα ραντεβού σας",
+		selectDate: "Επιλογή ημερομηνίας",
+		schedule: "Πρόγραμμα",
+		noAppointments: "Δεν υπάρχουν ραντεβού για αυτή την ημερομηνία",
+	},
+
 	business: {
 		nav: {
 			overview: "Επισκόπηση",
@@ -406,6 +419,10 @@ const el = {
 		shopFailed: "Αποτυχία αποθήκευσης.",
 		welcomeBack: "Καλωσήρθατε πίσω!",
 		accountCreated: "Ο λογαριασμός δημιουργήθηκε! Καλωσήρθατε στο FadeIn.",
+		ratingRequired: "Παρακαλώ επιλέξτε βαθμολογία",
+		commentRequired: "Παρακαλώ γράψτε ένα σχόλιο",
+		reviewSubmitted: "Η αξιολόγηση υποβλήθηκε!",
+		reviewFailed: "Αποτυχία υποβολής αξιολόγησης.",
 	},
 	form: {
 		phoneLabel: "Αριθμός τηλεφώνου",
@@ -426,6 +443,17 @@ const el = {
 		websiteLabel: "Website",
 		cityPlaceholder: "Θεσσαλονίκη",
 	},
+
+	// Review
+	review: {
+		title: "Αξιολογήστε το ραντεβού σας",
+		subtitle: "Πώς ήταν η εμπειρία σας;",
+		ratingLabel: "Βαθμολογία",
+		commentLabel: "Σχόλιο",
+		commentPlaceholder: "Μοιραστείτε την εμπειρία σας...",
+		submit: "Υποβολή αξιολόγησης",
+	},
+
 	status: {
 		pending: "Σε αναμονή",
 		confirmed: "Επιβεβαιωμένο",

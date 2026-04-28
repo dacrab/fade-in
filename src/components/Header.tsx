@@ -15,7 +15,11 @@ import LanguageToggle from "./LanguageToggle"
 import { Menu } from "./ui/Menu"
 
 const ROLE_NAV = {
-	customer: { labelKey: "nav.dashboard", icon: <LayoutDashboard size={14} />, to: "/dashboard/overview" },
+	customer: {
+		labelKey: "nav.dashboard",
+		icon: <LayoutDashboard size={14} />,
+		to: "/dashboard/overview",
+	},
 	barber: { labelKey: "nav.barber", icon: <Scissors size={14} />, to: "/barber/overview" },
 	owner: { labelKey: "nav.business", icon: <Building2 size={14} />, to: "/business/overview" },
 	admin: { labelKey: "nav.admin", icon: <ShieldCheck size={14} />, to: "/admin/overview" },
