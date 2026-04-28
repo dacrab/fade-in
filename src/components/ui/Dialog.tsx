@@ -3,19 +3,7 @@ import { X } from "lucide-react"
 import type { ReactNode } from "react"
 import { cn } from "#/lib/cn"
 
-interface DialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	children: ReactNode
-}
-
-export function Dialog({ open, onOpenChange, children }: DialogProps) {
-	return (
-		<BaseDialog.Root open={open} onOpenChange={onOpenChange}>
-			{children}
-		</BaseDialog.Root>
-	)
-}
+export const Dialog = BaseDialog.Root
 
 export function DialogContent({
 	children,

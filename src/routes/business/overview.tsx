@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import {
 	BarChart3,
@@ -14,12 +14,11 @@ import {
 	TrendingUp,
 	Users,
 } from "lucide-react"
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import EmptyState from "#/components/EmptyState"
-import SkeletonList from "#/components/SkeletonList"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { useAuth } from "#/hooks/useAuth"
 import { formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop, Review } from "#/types"
 import { STATUS_BADGE } from "#/types"
@@ -28,7 +27,7 @@ import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/")({ component: BusinessDashboard })
 
-// Nav links use translation inside component; define icons only
+// Navigation links - icons defined here, labels from i18n
 const NAV_LINK_DEFS = [
 	{ to: "/business", key: "overview", icon: BarChart3 },
 	{ to: "/business/appointments", key: "appointments", icon: Calendar },
@@ -41,7 +40,13 @@ const NAV_LINK_DEFS = [
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: business dashboard has multiple data sources
 function BusinessDashboard() {
 	const { t } = useTranslation()
-	const { user, loading } = useRequireRole(["owner", "admin"], "/login")
+	const { user } = useAuth()
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (!user) return
+		if (user.role !== "owner" && user.role !== "admin") navigate({ to: "/" })
+	}, [user, navigate])
 
 	const shopsRaw = useQuery(
 		api.barbershops.listByOwner,
@@ -63,7 +68,6 @@ function BusinessDashboard() {
 		| Review[]
 		| undefined
 
-	// Revenue analytics derived from appointments
 	const completedAppts = allAppts?.filter((a) => a.status === "completed") ?? []
 	const totalRevenue = completedAppts.reduce((sum, a) => sum + a.totalPrice, 0)
 	const monthRevenue = completedAppts
@@ -72,7 +76,7 @@ function BusinessDashboard() {
 	const completionRate =
 		allAppts && allAppts.length > 0 ? Math.round((completedAppts.length / allAppts.length) * 100) : 0
 
-	// CRM: deduplicate customers from all appointments
+	// Deduplicate customers from appointments
 	const customerMap = new Map<string, { visits: number; totalSpent: number; lastDate: string }>()
 	for (const appt of allAppts ?? []) {
 		const id = appt.customerId as string
@@ -89,7 +93,7 @@ function BusinessDashboard() {
 		b[1].lastDate > a[1].lastDate ? 1 : -1,
 	)
 
-	if (loading || !user) return <DashSkeleton />
+	if (!user) return <DashSkeleton />
 
 	if (!shop) {
 		return (
@@ -186,9 +190,17 @@ function BusinessDashboard() {
 							</Link>
 						</div>
 						{todayAppts === undefined ? (
-							<SkeletonList count={3} height="h-14" />
+							<div className="space-y-2">
+								{Array.from({ length: 3 }).map((_, i) => (
+									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+									<Skeleton key={i} className="h-14 w-full rounded-xl" />
+								))}
+							</div>
 						) : todayAppts.length === 0 ? (
-							<EmptyState icon={Clock} message={t("business.noToday")} />
+							<div className="empty-state">
+								<Clock size={32} className="mx-auto mb-2 opacity-30" />
+								<p className="text-sm">{t("business.noToday")}</p>
+							</div>
 						) : (
 							<div className="space-y-2">
 								{todayAppts.map((appt) => (
@@ -279,9 +291,17 @@ function BusinessDashboard() {
 							)}
 						</h2>
 						{allAppts === undefined ? (
-							<SkeletonList count={3} height="h-12" />
+							<div className="space-y-3">
+								{Array.from({ length: 3 }).map((_, i) => (
+									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+									<Skeleton key={i} className="h-12 w-full rounded-xl" />
+								))}
+							</div>
 						) : customerEntries.length === 0 ? (
-							<EmptyState icon={Users} message={t("business.crm.noCustomers")} />
+							<div className="empty-state">
+								<Users size={32} className="mx-auto mb-2 opacity-30" />
+								<p className="text-sm">{t("business.crm.noCustomers")}</p>
+							</div>
 						) : (
 							<div className="divide-y divide-[var(--border)]">
 								{customerEntries.slice(0, 10).map(([customerId, data]) => (

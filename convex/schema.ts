@@ -38,7 +38,6 @@ export default defineSchema({
 		.index("by_active", ["isActive"]),
 
 	barbers: defineTable({
-		userId: v.optional(v.id("users")),
 		barbershopId: v.id("barbershops"),
 		name: v.string(),
 		bio: v.optional(v.string()),
@@ -46,9 +45,7 @@ export default defineSchema({
 		avatarUrl: v.optional(v.string()),
 		workingHours: workingHoursValidator,
 		isActive: v.boolean(),
-	})
-		.index("by_shop", ["barbershopId"])
-		.index("by_user", ["userId"]),
+	}).index("by_shop", ["barbershopId"]),
 
 	services: defineTable({
 		barbershopId: v.id("barbershops"),
@@ -90,8 +87,5 @@ export default defineSchema({
 		comment: v.string(),
 		ownerReply: v.optional(v.string()),
 		createdAt: v.number(),
-	})
-		.index("by_shop", ["barbershopId"])
-		.index("by_customer", ["customerId"])
-		.index("by_appointment", ["appointmentId"]),
+	}).index("by_shop", ["barbershopId"]),
 })

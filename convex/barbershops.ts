@@ -1,6 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { filterDefined, socialLinksValidator, workingHoursValidator } from "./validators"
+import { socialLinksValidator, workingHoursValidator } from "./validators"
 
 /** Lists active barbershops with optional city, search, minRating, isVerified filters.
  * city is filtered via the by_city index; minRating and isVerified are applied as
@@ -140,8 +140,33 @@ export const update = mutation({
 		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		const { id, ...fields } = args
-		return await ctx.db.patch(id, filterDefined(fields))
+		const {
+			id,
+			name,
+			description,
+			phone,
+			address,
+			city,
+			lat,
+			lng,
+			images,
+			workingHours,
+			socialLinks,
+			isActive,
+		} = args
+		return await ctx.db.patch(id, {
+			...(name !== undefined && { name }),
+			...(description !== undefined && { description }),
+			...(phone !== undefined && { phone }),
+			...(address !== undefined && { address }),
+			...(city !== undefined && { city }),
+			...(lat !== undefined && { lat }),
+			...(lng !== undefined && { lng }),
+			...(images !== undefined && { images }),
+			...(workingHours !== undefined && { workingHours }),
+			...(socialLinks !== undefined && { socialLinks }),
+			...(isActive !== undefined && { isActive }),
+		})
 	},
 })
 

@@ -28,7 +28,6 @@ describe("formatPrice", () => {
 
 	it("always produces two decimal places", () => {
 		const result = formatPrice(200)
-		// e.g. "€2.00" → after € there should be digits and a dot
 		expect(result).toMatch(/^€\d+\.\d{2}$/)
 	})
 })
@@ -109,7 +108,6 @@ describe("capitalizeFirst", () => {
 	})
 
 	it("handles strings with leading spaces", () => {
-		// Space is not a letter; capitalizeFirst only uppercases index 0
 		const result = capitalizeFirst(" hello")
 		expect(result[0]).toBe(" ")
 	})

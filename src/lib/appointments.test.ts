@@ -95,4 +95,37 @@ describe("generateSlots — appointment slot algorithm", () => {
 		const existing = [{ startTime: "09:00", endTime: "19:00" }]
 		expect(generateSlots(30, existing)).toHaveLength(0)
 	})
+
+	it("handles back-to-back appointments correctly", () => {
+		const existing = [
+			{ startTime: "09:00", endTime: "09:30" },
+			{ startTime: "09:30", endTime: "10:00" },
+			{ startTime: "10:00", endTime: "10:30" },
+		]
+		const slots = generateSlots(30, existing)
+		expect(slots).not.toContain("09:00")
+		expect(slots).not.toContain("09:30")
+		expect(slots).not.toContain("10:00")
+		expect(slots).toContain("10:30")
+	})
+
+	it("handles 90-minute duration correctly", () => {
+		const slots = generateSlots(90, [])
+		expect(slots[0]).toBe("09:00")
+		expect(slots[slots.length - 1]).toBe("18:00") // 18:00 + 90min = 19:30, exceeds 19:00
+	})
+
+	it("handles appointments that start before working hours", () => {
+		const existing = [{ startTime: "08:00", endTime: "09:30" }]
+		const slots = generateSlots(30, existing)
+		expect(slots).not.toContain("09:00")
+		expect(slots).toContain("09:30")
+	})
+
+	it("handles appointments that end after working hours", () => {
+		const existing = [{ startTime: "18:30", endTime: "20:00" }]
+		const slots = generateSlots(30, existing)
+		expect(slots).not.toContain("18:30")
+		expect(slots).toContain("18:00")
+	})
 })

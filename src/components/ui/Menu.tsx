@@ -2,15 +2,24 @@ import { Menu as BaseMenu } from "@base-ui/react/menu"
 import type { ReactElement, ReactNode } from "react"
 import { cn } from "#/lib/cn"
 
-export interface MenuItem {
+interface MenuItemBase {
+	id: string
+	disabled?: boolean
+}
+
+interface MenuItemAction extends MenuItemBase {
+	separator?: false
 	label: ReactNode
 	onClick?: () => void
 	danger?: boolean
-	disabled?: boolean
-	separator?: boolean
 	icon?: ReactNode
-	id?: string
 }
+
+interface MenuItemSeparator extends MenuItemBase {
+	separator: true
+}
+
+export type MenuItem = MenuItemAction | MenuItemSeparator
 
 interface MenuProps {
 	trigger: ReactElement
@@ -27,13 +36,10 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 					<BaseMenu.Popup className="popup min-w-[10rem]">
 						{items.map((item) =>
 							item.separator ? (
-								<BaseMenu.Separator
-									key={item.id || `sep-${Math.random()}`}
-									className="my-1 h-px mx-2 bg-[var(--border)]"
-								/>
+								<BaseMenu.Separator key={item.id} className="my-1 h-px mx-2 bg-[var(--border)]" />
 							) : (
 								<BaseMenu.Item
-									key={item.id || (typeof item.label === "string" ? item.label : `item-${Math.random()}`)}
+									key={item.id}
 									disabled={item.disabled}
 									onClick={item.onClick}
 									className={cn(

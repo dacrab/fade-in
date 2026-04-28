@@ -19,7 +19,7 @@ function getInitialLanguage(): Language {
 		const browser = navigator.language.split("-")[0] as Language
 		if (browser in LANGUAGES) return browser
 	} catch {
-		// SSR or localStorage unavailable
+		// SSR fallback
 	}
 	return "en"
 }
@@ -42,7 +42,7 @@ export function setLanguage(lang: Language): void {
 	try {
 		localStorage.setItem(STORAGE_KEY, lang)
 	} catch {
-		// ignore
+		// Ignore
 	}
 }
 

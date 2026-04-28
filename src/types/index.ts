@@ -1,7 +1,10 @@
 import type { Id } from "../../convex/_generated/dataModel"
 
+// User & Auth
+
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 
+/** Authenticated user data returned by useAuth hook */
 export interface AuthUser {
 	id: string
 	name: string
@@ -10,9 +13,23 @@ export interface AuthUser {
 	avatarUrl?: string
 }
 
+/** Full user document from database */
+export interface User {
+	_id: Id<"users">
+	_creationTime: number
+	name: string
+	email: string
+	phone?: string
+	role: UserRole
+	avatarUrl?: string
+	favoriteShopIds: Id<"barbershops">[]
+}
+
+// Working Hours
+
 export interface DayHours {
-	open: string
-	close: string
+	open: string // HH:MM
+	close: string // HH:MM
 	closed: boolean
 }
 
@@ -27,11 +44,25 @@ export type WeekDay =
 
 export type WorkingHours = Partial<Record<WeekDay, DayHours>>
 
+export const WEEK_DAYS: WeekDay[] = [
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
+	"sunday",
+]
+
+// Social Links
+
 export interface SocialLinks {
 	instagram?: string
 	facebook?: string
 	website?: string
 }
+
+// Barbershop
 
 export interface Barbershop {
 	_id: Id<"barbershops">
@@ -54,10 +85,11 @@ export interface Barbershop {
 	socialLinks?: SocialLinks
 }
 
+// Barber
+
 export interface Barber {
 	_id: Id<"barbers">
 	_creationTime: number
-	userId?: Id<"users">
 	barbershopId: Id<"barbershops">
 	name: string
 	bio?: string
@@ -66,6 +98,8 @@ export interface Barber {
 	workingHours?: WorkingHours
 	isActive: boolean
 }
+
+// Service
 
 export interface Service {
 	_id: Id<"services">
@@ -78,6 +112,8 @@ export interface Service {
 	category: string
 	isActive: boolean
 }
+
+// Appointment
 
 export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled"
 
@@ -97,29 +133,7 @@ export interface Appointment {
 	createdAt: number
 }
 
-export interface Review {
-	_id: Id<"reviews">
-	_creationTime: number
-	customerId: Id<"users">
-	barbershopId: Id<"barbershops">
-	appointmentId: Id<"appointments">
-	rating: number
-	comment: string
-	ownerReply?: string
-	createdAt: number
-}
-
-export interface User {
-	_id: Id<"users">
-	_creationTime: number
-	name: string
-	email: string
-	phone?: string
-	role: UserRole
-	avatarUrl?: string
-	favoriteShopIds: Id<"barbershops">[]
-}
-
+/** Badge CSS classes for appointment statuses */
 export const STATUS_BADGE: Record<AppointmentStatus, string> = {
 	pending: "badge-gold",
 	confirmed: "badge-green",
@@ -127,12 +141,16 @@ export const STATUS_BADGE: Record<AppointmentStatus, string> = {
 	cancelled: "badge-red",
 }
 
-export const WEEK_DAYS: WeekDay[] = [
-	"monday",
-	"tuesday",
-	"wednesday",
-	"thursday",
-	"friday",
-	"saturday",
-	"sunday",
-]
+// Review
+
+export interface Review {
+	_id: Id<"reviews">
+	_creationTime: number
+	customerId: Id<"users">
+	barbershopId: Id<"barbershops">
+	appointmentId: Id<"appointments">
+	rating: number // 1-5
+	comment: string
+	ownerReply?: string
+	createdAt: number
+}

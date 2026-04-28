@@ -106,9 +106,10 @@ function RegisterPage() {
 							<PasswordInput
 								id="reg-password"
 								value={password}
-								onChange={setPassword}
+								onChange={(e) => setPassword(e.target.value)}
 								placeholder={t("form.passwordMin")}
 								autoComplete="new-password"
+								required
 							/>
 						</div>
 						<button

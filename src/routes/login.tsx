@@ -70,9 +70,10 @@ function LoginPage() {
 							<PasswordInput
 								id="login-password"
 								value={password}
-								onChange={setPassword}
+								onChange={(e) => setPassword(e.target.value)}
 								placeholder={t("auth.passwordPlaceholder")}
 								autoComplete="current-password"
+								required
 							/>
 						</div>
 						<button

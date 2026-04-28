@@ -1,13 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-
-type Role = "customer" | "owner" | "barber" | "admin"
-
-interface AuthUser {
-	_id: string
-	name: string
-	email: string
-	role: Role
-}
+import type { AuthUser, UserRole } from "#/types"
 
 function isCustomer(user: AuthUser | null): boolean {
 	return user?.role === "customer"
@@ -30,10 +22,10 @@ afterEach(() => {
 })
 
 describe("Role guards (useAuth logic)", () => {
-	const customer: AuthUser = { _id: "u1", name: "Alice", email: "a@b.com", role: "customer" }
-	const owner: AuthUser = { _id: "u2", name: "Bob", email: "b@b.com", role: "owner" }
-	const admin: AuthUser = { _id: "u3", name: "Carol", email: "c@b.com", role: "admin" }
-	const barber: AuthUser = { _id: "u4", name: "Dan", email: "d@b.com", role: "barber" }
+	const customer: AuthUser = { id: "u1", name: "Alice", email: "a@b.com", role: "customer" }
+	const owner: AuthUser = { id: "u2", name: "Bob", email: "b@b.com", role: "owner" }
+	const admin: AuthUser = { id: "u3", name: "Carol", email: "c@b.com", role: "admin" }
+	const barber: AuthUser = { id: "u4", name: "Dan", email: "d@b.com", role: "barber" }
 
 	it("isCustomer returns true for customer role", () => {
 		expect(isCustomer(customer)).toBe(true)
@@ -80,49 +72,27 @@ describe("Role guards (useAuth logic)", () => {
 	})
 })
 
-describe("localStorage auth persistence", () => {
-	it("stores a user key after login", () => {
-		const user = { _id: "u1", name: "Alice", email: "a@b.com", role: "customer" as Role }
-		localStorage.setItem("auth_user", JSON.stringify(user))
-		const stored = localStorage.getItem("auth_user")
-		expect(stored).not.toBeNull()
-		expect(JSON.parse(stored as string).name).toBe("Alice")
-	})
-
-	it("returns null after the key is removed (logout)", () => {
-		localStorage.setItem("auth_user", JSON.stringify({ _id: "u1" }))
-		localStorage.removeItem("auth_user")
-		expect(localStorage.getItem("auth_user")).toBeNull()
-	})
-
-	it("overwrites existing user on re-login", () => {
-		localStorage.setItem("auth_user", JSON.stringify({ _id: "u1", name: "Alice" }))
-		localStorage.setItem("auth_user", JSON.stringify({ _id: "u2", name: "Bob" }))
-		const raw = localStorage.getItem("auth_user")
-		expect(raw).not.toBeNull()
-		expect(JSON.parse(raw as string).name).toBe("Bob")
-	})
-})
+// localStorage tests removed - useAuth uses Convex Auth, not localStorage
 
 describe("AuthUser shape validation", () => {
 	it("a valid AuthUser has all required fields", () => {
 		const user: AuthUser = {
-			_id: "abc123",
+			id: "abc123",
 			name: "Test User",
 			email: "test@example.com",
 			role: "customer",
 		}
-		expect(user._id).toBeTruthy()
+		expect(user.id).toBeTruthy()
 		expect(user.name).toBeTruthy()
 		expect(user.email).toContain("@")
 		expect(["customer", "owner", "barber", "admin"]).toContain(user.role)
 	})
 
 	it("role must be one of the four allowed values", () => {
-		const validRoles: Role[] = ["customer", "owner", "barber", "admin"]
+		const validRoles: UserRole[] = ["customer", "owner", "barber", "admin"]
 		for (const role of validRoles) {
 			expect(() => {
-				const u: AuthUser = { _id: "x", name: "x", email: "x@x.com", role }
+				const u: AuthUser = { id: "x", name: "x", email: "x@x.com", role }
 				return u
 			}).not.toThrow()
 		}

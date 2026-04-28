@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucide-react"
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import AsyncList from "#/components/AsyncList"
-import PageHeader from "#/components/PageHeader"
+import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -69,7 +69,15 @@ function ShopRow({ shop, onVerify, onSuspend }: ShopRowProps) {
 
 function AdminShops() {
 	const { t } = useTranslation()
-	useRequireRole(["admin"])
+	const { user, loading } = useAuth()
+	const router = useRouter()
+
+	useEffect(() => {
+		if (!loading && (!user || user.role !== "admin")) {
+			void router.navigate({ to: "/" })
+		}
+	}, [user, loading, router])
+
 	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined
 	const verify = useMutation(api.barbershops.verify)
 	const suspend = useMutation(api.barbershops.suspend)
@@ -91,20 +99,34 @@ function AdminShops() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-5xl">
-				<PageHeader back="/admin" backLabel={t("nav.admin")} title={t("admin.shops.title")} />
-				<AsyncList
-					data={allShops}
-					skeleton={{ count: 5, height: "h-16" }}
-					empty={{ icon: Building2, message: t("admin.shops.noShops") }}
-				>
-					{(shops) => (
-						<div className="space-y-2">
-							{shops.map((shop) => (
-								<ShopRow key={shop._id} shop={shop} onVerify={handleVerify} onSuspend={handleSuspend} />
-							))}
-						</div>
-					)}
-				</AsyncList>
+				<div className="flex items-center justify-between mb-6">
+					<div className="page-header">
+						<Link to="/admin" className="breadcrumb-back">
+							← {t("nav.admin")}
+						</Link>
+						<span className="breadcrumb-sep">/</span>
+						<h1>{t("admin.shops.title")}</h1>
+					</div>
+				</div>
+
+				{!allShops ? (
+					<div className="space-y-3">
+						{Array.from({ length: 5 }, (_, i) => (
+							<Skeleton key={i} className="h-16 w-full rounded-xl" />
+						))}
+					</div>
+				) : allShops.length === 0 ? (
+					<div className="empty-state">
+						<Building2 size={36} className="mx-auto mb-3 opacity-30" />
+						<p className="text-sm">{t("admin.shops.noShops")}</p>
+					</div>
+				) : (
+					<div className="space-y-2">
+						{allShops.map((shop) => (
+							<ShopRow key={shop._id} shop={shop} onVerify={handleVerify} onSuspend={handleSuspend} />
+						))}
+					</div>
+				)}
 			</div>
 		</main>
 	)

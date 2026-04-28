@@ -17,7 +17,6 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const markersRef = useRef<L.Marker[]>([])
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: map initializes once on mount
 	useEffect(() => {
 		if (!mapContainerRef.current || mapRef.current) return
 
@@ -41,7 +40,6 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 				maxZoom: 19,
 			}).addTo(map)
 			mapRef.current = map
-			placeMarkers(L, map, shops, markersRef, onShopClick, t)
 		})
 
 		return () => {
@@ -55,8 +53,48 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 
 	useEffect(() => {
 		if (!mapRef.current) return
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: inline marker placement logic
 		import("leaflet").then((L) => {
-			if (mapRef.current) placeMarkers(L, mapRef.current, shops, markersRef, onShopClick, t)
+			if (!mapRef.current) return
+
+			for (const m of markersRef.current) m.remove()
+			markersRef.current = []
+
+			const shopsWithCoords = shops.filter(
+				(s): s is Barbershop & { lat: number; lng: number } =>
+					s.lat !== undefined && s.lng !== undefined,
+			)
+			if (shopsWithCoords.length === 0) return
+
+			const goldIcon = L.divIcon({
+				html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,#F59E0B,#D97706);transform:rotate(-45deg);border:2px solid #0A0A0A;box-shadow:0 4px 12px rgba(245,158,11,0.5);display:flex;align-items:center;justify-content:center;"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' style='transform:rotate(45deg)'><circle cx='6' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><line x1='20' y1='4' x2='8.12' y2='15.88'/><line x1='14.47' y1='14.48' x2='20' y2='20'/><line x1='8.12' y1='8.12' x2='12' y2='12'/></svg></div>`,
+				className: "",
+				iconSize: [32, 32],
+				iconAnchor: [16, 32],
+				popupAnchor: [0, -36],
+			})
+
+			const bounds: [number, number][] = []
+
+			for (const shop of shopsWithCoords) {
+				const marker = L.marker([shop.lat, shop.lng], { icon: goldIcon })
+					.addTo(mapRef.current)
+					.bindPopup(
+						`<div style="font-family:system-ui;min-width:160px;padding:4px;">
+						<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#F5F5F5;">${shop.name}</div>
+						<div style="font-size:12px;color:#888;margin-bottom:6px;">${shop.address}, ${shop.city}</div>
+						<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">${shop.rating.toFixed(1)} / 5 (${t("map.reviewsCount", { count: shop.reviewCount })})</div>
+						<a href="/barbershops/${shop.slug}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">${t("map.bookNowArrow")} →</a>
+					</div>`,
+						{ className: "fadein-popup" },
+					)
+
+				if (onShopClick) marker.on("click", () => onShopClick(shop.slug))
+				markersRef.current.push(marker)
+				bounds.push([shop.lat, shop.lng])
+			}
+
+			if (bounds.length > 0) mapRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 })
 		})
 	}, [shops, onShopClick, t])
 
@@ -77,56 +115,4 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 			</div>
 		</div>
 	)
-}
-
-function placeMarkers(
-	L: typeof import("leaflet"),
-	map: L.Map,
-	shops: Barbershop[],
-	markersRef: React.MutableRefObject<L.Marker[]>,
-	onShopClick?: (slug: string) => void,
-	t?: (key: string, opts?: Record<string, unknown>) => string,
-) {
-	for (const m of markersRef.current) m.remove()
-	markersRef.current = []
-
-	const shopsWithCoords = shops.filter(
-		(s): s is Barbershop & { lat: number; lng: number } => s.lat !== undefined && s.lng !== undefined,
-	)
-	if (shopsWithCoords.length === 0) return
-
-	const goldIcon = L.divIcon({
-		html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,#F59E0B,#D97706);transform:rotate(-45deg);border:2px solid #0A0A0A;box-shadow:0 4px 12px rgba(245,158,11,0.5);display:flex;align-items:center;justify-content:center;"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' style='transform:rotate(45deg)'><circle cx='6' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><line x1='20' y1='4' x2='8.12' y2='15.88'/><line x1='14.47' y1='14.48' x2='20' y2='20'/><line x1='8.12' y1='8.12' x2='12' y2='12'/></svg></div>`,
-		className: "",
-		iconSize: [32, 32],
-		iconAnchor: [16, 32],
-		popupAnchor: [0, -36],
-	})
-
-	const bounds: [number, number][] = []
-
-	for (const shop of shopsWithCoords) {
-		const bookLabel = t ? t("map.bookNowArrow") : "Book now"
-		const reviewsLabel = t
-			? t("map.reviewsCount", { count: shop.reviewCount })
-			: `${shop.reviewCount} reviews`
-
-		const marker = L.marker([shop.lat, shop.lng], { icon: goldIcon })
-			.addTo(map)
-			.bindPopup(
-				`<div style="font-family:system-ui;min-width:160px;padding:4px;">
-				<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#F5F5F5;">${shop.name}</div>
-				<div style="font-size:12px;color:#888;margin-bottom:6px;">${shop.address}, ${shop.city}</div>
-				<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">${shop.rating.toFixed(1)} / 5 (${reviewsLabel})</div>
-				<a href="/barbershops/${shop.slug}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#000;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">${bookLabel} →</a>
-			</div>`,
-				{ className: "fadein-popup" },
-			)
-
-		if (onShopClick) marker.on("click", () => onShopClick(shop.slug))
-		markersRef.current.push(marker)
-		bounds.push([shop.lat, shop.lng])
-	}
-
-	if (bounds.length > 0) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 })
 }
