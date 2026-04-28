@@ -38,7 +38,7 @@ function BusinessProfile() {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (user && user.role !== "owner" && user.role !== "admin") navigate({ to: "/" })
+		if (user && user.role !== "owner" && user.role !== "admin") navigate({ to: "/home" })
 	}, [user, navigate])
 
 	const [form, setForm] = useState(EMPTY)
@@ -116,7 +116,7 @@ function BusinessProfile() {
 			<div className="page-wrap max-w-2xl">
 				<div className="mb-6">
 					<Link
-						to="/business"
+						to="/business/overview"
 						className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
 					>
 						<ArrowLeft size={14} />

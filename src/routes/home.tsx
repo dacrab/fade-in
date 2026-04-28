@@ -20,7 +20,11 @@ function HomePage() {
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault()
-		void navigate({ to: "/barbershops", search: { q: search || undefined, city: city || undefined } })
+		void navigate({
+			to: "/barbershops/listing",
+			// biome-ignore lint/suspicious/noExplicitAny: TanStack Router search params type limitation
+			search: { q: search || undefined, city: city || undefined } as any,
+		})
 	}
 
 	return (
@@ -105,7 +109,7 @@ function HomePage() {
 							<h2 className="text-2xl font-bold text-[var(--text)] mb-1">{t("home.featured")}</h2>
 							<p className="text-[var(--text-muted)] text-sm">{t("home.featuredSubtitle")}</p>
 						</div>
-						<Link to="/barbershops" className="section-link flex items-center gap-1">
+						<Link to="/barbershops/listing" className="section-link flex items-center gap-1">
 							{t("common.viewAll")} <ArrowRight size={14} />
 						</Link>
 					</div>

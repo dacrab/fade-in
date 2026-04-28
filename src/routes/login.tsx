@@ -22,7 +22,7 @@ function LoginPage() {
 		try {
 			await login(email, password)
 			showToast(t("errors.welcomeBack"), "success")
-			void router.navigate({ to: "/dashboard" })
+			void router.navigate({ to: "/dashboard/overview" })
 		} catch {
 			showToast(t("errors.loginFailed"), "error")
 		} finally {
@@ -34,7 +34,7 @@ function LoginPage() {
 		<main className="auth-page">
 			<div className="w-full max-w-md">
 				<div className="text-center mb-8">
-					<Link to="/" className="auth-logo">
+					<Link to="/home" className="auth-logo">
 						<div className="auth-logo-icon gold-gradient">
 							<Scissors size={20} className="text-black" />
 						</div>

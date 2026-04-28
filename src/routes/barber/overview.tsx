@@ -20,7 +20,7 @@ function BarberDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "barber" && user.role !== "admin") navigate({ to: "/" })
+		if (user.role !== "barber" && user.role !== "admin") navigate({ to: "/home" })
 	}, [user, navigate])
 
 	// Get barber profile for current user

@@ -41,12 +41,13 @@ function BarbershopsPage() {
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault()
 		void navigate({
-			to: "/barbershops",
+			to: "/barbershops/listing",
 			search: {
 				q: search || undefined,
 				city: city || undefined,
 				minRating: minRating > 0 ? minRating : undefined,
-			},
+				// biome-ignore lint/suspicious/noExplicitAny: TanStack Router search params type limitation
+			} as any,
 		})
 	}
 

@@ -18,7 +18,7 @@ function AdminDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "admin") navigate({ to: "/" })
+		if (user.role !== "admin") navigate({ to: "/home" })
 	}, [user, navigate])
 
 	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined

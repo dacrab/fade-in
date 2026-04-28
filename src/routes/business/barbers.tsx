@@ -26,7 +26,7 @@ function BusinessBarbers() {
 
 	useEffect(() => {
 		if (!(loading || (user && ["owner", "admin"].includes(user.role)))) {
-			void router.navigate({ to: "/" })
+			void router.navigate({ to: "/home" })
 		}
 	}, [user, loading, router])
 
@@ -103,7 +103,7 @@ function BusinessBarbers() {
 			<div className="page-wrap max-w-3xl">
 				<div className="flex items-center justify-between mb-6">
 					<div className="page-header">
-						<Link to="/business" className="breadcrumb-back">
+						<Link to="/business/overview" className="breadcrumb-back">
 							← {t("nav.business")}
 						</Link>
 						<span className="breadcrumb-sep">/</span>

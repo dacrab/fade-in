@@ -21,7 +21,7 @@ function CustomerDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "customer" && user.role !== "admin") navigate({ to: "/" })
+		if (user.role !== "customer" && user.role !== "admin") navigate({ to: "/home" })
 	}, [user, navigate])
 
 	const appointments = useQuery(
@@ -104,7 +104,7 @@ function CustomerDashboard() {
 						<div className="empty-state">
 							<Calendar size={32} className="mx-auto mb-2 opacity-30" />
 							<p className="text-sm">{t("dashboard.noUpcoming")}</p>
-							<Link to="/barbershops" className="btn btn-primary mt-3 inline-flex text-sm">
+							<Link to="/barbershops/listing" className="btn btn-primary mt-3 inline-flex text-sm">
 								{t("common.bookNow")}
 							</Link>
 						</div>

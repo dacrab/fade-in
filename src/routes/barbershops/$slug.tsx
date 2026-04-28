@@ -61,7 +61,7 @@ function ShopProfilePage() {
 			<main className="px-4 py-16 text-center page-wrap">
 				<Scissors size={40} className="mx-auto mb-4 text-[var(--text-subtle)]" />
 				<h1 className="text-2xl font-bold text-[var(--text)] mb-2">{t("shop.notFound")}</h1>
-				<Link to="/barbershops" className="btn btn-primary mt-4 inline-flex">
+				<Link to="/barbershops/listing" className="btn btn-primary mt-4 inline-flex">
 					{t("shop.notFoundHint")}
 				</Link>
 			</main>
@@ -70,7 +70,7 @@ function ShopProfilePage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-5xl">
-				<Link to="/barbershops" className="breadcrumb-back">
+				<Link to="/barbershops/listing" className="breadcrumb-back">
 					<ChevronLeft size={16} /> {t("shop.back")}
 				</Link>
 
