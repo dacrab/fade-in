@@ -37,7 +37,7 @@ function BusinessServices() {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (user && user.role !== "owner" && user.role !== "admin") navigate({ to: "/" })
+		if (user && user.role !== "owner" && user.role !== "admin") navigate({ to: "/home" })
 	}, [user, navigate])
 
 	const [form, setForm] = useState(EMPTY_FORM)
@@ -132,7 +132,7 @@ function BusinessServices() {
 				<div className="section-header mb-6">
 					<div>
 						<Link
-							to="/business"
+							to="/business/overview"
 							className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
 						>
 							<ArrowLeft size={14} />

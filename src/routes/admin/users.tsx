@@ -24,7 +24,7 @@ function AdminUsers() {
 
 	useEffect(() => {
 		if (!loading && (!user || user.role !== "admin")) {
-			void router.navigate({ to: "/" })
+			void router.navigate({ to: "/home" })
 		}
 	}, [user, loading, router])
 
@@ -35,7 +35,7 @@ function AdminUsers() {
 			<div className="page-wrap max-w-4xl">
 				<div className="flex items-center justify-between mb-6">
 					<div className="page-header">
-						<Link to="/admin" className="breadcrumb-back">
+						<Link to="/admin/overview" className="breadcrumb-back">
 							← {t("nav.admin")}
 						</Link>
 						<span className="breadcrumb-sep">/</span>

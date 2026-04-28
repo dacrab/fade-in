@@ -3,7 +3,7 @@ import { Building2, ShieldCheck, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 const NAV_LINKS = [
-	{ to: "/admin" as const, labelKey: "admin.overviewTitle", icon: ShieldCheck },
+	{ to: "/admin/overview" as const, labelKey: "admin.overviewTitle", icon: ShieldCheck },
 	{ to: "/admin/shops" as const, labelKey: "admin.shops.title", icon: Building2 },
 	{ to: "/admin/users" as const, labelKey: "admin.users.title", icon: Users },
 ]

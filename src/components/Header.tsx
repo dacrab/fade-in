@@ -33,7 +33,7 @@ export default function Header() {
 
 	const handleLogout = () => {
 		logout()
-		void router.navigate({ to: "/" })
+		void router.navigate({ to: "/home" })
 	}
 
 	const roleItem = user ? ROLE_NAV[user.role as keyof typeof ROLE_NAV] : undefined
@@ -61,7 +61,7 @@ export default function Header() {
 	return (
 		<header className="sticky top-0 z-50 border-b border-[var(--border)] backdrop-blur-lg bg-[var(--header-bg)]">
 			<nav className="page-wrap px-4 flex items-center gap-4 h-16">
-				<Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
+				<Link to="/home" className="flex items-center gap-2 no-underline flex-shrink-0">
 					<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
 						<Scissors size={16} className="text-black" />
 					</div>
@@ -71,10 +71,14 @@ export default function Header() {
 				</Link>
 
 				<div className="hidden md:flex items-center gap-1 ml-4">
-					<Link to="/" className="nav-link" activeProps={{ className: "nav-link active" }}>
+					<Link to="/home" className="nav-link" activeProps={{ className: "nav-link active" }}>
 						{t("nav.home")}
 					</Link>
-					<Link to="/barbershops" className="nav-link" activeProps={{ className: "nav-link active" }}>
+					<Link
+						to="/barbershops/listing"
+						className="nav-link"
+						activeProps={{ className: "nav-link active" }}
+					>
 						{t("nav.barbershops")}
 					</Link>
 					<Link to="/for-business" className="nav-link" activeProps={{ className: "nav-link active" }}>
@@ -122,10 +126,10 @@ export default function Header() {
 
 			{mobileOpen && (
 				<div className="md:hidden bg-card border-t border-[var(--border)] px-4 py-4 flex flex-col gap-2">
-					<Link to="/" className="nav-link" onClick={() => setMobileOpen(false)}>
+					<Link to="/home" className="nav-link" onClick={() => setMobileOpen(false)}>
 						{t("nav.home")}
 					</Link>
-					<Link to="/barbershops" className="nav-link" onClick={() => setMobileOpen(false)}>
+					<Link to="/barbershops/listing" className="nav-link" onClick={() => setMobileOpen(false)}>
 						{t("nav.barbershops")}
 					</Link>
 					<Link to="/for-business" className="nav-link" onClick={() => setMobileOpen(false)}>

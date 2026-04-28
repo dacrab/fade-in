@@ -30,7 +30,7 @@ function FavoritesPage() {
 			<div className="page-wrap max-w-4xl">
 				<div className="flex items-center justify-between mb-6">
 					<div className="page-header">
-						<Link to="/dashboard" className="breadcrumb-back">
+						<Link to="/dashboard/overview" className="breadcrumb-back">
 							← {t("nav.dashboard")}
 						</Link>
 						<span className="breadcrumb-sep">/</span>
@@ -43,7 +43,7 @@ function FavoritesPage() {
 						<Heart size={36} className="mx-auto mb-3 opacity-30" />
 						<p className="text-sm">{t("dashboard.noFavorites")}</p>
 						<p className="text-sm mb-4">{t("dashboard.noFavoritesHint")}</p>
-						<Link to="/barbershops" className="btn btn-primary inline-flex">
+						<Link to="/barbershops/listing" className="btn btn-primary inline-flex">
 							{t("nav.barbershops")}
 						</Link>
 					</div>

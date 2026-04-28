@@ -21,7 +21,7 @@ export default function Footer() {
 			<div className="page-wrap">
 				<div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 mb-10">
 					<div>
-						<Link to="/" className="flex items-center gap-2 no-underline mb-3">
+						<Link to="/home" className="flex items-center gap-2 no-underline mb-3">
 							<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
 								<Scissors size={16} className="text-black" />
 							</div>
@@ -34,7 +34,7 @@ export default function Footer() {
 
 					<FooterSection title={t("footer.discover")}>
 						<li>
-							<Link to="/barbershops" className={LINK_CLASS}>
+							<Link to="/barbershops/listing" className={LINK_CLASS}>
 								{t("nav.barbershops")}
 							</Link>
 						</li>

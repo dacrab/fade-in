@@ -37,7 +37,7 @@ function ProfilePage() {
 			<div className="page-wrap max-w-xl">
 				<div className="mb-6">
 					<Link
-						to="/dashboard"
+						to="/dashboard/overview"
 						className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
 					>
 						<ArrowLeft size={14} />

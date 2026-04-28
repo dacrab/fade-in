@@ -32,7 +32,7 @@ function RegisterPage() {
 		try {
 			await register(email, password, name, role)
 			showToast(t("errors.accountCreated"), "success")
-			void router.navigate({ to: role === "owner" ? "/business" : "/dashboard" })
+			void router.navigate({ to: role === "owner" ? "/business/overview" : "/dashboard/overview" })
 		} catch {
 			showToast(t("errors.registrationFailed"), "error")
 		} finally {
@@ -44,7 +44,7 @@ function RegisterPage() {
 		<main className="auth-page">
 			<div className="w-full max-w-md">
 				<div className="text-center mb-8">
-					<Link to="/" className="auth-logo">
+					<Link to="/home" className="auth-logo">
 						<div className="auth-logo-icon gold-gradient">
 							<Scissors size={20} className="text-black" />
 						</div>

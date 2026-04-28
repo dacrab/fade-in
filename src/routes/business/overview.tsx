@@ -29,7 +29,7 @@ export const Route = createFileRoute("/business/overview")({ component: Business
 
 // Navigation links - icons defined here, labels from i18n
 const NAV_LINK_DEFS = [
-	{ to: "/business", key: "overview", icon: BarChart3 },
+	{ to: "/business/overview", key: "overview", icon: BarChart3 },
 	{ to: "/business/appointments", key: "appointments", icon: Calendar },
 	{ to: "/business/services", key: "services", icon: Scissors },
 	{ to: "/business/barbers", key: "barbers", icon: Users },
@@ -45,7 +45,7 @@ function BusinessDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "owner" && user.role !== "admin") navigate({ to: "/" })
+		if (user.role !== "owner" && user.role !== "admin") navigate({ to: "/home" })
 	}, [user, navigate])
 
 	const shopsRaw = useQuery(
