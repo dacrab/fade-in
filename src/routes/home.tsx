@@ -22,8 +22,7 @@ function HomePage() {
 		e.preventDefault()
 		void navigate({
 			to: "/barbershops/listing",
-			// biome-ignore lint/suspicious/noExplicitAny: TanStack Router search params type limitation
-			search: { q: search || undefined, city: city || undefined } as any,
+			search: { q: search || undefined, city: city || undefined },
 		})
 	}
 
