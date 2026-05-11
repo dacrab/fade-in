@@ -1,10 +1,11 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
-import { useMutation, useQuery } from "convex/react"
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { useMutation } from "convex/react"
 import { ArrowLeft, PlusCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
+import { useBusinessAuth } from "#/hooks/useBusinessAuth"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { slugify } from "#/lib/format"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -34,23 +35,14 @@ const EMPTY: ShopForm = {
 
 function BusinessProfile() {
 	const { t } = useTranslation()
-	const { user } = useAuth()
-	const navigate = useNavigate()
-
-	useEffect(() => {
-		if (user && user.role !== "owner" && user.role !== "admin") navigate({ to: "/home" })
-	}, [user, navigate])
+	const { user } = useBusinessAuth()
 
 	const [form, setForm] = useState(EMPTY)
 	const set =
 		(key: keyof ShopForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
 			setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0]
+	const shop = useOwnerShop(user?.id)
 	const [saving, setSaving] = useState(false)
 
 	useEffect(() => {

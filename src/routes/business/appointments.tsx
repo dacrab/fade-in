@@ -1,11 +1,12 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Calendar, Check, Clock, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
+import { useBusinessAuth } from "#/hooks/useBusinessAuth"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment, AppointmentStatus } from "#/types"
 import { STATUS_BADGE } from "#/types"
@@ -16,21 +17,10 @@ export const Route = createFileRoute("/business/appointments")({ component: Busi
 
 function BusinessAppointments() {
 	const { t } = useTranslation()
-	const { user, loading } = useAuth()
-	const router = useRouter()
+	const { user } = useBusinessAuth()
 	const [selectedDate, setSelectedDate] = useState("")
 
-	useEffect(() => {
-		if (!(loading || (user && ["owner", "admin"].includes(user.role)))) {
-			void router.navigate({ to: "/home" })
-		}
-	}, [user, loading, router])
-
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0]
+	const shop = useOwnerShop(user?.id)
 	const appointments = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip",

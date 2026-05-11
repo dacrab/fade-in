@@ -1,11 +1,12 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Scissors, Trash2, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
+import { useBusinessAuth } from "#/hooks/useBusinessAuth"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import type { Barber } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -21,24 +22,13 @@ const EMPTY: BarberForm = { name: "", bio: "", specializations: "" }
 
 function BusinessBarbers() {
 	const { t } = useTranslation()
-	const { user, loading } = useAuth()
-	const router = useRouter()
-
-	useEffect(() => {
-		if (!(loading || (user && ["owner", "admin"].includes(user.role)))) {
-			void router.navigate({ to: "/home" })
-		}
-	}, [user, loading, router])
+	const { user } = useBusinessAuth()
 
 	const [form, setForm] = useState<BarberForm>(EMPTY)
 	const [showForm, setShowForm] = useState(false)
 	const [editId, setEditId] = useState<string | null>(null)
 
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0]
+	const shop = useOwnerShop(user?.id)
 	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip") as
 		| Barber[]
 		| undefined
