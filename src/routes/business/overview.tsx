@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import {
 	BarChart3,
@@ -14,16 +14,15 @@ import {
 	TrendingUp,
 	Users,
 } from "lucide-react"
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
-import { useAuth } from "#/hooks/useAuth"
+import { useBusinessAuth } from "#/hooks/useBusinessAuth"
+import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop, Review } from "#/types"
 import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/overview")({ component: BusinessDashboard })
 
@@ -40,19 +39,9 @@ const NAV_LINK_DEFS = [
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: business dashboard has multiple data sources
 function BusinessDashboard() {
 	const { t } = useTranslation()
-	const { user } = useAuth()
-	const navigate = useNavigate()
+	const { user } = useBusinessAuth()
 
-	useEffect(() => {
-		if (!user) return
-		if (user.role !== "owner" && user.role !== "admin") navigate({ to: "/home" })
-	}, [user, navigate])
-
-	const shopsRaw = useQuery(
-		api.barbershops.listByOwner,
-		user ? { ownerId: user.id as Id<"users"> } : "skip",
-	)
-	const shop = shopsRaw?.[0] as Barbershop | undefined
+	const shop = useOwnerShop(user?.id) as Barbershop | undefined
 
 	const todayStr = new Date().toISOString().slice(0, 10)
 	const thisMonthStr = new Date().toISOString().slice(0, 7) // YYYY-MM
