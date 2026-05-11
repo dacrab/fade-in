@@ -23,14 +23,8 @@ function BarberDashboard() {
 		if (user.role !== "barber" && user.role !== "admin") navigate({ to: "/home" })
 	}, [user, navigate])
 
-	// Get barber profile for current user
-	const barbers = useQuery(api.barbers.listByShop, "skip") // Need to get barber by userId
-	const barber = barbers?.[0] // Simplified - assumes one barber per user
-
-	const appointments = useQuery(
-		api.appointments.listByBarber,
-		barber ? { barberId: barber._id, date: selectedDate } : "skip",
-	) as Appointment[] | undefined
+	// TODO: Add barbers.getByUserId query to resolve current user's barber profile
+	const appointments = useQuery(api.appointments.listByBarber, "skip") as Appointment[] | undefined
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
 

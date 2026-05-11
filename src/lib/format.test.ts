@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { capitalizeFirst, formatDateShort, formatPrice, formatTime, slugify } from "./format"
+import { capitalizeFirst, formatDateShort, formatPrice, slugify } from "./format"
 
 describe("formatPrice", () => {
 	it("formats 100 cents as €1.00", () => {
@@ -29,40 +29,6 @@ describe("formatPrice", () => {
 	it("always produces two decimal places", () => {
 		const result = formatPrice(200)
 		expect(result).toMatch(/^€\d+\.\d{2}$/)
-	})
-})
-
-describe("formatTime", () => {
-	it("converts midnight 00:00 → 12:00 AM", () => {
-		expect(formatTime("00:00")).toBe("12:00 AM")
-	})
-
-	it("converts 01:00 → 1:00 AM", () => {
-		expect(formatTime("01:00")).toBe("1:00 AM")
-	})
-
-	it("converts 09:30 → 9:30 AM", () => {
-		expect(formatTime("09:30")).toBe("9:30 AM")
-	})
-
-	it("converts 11:59 → 11:59 AM", () => {
-		expect(formatTime("11:59")).toBe("11:59 AM")
-	})
-
-	it("converts noon 12:00 → 12:00 PM", () => {
-		expect(formatTime("12:00")).toBe("12:00 PM")
-	})
-
-	it("converts 12:01 → 12:01 PM", () => {
-		expect(formatTime("12:01")).toBe("12:01 PM")
-	})
-
-	it("converts 14:45 → 2:45 PM", () => {
-		expect(formatTime("14:45")).toBe("2:45 PM")
-	})
-
-	it("converts 23:59 → 11:59 PM", () => {
-		expect(formatTime("23:59")).toBe("11:59 PM")
 	})
 })
 

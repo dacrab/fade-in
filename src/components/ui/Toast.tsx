@@ -12,7 +12,7 @@ interface Toast {
 let toastId = 0
 let globalSetToasts: React.Dispatch<React.SetStateAction<Toast[]>> | null = null
 
-export function showToast(message: string, type: ToastType = "info"): void {
+export function showToast(message: string, type: ToastType = "info") {
 	if (globalSetToasts) {
 		const id = ++toastId
 		globalSetToasts((prev) => [...prev, { id, type, message }])

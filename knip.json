@@ -1,0 +1,28 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"entry": [
+		"src/routes/**/*.{ts,tsx}",
+		"src/router.tsx",
+		"src/routes/__root.tsx",
+		"src/integrations/convex/provider.tsx",
+		"src/i18n/index.ts",
+		"convex/**/*.ts"
+	],
+	"project": ["src/**/*.{ts,tsx}", "convex/**/*.ts"],
+	"ignore": ["convex/_generated/**"],
+	"ignoreDependencies": [
+		"@tanstack/router-plugin",
+		"@tanstack/react-router-devtools",
+		"@tanstack/react-devtools",
+		"@tanstack/devtools-event-client",
+		"@tanstack/react-router-ssr-query",
+		"@convex-dev/react-query",
+		"tailwindcss",
+		"@tailwindcss/typography",
+		"@testing-library/dom",
+		"@testing-library/react",
+		"@testing-library/user-event",
+		"react-leaflet"
+	],
+	"ignoreExportsUsedInFile": true
+}

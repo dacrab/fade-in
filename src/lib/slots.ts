@@ -1,4 +1,4 @@
-export interface ExistingAppt {
+interface ExistingAppt {
 	startTime: string
 	endTime: string
 }

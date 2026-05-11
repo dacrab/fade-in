@@ -77,10 +77,14 @@ export default function BookingModal({ shop, onClose }: Props) {
 	const services = useQuery(api.services.listByShop, { barbershopId: shop._id })
 	const barbers = useQuery(api.barbers.listByShop, { barbershopId: shop._id })
 
+	const selectedServiceDocs =
+		services?.filter((s: Doc<"services">) => state.selectedServices.includes(s._id)) ?? []
 	const totalDuration =
-		services
-			?.filter((s: Doc<"services">) => state.selectedServices.includes(s._id))
-			.reduce((acc: number, s: Doc<"services">) => acc + s.durationMinutes, 0) ?? 30
+		selectedServiceDocs.reduce((acc: number, s: Doc<"services">) => acc + s.durationMinutes, 0) || 30
+	const totalPrice = selectedServiceDocs.reduce(
+		(acc: number, s: Doc<"services">) => acc + s.price,
+		0,
+	)
 
 	const slots = useQuery(
 		api.appointments.getAvailableSlots,
@@ -93,11 +97,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 				}
 			: "skip",
 	)
-
-	const totalPrice =
-		services
-			?.filter((s: Doc<"services">) => state.selectedServices.includes(s._id))
-			.reduce((acc: number, s: Doc<"services">) => acc + s.price, 0) ?? 0
 
 	const createAppointment = useMutation(api.appointments.create)
 
@@ -145,8 +144,6 @@ export default function BookingModal({ shop, onClose }: Props) {
 		(state.step === 3 && state.selectedDate !== "" && state.selectedSlot !== "") ||
 		state.step === 4
 
-	const selectedServiceDocs =
-		services?.filter((s: Doc<"services">) => state.selectedServices.includes(s._id)) ?? []
 	const selectedBarberDoc = barbers?.find((b: Doc<"barbers">) => b._id === state.selectedBarber)
 
 	const summaryRows: [string, string][] = [

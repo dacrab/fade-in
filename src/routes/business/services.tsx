@@ -29,7 +29,6 @@ const EMPTY_FORM: ServiceForm = {
 	category: "haircut",
 }
 const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other"] as const
-type Category = (typeof CATEGORIES)[number]
 
 function BusinessServices() {
 	const { t } = useTranslation()
@@ -215,7 +214,7 @@ function BusinessServices() {
 									value={form.category}
 									onChange={set("category")}
 								>
-									{CATEGORIES.map((c: Category) => (
+									{CATEGORIES.map((c) => (
 										<option key={c} value={c}>
 											{t(`business.services.categories.${c}`)}
 										</option>

@@ -2,7 +2,7 @@ import { Eye, EyeOff } from "lucide-react"
 import type { InputHTMLAttributes } from "react"
 import { useState } from "react"
 
-interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {}
+type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "type">
 
 export default function PasswordInput({ className = "input pr-10", ...props }: Props) {
 	const [show, setShow] = useState(false)

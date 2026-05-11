@@ -9,19 +9,7 @@ interface StarRatingProps {
 	onRate?: (rating: number) => void
 }
 
-// Pre-generated stable keys for stars (up to 10 stars)
-const STAR_KEYS = [
-	"star-a",
-	"star-b",
-	"star-c",
-	"star-d",
-	"star-e",
-	"star-f",
-	"star-g",
-	"star-h",
-	"star-i",
-	"star-j",
-]
+const KEYS = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
 
 export function StarRating({
 	rating,
@@ -30,11 +18,9 @@ export function StarRating({
 	interactive = false,
 	onRate,
 }: StarRatingProps) {
-	const stars = STAR_KEYS.slice(0, max)
-
 	return (
 		<div className="flex items-center gap-0.5">
-			{stars.map((key, i) => (
+			{KEYS.slice(0, max).map((key, i) => (
 				<button
 					key={key}
 					type="button"

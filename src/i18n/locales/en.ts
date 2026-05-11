@@ -492,4 +492,3 @@ const en = {
 } as const
 
 export default en
-export type TranslationKeys = typeof en

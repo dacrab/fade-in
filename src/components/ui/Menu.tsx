@@ -19,7 +19,7 @@ interface MenuItemSeparator extends MenuItemBase {
 	separator: true
 }
 
-export type MenuItem = MenuItemAction | MenuItemSeparator
+type MenuItem = MenuItemAction | MenuItemSeparator
 
 interface MenuProps {
 	trigger: ReactElement

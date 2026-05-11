@@ -1,5 +1,5 @@
 import { MapPin } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import type { Barbershop } from "#/types"
 
@@ -16,6 +16,15 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	const mapRef = useRef<L.Map | null>(null)
 	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const markersRef = useRef<L.Marker[]>([])
+
+	const shopsWithCoords = useMemo(
+		() =>
+			shops.filter(
+				(s): s is Barbershop & { lat: number; lng: number } =>
+					s.lat !== undefined && s.lng !== undefined,
+			),
+		[shops],
+	)
 
 	useEffect(() => {
 		if (!mapContainerRef.current || mapRef.current) return
@@ -60,10 +69,6 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 			for (const m of markersRef.current) m.remove()
 			markersRef.current = []
 
-			const shopsWithCoords = shops.filter(
-				(s): s is Barbershop & { lat: number; lng: number } =>
-					s.lat !== undefined && s.lng !== undefined,
-			)
 			if (shopsWithCoords.length === 0) return
 
 			const goldIcon = L.divIcon({
@@ -96,9 +101,7 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 
 			if (bounds.length > 0) mapRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 })
 		})
-	}, [shops, onShopClick, t])
-
-	const shopsWithCoords = shops.filter((s) => s.lat !== undefined && s.lng !== undefined)
+	}, [shopsWithCoords, onShopClick, t])
 
 	return (
 		<div className="relative rounded-2xl overflow-hidden border border-[var(--border)] h-[500px]">

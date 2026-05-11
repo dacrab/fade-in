@@ -4,7 +4,8 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
-import { type UserRole, useAuth } from "#/hooks/useAuth"
+import { useAuth } from "#/hooks/useAuth"
+import type { UserRole } from "#/types"
 
 export const Route = createFileRoute("/register")({ component: RegisterPage })
 

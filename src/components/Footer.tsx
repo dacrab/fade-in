@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { Globe, Scissors } from "lucide-react"
+import { Scissors } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 const LINK_CLASS = "text-sm text-muted no-underline hover:text-[var(--gold)] transition-colors"
@@ -87,9 +87,6 @@ export default function Footer() {
 					<p className="text-sm text-muted m-0">
 						{t("footer.rights", { year: new Date().getFullYear() })}
 					</p>
-					<span className="text-muted p-2 rounded-lg transition-colors hover:bg-[var(--bg-card)]">
-						<Globe size={18} />
-					</span>
 				</div>
 			</div>
 		</footer>

@@ -68,7 +68,7 @@ export const getFeatured = query({
 export const getBySlug = query({
 	args: { slug: v.string() },
 	handler: async (ctx, args) => {
-		return await ctx.db
+		return ctx.db
 			.query("barbershops")
 			.withIndex("by_slug", (q) => q.eq("slug", args.slug))
 			.first()
@@ -79,7 +79,7 @@ export const getBySlug = query({
 export const getById = query({
 	args: { id: v.id("barbershops") },
 	handler: async (ctx, args) => {
-		return await ctx.db.get(args.id)
+		return ctx.db.get(args.id)
 	},
 })
 
@@ -87,7 +87,7 @@ export const getById = query({
 export const listByOwner = query({
 	args: { ownerId: v.id("users") },
 	handler: async (ctx, args) => {
-		return await ctx.db
+		return ctx.db
 			.query("barbershops")
 			.withIndex("by_owner", (q) => q.eq("ownerId", args.ownerId))
 			.collect()
@@ -112,7 +112,7 @@ export const create = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { images, ...rest } = args
-		return await ctx.db.insert("barbershops", {
+		return ctx.db.insert("barbershops", {
 			...rest,
 			images: images ?? [],
 			rating: 0,
@@ -154,7 +154,7 @@ export const update = mutation({
 			socialLinks,
 			isActive,
 		} = args
-		return await ctx.db.patch(id, {
+		return ctx.db.patch(id, {
 			...(name !== undefined && { name }),
 			...(description !== undefined && { description }),
 			...(phone !== undefined && { phone }),
@@ -174,7 +174,7 @@ export const update = mutation({
 export const verify = mutation({
 	args: { id: v.id("barbershops"), isVerified: v.boolean() },
 	handler: async (ctx, args) => {
-		return await ctx.db.patch(args.id, { isVerified: args.isVerified })
+		return ctx.db.patch(args.id, { isVerified: args.isVerified })
 	},
 })
 
@@ -182,7 +182,7 @@ export const verify = mutation({
 export const suspend = mutation({
 	args: { id: v.id("barbershops"), isActive: v.boolean() },
 	handler: async (ctx, args) => {
-		return await ctx.db.patch(args.id, { isActive: args.isActive })
+		return ctx.db.patch(args.id, { isActive: args.isActive })
 	},
 })
 
@@ -199,6 +199,6 @@ export const listByIds = query({
 export const listAll = query({
 	args: {},
 	handler: async (ctx) => {
-		return await ctx.db.query("barbershops").collect()
+		return ctx.db.query("barbershops").collect()
 	},
 })

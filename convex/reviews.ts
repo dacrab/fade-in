@@ -4,7 +4,7 @@ import { mutation, query } from "./_generated/server"
 export const listByShop = query({
 	args: { barbershopId: v.id("barbershops") },
 	handler: async (ctx, args) => {
-		return await ctx.db
+		return ctx.db
 			.query("reviews")
 			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
 			.order("desc")
@@ -46,6 +46,6 @@ export const addOwnerReply = mutation({
 		ownerReply: v.string(),
 	},
 	handler: async (ctx, args) => {
-		return await ctx.db.patch(args.id, { ownerReply: args.ownerReply })
+		return ctx.db.patch(args.id, { ownerReply: args.ownerReply })
 	},
 })

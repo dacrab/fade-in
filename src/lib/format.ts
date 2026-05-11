@@ -12,12 +12,6 @@ export function formatDateShort(dateStr: string): string {
 	return format(parseISO(dateStr), "d MMM yyyy")
 }
 
-export function formatTime(timeStr: string): string {
-	const [h, m] = timeStr.split(":")
-	const hour = parseInt(h, 10)
-	return `${hour % 12 || 12}:${m} ${hour >= 12 ? "PM" : "AM"}`
-}
-
 export function formatRelative(timestamp: number): string {
 	return formatDistanceToNow(new Date(timestamp), { addSuffix: true })
 }

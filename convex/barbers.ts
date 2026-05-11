@@ -5,7 +5,7 @@ import { workingHoursValidator } from "./validators"
 export const listByShop = query({
 	args: { barbershopId: v.id("barbershops") },
 	handler: async (ctx, args) => {
-		return await ctx.db
+		return ctx.db
 			.query("barbers")
 			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
 			.filter((q) => q.eq(q.field("isActive"), true))
@@ -24,7 +24,7 @@ export const create = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { specializations, ...rest } = args
-		return await ctx.db.insert("barbers", {
+		return ctx.db.insert("barbers", {
 			...rest,
 			specializations: specializations ?? [],
 			isActive: true,
@@ -44,7 +44,7 @@ export const update = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { id, name, bio, specializations, avatarUrl, workingHours, isActive } = args
-		return await ctx.db.patch(id, {
+		return ctx.db.patch(id, {
 			...(name !== undefined && { name }),
 			...(bio !== undefined && { bio }),
 			...(specializations !== undefined && { specializations }),
@@ -58,6 +58,6 @@ export const update = mutation({
 export const remove = mutation({
 	args: { id: v.id("barbers") },
 	handler: async (ctx, args) => {
-		return await ctx.db.patch(args.id, { isActive: false })
+		return ctx.db.patch(args.id, { isActive: false })
 	},
 })
