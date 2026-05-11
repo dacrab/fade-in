@@ -1,9 +1,6 @@
 name: Sync Lockfile
 
 on:
-  push:
-    branches: [master]
-    paths: ["package.json"]
   pull_request:
     paths: ["package.json"]
 
@@ -12,34 +9,22 @@ permissions:
 
 jobs:
   sync:
-    # Run on Dependabot PRs, or on direct pushes to master that touch package.json
-    if: >
-      (github.event_name == 'pull_request' &&
-       github.event.pull_request.user.login == 'dependabot[bot]' &&
-       github.event.pull_request.state == 'open') ||
-      github.event_name == 'push'
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
         with:
-          # For PRs use the branch head; for pushes use the default ref
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+          ref: ${{ github.head_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        run: bun install
+      - run: bun install
 
-      - name: Commit updated lockfile
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add bun.lock
-          if git diff --staged --quiet; then
-            echo "No lockfile changes, skipping commit"
-            exit 0
-          fi
-          git commit -m "chore: sync bun.lock"
-          git push --force-with-lease
+      - uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: sync bun.lock"
+          file_pattern: bun.lock
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
