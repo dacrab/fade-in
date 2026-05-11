@@ -87,7 +87,7 @@ function BusinessReviews() {
 					</div>
 				) : (
 					<div className="space-y-4">
-						{reviews.map((r: Review) => (
+						{reviews.map((r) => (
 							<div key={r._id} className="card p-5">
 								<div className="flex items-center justify-between mb-2">
 									<StarRating rating={r.rating} size={16} />

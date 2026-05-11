@@ -193,7 +193,7 @@ function BusinessBarbers() {
 					</div>
 				) : (
 					<div className="space-y-3">
-						{barbers.map((b: Barber) => (
+						{barbers.map((b) => (
 							<div key={b._id} className="card p-4 flex items-center gap-4">
 								<div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
 									{b.name.charAt(0)}

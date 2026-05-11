@@ -34,7 +34,7 @@ export const create = mutation({
 		notes: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
-		return await ctx.db.insert("appointments", {
+		return ctx.db.insert("appointments", {
 			...args,
 			status: "pending",
 			createdAt: Date.now(),
@@ -54,7 +54,7 @@ export const updateStatus = mutation({
 		),
 	},
 	handler: async (ctx, args) => {
-		return await ctx.db.patch(args.id, { status: args.status })
+		return ctx.db.patch(args.id, { status: args.status })
 	},
 })
 
@@ -62,7 +62,7 @@ export const updateStatus = mutation({
 export const listByCustomer = query({
 	args: { customerId: v.id("users") },
 	handler: async (ctx, args) => {
-		return await ctx.db
+		return ctx.db
 			.query("appointments")
 			.withIndex("by_customer", (q) => q.eq("customerId", args.customerId))
 			.order("desc")

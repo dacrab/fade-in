@@ -1,9 +1,7 @@
 import { useAuthActions } from "@convex-dev/auth/react"
 import { useQuery } from "convex/react"
-import type { AuthUser, UserRole } from "#/types"
+import type { UserRole } from "#/types"
 import { api } from "../../convex/_generated/api"
-
-export type { AuthUser, UserRole }
 
 /**
  * Provides the current authenticated user and auth actions.

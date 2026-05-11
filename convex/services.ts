@@ -4,7 +4,7 @@ import { mutation, query } from "./_generated/server"
 export const listByShop = query({
 	args: { barbershopId: v.id("barbershops") },
 	handler: async (ctx, args) => {
-		return await ctx.db
+		return ctx.db
 			.query("services")
 			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
 			.filter((q) => q.eq(q.field("isActive"), true))
@@ -22,7 +22,7 @@ export const create = mutation({
 		category: v.string(),
 	},
 	handler: async (ctx, args) => {
-		return await ctx.db.insert("services", {
+		return ctx.db.insert("services", {
 			...args,
 			isActive: true,
 		})
@@ -41,7 +41,7 @@ export const update = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { id, name, description, price, durationMinutes, category, isActive } = args
-		return await ctx.db.patch(id, {
+		return ctx.db.patch(id, {
 			...(name !== undefined && { name }),
 			...(description !== undefined && { description }),
 			...(price !== undefined && { price }),
@@ -55,6 +55,6 @@ export const update = mutation({
 export const remove = mutation({
 	args: { id: v.id("services") },
 	handler: async (ctx, args) => {
-		return await ctx.db.patch(args.id, { isActive: false })
+		return ctx.db.patch(args.id, { isActive: false })
 	},
 })

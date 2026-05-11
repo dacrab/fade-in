@@ -34,7 +34,6 @@ void i18n.use(initReactI18next).init({
 	interpolation: {
 		escapeValue: false, // React already escapes
 	},
-	returnNull: false,
 })
 
 export function setLanguage(lang: Language): void {

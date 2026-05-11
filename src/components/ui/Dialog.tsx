@@ -60,11 +60,3 @@ export function DialogDescription({
 		</BaseDialog.Description>
 	)
 }
-
-export function DialogClose({ children, className }: { children: ReactNode; className?: string }) {
-	return (
-		<BaseDialog.Close className={cn("icon-btn bg-transparent border-0", className)}>
-			{children}
-		</BaseDialog.Close>
-	)
-}
