@@ -1,4 +1,5 @@
-import { v } from "convex/values"
+import { getAuthUserId } from "@convex-dev/auth/server"
+import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { workingHoursValidator } from "./validators"
 
@@ -23,6 +24,12 @@ export const create = mutation({
 		workingHours: workingHoursValidator,
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const shop = await ctx.db.get(args.barbershopId)
+		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+
 		const { specializations, ...rest } = args
 		return ctx.db.insert("barbers", {
 			...rest,
@@ -43,6 +50,15 @@ export const update = mutation({
 		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const barber = await ctx.db.get(args.id)
+		if (!barber) throw new ConvexError("Not found")
+
+		const shop = await ctx.db.get(barber.barbershopId)
+		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+
 		const { id, name, bio, specializations, avatarUrl, workingHours, isActive } = args
 		return ctx.db.patch(id, {
 			...(name !== undefined && { name }),
@@ -58,6 +74,15 @@ export const update = mutation({
 export const remove = mutation({
 	args: { id: v.id("barbers") },
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const barber = await ctx.db.get(args.id)
+		if (!barber) throw new ConvexError("Not found")
+
+		const shop = await ctx.db.get(barber.barbershopId)
+		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+
 		return ctx.db.patch(args.id, { isActive: false })
 	},
 })
