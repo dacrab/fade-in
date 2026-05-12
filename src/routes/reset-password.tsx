@@ -81,10 +81,7 @@ function ResetPasswordPage() {
 
 					<div className="mt-6 text-center text-sm text-[var(--text-muted)]">
 						Remember your password?{" "}
-						<Link
-							to="/login"
-							className="text-[var(--gold)] hover:underline no-underline font-semibold"
-						>
+						<Link to="/login" className="text-[var(--gold)] hover:underline no-underline font-semibold">
 							Sign in
 						</Link>
 					</div>
