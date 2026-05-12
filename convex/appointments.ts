@@ -1,4 +1,5 @@
-import { v } from "convex/values"
+import { getAuthUserId } from "@convex-dev/auth/server"
+import { ConvexError, v } from "convex/values"
 import { generateSlots } from "../src/lib/slots"
 import { mutation, query } from "./_generated/server"
 
@@ -34,6 +35,9 @@ export const create = mutation({
 		notes: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
 		return ctx.db.insert("appointments", {
 			...args,
 			status: "pending",
@@ -54,6 +58,9 @@ export const updateStatus = mutation({
 		),
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
 		return ctx.db.patch(args.id, { status: args.status })
 	},
 })

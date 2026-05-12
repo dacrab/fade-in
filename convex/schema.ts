@@ -12,6 +12,7 @@ export default defineSchema({
 		role: v.union(v.literal("customer"), v.literal("owner"), v.literal("barber"), v.literal("admin")),
 		avatarUrl: v.optional(v.string()),
 		favoriteShopIds: v.array(v.id("barbershops")),
+		emailVerified: v.optional(v.boolean()),
 	}).index("by_email", ["email"]),
 
 	barbershops: defineTable({

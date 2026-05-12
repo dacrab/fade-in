@@ -1,49 +1,47 @@
-import { v } from "convex/values"
+import { getAuthUserId } from "@convex-dev/auth/server"
+import { paginationOptsValidator } from "convex/server"
+import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { socialLinksValidator, workingHoursValidator } from "./validators"
 
-/** Lists active barbershops with optional city, search, minRating, isVerified filters.
- * city is filtered via the by_city index; minRating and isVerified are applied as
- * range/equality filters on the index scan. Free-text search stays in-memory since
- * Convex's search indexes require a separate schema declaration. */
+/** Lists active barbershops with optional city, search, minRating, isVerified filters. */
 export const list = query({
 	args: {
 		city: v.optional(v.string()),
 		search: v.optional(v.string()),
 		minRating: v.optional(v.number()),
 		isVerified: v.optional(v.boolean()),
+		paginationOpts: paginationOptsValidator,
 	},
 	handler: async (ctx, args) => {
-		// Use city index when a city filter is provided, otherwise use the active index.
-		const shops = args.city
-			? await ctx.db
+		const baseQuery = args.city
+			? ctx.db
 					.query("barbershops")
 					.withIndex("by_city", (q) => q.eq("city", args.city as string))
 					.filter((q) => q.eq(q.field("isActive"), true))
-					.collect()
-			: await ctx.db
-					.query("barbershops")
-					.withIndex("by_active", (q) => q.eq("isActive", true))
-					.collect()
+			: ctx.db.query("barbershops").withIndex("by_active", (q) => q.eq("isActive", true))
 
-		// Apply remaining filters in a single pass.
-		// Free-text search (name/city/address) stays in-memory — no full-text index.
-		return shops.filter((s) => {
-			if (args.isVerified !== undefined && s.isVerified !== args.isVerified) return false
-			if (args.minRating !== undefined && s.rating < args.minRating) return false
-			if (args.search) {
-				const term = args.search.toLowerCase()
-				if (
-					!(
-						s.name.toLowerCase().includes(term) ||
-						s.city.toLowerCase().includes(term) ||
-						s.address.toLowerCase().includes(term)
+		const result = await baseQuery.paginate(args.paginationOpts)
+
+		return {
+			...result,
+			page: result.page.filter((s) => {
+				if (args.isVerified !== undefined && s.isVerified !== args.isVerified) return false
+				if (args.minRating !== undefined && s.rating < args.minRating) return false
+				if (args.search) {
+					const term = args.search.toLowerCase()
+					if (
+						!(
+							s.name.toLowerCase().includes(term) ||
+							s.city.toLowerCase().includes(term) ||
+							s.address.toLowerCase().includes(term)
+						)
 					)
-				)
-					return false
-			}
-			return true
-		})
+						return false
+				}
+				return true
+			}),
+		}
 	},
 })
 
@@ -52,8 +50,6 @@ export const getFeatured = query({
 	args: { limit: v.optional(v.number()) },
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 6
-		// Filter verified in-memory after the index scan; Convex doesn't support
-		// multi-field compound indexes on isActive+isVerified+rating in one pass.
 		const shops = await ctx.db
 			.query("barbershops")
 			.withIndex("by_active", (q) => q.eq("isActive", true))
@@ -94,7 +90,7 @@ export const listByOwner = query({
 	},
 })
 
-/** Creates a new barbershop. Sets initial rating=0, reviewCount=0, isVerified=false, isActive=true. */
+/** Creates a new barbershop. */
 export const create = mutation({
 	args: {
 		name: v.string(),
@@ -111,6 +107,9 @@ export const create = mutation({
 		socialLinks: socialLinksValidator,
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
 		const { images, ...rest } = args
 		return ctx.db.insert("barbershops", {
 			...rest,
@@ -140,6 +139,12 @@ export const update = mutation({
 		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const shop = await ctx.db.get(args.id)
+		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+
 		const {
 			id,
 			name,
@@ -174,6 +179,12 @@ export const update = mutation({
 export const verify = mutation({
 	args: { id: v.id("barbershops"), isVerified: v.boolean() },
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const user = await ctx.db.get(userId)
+		if (!user || user.role !== "admin") throw new ConvexError("Not authorized")
+
 		return ctx.db.patch(args.id, { isVerified: args.isVerified })
 	},
 })
@@ -182,7 +193,27 @@ export const verify = mutation({
 export const suspend = mutation({
 	args: { id: v.id("barbershops"), isActive: v.boolean() },
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const user = await ctx.db.get(userId)
+		if (!user || user.role !== "admin") throw new ConvexError("Not authorized")
+
 		return ctx.db.patch(args.id, { isActive: args.isActive })
+	},
+})
+
+/** Updates a shop's images with Convex storage IDs. */
+export const updateImages = mutation({
+	args: { id: v.id("barbershops"), images: v.array(v.string()) },
+	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const shop = await ctx.db.get(args.id)
+		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+
+		await ctx.db.patch(args.id, { images: args.images })
 	},
 })
 

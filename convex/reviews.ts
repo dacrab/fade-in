@@ -1,14 +1,19 @@
-import { v } from "convex/values"
+import { getAuthUserId } from "@convex-dev/auth/server"
+import { paginationOptsValidator } from "convex/server"
+import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 
 export const listByShop = query({
-	args: { barbershopId: v.id("barbershops") },
+	args: {
+		barbershopId: v.id("barbershops"),
+		paginationOpts: paginationOptsValidator,
+	},
 	handler: async (ctx, args) => {
 		return ctx.db
 			.query("reviews")
 			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
 			.order("desc")
-			.collect()
+			.paginate(args.paginationOpts)
 	},
 })
 
@@ -21,13 +26,14 @@ export const create = mutation({
 		comment: v.string(),
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
 		const reviewId = await ctx.db.insert("reviews", {
 			...args,
 			createdAt: Date.now(),
 		})
 
-		// Incrementally update the shop's rating using the existing denormalized
-		// rating and reviewCount — no need to re-fetch all reviews.
 		const shop = await ctx.db.get(args.barbershopId)
 		if (shop) {
 			const newCount = shop.reviewCount + 1
@@ -46,6 +52,15 @@ export const addOwnerReply = mutation({
 		ownerReply: v.string(),
 	},
 	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const review = await ctx.db.get(args.id)
+		if (!review) throw new ConvexError("Not found")
+
+		const shop = await ctx.db.get(review.barbershopId)
+		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+
 		return ctx.db.patch(args.id, { ownerReply: args.ownerReply })
 	},
 })
