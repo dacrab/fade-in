@@ -62,9 +62,10 @@ export const toggleFavorite = mutation({
 
 		const favorites = user.favoriteShopIds ?? []
 		const index = favorites.indexOf(args.barbershopId)
-		const updated = index === -1
-			? [...favorites, args.barbershopId]
-			: favorites.filter((id) => id !== args.barbershopId)
+		const updated =
+			index === -1
+				? [...favorites, args.barbershopId]
+				: favorites.filter((id) => id !== args.barbershopId)
 
 		await ctx.db.patch(userId, { favoriteShopIds: updated })
 		return index === -1
@@ -81,9 +82,7 @@ export const getFavorites = query({
 		const user = await ctx.db.get(userId)
 		if (!user) return []
 
-		const shops = await Promise.all(
-			(user.favoriteShopIds ?? []).map((id) => ctx.db.get(id)),
-		)
+		const shops = await Promise.all((user.favoriteShopIds ?? []).map((id) => ctx.db.get(id)))
 		return shops.filter(Boolean)
 	},
 })
