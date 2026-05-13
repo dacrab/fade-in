@@ -29,7 +29,6 @@ import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProfilePage })
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: shop profile displays multiple data sections
 function ShopProfilePage() {
 	const { t } = useTranslation()
 	const { slug } = Route.useParams()
@@ -156,8 +155,7 @@ function ShopProfilePage() {
 							<h2 className="text-xl font-bold text-(--text) mb-5 tracking-tight">{t("shop.services")}</h2>
 							{!services ? (
 								<div className="space-y-3">
-									{Array.from({ length: 3 }).map((_, i) => (
-										// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+									{[0, 1, 2].map((i) => (
 										<Skeleton key={i} className="h-14 w-full rounded-xl" />
 									))}
 								</div>
@@ -199,8 +197,7 @@ function ShopProfilePage() {
 							</h2>
 							{!barbers ? (
 								<div className="flex gap-4">
-									{Array.from({ length: 3 }).map((_, i) => (
-										// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+									{[0, 1, 2].map((i) => (
 										<Skeleton key={i} className="h-24 w-24 rounded-2xl flex-shrink-0" />
 									))}
 								</div>
@@ -242,8 +239,7 @@ function ShopProfilePage() {
 							</div>
 							{!reviews ? (
 								<div className="space-y-4">
-									{Array.from({ length: 3 }).map((_, i) => (
-										// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+									{[0, 1, 2].map((i) => (
 										<Skeleton key={i} className="h-20 w-full rounded-xl" />
 									))}
 								</div>

@@ -2,24 +2,17 @@ import { Menu as BaseMenu } from "@base-ui/react/menu"
 import type { ReactElement, ReactNode } from "react"
 import { cn } from "#/lib/cn"
 
-interface MenuItemBase {
-	id: string
-	disabled?: boolean
-}
-
-interface MenuItemAction extends MenuItemBase {
-	separator?: false
-	label: ReactNode
-	onClick?: () => void
-	danger?: boolean
-	icon?: ReactNode
-}
-
-interface MenuItemSeparator extends MenuItemBase {
-	separator: true
-}
-
-type MenuItem = MenuItemAction | MenuItemSeparator
+type MenuItem =
+	| { id: string; separator: true; disabled?: boolean }
+	| {
+			id: string
+			separator?: false
+			label: ReactNode
+			onClick?: () => void
+			danger?: boolean
+			icon?: ReactNode
+			disabled?: boolean
+	  }
 
 interface MenuProps {
 	trigger: ReactElement

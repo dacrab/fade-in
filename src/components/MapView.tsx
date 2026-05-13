@@ -57,12 +57,10 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 				mapRef.current = null
 			}
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	useEffect(() => {
 		if (!mapRef.current) return
-		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: inline marker placement logic
 		import("leaflet").then((L) => {
 			if (!mapRef.current) return
 
@@ -72,7 +70,8 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 			if (shopsWithCoords.length === 0) return
 
 			const goldIcon = L.divIcon({
-				html: `<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,var(--gold),#A63D28);transform:rotate(-45deg);border:2px solid #FAF7F2;box-shadow:0 4px 12px rgba(200,75,49,0.4);display:flex;align-items:center;justify-content:center;"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' style='transform:rotate(45deg)'><circle cx='6' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><line x1='20' y1='4' x2='8.12' y2='15.88'/><line x1='14.47' y1='14.48' x2='20' y2='20'/><line x1='8.12' y1='8.12' x2='12' y2='12'/></svg></div>`,
+				html:
+					'<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,var(--gold),#A63D28);transform:rotate(-45deg);border:2px solid #FAF7F2;box-shadow:0 4px 12px rgba(200,75,49,0.4);display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(45deg)"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></div>',
 				className: "",
 				iconSize: [32, 32],
 				iconAnchor: [16, 32],

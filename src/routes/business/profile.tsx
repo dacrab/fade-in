@@ -8,7 +8,6 @@ import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { slugify } from "#/lib/format"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/profile")({ component: BusinessProfile })
 
@@ -32,6 +31,8 @@ const EMPTY: ShopForm = {
 	facebook: "",
 	website: "",
 }
+const INPUT =
+	"w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 
 function BusinessProfile() {
 	const { t } = useTranslation()
@@ -88,7 +89,6 @@ function BusinessProfile() {
 				await createShop({
 					name: form.name,
 					slug: slugify(form.name),
-					ownerId: user.id as Id<"users">,
 					description: form.description || undefined,
 					phone: form.phone || undefined,
 					address: form.address,
@@ -126,7 +126,7 @@ function BusinessProfile() {
 								{t("form.nameStar")}
 							</label>
 							<input
-								className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+								className={INPUT}
 								placeholder={t("business.profile.namePlaceholder")}
 								value={form.name}
 								onChange={set("name")}
@@ -144,7 +144,7 @@ function BusinessProfile() {
 							</label>
 							<textarea
 								id="shop-desc"
-								className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
+								className={`${INPUT} resize-none`}
 								rows={3}
 								placeholder={t("business.profile.descPlaceholder")}
 								value={form.description}
@@ -157,7 +157,7 @@ function BusinessProfile() {
 									{t("form.phoneLabel")}
 								</label>
 								<input
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className={INPUT}
 									placeholder={t("business.profile.phonePlaceholder")}
 									value={form.phone}
 									onChange={set("phone")}
@@ -169,7 +169,7 @@ function BusinessProfile() {
 									{t("form.cityStar")}
 								</label>
 								<input
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className={INPUT}
 									placeholder={t("form.cityPlaceholder")}
 									value={form.city}
 									onChange={set("city")}
@@ -182,7 +182,7 @@ function BusinessProfile() {
 								{t("form.addressStar")}
 							</label>
 							<input
-								className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+								className={INPUT}
 								placeholder={t("business.profile.addressPlaceholder")}
 								value={form.address}
 								onChange={set("address")}
@@ -203,7 +203,7 @@ function BusinessProfile() {
 								</label>
 								<input
 									id={`social-${key}`}
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className={INPUT}
 									placeholder="https://..."
 									value={form[key]}
 									onChange={set(key)}

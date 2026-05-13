@@ -80,6 +80,7 @@ export default defineSchema({
 	})
 		.index("by_customer", ["customerId"])
 		.index("by_shop", ["barbershopId"])
+		.index("by_shop_date", ["barbershopId", "date"])
 		.index("by_barber", ["barberId"]),
 
 	reviews: defineTable({

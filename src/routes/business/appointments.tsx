@@ -14,6 +14,13 @@ import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/appointments")({ component: BusinessAppointments })
 
+const STATUS_COLOR: Record<AppointmentStatus, string> = {
+	confirmed: "bg-emerald-500",
+	completed: "bg-(--text-subtle)",
+	cancelled: "bg-red-400",
+	pending: "bg-amber-400",
+}
+
 function BusinessAppointments() {
 	const { t } = useTranslation()
 	const { user } = useBusinessAuth()
@@ -44,7 +51,6 @@ function BusinessAppointments() {
 			</h1>
 
 			<div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-				{/* Calendar */}
 				<div>
 					<MiniCalendar selected={selectedDate} onSelect={setSelectedDate} />
 					{selectedDate && (
@@ -58,9 +64,7 @@ function BusinessAppointments() {
 					)}
 				</div>
 
-				{/* Appointments list */}
 				<div>
-					{/* Quick stats for selected day */}
 					{appointments && appointments.length > 0 && (
 						<div className="flex gap-4 mb-4 text-xs text-(--text-muted)">
 							<span>{appointments.length} total</span>
@@ -76,8 +80,7 @@ function BusinessAppointments() {
 
 					{!appointments ? (
 						<div className="space-y-3">
-							{Array.from({ length: 5 }, (_, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+							{[0, 1, 2, 3, 4].map((i) => (
 								<Skeleton key={i} className="h-14 w-full" />
 							))}
 						</div>
@@ -88,7 +91,7 @@ function BusinessAppointments() {
 						</div>
 					) : (
 						<div className="divide-y divide-(--border)">
-							{appointments
+							{[...appointments]
 								.sort((a, b) => a.startTime.localeCompare(b.startTime))
 								.map((appt) => (
 									<div key={appt._id} className="flex items-center gap-4 py-3 group">
@@ -96,7 +99,7 @@ function BusinessAppointments() {
 											<div className="text-sm font-mono font-medium text-(--text)">{appt.startTime}</div>
 											<div className="text-[11px] font-mono text-(--text-subtle)">{appt.endTime}</div>
 										</div>
-										<StatusDot status={appt.status} />
+										<span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLOR[appt.status]}`} />
 										<div className="flex-1 min-w-0">
 											<div className="text-sm text-(--text) truncate">{appt.notes || "—"}</div>
 											<div className="text-xs text-(--text-subtle)">{formatPrice(appt.totalPrice)}</div>
@@ -142,18 +145,6 @@ function BusinessAppointments() {
 	)
 }
 
-function StatusDot({ status }: { status: AppointmentStatus }) {
-	const color =
-		status === "confirmed"
-			? "bg-emerald-500"
-			: status === "completed"
-				? "bg-(--text-subtle)"
-				: status === "cancelled"
-					? "bg-red-400"
-					: "bg-amber-400"
-	return <span className={`w-2 h-2 rounded-full shrink-0 ${color}`} />
-}
-
 function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: string) => void }) {
 	const [viewDate, setViewDate] = useState(() => {
 		const d = selected ? new Date(selected) : new Date()
@@ -161,8 +152,8 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 	})
 
 	const daysInMonth = new Date(viewDate.year, viewDate.month + 1, 0).getDate()
-	const firstDayOfWeek = new Date(viewDate.year, viewDate.month, 1).getDay()
-	const offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1 // Monday start
+	const firstDay = new Date(viewDate.year, viewDate.month, 1).getDay()
+	const offset = firstDay === 0 ? 6 : firstDay - 1
 
 	const today = new Date().toISOString().slice(0, 10)
 	const monthLabel = new Date(viewDate.year, viewDate.month).toLocaleDateString(undefined, {
@@ -170,27 +161,25 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 		year: "numeric",
 	})
 
-	const prev = () => {
-		setViewDate((v) =>
-			v.month === 0 ? { year: v.year - 1, month: 11 } : { ...v, month: v.month - 1 },
-		)
-	}
-	const next = () => {
-		setViewDate((v) =>
-			v.month === 11 ? { year: v.year + 1, month: 0 } : { ...v, month: v.month + 1 },
-		)
-	}
+	const shift = (dir: 1 | -1) =>
+		setViewDate((v) => {
+			const m = v.month + dir
+			return m < 0
+				? { year: v.year - 1, month: 11 }
+				: m > 11
+					? { year: v.year + 1, month: 0 }
+					: { ...v, month: m }
+		})
 
 	const toDateStr = (day: number) =>
 		`${viewDate.year}-${String(viewDate.month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 
 	return (
 		<div className="card p-4">
-			{/* Header */}
 			<div className="flex items-center justify-between mb-3">
 				<button
 					type="button"
-					onClick={prev}
+					onClick={() => shift(-1)}
 					className="p-1 rounded-md hover:bg-(--bg-card-hover) text-(--text-muted) transition-colors"
 				>
 					<ChevronLeft size={16} />
@@ -198,14 +187,13 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 				<span className="text-sm font-medium text-(--text) capitalize">{monthLabel}</span>
 				<button
 					type="button"
-					onClick={next}
+					onClick={() => shift(1)}
 					className="p-1 rounded-md hover:bg-(--bg-card-hover) text-(--text-muted) transition-colors"
 				>
 					<ChevronRight size={16} />
 				</button>
 			</div>
 
-			{/* Day headers */}
 			<div className="grid grid-cols-7 mb-1">
 				{["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d) => (
 					<div key={d} className="text-[10px] text-(--text-subtle) text-center py-1 font-medium">
@@ -214,26 +202,22 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 				))}
 			</div>
 
-			{/* Days grid */}
 			<div className="grid grid-cols-7 gap-0.5">
-				{Array.from({ length: offset }).map((_, i) => (
-					// biome-ignore lint/suspicious/noArrayIndexKey: calendar empty cells have no stable ID
-					<div key={`empty-${i}`} />
+				{Array.from({ length: offset }, (_, i) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: calendar empty cells
+					<div key={i} />
 				))}
 				{Array.from({ length: daysInMonth }, (_, i) => {
 					const day = i + 1
 					const dateStr = toDateStr(day)
 					const isSelected = dateStr === selected
 					const isToday = dateStr === today
-
 					return (
 						<button
 							key={day}
 							type="button"
 							onClick={() => onSelect(dateStr)}
-							className={`w-8 h-8 rounded-md text-xs font-medium transition-colors mx-auto flex items-center justify-center
-								${isSelected ? "bg-(--gold) text-white" : isToday ? "border border-(--gold) text-(--gold)" : "text-(--text-muted) hover:bg-(--bg-card-hover) hover:text-(--text)"}
-							`}
+							className={`w-8 h-8 rounded-md text-xs font-medium transition-colors mx-auto flex items-center justify-center ${isSelected ? "bg-(--gold) text-white" : isToday ? "border border-(--gold) text-(--gold)" : "text-(--text-muted) hover:bg-(--bg-card-hover) hover:text-(--text)"}`}
 						>
 							{day}
 						</button>

@@ -99,7 +99,7 @@ function RootDocument() {
 				</ConvexProvider>
 				<Scripts />
 				<script
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: SW registration
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: SW registration inline script
 					dangerouslySetInnerHTML={{
 						__html: `if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js')); }`,
 					}}

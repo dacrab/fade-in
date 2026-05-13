@@ -239,8 +239,7 @@ function BusinessServices() {
 
 				{services === undefined ? (
 					<div className="space-y-3">
-						{Array.from({ length: 4 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+						{[0, 1, 2, 3].map((i) => (
 							<Skeleton key={i} className="h-14 w-full rounded-lg" />
 						))}
 					</div>

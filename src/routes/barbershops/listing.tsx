@@ -21,7 +21,6 @@ export const Route = createFileRoute("/barbershops/listing")({
 	component: BarbershopsPage,
 })
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: search + filter + view logic is inherently complex
 function BarbershopsPage() {
 	const { t } = useTranslation()
 	const { q, city: cityParam, minRating: minRatingParam } = Route.useSearch()
@@ -184,8 +183,7 @@ function BarbershopsPage() {
 					/>
 				) : shops === undefined ? (
 					<div className="shop-grid">
-						{Array.from({ length: 6 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+						{[0, 1, 2, 3, 4, 5].map((i) => (
 							<ShopCardSkeleton key={i} />
 						))}
 					</div>
