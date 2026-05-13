@@ -14,8 +14,15 @@ export function DialogContent({
 }) {
 	return (
 		<BaseDialog.Portal>
-			<BaseDialog.Backdrop className="dialog-backdrop" />
-			<BaseDialog.Popup className={cn("dialog-popup", className)}>{children}</BaseDialog.Popup>
+			<BaseDialog.Backdrop className="fixed inset-0 bg-black/30 z-50" />
+			<BaseDialog.Popup
+				className={cn(
+					"fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] bg-white rounded-2xl shadow-xl border border-(--border) overflow-hidden",
+					className,
+				)}
+			>
+				{children}
+			</BaseDialog.Popup>
 		</BaseDialog.Portal>
 	)
 }
@@ -28,11 +35,14 @@ export function DialogHeader({
 	onClose?: () => void
 }) {
 	return (
-		<div className="dialog-header">
-			{children}
+		<div className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
+			<div className="space-y-1 flex-1">{children}</div>
 			{onClose && (
-				<BaseDialog.Close className="icon-btn bg-transparent border-0" onClick={onClose}>
-					<X size={18} />
+				<BaseDialog.Close
+					className="rounded-lg p-1.5 text-(--text-subtle) hover:text-(--text-muted) hover:bg-(--bg-input) transition-colors border-0 bg-transparent cursor-pointer"
+					onClick={onClose}
+				>
+					<X size={16} />
 				</BaseDialog.Close>
 			)}
 		</div>
@@ -41,7 +51,7 @@ export function DialogHeader({
 
 export function DialogTitle({ children, className }: { children: ReactNode; className?: string }) {
 	return (
-		<BaseDialog.Title className={cn("font-bold text-[var(--text)]", className)}>
+		<BaseDialog.Title className={cn("font-semibold text-(--text) tracking-tight", className)}>
 			{children}
 		</BaseDialog.Title>
 	)
@@ -55,7 +65,7 @@ export function DialogDescription({
 	className?: string
 }) {
 	return (
-		<BaseDialog.Description className={cn("text-sm text-[var(--text-muted)]", className)}>
+		<BaseDialog.Description className={cn("text-sm text-(--text-muted) leading-relaxed", className)}>
 			{children}
 		</BaseDialog.Description>
 	)

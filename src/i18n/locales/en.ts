@@ -1,17 +1,11 @@
 const en = {
-	// Common
 	common: {
-		loading: "Loading...",
+		loading: "Loading…",
 		save: "Save changes",
 		cancel: "Cancel",
-		confirm: "Confirm",
-		delete: "Delete",
-		edit: "Edit",
-		add: "Add",
 		back: "Back",
 		next: "Next",
 		done: "Done",
-		close: "Close",
 		search: "Search",
 		filter: "Filters",
 		reset: "Reset",
@@ -21,20 +15,15 @@ const en = {
 		signIn: "Sign in",
 		signOut: "Sign out",
 		createAccount: "Create account",
-		or: "or",
+		edit: "Edit",
 		verified: "Verified",
 		active: "Active",
 		suspended: "Suspended",
 		anyRating: "Any",
-
 		at: "at",
 		min: "min",
-		pending: "Pending",
-		characters: "characters",
-		submitting: "Submitting...",
 	},
 
-	// Navigation
 	nav: {
 		home: "Home",
 		barbershops: "Barbershops",
@@ -45,7 +34,6 @@ const en = {
 		admin: "Admin Panel",
 	},
 
-	// Auth
 	auth: {
 		loginTitle: "Welcome back",
 		loginSubtitle: "Sign in to your FadeIn account",
@@ -55,39 +43,44 @@ const en = {
 		emailPlaceholder: "you@example.com",
 		passwordLabel: "Password",
 		passwordPlaceholder: "••••••••",
-		namePlaceholder: "John Doe",
 		nameLabel: "Full name",
+		namePlaceholder: "John Doe",
 		roleCustomer: "Customer",
 		roleOwner: "Shop Owner",
 		noAccount: "Don't have an account?",
 		haveAccount: "Already have an account?",
-
 		agreeTerms: "By signing up you agree to our",
 		terms: "Terms",
 		privacy: "Privacy Policy",
-		signingIn: "Signing in...",
-		creatingAccount: "Creating account...",
+		signingIn: "Signing in…",
+		creatingAccount: "Creating account…",
+		confirmPasswordLabel: "Confirm password",
+		confirmPasswordPlaceholder: "Re-enter your password",
+		strength: {
+			weak: "Weak",
+			fair: "Fair",
+			good: "Good",
+			strong: "Strong",
+		},
 	},
 
-	// Home
 	home: {
 		badge: "The #1 barbershop booking platform",
 		heroTitle: "Look sharp,",
 		heroTitleHighlight: "book fast",
 		heroSubtitle:
 			"Discover top-rated barbershops near you and book your next appointment in seconds.",
-		searchPlaceholder: "Barbershop name or service...",
-		cityPlaceholder: "City...",
+		searchPlaceholder: "Barbershop name or service…",
+		cityPlaceholder: "City…",
 		stats: {
 			shops: "Barbershops",
 			clients: "Happy clients",
 			rating: "Average rating",
 		},
 		featured: "Featured Barbershops",
-		featuredSubtitle: "Top-rated shops loved by our community",
 		noFeatured: "No featured shops yet. Be the first to list yours!",
 		howTitle: "How FadeIn works",
-		howSubtitle: "Book your barbershop in 3 simple steps",
+		howSubtitle: "Book your barbershop in three simple steps.",
 		steps: {
 			discover: {
 				title: "Discover",
@@ -106,32 +99,23 @@ const en = {
 		ctaSubtitle: "Join hundreds of barbershops already using FadeIn to grow their business.",
 	},
 
-	// Barbershops
 	barbershops: {
 		title: "Find a barbershop",
-		subtitle: "Discover top-rated barbershops in your area",
 		found_one: "{{count}} barbershop found",
 		found_other: "{{count}} barbershops found",
-		searchPlaceholder: "Barbershop or service...",
-		minRating: "Minimum rating",
-		ratingAbove: "{{rating}}+ stars",
+		searchPlaceholder: "Barbershop or service…",
+		minRating: "MINIMUM RATING",
 		noShops: "No barbershops found",
 		noShopsHint: "Try adjusting your search or filters",
 		clearFilters: "Clear all filters",
-		mapped: "Mapped",
 		mapView: "Map",
 		listView: "List",
-		noMappedLocations: "No mapped locations",
-		noMappedHint: "Shops need coordinates (lat/lng) to appear on map",
-		shopsOnMap: "{{count}} shops on map",
 	},
 
-	// Shop Profile
 	shop: {
 		back: "Back to barbershops",
 		notFound: "Shop not found",
 		notFoundHint: "Browse barbershops",
-		reviews: "reviews",
 		services: "Services",
 		noServices: "No services listed yet.",
 		ourBarbers: "Our Barbers",
@@ -151,14 +135,13 @@ const en = {
 		hideQr: "Hide QR code",
 	},
 
-	// Booking
 	booking: {
 		title: "Book at {{name}}",
 		step: "Step {{current}} of {{total}}",
 		steps: {
 			services: "Services",
 			barber: "Barber",
-			date: "Date",
+			date: "Date & Time",
 			confirm: "Confirm",
 			done: "Done",
 		},
@@ -168,7 +151,7 @@ const en = {
 		noBarbers: "No barbers available.",
 		pickDate: "Pick a date",
 		availableSlots: "Available time slots",
-		loadingSlots: "Loading slots...",
+		loadingSlots: "Loading slots…",
 		noSlots: "No slots available for this date.",
 		notes: "Notes (optional)",
 		notesPlaceholder: "Any special requests?",
@@ -183,23 +166,22 @@ const en = {
 			total: "Total",
 		},
 		duration: "{{minutes}} min",
-		confirming: "Confirming...",
+		confirming: "Confirming…",
 		confirmBooking: "Confirm booking",
 		confirmed: "Booking confirmed!",
 		confirmedMessage: "Your appointment at {{name}} is confirmed for {{date}} at {{time}}.",
-		signInRequired: "Please sign in to book",
+		signInRequired: "Please sign in to book.",
 		failed: "Booking failed. Please try again.",
 	},
 
-	// For Business
 	forBusiness: {
-		badge: "For barbershop owners",
+		badge: "FOR BARBERSHOP OWNERS",
 		title: "Grow your barbershop",
 		titleHighlight: "with FadeIn",
 		subtitle:
 			"Join hundreds of barbershops already using FadeIn to manage appointments, attract new clients, and build their online reputation.",
-		featuresTitle: "Everything you need to run your shop",
-		featuresSubtitle: "Powerful tools built for modern barbershops",
+		featuresTitle: "EVERYTHING YOU NEED TO RUN YOUR SHOP",
+		featuresSubtitle: "Powerful tools built for modern barbershops.",
 		features: {
 			calendar: {
 				title: "Smart Booking Calendar",
@@ -220,7 +202,6 @@ const en = {
 		},
 	},
 
-	// Dashboard
 	dashboard: {
 		title: "My Dashboard",
 		welcome: "Welcome back, {{name}}!",
@@ -237,13 +218,12 @@ const en = {
 		pastTitle: "Past appointments",
 		favoritesTitle: "Favorite Shops",
 		noFavorites: "No favorites yet",
-		noFavoritesHint: "Save your go-to barbershops for quick access",
+		noFavoritesHint: "Save your go-to barbershops for quick access.",
 		profileTitle: "My Profile",
 		phonePlaceholder: "+30 6900 000000",
-		emailNote: "Email cannot be changed",
+		emailNote: "Email cannot be changed.",
 	},
 
-	// Business Dashboard
 	business: {
 		nav: {
 			overview: "Overview",
@@ -261,37 +241,33 @@ const en = {
 		overviewTitle: "Overview",
 		stats: {
 			todayBookings: "Today's bookings",
-			totalBookings: "Total bookings",
-			totalReviews: "Total reviews",
 			avgRating: "Avg. rating",
 			totalRevenue: "Total revenue",
 			monthRevenue: "This month",
 			completionRate: "Completion rate",
 		},
-		todayTitle: "Today's appointments",
-		noToday: "No appointments today",
-		recentReviews: "Recent reviews",
-		noReviews: "No reviews yet.",
+		todayTitle: "TODAY'S APPOINTMENTS",
+		noToday: "No appointments today.",
+		recentReviews: "RECENT REVIEWS",
 		revenue: {
-			title: "Revenue Analytics",
+			title: "REVENUE ANALYTICS",
 			completed: "Completed",
 			pending: "Pending",
 			cancelled: "Cancelled",
 			noData: "No appointment data yet.",
 		},
 		crm: {
-			title: "Customers",
+			title: "CUSTOMERS",
 			totalCustomers: "Total customers",
-			visits: "{{count}} visit",
+			visits_one: "{{count}} visit",
 			visits_other: "{{count}} visits",
 			lastVisit: "Last visit: {{date}}",
 			noCustomers: "No customers yet.",
-			spent: "Spent: {{amount}}",
 		},
 		appointments: {
 			title: "Appointments",
 			clearFilter: "Clear",
-			noAppointments: "No appointments found",
+			noAppointments: "No appointments found.",
 			confirm: "Confirm",
 			cancel: "Cancel",
 			complete: "Complete",
@@ -299,8 +275,8 @@ const en = {
 		services: {
 			title: "Services",
 			addService: "Add service",
-			editService: "Edit service",
-			newService: "New service",
+			editService: "EDIT SERVICE",
+			newService: "NEW SERVICE",
 			namePlaceholder: "e.g. Classic Haircut",
 			noServices: "No services yet.",
 			categories: {
@@ -318,31 +294,30 @@ const en = {
 			namePlaceholder: "e.g. Nikos",
 			specializationsLabel: "Specializations",
 			specializationsPlaceholder: "Fades, Beards, Classic cuts",
-			bioPlaceholder: "Short bio...",
+			bioPlaceholder: "Short bio…",
 			noBarbers: "No barbers yet.",
 		},
 		reviews: {
 			title: "Reviews",
 			noReviews: "No reviews yet. Keep providing great service!",
 			yourReply: "Your reply: ",
-			replyPlaceholder: "Write a reply...",
+			replyPlaceholder: "Write a reply…",
 			replyButton: "Reply",
 			replyAction: "Reply to this review",
 		},
 		profile: {
 			editTitle: "Edit Shop Profile",
 			createTitle: "Create Your Shop",
-			basicInfo: "Basic info",
-			socialLinks: "Social links",
+			basicInfo: "BASIC INFO",
+			socialLinks: "SOCIAL LINKS",
 			namePlaceholder: "e.g. Nikos Barbershop",
-			descPlaceholder: "Tell customers about your shop...",
+			descPlaceholder: "Tell customers about your shop…",
 			phonePlaceholder: "+30 210 0000000",
 			addressPlaceholder: "Tsimiski 10, Thessaloniki",
 			urlPreview: "URL: /barbershops/{{slug}}",
 		},
 	},
 
-	// Admin
 	admin: {
 		title: "Admin Panel",
 		subtitle: "Platform management",
@@ -366,10 +341,10 @@ const en = {
 			noShops: "No shops registered yet.",
 			pending: "Pending",
 			verified: "Shop verified!",
-			verificationRemoved: "Verification removed",
-			reactivated: "Shop reactivated",
-			suspended: "Shop suspended",
-			failed: "Action failed",
+			verificationRemoved: "Verification removed.",
+			reactivated: "Shop reactivated.",
+			suspended: "Shop suspended.",
+			failed: "Action failed.",
 			verify: "Verify",
 			unverify: "Unverify",
 			suspend: "Suspend",
@@ -385,69 +360,51 @@ const en = {
 		},
 	},
 
-	// Footer
 	footer: {
-		tagline: "The modern platform for discovering and booking top barbershops near you.",
-		discover: "Discover",
-		account: "Account",
-		company: "Company",
 		rights: "© {{year}} FadeIn. All rights reserved.",
-
 		links: {
 			about: "About",
 			privacy: "Privacy",
 			terms: "Terms",
 			login: "Sign in",
 			register: "Create account",
-			businessLogin: "Business login",
 		},
 	},
 
-	// Map
 	map: {
 		noLocations: "No mapped locations",
-		noLocationsHint: "Shops need coordinates (lat/lng) to appear on map",
+		noLocationsHint: "Shops need coordinates to appear on the map.",
 		shopsOnMap: "{{count}} shops on map",
 		bookNowArrow: "Book now",
 		switchTo: "Switch to {{lang}}",
 		reviewsCount: "{{count}} reviews",
-		ratingOf: "{{rating}} / 5",
 	},
 
-	// Barber
 	barber: {
 		title: "My Schedule",
-		subtitle: "View your upcoming appointments",
+		subtitle: "View your upcoming appointments.",
 		selectDate: "Select date",
 		schedule: "Schedule",
-		noAppointments: "No appointments for this date",
+		noAppointments: "No appointments for this date.",
 	},
 
-	// Review
-	review: {
-		title: "Rate your experience",
-		subtitle: "How was your visit to {{shop}}?",
-		ratingLabel: "Your rating",
-		commentLabel: "Your review",
-		commentPlaceholder: "Share your experience with others...",
-		submit: "Submit review",
-	},
-
-	// Errors / Toasts
 	errors: {
-		updateStatusFailed: "Failed to update status",
-		fillAllFields: "Please fill in all fields",
-		passwordLength: "Password must be at least 8 characters",
+		notFoundTitle: "Page not found",
+		notFoundMessage: "The page you're looking for doesn't exist or has been moved.",
+		backHome: "Back to home",
+		errorTitle: "Something went wrong",
+		errorMessage: "An unexpected error occurred. Please try again.",
+		tryAgain: "Try again",
+		updateStatusFailed: "Failed to update status.",
+		fillAllFields: "Please fill in all fields.",
+		passwordLength: "Password must be at least 8 characters.",
+		passwordMismatch: "Passwords do not match.",
 		registrationFailed: "Registration failed. Please try again.",
-		loginFailed: "Sign in failed. Check your credentials.",
+		loginFailed: "Sign-in failed. Check your credentials.",
 		profileSaved: "Profile saved!",
 		profileFailed: "Failed to update profile.",
 		replyAdded: "Reply added!",
 		replyFailed: "Failed to add reply.",
-		ratingRequired: "Please select a rating",
-		commentRequired: "Please write a review",
-		reviewSubmitted: "Review submitted successfully!",
-		reviewFailed: "Failed to submit review",
 		barberSaved: "Barber saved!",
 		barberFailed: "Failed to save barber.",
 		barberRemoved: "Barber removed.",
@@ -461,14 +418,11 @@ const en = {
 		accountCreated: "Account created! Welcome to FadeIn.",
 	},
 
-	// Forms
 	form: {
 		phoneLabel: "Phone number",
-		cityLabel: "City",
-		addressLabel: "Address",
 		descriptionLabel: "Description",
 		passwordMin: "Min. 8 characters",
-		optional: "Optional...",
+		optional: "Optional…",
 		priceLabel: "Price (€)",
 		durationLabel: "Duration (min)",
 		categoryLabel: "Category",
@@ -482,7 +436,76 @@ const en = {
 		cityPlaceholder: "Thessaloniki",
 	},
 
-	// Status
+	legal: {
+		termsTitle: "Terms of Service",
+		privacyTitle: "Privacy Policy",
+		lastUpdated: "Last updated: {{date}}",
+		terms: {
+			acceptance: {
+				title: "Acceptance of Terms",
+				body:
+					"By accessing or using FadeIn, you agree to be bound by these Terms of Service. If you do not agree, please do not use our platform.",
+			},
+			services: {
+				title: "Our Services",
+				body:
+					"FadeIn provides an online platform that connects customers with barbershops for appointment booking. We do not provide barbering services directly and are not responsible for the quality of services provided by listed barbershops.",
+			},
+			accounts: {
+				title: "User Accounts",
+				body:
+					"You are responsible for maintaining the confidentiality of your account credentials. You must provide accurate information when creating an account and keep it up to date. We reserve the right to suspend accounts that violate these terms.",
+			},
+			bookings: {
+				title: "Bookings & Cancellations",
+				body:
+					"Bookings made through FadeIn are agreements between you and the barbershop. Cancellation policies are set by individual shops. FadeIn is not liable for disputes between customers and barbershops.",
+			},
+			liability: {
+				title: "Limitation of Liability",
+				body:
+					'FadeIn is provided "as is" without warranties of any kind. We are not liable for any indirect, incidental, or consequential damages arising from your use of the platform.',
+			},
+			changes: {
+				title: "Changes to Terms",
+				body:
+					"We may update these terms from time to time. Continued use of FadeIn after changes constitutes acceptance of the updated terms. We will notify users of significant changes via email or in-app notification.",
+			},
+		},
+		privacy: {
+			collection: {
+				title: "Information We Collect",
+				body:
+					"We collect information you provide directly (name, email, phone number) and information generated through your use of the platform (booking history, preferences, device information).",
+			},
+			usage: {
+				title: "How We Use Your Information",
+				body:
+					"We use your information to provide and improve our services, process bookings, send appointment reminders, and communicate important updates about your account.",
+			},
+			sharing: {
+				title: "Information Sharing",
+				body:
+					"We share your booking details with the barbershops you book with. We do not sell your personal information to third parties. We may share anonymized, aggregated data for analytics purposes.",
+			},
+			security: {
+				title: "Data Security",
+				body:
+					"We implement industry-standard security measures to protect your data, including encryption in transit and at rest. However, no method of transmission over the internet is 100% secure.",
+			},
+			rights: {
+				title: "Your Rights",
+				body:
+					"You have the right to access, correct, or delete your personal data. You can export your data or request account deletion at any time by contacting us or through your account settings.",
+			},
+			contact: {
+				title: "Contact Us",
+				body:
+					"If you have questions about this Privacy Policy or our data practices, please contact us at privacy@fadein.app.",
+			},
+		},
+	},
+
 	status: {
 		pending: "Pending",
 		confirmed: "Confirmed",

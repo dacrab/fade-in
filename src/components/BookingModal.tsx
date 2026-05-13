@@ -173,31 +173,32 @@ export default function BookingModal({ shop, onClose }: Props) {
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="flex items-center px-5 py-3 gap-1 border-b border-[var(--border)]">
+				{/* Step indicator dots */}
+				<div className="flex items-center justify-center px-5 py-4 gap-3">
 					{stepLabels.map((label, i) => (
-						<div key={label} className="flex items-center gap-1 flex-1">
-							<div
-								className={`step-dot flex-shrink-0 ${i + 1 < state.step ? "completed" : i + 1 === state.step ? "active" : ""}`}
-							>
-								{i + 1 < state.step ? <Check size={12} /> : i + 1}
-							</div>
-							{i < stepLabels.length - 1 && (
-								<div
-									className={`h-px flex-1 ${i + 1 < state.step ? "bg-app-success" : "bg-[var(--border)]"}`}
-								/>
-							)}
+						<div
+							key={label}
+							className="flex items-center justify-center rounded-full text-xs font-semibold transition-all duration-300"
+							style={{
+								width: 28,
+								height: 28,
+								backgroundColor: i + 1 <= state.step ? "var(--gold)" : "#f0ebe5",
+								color: i + 1 <= state.step ? "#fff" : "#9c8b7a",
+							}}
+						>
+							{i + 1 < state.step ? <Check size={14} /> : i + 1}
 						</div>
 					))}
 				</div>
 
-				<div className="p-5 max-h-[55vh] overflow-y-auto">
+				<div className="px-6 pb-2 max-h-[55vh] overflow-y-auto">
 					{state.step === 1 && (
-						<div className="space-y-2">
-							<p className="text-sm text-[var(--text-muted)] mb-3">{t("booking.selectServices")}</p>
+						<div className="space-y-3">
+							<p className="text-sm text-(--text-muted) mb-4">{t("booking.selectServices")}</p>
 							{!services ? (
-								<p className="text-sm text-[var(--text-muted)]">{t("common.loading")}</p>
+								<p className="text-sm text-(--text-subtle)">{t("common.loading")}</p>
 							) : services.length === 0 ? (
-								<p className="text-sm text-[var(--text-muted)]">{t("booking.noServices")}</p>
+								<p className="text-sm text-(--text-subtle)">{t("booking.noServices")}</p>
 							) : (
 								services.map((svc: Service) => {
 									const selected = state.selectedServices.includes(svc._id)
@@ -206,23 +207,24 @@ export default function BookingModal({ shop, onClose }: Props) {
 											key={svc._id}
 											type="button"
 											onClick={() => dispatch({ type: "TOGGLE_SERVICE", id: svc._id })}
-											className="w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left"
-											style={{
-												background: selected ? "rgba(245,158,11,0.08)" : "var(--bg-input)",
-												borderColor: selected ? "rgba(245,158,11,0.4)" : "var(--border)",
-												cursor: "pointer",
-											}}
+											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${
+												selected
+													? "bg-(--gold)/5 border-(--gold)/40"
+													: "bg-white border-(--border) hover:border-stone-300"
+											}`}
 										>
 											<div
-												className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${selected ? "border-[var(--gold)] bg-[var(--gold)]" : "border-[var(--border)]"}`}
+												className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+													selected ? "bg-(--gold)" : "border-2 border-stone-300"
+												}`}
 											>
-												{selected && <Check size={12} color="#000" />}
+												{selected && <Check size={12} color="#fff" />}
 											</div>
 											<div className="flex-1 min-w-0">
-												<div className="font-medium text-[var(--text)] text-sm">{svc.name}</div>
-												<div className="text-xs text-[var(--text-muted)]">{svc.durationMinutes} min</div>
+												<div className="font-medium text-(--text) text-sm">{svc.name}</div>
+												<div className="text-xs text-(--text-subtle) mt-0.5">{svc.durationMinutes} min</div>
 											</div>
-											<div className="font-bold text-[var(--gold)] text-sm">{formatPrice(svc.price)}</div>
+											<div className="font-semibold text-sm text-(--gold)">{formatPrice(svc.price)}</div>
 										</button>
 									)
 								})
@@ -232,11 +234,11 @@ export default function BookingModal({ shop, onClose }: Props) {
 
 					{state.step === 2 && (
 						<div className="space-y-3">
-							<p className="text-sm text-[var(--text-muted)] mb-3">{t("booking.chooseBarber")}</p>
+							<p className="text-sm text-(--text-muted) mb-4">{t("booking.chooseBarber")}</p>
 							{!barbers ? (
-								<p className="text-sm text-[var(--text-muted)]">{t("common.loading")}</p>
+								<p className="text-sm text-(--text-subtle)">{t("common.loading")}</p>
 							) : barbers.length === 0 ? (
-								<p className="text-sm text-[var(--text-muted)]">{t("booking.noBarbers")}</p>
+								<p className="text-sm text-(--text-subtle)">{t("booking.noBarbers")}</p>
 							) : (
 								barbers.map((b: Barber) => {
 									const selected = state.selectedBarber === b._id
@@ -245,14 +247,13 @@ export default function BookingModal({ shop, onClose }: Props) {
 											key={b._id}
 											type="button"
 											onClick={() => dispatch({ type: "SET_BARBER", id: b._id })}
-											className="w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left"
-											style={{
-												background: selected ? "rgba(245,158,11,0.08)" : "var(--bg-input)",
-												borderColor: selected ? "rgba(245,158,11,0.4)" : "var(--border)",
-												cursor: "pointer",
-											}}
+											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${
+												selected
+													? "bg-(--gold)/5 border-(--gold)/40"
+													: "bg-white border-(--border) hover:border-stone-300"
+											}`}
 										>
-											<div className="avatar avatar-md bg-brand/10 text-[var(--gold)]">
+											<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
 												{b.avatarUrl ? (
 													<img
 														src={b.avatarUrl}
@@ -260,16 +261,22 @@ export default function BookingModal({ shop, onClose }: Props) {
 														className="w-full h-full object-cover rounded-full"
 													/>
 												) : (
-													b.name.charAt(0)
+													<span className="text-sm font-semibold">{b.name.charAt(0)}</span>
 												)}
 											</div>
 											<div className="flex-1">
-												<div className="font-medium text-[var(--text)] text-sm">{b.name}</div>
+												<div className="font-medium text-(--text) text-sm">{b.name}</div>
 												{b.specializations.length > 0 && (
-													<div className="text-xs text-[var(--text-muted)]">{b.specializations.join(", ")}</div>
+													<div className="text-xs text-(--text-subtle) mt-0.5">
+														{b.specializations.join(", ")}
+													</div>
 												)}
 											</div>
-											{selected && <Check size={16} className="text-[var(--gold)]" />}
+											{selected && (
+												<div className="w-6 h-6 rounded-full flex items-center justify-center bg-(--gold)">
+													<Check size={14} color="#fff" />
+												</div>
+											)}
 										</button>
 									)
 								})
@@ -278,15 +285,15 @@ export default function BookingModal({ shop, onClose }: Props) {
 					)}
 
 					{state.step === 3 && (
-						<div className="space-y-4">
+						<div className="space-y-5">
 							<div>
-								<label className="block text-sm font-medium text-[var(--text)] mb-2" htmlFor="booking-date">
+								<label className="block text-sm font-medium text-stone-700 mb-2" htmlFor="booking-date">
 									{t("booking.pickDate")}
 								</label>
 								<input
 									id="booking-date"
 									type="date"
-									className="input"
+									className="w-full rounded-lg border border-(--border) bg-white px-4 py-2.5 text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold)"
 									min={minDate}
 									value={state.selectedDate}
 									onChange={(e) => dispatch({ type: "SET_DATE", date: e.target.value })}
@@ -294,13 +301,13 @@ export default function BookingModal({ shop, onClose }: Props) {
 							</div>
 							{state.selectedDate && (
 								<div>
-									<p className="block text-sm font-medium text-[var(--text)] mb-2">
+									<p className="block text-sm font-medium text-stone-700 mb-3">
 										{t("booking.availableSlots")}
 									</p>
 									{slots === undefined ? (
-										<p className="text-sm text-[var(--text-muted)]">{t("booking.loadingSlots")}</p>
+										<p className="text-sm text-(--text-subtle)">{t("booking.loadingSlots")}</p>
 									) : slots.length === 0 ? (
-										<p className="text-sm text-[var(--text-muted)]">{t("booking.noSlots")}</p>
+										<p className="text-sm text-(--text-subtle)">{t("booking.noSlots")}</p>
 									) : (
 										<div className="grid grid-cols-4 gap-2">
 											{slots.map((slot: string) => (
@@ -308,13 +315,11 @@ export default function BookingModal({ shop, onClose }: Props) {
 													key={slot}
 													type="button"
 													onClick={() => dispatch({ type: "SET_SLOT", slot })}
-													className="py-2 px-1 text-xs rounded-lg border font-medium transition-all"
-													style={{
-														background: state.selectedSlot === slot ? "var(--gold)" : "var(--bg-input)",
-														borderColor: state.selectedSlot === slot ? "var(--gold)" : "var(--border)",
-														color: state.selectedSlot === slot ? "#000" : "var(--text)",
-														cursor: "pointer",
-													}}
+													className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${
+														state.selectedSlot === slot
+															? "bg-(--gold) border-(--gold) text-white"
+															: "bg-white border-(--border) text-stone-700 hover:border-(--gold)/40"
+													}`}
 												>
 													{slot}
 												</button>
@@ -324,15 +329,12 @@ export default function BookingModal({ shop, onClose }: Props) {
 								</div>
 							)}
 							<div>
-								<label
-									className="block text-sm font-medium text-[var(--text)] mb-2"
-									htmlFor="booking-notes"
-								>
+								<label className="block text-sm font-medium text-stone-700 mb-2" htmlFor="booking-notes">
 									{t("booking.notes")}
 								</label>
 								<textarea
 									id="booking-notes"
-									className="input resize-none"
+									className="w-full rounded-lg border border-(--border) bg-white px-4 py-2.5 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold) resize-none"
 									rows={3}
 									placeholder={t("booking.notesPlaceholder")}
 									value={state.notes}
@@ -343,39 +345,43 @@ export default function BookingModal({ shop, onClose }: Props) {
 					)}
 
 					{state.step === 4 && (
-						<div className="space-y-4">
-							<h3 className="font-semibold text-[var(--text)]">{t("booking.summary")}</h3>
-							<div className="card p-4 space-y-3">
+						<div className="space-y-5">
+							<h3 className="font-semibold text-(--text)">{t("booking.summary")}</h3>
+							<div className="rounded-xl p-5 space-y-3 bg-white border border-(--border)">
 								{summaryRows.map(([label, val]) => (
 									<div key={label} className="flex justify-between text-sm">
-										<span className="text-[var(--text-muted)]">{label}</span>
-										<span className="font-medium text-[var(--text)] text-right max-w-[60%]">{val}</span>
+										<span className="text-(--text-muted)">{label}</span>
+										<span className="font-medium text-(--text) text-right max-w-[60%]">{val}</span>
 									</div>
 								))}
-								<hr className="divider" />
+								<div className="my-3 h-px bg-(--bg-input)" />
 								<div className="flex justify-between font-bold">
-									<span className="text-[var(--text)]">{t("booking.summaryFields.total")}</span>
-									<span className="text-[var(--gold)] text-lg">{formatPrice(totalPrice)}</span>
+									<span className="text-(--text)">{t("booking.summaryFields.total")}</span>
+									<span className="text-lg text-(--gold)">{formatPrice(totalPrice)}</span>
 								</div>
 							</div>
-							{state.notes && <p className="text-sm text-[var(--text-muted)]">{state.notes}</p>}
+							{state.notes && <p className="text-sm text-(--text-muted)">{state.notes}</p>}
 						</div>
 					)}
 
 					{state.step === 5 && (
-						<div className="text-center py-8">
-							<div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-green-500/15 border-2 border-green-500/30">
-								<Check size={32} className="text-[var(--success)]" />
+						<div className="text-center py-10">
+							<div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-emerald-50 border-2 border-emerald-200">
+								<Check size={32} className="text-emerald-500" />
 							</div>
-							<h3 className="text-xl font-bold text-[var(--text)] mb-2">{t("booking.confirmed")}</h3>
-							<p className="text-[var(--text-muted)] text-sm mb-6">
+							<h3 className="text-xl font-bold text-(--text) mb-2">{t("booking.confirmed")}</h3>
+							<p className="text-(--text-muted) text-sm mb-8">
 								{t("booking.confirmedMessage", {
 									name: shop.name,
 									date: formatDate(state.selectedDate),
 									time: state.selectedSlot,
 								})}
 							</p>
-							<button type="button" onClick={onClose} className="btn btn-primary">
+							<button
+								type="button"
+								onClick={onClose}
+								className="rounded-lg px-8 py-2.5 font-medium text-white text-sm transition-all duration-200 bg-(--gold) hover:bg-(--gold-dark) cursor-pointer"
+							>
 								{t("common.done")}
 							</button>
 						</div>
@@ -383,12 +389,12 @@ export default function BookingModal({ shop, onClose }: Props) {
 				</div>
 
 				{state.step < 5 && (
-					<div className="flex gap-3 px-5 py-4 border-t border-[var(--border)]">
+					<div className="flex gap-3 px-6 py-5 border-t border-(--border)">
 						{state.step > 1 && (
 							<button
 								type="button"
 								onClick={() => dispatch({ type: "SET_STEP", step: (state.step - 1) as Step })}
-								className="btn btn-secondary gap-1"
+								className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-stone-700 hover:bg-(--bg-card-hover) transition-all duration-200 flex items-center gap-1 cursor-pointer"
 							>
 								<ChevronLeft size={16} /> {t("common.back")}
 							</button>
@@ -401,7 +407,7 @@ export default function BookingModal({ shop, onClose }: Props) {
 									: dispatch({ type: "SET_STEP", step: (state.step + 1) as Step })
 							}
 							disabled={!canNext || state.loading}
-							className="btn btn-primary flex-1 justify-center gap-1"
+							className="rounded-lg flex-1 py-2.5 text-sm font-medium text-white transition-all duration-200 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed bg-(--gold) hover:bg-(--gold-dark) cursor-pointer"
 						>
 							{state.loading
 								? t("booking.confirming")

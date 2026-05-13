@@ -233,3 +233,25 @@ export const listAll = query({
 		return ctx.db.query("barbershops").collect()
 	},
 })
+
+/** Returns platform-wide stats for the homepage. */
+export const getStats = query({
+	args: {},
+	handler: async (ctx) => {
+		const shops = await ctx.db
+			.query("barbershops")
+			.withIndex("by_active", (q) => q.eq("isActive", true))
+			.collect()
+		const appointments = await ctx.db.query("appointments").collect()
+		const customers = new Set(appointments.map((a) => a.customerId))
+		const avgRating =
+			shops.length > 0
+				? Math.round((shops.reduce((sum, s) => sum + s.rating, 0) / shops.length) * 10) / 10
+				: 0
+		return {
+			shopCount: shops.length,
+			customerCount: customers.size,
+			avgRating,
+		}
+	},
+})

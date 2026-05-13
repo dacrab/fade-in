@@ -8,7 +8,7 @@ export function useBusinessAuth() {
 
 	useEffect(() => {
 		if (!loading && user && user.role !== "owner" && user.role !== "admin") {
-			void navigate({ to: "/home" })
+			void navigate({ to: "/" })
 		}
 	}, [user, loading, navigate])
 

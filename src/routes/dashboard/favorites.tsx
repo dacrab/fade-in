@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { Heart } from "lucide-react"
+import { ArrowLeft, Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
@@ -27,23 +27,21 @@ function FavoritesPage() {
 
 	return (
 		<main className="page-main">
-			<div className="page-wrap max-w-4xl">
-				<div className="flex items-center justify-between mb-6">
-					<div className="page-header">
-						<Link to="/dashboard/overview" className="breadcrumb-back">
-							← {t("nav.dashboard")}
-						</Link>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("dashboard.favoritesTitle")}</h1>
-					</div>
-				</div>
+			<div className="page-wrap max-w-3xl py-8">
+				<Link
+					to="/dashboard/overview"
+					className="inline-flex items-center gap-1.5 text-xs text-(--text-muted) hover:text-(--text) mb-4"
+				>
+					<ArrowLeft size={12} /> {t("nav.dashboard")}
+				</Link>
+				<h1 className="text-2xl font-bold text-(--text) mb-6">{t("dashboard.favoritesTitle")}</h1>
 
 				{favoriteIds.length === 0 ? (
-					<div className="empty-state">
-						<Heart size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="text-sm">{t("dashboard.noFavorites")}</p>
-						<p className="text-sm mb-4">{t("dashboard.noFavoritesHint")}</p>
-						<Link to="/barbershops/listing" className="btn btn-primary inline-flex">
+					<div className="card p-8 text-center">
+						<Heart size={24} className="mx-auto mb-2 text-(--text-subtle)" />
+						<p className="text-sm text-(--text-muted) mb-1">{t("dashboard.noFavorites")}</p>
+						<p className="text-xs text-(--text-subtle) mb-4">{t("dashboard.noFavoritesHint")}</p>
+						<Link to="/barbershops/listing" className="btn btn-primary text-xs">
 							{t("nav.barbershops")}
 						</Link>
 					</div>

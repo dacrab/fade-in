@@ -11,18 +11,21 @@ const NAV_LINKS = [
 export default function AdminNav() {
 	const { t } = useTranslation()
 	return (
-		<aside className="bg-card border-r border-[var(--border)] px-4 py-6 hidden md:block">
+		<aside className="px-4 py-6 hidden md:block">
 			<div className="mb-6">
-				<h2 className="font-bold text-[var(--text)]">{t("admin.title")}</h2>
-				<p className="text-xs text-[var(--text-muted)]">{t("admin.subtitle")}</p>
+				<h2 className="font-semibold text-(--text)">{t("admin.title")}</h2>
+				<p className="text-xs text-(--text-muted)">{t("admin.subtitle")}</p>
 			</div>
-			<nav className="space-y-1">
+			<nav className="space-y-0.5">
 				{NAV_LINKS.map(({ to, labelKey, icon: Icon }) => (
 					<Link
 						key={to}
 						to={to}
-						className="sidebar-link"
-						activeProps={{ className: "sidebar-link active" }}
+						className="flex items-center gap-2.5 px-3 py-2 text-sm text-(--text-muted) rounded-lg border-l-2 border-transparent transition-colors hover:text-(--text) hover:bg-(--bg-card-hover)"
+						activeProps={{
+							className:
+								"flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg border-l-2 border-(--gold) text-(--text) bg-(--bg-card-hover)",
+						}}
 					>
 						<Icon size={16} />
 						{t(labelKey)}

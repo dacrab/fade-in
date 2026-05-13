@@ -9,11 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as HomeRouteImport } from './routes/home'
-import { Route as ForBusinessRouteImport } from './routes/for-business'
+import { Route as BusinessRouteImport } from './routes/business'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as TermsIndexRouteImport } from './routes/terms/index'
+import { Route as ResetPasswordIndexRouteImport } from './routes/reset-password/index'
+import { Route as RegisterIndexRouteImport } from './routes/register/index'
+import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as ForBusinessIndexRouteImport } from './routes/for-business/index'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
 import { Route as DashboardOverviewRouteImport } from './routes/dashboard/overview'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard/favorites'
@@ -30,29 +33,44 @@ import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminShopsRouteImport } from './routes/admin/shops'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
 
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const TermsIndexRoute = TermsIndexRouteImport.update({
+  id: '/terms/',
+  path: '/terms/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
+const ResetPasswordIndexRoute = ResetPasswordIndexRouteImport.update({
+  id: '/reset-password/',
+  path: '/reset-password/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForBusinessRoute = ForBusinessRouteImport.update({
-  id: '/for-business',
-  path: '/for-business',
+const RegisterIndexRoute = RegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyIndexRoute = PrivacyIndexRouteImport.update({
+  id: '/privacy/',
+  path: '/privacy/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForBusinessIndexRoute = ForBusinessIndexRouteImport.update({
+  id: '/for-business/',
+  path: '/for-business/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
@@ -71,34 +89,34 @@ const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessServicesRoute = BusinessServicesRouteImport.update({
-  id: '/business/services',
-  path: '/business/services',
-  getParentRoute: () => rootRouteImport,
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => BusinessRoute,
 } as any)
 const BusinessReviewsRoute = BusinessReviewsRouteImport.update({
-  id: '/business/reviews',
-  path: '/business/reviews',
-  getParentRoute: () => rootRouteImport,
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => BusinessRoute,
 } as any)
 const BusinessProfileRoute = BusinessProfileRouteImport.update({
-  id: '/business/profile',
-  path: '/business/profile',
-  getParentRoute: () => rootRouteImport,
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => BusinessRoute,
 } as any)
 const BusinessOverviewRoute = BusinessOverviewRouteImport.update({
-  id: '/business/overview',
-  path: '/business/overview',
-  getParentRoute: () => rootRouteImport,
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => BusinessRoute,
 } as any)
 const BusinessBarbersRoute = BusinessBarbersRouteImport.update({
-  id: '/business/barbers',
-  path: '/business/barbers',
-  getParentRoute: () => rootRouteImport,
+  id: '/barbers',
+  path: '/barbers',
+  getParentRoute: () => BusinessRoute,
 } as any)
 const BusinessAppointmentsRoute = BusinessAppointmentsRouteImport.update({
-  id: '/business/appointments',
-  path: '/business/appointments',
-  getParentRoute: () => rootRouteImport,
+  id: '/appointments',
+  path: '/appointments',
+  getParentRoute: () => BusinessRoute,
 } as any)
 const BarbershopsListingRoute = BarbershopsListingRouteImport.update({
   id: '/barbershops/listing',
@@ -132,11 +150,8 @@ const AdminOverviewRoute = AdminOverviewRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/for-business': typeof ForBusinessRoute
-  '/home': typeof HomeRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
+  '/': typeof IndexRoute
+  '/business': typeof BusinessRouteWithChildren
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/shops': typeof AdminShopsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -152,13 +167,16 @@ export interface FileRoutesByFullPath {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/for-business/': typeof ForBusinessIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/privacy/': typeof PrivacyIndexRoute
+  '/register/': typeof RegisterIndexRoute
+  '/reset-password/': typeof ResetPasswordIndexRoute
+  '/terms/': typeof TermsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/for-business': typeof ForBusinessRoute
-  '/home': typeof HomeRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
+  '/': typeof IndexRoute
+  '/business': typeof BusinessRouteWithChildren
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/shops': typeof AdminShopsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -174,14 +192,17 @@ export interface FileRoutesByTo {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/for-business': typeof ForBusinessIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/privacy': typeof PrivacyIndexRoute
+  '/register': typeof RegisterIndexRoute
+  '/reset-password': typeof ResetPasswordIndexRoute
+  '/terms': typeof TermsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/for-business': typeof ForBusinessRoute
-  '/home': typeof HomeRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
+  '/': typeof IndexRoute
+  '/business': typeof BusinessRouteWithChildren
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/shops': typeof AdminShopsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -197,15 +218,18 @@ export interface FileRoutesById {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/for-business/': typeof ForBusinessIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/privacy/': typeof PrivacyIndexRoute
+  '/register/': typeof RegisterIndexRoute
+  '/reset-password/': typeof ResetPasswordIndexRoute
+  '/terms/': typeof TermsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/for-business'
-    | '/home'
-    | '/login'
-    | '/register'
-    | '/reset-password'
+    | '/'
+    | '/business'
     | '/admin/overview'
     | '/admin/shops'
     | '/admin/users'
@@ -221,13 +245,16 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/overview'
     | '/dashboard/profile'
+    | '/for-business/'
+    | '/login/'
+    | '/privacy/'
+    | '/register/'
+    | '/reset-password/'
+    | '/terms/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/for-business'
-    | '/home'
-    | '/login'
-    | '/register'
-    | '/reset-password'
+    | '/'
+    | '/business'
     | '/admin/overview'
     | '/admin/shops'
     | '/admin/users'
@@ -243,13 +270,16 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/overview'
     | '/dashboard/profile'
+    | '/for-business'
+    | '/login'
+    | '/privacy'
+    | '/register'
+    | '/reset-password'
+    | '/terms'
   id:
     | '__root__'
-    | '/for-business'
-    | '/home'
-    | '/login'
-    | '/register'
-    | '/reset-password'
+    | '/'
+    | '/business'
     | '/admin/overview'
     | '/admin/shops'
     | '/admin/users'
@@ -265,66 +295,90 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/overview'
     | '/dashboard/profile'
+    | '/for-business/'
+    | '/login/'
+    | '/privacy/'
+    | '/register/'
+    | '/reset-password/'
+    | '/terms/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  ForBusinessRoute: typeof ForBusinessRoute
-  HomeRoute: typeof HomeRoute
-  LoginRoute: typeof LoginRoute
-  RegisterRoute: typeof RegisterRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
+  IndexRoute: typeof IndexRoute
+  BusinessRoute: typeof BusinessRouteWithChildren
   AdminOverviewRoute: typeof AdminOverviewRoute
   AdminShopsRoute: typeof AdminShopsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   BarberOverviewRoute: typeof BarberOverviewRoute
   BarbershopsSlugRoute: typeof BarbershopsSlugRoute
   BarbershopsListingRoute: typeof BarbershopsListingRoute
-  BusinessAppointmentsRoute: typeof BusinessAppointmentsRoute
-  BusinessBarbersRoute: typeof BusinessBarbersRoute
-  BusinessOverviewRoute: typeof BusinessOverviewRoute
-  BusinessProfileRoute: typeof BusinessProfileRoute
-  BusinessReviewsRoute: typeof BusinessReviewsRoute
-  BusinessServicesRoute: typeof BusinessServicesRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardOverviewRoute: typeof DashboardOverviewRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
+  ForBusinessIndexRoute: typeof ForBusinessIndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  PrivacyIndexRoute: typeof PrivacyIndexRoute
+  RegisterIndexRoute: typeof RegisterIndexRoute
+  ResetPasswordIndexRoute: typeof ResetPasswordIndexRoute
+  TermsIndexRoute: typeof TermsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/reset-password': {
-      id: '/reset-password'
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms/': {
+      id: '/terms/'
+      path: '/terms'
+      fullPath: '/terms/'
+      preLoaderRoute: typeof TermsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password/': {
+      id: '/reset-password/'
       path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
+      fullPath: '/reset-password/'
+      preLoaderRoute: typeof ResetPasswordIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/register': {
-      id: '/register'
+    '/register/': {
+      id: '/register/'
       path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
+      fullPath: '/register/'
+      preLoaderRoute: typeof RegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
+    '/privacy/': {
+      id: '/privacy/'
+      path: '/privacy'
+      fullPath: '/privacy/'
+      preLoaderRoute: typeof PrivacyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
       path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-business': {
-      id: '/for-business'
+    '/for-business/': {
+      id: '/for-business/'
       path: '/for-business'
-      fullPath: '/for-business'
-      preLoaderRoute: typeof ForBusinessRouteImport
+      fullPath: '/for-business/'
+      preLoaderRoute: typeof ForBusinessIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/profile': {
@@ -350,45 +404,45 @@ declare module '@tanstack/react-router' {
     }
     '/business/services': {
       id: '/business/services'
-      path: '/business/services'
+      path: '/services'
       fullPath: '/business/services'
       preLoaderRoute: typeof BusinessServicesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof BusinessRoute
     }
     '/business/reviews': {
       id: '/business/reviews'
-      path: '/business/reviews'
+      path: '/reviews'
       fullPath: '/business/reviews'
       preLoaderRoute: typeof BusinessReviewsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof BusinessRoute
     }
     '/business/profile': {
       id: '/business/profile'
-      path: '/business/profile'
+      path: '/profile'
       fullPath: '/business/profile'
       preLoaderRoute: typeof BusinessProfileRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof BusinessRoute
     }
     '/business/overview': {
       id: '/business/overview'
-      path: '/business/overview'
+      path: '/overview'
       fullPath: '/business/overview'
       preLoaderRoute: typeof BusinessOverviewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof BusinessRoute
     }
     '/business/barbers': {
       id: '/business/barbers'
-      path: '/business/barbers'
+      path: '/barbers'
       fullPath: '/business/barbers'
       preLoaderRoute: typeof BusinessBarbersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof BusinessRoute
     }
     '/business/appointments': {
       id: '/business/appointments'
-      path: '/business/appointments'
+      path: '/appointments'
       fullPath: '/business/appointments'
       preLoaderRoute: typeof BusinessAppointmentsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof BusinessRoute
     }
     '/barbershops/listing': {
       id: '/barbershops/listing'
@@ -435,27 +489,46 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  ForBusinessRoute: ForBusinessRoute,
-  HomeRoute: HomeRoute,
-  LoginRoute: LoginRoute,
-  RegisterRoute: RegisterRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
-  AdminOverviewRoute: AdminOverviewRoute,
-  AdminShopsRoute: AdminShopsRoute,
-  AdminUsersRoute: AdminUsersRoute,
-  BarberOverviewRoute: BarberOverviewRoute,
-  BarbershopsSlugRoute: BarbershopsSlugRoute,
-  BarbershopsListingRoute: BarbershopsListingRoute,
+interface BusinessRouteChildren {
+  BusinessAppointmentsRoute: typeof BusinessAppointmentsRoute
+  BusinessBarbersRoute: typeof BusinessBarbersRoute
+  BusinessOverviewRoute: typeof BusinessOverviewRoute
+  BusinessProfileRoute: typeof BusinessProfileRoute
+  BusinessReviewsRoute: typeof BusinessReviewsRoute
+  BusinessServicesRoute: typeof BusinessServicesRoute
+}
+
+const BusinessRouteChildren: BusinessRouteChildren = {
   BusinessAppointmentsRoute: BusinessAppointmentsRoute,
   BusinessBarbersRoute: BusinessBarbersRoute,
   BusinessOverviewRoute: BusinessOverviewRoute,
   BusinessProfileRoute: BusinessProfileRoute,
   BusinessReviewsRoute: BusinessReviewsRoute,
   BusinessServicesRoute: BusinessServicesRoute,
+}
+
+const BusinessRouteWithChildren = BusinessRoute._addFileChildren(
+  BusinessRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  BusinessRoute: BusinessRouteWithChildren,
+  AdminOverviewRoute: AdminOverviewRoute,
+  AdminShopsRoute: AdminShopsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  BarberOverviewRoute: BarberOverviewRoute,
+  BarbershopsSlugRoute: BarbershopsSlugRoute,
+  BarbershopsListingRoute: BarbershopsListingRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardOverviewRoute: DashboardOverviewRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  ForBusinessIndexRoute: ForBusinessIndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  PrivacyIndexRoute: PrivacyIndexRoute,
+  RegisterIndexRoute: RegisterIndexRoute,
+  ResetPasswordIndexRoute: ResetPasswordIndexRoute,
+  TermsIndexRoute: TermsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

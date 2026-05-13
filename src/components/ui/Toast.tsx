@@ -1,5 +1,5 @@
-import { AlertCircle, CheckCircle, Info, X } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import { AlertCircle, CheckCircle, Info } from "lucide-react"
+import { useEffect, useState } from "react"
 
 type ToastType = "success" | "error" | "info"
 
@@ -37,9 +37,9 @@ export async function withToast<T>(
 }
 
 const TOAST_CONFIG = {
-	success: { icon: CheckCircle, color: "border-green-500/30 bg-green-500/10 text-green-400" },
-	error: { icon: AlertCircle, color: "border-red-500/30 bg-red-500/10 text-red-400" },
-	info: { icon: Info, color: "border-[var(--gold)]/30 bg-[var(--gold)]/10 text-[var(--gold)]" },
+	success: { icon: CheckCircle, borderColor: "#16a34a" },
+	error: { icon: AlertCircle, borderColor: "#dc2626" },
+	info: { icon: Info, borderColor: "var(--gold)" },
 } as const
 
 export function ToastContainer() {
@@ -52,28 +52,18 @@ export function ToastContainer() {
 		}
 	}, [])
 
-	const dismiss = useCallback((id: number) => {
-		setToasts((prev) => prev.filter((t) => t.id !== id))
-	}, [])
-
 	return (
 		<div className="toast-container">
 			{toasts.map((toast) => {
-				const { icon: Icon, color } = TOAST_CONFIG[toast.type]
+				const { icon: Icon, borderColor } = TOAST_CONFIG[toast.type]
 				return (
 					<div
 						key={toast.id}
-						className={`fade-up flex items-start gap-3 p-4 rounded-xl border backdrop-blur-lg bg-black/90 ${color}`}
+						className="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-white shadow-md border border-(--border) animate-in slide-in-from-top-2"
+						style={{ borderLeft: `3px solid ${borderColor}` }}
 					>
-						<Icon size={18} className="flex-shrink-0 mt-0.5" />
-						<span className="text-sm text-[var(--text)] flex-1">{toast.message}</span>
-						<button
-							type="button"
-							onClick={() => dismiss(toast.id)}
-							className="icon-btn flex-shrink-0 bg-transparent border-0 text-app-muted"
-						>
-							<X size={14} />
-						</button>
+						<Icon size={15} className="flex-shrink-0" style={{ color: borderColor }} />
+						<span className="text-[13px] text-stone-700 font-medium">{toast.message}</span>
 					</div>
 				)
 			})}

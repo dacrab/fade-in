@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { MessageSquare, Send } from "lucide-react"
+import { Send } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { StarRating } from "#/components/ui/StarRating"
 import { withToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
@@ -20,9 +19,11 @@ function BusinessReviews() {
 	const { t } = useTranslation()
 
 	const shop = useOwnerShop(user?.id)
-	const reviews = useQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip") as
-		| Review[]
-		| undefined
+	const reviewsResult = useQuery(
+		api.reviews.listByShop,
+		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
+	)
+	const reviews = (reviewsResult?.page ?? undefined) as Review[] | undefined
 	const addReply = useMutation(api.reviews.addOwnerReply)
 	const [replyId, setReplyId] = useState<string | null>(null)
 	const [replyText, setReplyText] = useState("")
@@ -39,27 +40,21 @@ function BusinessReviews() {
 	}
 
 	return (
-		<main className="page-main">
-			<div className="page-wrap max-w-3xl">
-				<div className="flex items-center justify-between mb-6">
-					<div className="page-header">
-						<Link to="/business/overview" className="breadcrumb-back">
-							← {t("nav.business")}
-						</Link>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("business.reviews.title")}</h1>
-					</div>
+		<div className="px-8 py-8">
+			<div className="max-w-3xl mx-auto px-6 py-8">
+				<div className="mb-5">
+					<Link to="/business/overview"></Link>
+					<h1 className="text-lg font-medium text-(--text) tracking-tight">
+						{t("business.reviews.title")}
+					</h1>
 				</div>
 
 				{shop && (
-					<div className="card p-4 mb-6 flex items-center gap-4">
-						<div className="text-4xl font-bold text-[var(--gold)]">{shop.rating.toFixed(1)}</div>
-						<div>
-							<StarRating rating={shop.rating} size={18} />
-							<p className="text-sm text-[var(--text-muted)] mt-0.5">
-								{t("map.reviewsCount", { count: shop.reviewCount })}
-							</p>
-						</div>
+					<div className="flex items-baseline gap-3 mb-5 pb-6 border-b border-(--border)">
+						<span className="text-3xl font-semibold text-(--gold)">{shop.rating.toFixed(1)}</span>
+						<span className="text-sm text-(--text-subtle)">
+							/ 5 · {t("map.reviewsCount", { count: shop.reviewCount })}
+						</span>
 					</div>
 				)}
 
@@ -67,34 +62,34 @@ function BusinessReviews() {
 					<div className="space-y-3">
 						{Array.from({ length: 3 }, (_, i) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-28 w-full rounded-xl" />
+							<Skeleton key={i} className="h-24 w-full rounded-lg" />
 						))}
 					</div>
 				) : reviews.length === 0 ? (
-					<div className="empty-state">
-						<MessageSquare size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="text-sm">{t("business.reviews.noReviews")}</p>
-					</div>
+					<p className="text-sm text-(--text-subtle) py-8 text-center">
+						{t("business.reviews.noReviews")}
+					</p>
 				) : (
-					<div className="space-y-4">
+					<div className="space-y-0 divide-y divide-white/4">
 						{reviews.map((r) => (
-							<div key={r._id} className="card p-5">
+							<div key={r._id} className="py-5">
 								<div className="flex items-center justify-between mb-2">
-									<StarRating rating={r.rating} size={16} />
-									<span className="text-xs text-[var(--text-muted)]">{formatRelative(r.createdAt)}</span>
+									<div className="flex items-baseline gap-1.5">
+										<span className="text-sm font-medium text-(--gold)">{r.rating.toFixed(1)}</span>
+										<span className="text-xs text-(--text-subtle)">/ 5</span>
+									</div>
+									<span className="text-[11px] text-white/25">{formatRelative(r.createdAt)}</span>
 								</div>
-								<p className="text-sm text-[var(--text-muted)] mb-3">{r.comment}</p>
+								<p className="text-sm text-(--text-muted) leading-relaxed">{r.comment}</p>
 								{r.ownerReply ? (
-									<div className="pl-3 border-l-2 border-[var(--gold)]/30 text-xs text-[var(--text-muted)]">
-										<span className="text-[var(--gold)] font-semibold">
-											{t("business.reviews.yourReply")}
-										</span>
+									<div className="mt-3 ml-4 pl-3 border-l border-(--gold)/20 text-xs text-(--text-muted) leading-relaxed">
+										<span className="text-(--gold)/70 font-medium">{t("business.reviews.yourReply")}</span>{" "}
 										{r.ownerReply}
 									</div>
 								) : replyId === r._id ? (
-									<div className="flex gap-2 mt-2">
+									<div className="flex gap-2 mt-3">
 										<input
-											className="input text-sm"
+											className="flex-1 bg-white border border-(--border) rounded-lg px-3 py-2 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 											placeholder={t("business.reviews.replyPlaceholder")}
 											value={replyText}
 											onChange={(e) => setReplyText(e.target.value)}
@@ -105,12 +100,16 @@ function BusinessReviews() {
 										<button
 											type="button"
 											onClick={() => void handleReply(r._id)}
-											className="btn btn-primary text-sm px-3 gap-1"
+											className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-(--gold) text-white text-xs font-medium hover:bg-(--gold-dark) transition-colors"
 										>
-											<Send size={13} />
+											<Send size={11} />
 											{t("business.reviews.replyButton")}
 										</button>
-										<button type="button" onClick={() => setReplyId(null)} className="btn btn-ghost text-sm">
+										<button
+											type="button"
+											onClick={() => setReplyId(null)}
+											className="px-3 py-2 rounded-full text-xs text-(--text-muted) hover:text-(--text-muted) transition-colors"
+										>
 											{t("common.cancel")}
 										</button>
 									</div>
@@ -121,7 +120,7 @@ function BusinessReviews() {
 											setReplyId(r._id)
 											setReplyText("")
 										}}
-										className="text-xs text-[var(--gold)] hover:underline btn-bare"
+										className="mt-2 text-xs text-(--gold)/70 hover:text-(--gold) transition-colors"
 									>
 										{t("business.reviews.replyAction")}
 									</button>
@@ -131,6 +130,6 @@ function BusinessReviews() {
 					</div>
 				)}
 			</div>
-		</main>
+		</div>
 	)
 }

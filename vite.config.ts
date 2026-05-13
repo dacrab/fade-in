@@ -1,4 +1,3 @@
-import path from "node:path"
 import tailwindcss from "@tailwindcss/vite"
 import { devtools } from "@tanstack/devtools-vite"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
@@ -16,11 +15,8 @@ export default defineConfig({
 		tailwindcss(),
 		viteReact(),
 	],
-	resolve: {
-		alias: {
-			react: path.resolve("./node_modules/react"),
-			"react-dom": path.resolve("./node_modules/react-dom"),
-		},
+	ssr: {
+		external: ["react", "react-dom"],
 	},
 	test: {
 		environment: "jsdom",

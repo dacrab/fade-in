@@ -6,12 +6,14 @@ import { socialLinksValidator, workingHoursValidator } from "./validators"
 export default defineSchema({
 	...authTables,
 	users: defineTable({
-		name: v.string(),
+		name: v.optional(v.string()),
 		email: v.string(),
 		phone: v.optional(v.string()),
-		role: v.union(v.literal("customer"), v.literal("owner"), v.literal("barber"), v.literal("admin")),
+		role: v.optional(
+			v.union(v.literal("customer"), v.literal("owner"), v.literal("barber"), v.literal("admin")),
+		),
 		avatarUrl: v.optional(v.string()),
-		favoriteShopIds: v.array(v.id("barbershops")),
+		favoriteShopIds: v.optional(v.array(v.id("barbershops"))),
 		emailVerified: v.optional(v.boolean()),
 	}).index("by_email", ["email"]),
 

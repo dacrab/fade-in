@@ -22,7 +22,7 @@ export interface User {
 	phone?: string
 	role: UserRole
 	avatarUrl?: string
-	favoriteShopIds: Id<"barbershops">[]
+	favoriteShopIds?: Id<"barbershops">[]
 }
 
 // Working Hours

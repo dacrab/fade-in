@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { ArrowLeft, Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
+import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
@@ -118,18 +118,14 @@ function BusinessServices() {
 	}
 
 	return (
-		<main className="page-main">
-			<div className="page-wrap max-w-3xl">
-				<div className="section-header mb-6">
+		<div className="px-8 py-8">
+			<div className="max-w-3xl mx-auto px-6 py-8">
+				<div className="flex items-start justify-between mb-5">
 					<div>
-						<Link
-							to="/business/overview"
-							className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
-						>
-							<ArrowLeft size={14} />
-							{t("nav.business")}
-						</Link>
-						<h1 className="text-2xl font-bold text-[var(--text)]">{t("business.services.title")}</h1>
+						<Link to="/business/overview"></Link>
+						<h1 className="text-lg font-medium text-(--text) tracking-tight">
+							{t("business.services.title")}
+						</h1>
 					</div>
 					<button
 						type="button"
@@ -137,28 +133,28 @@ function BusinessServices() {
 							reset()
 							setShowForm(!showForm)
 						}}
-						className="btn btn-primary gap-2 text-sm"
+						className="btn btn-primary text-xs"
 					>
-						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
+						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
 						{showForm ? t("common.cancel") : t("business.services.addService")}
 					</button>
 				</div>
 
 				{showForm && (
-					<div className="card p-5 mb-6 fade-up">
-						<h2 className="font-bold text-[var(--text)] mb-4">
+					<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5 animate-in fade-in slide-in-from-top-2 duration-200">
+						<h2 className="text-[11px] font-medium text-(--text-subtle) mb-5">
 							{editId ? t("business.services.editService") : t("business.services.newService")}
 						</h2>
 						<form
 							onSubmit={(e) => void handleSubmit(e)}
-							className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+							className="grid grid-cols-1 sm:grid-cols-2 gap-5"
 						>
 							<div className="sm:col-span-2">
-								<label className="form-label" htmlFor="svc-name">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-name">
 									{t("form.nameStar")}
 								</label>
 								<input
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									id="svc-name"
 									placeholder={t("business.services.namePlaceholder")}
 									value={form.name}
@@ -167,11 +163,11 @@ function BusinessServices() {
 								/>
 							</div>
 							<div>
-								<label className="form-label" htmlFor="svc-price">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-price">
 									{t("form.priceLabel")} *
 								</label>
 								<input
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									type="number"
 									step="0.01"
 									min="0"
@@ -182,11 +178,11 @@ function BusinessServices() {
 								/>
 							</div>
 							<div>
-								<label className="form-label" htmlFor="svc-duration">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-duration">
 									{t("form.durationLabel")} *
 								</label>
 								<input
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									type="number"
 									min="5"
 									step="5"
@@ -197,12 +193,12 @@ function BusinessServices() {
 								/>
 							</div>
 							<div>
-								<label className="form-label" htmlFor="svc-category">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-category">
 									{t("form.categoryLabel")}
 								</label>
 								<select
 									id="svc-category"
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) focus:outline-none focus:border-(--gold) transition-colors"
 									value={form.category}
 									onChange={set("category")}
 								>
@@ -214,22 +210,26 @@ function BusinessServices() {
 								</select>
 							</div>
 							<div className="sm:col-span-2">
-								<label className="form-label" htmlFor="svc-desc">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-desc">
 									{t("form.descriptionLabel")}
 								</label>
 								<input
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									placeholder={t("form.optional")}
 									value={form.description}
 									onChange={set("description")}
 								/>
 							</div>
-							<div className="sm:col-span-2 flex gap-2">
-								<button type="submit" className="btn btn-primary gap-1">
-									<Check size={15} />
+							<div className="sm:col-span-2 flex gap-3">
+								<button type="submit" className="btn btn-primary text-xs">
+									<Check size={13} />
 									{editId ? t("common.save") : t("business.services.addService")}
 								</button>
-								<button type="button" onClick={reset} className="btn btn-secondary">
+								<button
+									type="button"
+									onClick={reset}
+									className="px-4 py-2 rounded-full border border-(--border) text-xs text-(--text-muted) hover:text-(--text-muted) transition-colors"
+								>
 									{t("common.cancel")}
 								</button>
 							</div>
@@ -241,37 +241,38 @@ function BusinessServices() {
 					<div className="space-y-3">
 						{Array.from({ length: 4 }).map((_, i) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-16 w-full rounded-xl" />
+							<Skeleton key={i} className="h-14 w-full rounded-lg" />
 						))}
 					</div>
 				) : services.length === 0 ? (
-					<div className="empty-state">
-						<p className="text-sm">{t("business.services.noServices")}</p>
-					</div>
+					<p className="text-sm text-(--text-subtle) py-8 text-center">
+						{t("business.services.noServices")}
+					</p>
 				) : (
-					<div className="space-y-2">
+					<div className="divide-y divide-white/4">
 						{services.map((svc: Service) => (
-							<div key={svc._id} className="card p-4 flex items-center gap-4">
+							<div key={svc._id} className="flex items-center gap-4 py-4 group">
 								<div className="flex-1 min-w-0">
-									<div className="font-medium text-[var(--text)] text-sm">{svc.name}</div>
-									<div className="text-xs text-[var(--text-muted)]">
-										{svc.durationMinutes} min ·{" "}
-										<span className="badge badge-gray">
-											{t(`business.services.categories.${svc.category}` as const)}
-										</span>
+									<div className="text-sm text-(--text)">{svc.name}</div>
+									<div className="text-xs text-(--text-subtle) mt-0.5">
+										{svc.durationMinutes} min · {t(`business.services.categories.${svc.category}` as const)}
 									</div>
 								</div>
-								<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(svc.price)}</div>
-								<div className="flex gap-1.5">
-									<button type="button" onClick={() => handleEdit(svc)} className="icon-btn btn-bare">
-										<Pencil size={14} />
+								<div className="text-sm font-medium text-(--gold)">{formatPrice(svc.price)}</div>
+								<div className="flex gap-1">
+									<button
+										type="button"
+										onClick={() => handleEdit(svc)}
+										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--text-muted) transition-all"
+									>
+										<Pencil size={13} />
 									</button>
 									<button
 										type="button"
 										onClick={() => void handleDelete(svc._id)}
-										className="icon-btn icon-btn-danger btn-bare"
+										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
 									>
-										<Trash2 size={14} />
+										<Trash2 size={13} />
 									</button>
 								</div>
 							</div>
@@ -279,6 +280,6 @@ function BusinessServices() {
 					</div>
 				)}
 			</div>
-		</main>
+		</div>
 	)
 }

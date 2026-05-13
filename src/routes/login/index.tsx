@@ -6,7 +6,7 @@ import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 
-export const Route = createFileRoute("/login")({ component: LoginPage })
+export const Route = createFileRoute("/login/")({ component: LoginPage })
 
 function LoginPage() {
 	const { t } = useTranslation()
@@ -31,25 +31,24 @@ function LoginPage() {
 	}
 
 	return (
-		<main className="auth-page">
-			<div className="w-full max-w-md">
-				<div className="text-center mb-8">
-					<Link to="/home" className="auth-logo">
-						<div className="auth-logo-icon gold-gradient">
-							<Scissors size={20} className="text-black" />
-						</div>
-						<span className="text-2xl font-bold text-[var(--text)]">
-							Fade<span className="gold-text">In</span>
-						</span>
-					</Link>
-					<h1 className="text-2xl font-bold text-[var(--text)] mb-1">{t("auth.loginTitle")}</h1>
-					<p className="text-sm text-[var(--text-muted)]">{t("auth.loginSubtitle")}</p>
-				</div>
+		<main className="flex-1 flex items-center justify-center px-4 py-8">
+			<div className="w-full max-w-sm">
+				<Link to="/" className="flex items-center justify-center gap-2 mb-5 no-underline">
+					<div className="w-9 h-9 rounded-lg bg-(--gold) flex items-center justify-center">
+						<Scissors size={16} className="text-white" />
+					</div>
+					<span className="text-lg font-bold text-(--text)">
+						Fade<span className="text-(--gold)">In</span>
+					</span>
+				</Link>
 
-				<div className="card p-6 sm:p-8">
+				<div className="bg-white rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-8">
+					<h1 className="text-2xl font-bold text-(--text) mb-1 text-center">{t("auth.loginTitle")}</h1>
+					<p className="text-sm text-(--text-muted) mb-6 text-center">{t("auth.loginSubtitle")}</p>
+
 					<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
 						<div>
-							<label className="form-label" htmlFor="login-email">
+							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="login-email">
 								{t("auth.emailLabel")}
 							</label>
 							<input
@@ -64,7 +63,7 @@ function LoginPage() {
 							/>
 						</div>
 						<div>
-							<label className="form-label" htmlFor="login-password">
+							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="login-password">
 								{t("auth.passwordLabel")}
 							</label>
 							<PasswordInput
@@ -79,21 +78,18 @@ function LoginPage() {
 						<button
 							type="submit"
 							disabled={loading}
-							className="btn btn-primary w-full justify-center py-3 mt-2"
+							className="btn btn-primary w-full justify-center py-3"
 						>
 							{loading ? t("auth.signingIn") : t("common.signIn")}
 						</button>
 					</form>
 
-					<div className="mt-6 text-center text-sm text-[var(--text-muted)]">
+					<p className="mt-6 text-center text-sm text-(--text-muted)">
 						{t("auth.noAccount")}{" "}
-						<Link
-							to="/register"
-							className="text-[var(--gold)] hover:underline no-underline font-semibold"
-						>
+						<Link to="/register" className="text-(--gold) hover:underline no-underline font-medium">
 							{t("common.createAccount")}
 						</Link>
-					</div>
+					</p>
 				</div>
 			</div>
 		</main>

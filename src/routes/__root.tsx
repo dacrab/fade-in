@@ -7,6 +7,7 @@ import {
 	Scripts,
 	useRouter,
 } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import Footer from "#/components/Footer"
 import Header from "#/components/Header"
 import { ToastContainer } from "#/components/ui/Toast"
@@ -25,13 +26,20 @@ export const Route = createRootRoute({
 				content:
 					"Discover and book top barbershops near you. FadeIn is the modern platform for premium grooming experiences.",
 			},
-			{ name: "theme-color", content: "#f59e0b" },
+			{ name: "theme-color", content: "var(--gold)" },
 			{ name: "mobile-web-app-capable", content: "yes" },
 			{ name: "apple-mobile-web-app-capable", content: "yes" },
 			{ name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
 			{ name: "apple-mobile-web-app-title", content: "FadeIn" },
 		],
 		links: [
+			{ rel: "preconnect", href: "https://fonts.googleapis.com" },
+			{ rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+			{
+				rel: "stylesheet",
+				href:
+					"https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap",
+			},
 			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
 			{ rel: "stylesheet", href: appCss },
 			{ rel: "manifest", href: "/manifest.json" },
@@ -44,32 +52,31 @@ export const Route = createRootRoute({
 })
 
 function NotFound() {
+	const { t } = useTranslation()
 	return (
-		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-			<h1 className="text-4xl font-bold">404</h1>
-			<p className="text-lg text-gray-600">Page not found</p>
-			<Link to="/home" className="text-amber-600 underline hover:text-amber-700">
-				Back to home
+		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
+			<h1 className="text-6xl font-bold text-(--border)">404</h1>
+			<p className="text-lg font-semibold text-(--text)">{t("errors.notFoundTitle")}</p>
+			<p className="text-sm text-(--text-muted) max-w-sm">{t("errors.notFoundMessage")}</p>
+			<Link to="/" className="btn btn-primary mt-4">
+				{t("errors.backHome")}
 			</Link>
 		</main>
 	)
 }
 
 function RouteError({ error }: ErrorComponentProps) {
+	const { t } = useTranslation()
 	const router = useRouter()
 
 	return (
-		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-			<h1 className="text-2xl font-bold">Something went wrong</h1>
-			<p className="text-gray-600">
-				{error instanceof Error ? error.message : "An unexpected error occurred"}
+		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
+			<h1 className="text-xl font-bold text-(--text)">{t("errors.errorTitle")}</h1>
+			<p className="text-sm text-(--text-muted) max-w-sm">
+				{error instanceof Error ? error.message : t("errors.errorMessage")}
 			</p>
-			<button
-				type="button"
-				onClick={() => router.invalidate()}
-				className="rounded-lg bg-amber-500 px-4 py-2 text-white hover:bg-amber-600"
-			>
-				Try again
+			<button type="button" onClick={() => router.invalidate()} className="btn btn-primary mt-4">
+				{t("errors.tryAgain")}
 			</button>
 		</main>
 	)
@@ -81,10 +88,12 @@ function RootDocument() {
 			<head>
 				<HeadContent />
 			</head>
-			<body>
+			<body className="flex flex-col min-h-screen">
 				<ConvexProvider>
 					<Header />
-					<Outlet />
+					<div className="flex-1">
+						<Outlet />
+					</div>
 					<Footer />
 					<ToastContainer />
 				</ConvexProvider>
