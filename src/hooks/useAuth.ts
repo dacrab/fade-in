@@ -3,11 +3,7 @@ import { useQuery } from "convex/react"
 import type { UserRole } from "#/types"
 import { api } from "../../convex/_generated/api"
 
-/**
- * Provides the current authenticated user and auth actions.
- * Returns `user: AuthUser | null`, `loading: boolean`, `isLoggedIn: boolean`,
- * and methods: `login`, `register`, `logout`, `signIn`, `signOut`.
- */
+/** Provides the current authenticated user and auth actions. */
 export function useAuth() {
 	const { signIn, signOut } = useAuthActions()
 	const viewer = useQuery(api.users.getViewer)

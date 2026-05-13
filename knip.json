@@ -9,7 +9,6 @@
 		"convex/**/*.ts"
 	],
 	"project": ["src/**/*.{ts,tsx}", "convex/**/*.ts"],
-	"ignore": ["convex/_generated/**"],
 	"ignoreDependencies": [
 		"@tanstack/router-plugin",
 		"@tanstack/react-router-devtools",

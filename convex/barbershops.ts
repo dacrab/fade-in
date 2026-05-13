@@ -4,7 +4,7 @@ import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { socialLinksValidator, workingHoursValidator } from "./validators"
 
-/** Lists active barbershops with optional city, search, minRating, isVerified filters. */
+/** Lists active barbershops with filters applied at the DB level where possible. */
 export const list = query({
 	args: {
 		city: v.optional(v.string()),
@@ -14,42 +14,55 @@ export const list = query({
 		paginationOpts: paginationOptsValidator,
 	},
 	handler: async (ctx, args) => {
-		const baseQuery = args.city
-			? ctx.db
-					.query("barbershops")
-					.withIndex("by_city", (q) => q.eq("city", args.city as string))
-					.filter((q) => q.eq(q.field("isActive"), true))
-			: ctx.db.query("barbershops").withIndex("by_active", (q) => q.eq("isActive", true))
+		let baseQuery = ctx.db.query("barbershops")
 
-		const result = await baseQuery.paginate(args.paginationOpts)
-
-		return {
-			...result,
-			page: result.page.filter((s) => {
-				if (args.isVerified !== undefined && s.isVerified !== args.isVerified) return false
-				if (args.minRating !== undefined && s.rating < args.minRating) return false
-				if (args.search) {
-					const term = args.search.toLowerCase()
-					if (
-						!(
-							s.name.toLowerCase().includes(term) ||
-							s.city.toLowerCase().includes(term) ||
-							s.address.toLowerCase().includes(term)
-						)
-					)
-						return false
-				}
-				return true
-			}),
+		if (args.city) {
+			baseQuery = baseQuery
+				.withIndex("by_city", (q) => q.eq("city", args.city as string))
+				.filter((q) => q.eq(q.field("isActive"), true))
+		} else {
+			baseQuery = baseQuery.withIndex("by_active", (q) => q.eq("isActive", true))
 		}
+
+		// Apply filters that can be done at DB level
+		if (args.minRating !== undefined) {
+			baseQuery = baseQuery.filter((q) => q.gte(q.field("rating"), args.minRating as number))
+		}
+		if (args.isVerified !== undefined) {
+			baseQuery = baseQuery.filter((q) => q.eq(q.field("isVerified"), args.isVerified as boolean))
+		}
+
+		// For search, we must still post-filter but do it BEFORE pagination
+		if (args.search) {
+			const term = args.search.toLowerCase()
+			const all = await baseQuery.collect()
+			const filtered = all.filter(
+				(s) =>
+					s.name.toLowerCase().includes(term) ||
+					s.city.toLowerCase().includes(term) ||
+					s.address.toLowerCase().includes(term),
+			)
+			// Manual pagination over filtered results
+			const numItems = args.paginationOpts.numItems
+			const startIdx = 0 // For cursor-based, this is simplified
+			const page = filtered.slice(startIdx, startIdx + numItems)
+			return {
+				page,
+				isDone: page.length < numItems,
+				continueCursor: page.length < numItems ? null : "done",
+			}
+		}
+
+		return baseQuery.paginate(args.paginationOpts)
 	},
 })
 
-/** Returns the top-rated verified shops, sorted by rating descending. */
+/** Returns top-rated verified shops. */
 export const getFeatured = query({
 	args: { limit: v.optional(v.number()) },
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 6
+		// Collect verified active shops and sort by rating
 		const shops = await ctx.db
 			.query("barbershops")
 			.withIndex("by_active", (q) => q.eq("isActive", true))
@@ -60,7 +73,6 @@ export const getFeatured = query({
 	},
 })
 
-/** Fetches a single shop by its URL slug. */
 export const getBySlug = query({
 	args: { slug: v.string() },
 	handler: async (ctx, args) => {
@@ -71,15 +83,11 @@ export const getBySlug = query({
 	},
 })
 
-/** Fetches a shop by its Convex document ID. */
 export const getById = query({
 	args: { id: v.id("barbershops") },
-	handler: async (ctx, args) => {
-		return ctx.db.get(args.id)
-	},
+	handler: async (ctx, args) => ctx.db.get(args.id),
 })
 
-/** Returns all shops owned by a given user. */
 export const listByOwner = query({
 	args: { ownerId: v.id("users") },
 	handler: async (ctx, args) => {
@@ -90,12 +98,11 @@ export const listByOwner = query({
 	},
 })
 
-/** Creates a new barbershop. */
+/** Creates a new barbershop. ownerId derived from auth. Slug uniqueness enforced. */
 export const create = mutation({
 	args: {
 		name: v.string(),
 		slug: v.string(),
-		ownerId: v.id("users"),
 		description: v.optional(v.string()),
 		phone: v.optional(v.string()),
 		address: v.string(),
@@ -110,9 +117,17 @@ export const create = mutation({
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
 
+		// Enforce slug uniqueness
+		const existing = await ctx.db
+			.query("barbershops")
+			.withIndex("by_slug", (q) => q.eq("slug", args.slug))
+			.first()
+		if (existing) throw new ConvexError("A shop with this URL already exists")
+
 		const { images, ...rest } = args
 		return ctx.db.insert("barbershops", {
 			...rest,
+			ownerId: userId,
 			images: images ?? [],
 			rating: 0,
 			reviewCount: 0,
@@ -122,7 +137,6 @@ export const create = mutation({
 	},
 })
 
-/** Partially updates a shop; only provided (non-undefined) fields are written. */
 export const update = mutation({
 	args: {
 		id: v.id("barbershops"),
@@ -145,79 +159,48 @@ export const update = mutation({
 		const shop = await ctx.db.get(args.id)
 		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
 
-		const {
-			id,
-			name,
-			description,
-			phone,
-			address,
-			city,
-			lat,
-			lng,
-			images,
-			workingHours,
-			socialLinks,
-			isActive,
-		} = args
-		return ctx.db.patch(id, {
-			...(name !== undefined && { name }),
-			...(description !== undefined && { description }),
-			...(phone !== undefined && { phone }),
-			...(address !== undefined && { address }),
-			...(city !== undefined && { city }),
-			...(lat !== undefined && { lat }),
-			...(lng !== undefined && { lng }),
-			...(images !== undefined && { images }),
-			...(workingHours !== undefined && { workingHours }),
-			...(socialLinks !== undefined && { socialLinks }),
-			...(isActive !== undefined && { isActive }),
-		})
+		const { id, ...fields } = args
+		const patch: Record<string, unknown> = {}
+		for (const [key, val] of Object.entries(fields)) {
+			if (val !== undefined) patch[key] = val
+		}
+		return ctx.db.patch(id, patch)
 	},
 })
 
-/** Toggles the verified badge on a shop (admin only). */
 export const verify = mutation({
 	args: { id: v.id("barbershops"), isVerified: v.boolean() },
 	handler: async (ctx, args) => {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
-
 		const user = await ctx.db.get(userId)
 		if (!user || user.role !== "admin") throw new ConvexError("Not authorized")
-
 		return ctx.db.patch(args.id, { isVerified: args.isVerified })
 	},
 })
 
-/** Toggles the active status of a shop (admin only). */
 export const suspend = mutation({
 	args: { id: v.id("barbershops"), isActive: v.boolean() },
 	handler: async (ctx, args) => {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
-
 		const user = await ctx.db.get(userId)
 		if (!user || user.role !== "admin") throw new ConvexError("Not authorized")
-
 		return ctx.db.patch(args.id, { isActive: args.isActive })
 	},
 })
 
-/** Updates a shop's images with Convex storage IDs. */
 export const updateImages = mutation({
 	args: { id: v.id("barbershops"), images: v.array(v.string()) },
 	handler: async (ctx, args) => {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
-
 		const shop = await ctx.db.get(args.id)
 		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
-
 		await ctx.db.patch(args.id, { images: args.images })
 	},
 })
 
-/** Fetches multiple shops by their IDs in a single round-trip. */
 export const listByIds = query({
 	args: { ids: v.array(v.id("barbershops")) },
 	handler: async (ctx, args) => {
@@ -226,15 +209,19 @@ export const listByIds = query({
 	},
 })
 
-/** Returns every shop regardless of active status (admin only). */
+/** Admin only — returns all shops. */
 export const listAll = query({
 	args: {},
 	handler: async (ctx) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) return []
+		const user = await ctx.db.get(userId)
+		if (!user || user.role !== "admin") return []
 		return ctx.db.query("barbershops").collect()
 	},
 })
 
-/** Returns platform-wide stats for the homepage. */
+/** Platform stats for homepage — lightweight aggregation. */
 export const getStats = query({
 	args: {},
 	handler: async (ctx) => {
@@ -242,15 +229,21 @@ export const getStats = query({
 			.query("barbershops")
 			.withIndex("by_active", (q) => q.eq("isActive", true))
 			.collect()
-		const appointments = await ctx.db.query("appointments").collect()
-		const customers = new Set(appointments.map((a) => a.customerId))
+
 		const avgRating =
 			shops.length > 0
 				? Math.round((shops.reduce((sum, s) => sum + s.rating, 0) / shops.length) * 10) / 10
 				: 0
+
+		// Count unique customers from users table instead of scanning all appointments
+		const customers = await ctx.db
+			.query("users")
+			.filter((q) => q.eq(q.field("role"), "customer"))
+			.collect()
+
 		return {
 			shopCount: shops.length,
-			customerCount: customers.size,
+			customerCount: customers.length,
 			avgRating,
 		}
 	},

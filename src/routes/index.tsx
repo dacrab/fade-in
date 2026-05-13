@@ -7,7 +7,6 @@ import ShopCard from "#/components/ShopCard"
 import { ShopCardSkeleton } from "#/components/ui/Skeleton"
 import type { Barbershop } from "#/types"
 import { api } from "../../convex/_generated/api"
-import type { Doc } from "../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/")({ component: HomePage })
 
@@ -102,11 +101,8 @@ function HomePage() {
 					<h2 className="text-2xl font-bold text-(--text) mb-5">{t("home.featured")}</h2>
 					{!featured ? (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{Array.from({ length: 6 }, (_, i) => (
-								<ShopCardSkeleton
-									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders have no id
-									key={i}
-								/>
+							{[0, 1, 2, 3, 4, 5].map((i) => (
+								<ShopCardSkeleton key={i} />
 							))}
 						</div>
 					) : featured.length === 0 ? (
@@ -119,7 +115,7 @@ function HomePage() {
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{featured.map((shop: Doc<"barbershops">) => (
+							{featured.map((shop) => (
 								<ShopCard key={shop._id} shop={shop as Barbershop} />
 							))}
 						</div>

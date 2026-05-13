@@ -111,8 +111,7 @@ function AdminShops() {
 
 				{!allShops ? (
 					<div className="space-y-3">
-						{Array.from({ length: 5 }, (_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+						{[0, 1, 2, 3, 4].map((i) => (
 							<Skeleton key={i} className="h-16 w-full rounded-xl" />
 						))}
 					</div>

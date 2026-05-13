@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Calendar, CheckCircle, Clock, Heart, RefreshCw, User, XCircle } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
@@ -9,7 +9,7 @@ import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Doc, Id } from "../../../convex/_generated/dataModel"
+import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/overview")({ component: CustomerDashboard })
 
@@ -19,8 +19,7 @@ function CustomerDashboard() {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (!user) return
-		if (user.role !== "customer" && user.role !== "admin") navigate({ to: "/" })
+		if (user && user.role !== "customer" && user.role !== "admin") navigate({ to: "/" })
 	}, [user, navigate])
 
 	const appointments = useQuery(
@@ -28,22 +27,32 @@ function CustomerDashboard() {
 		user ? { customerId: user.id as Id<"users"> } : "skip",
 	)
 
+	// Batch fetch all unique shops referenced by appointments (fixes N+1)
+	const shopIds = useMemo(() => {
+		if (!appointments) return []
+		return [...new Set(appointments.map((a) => a.barbershopId))] as Id<"barbershops">[]
+	}, [appointments])
+	const shopsRaw = useQuery(
+		api.barbershops.listByIds,
+		shopIds.length > 0 ? { ids: shopIds } : "skip",
+	)
+	const shopMap = useMemo(() => {
+		const map = new Map<string, Barbershop>()
+		if (shopsRaw) for (const s of shopsRaw) map.set(s._id, s as Barbershop)
+		return map
+	}, [shopsRaw])
+
 	if (!user) return <DashSkeleton />
 
 	const upcoming =
-		appointments?.filter(
-			(a: Doc<"appointments">) => a.status === "pending" || a.status === "confirmed",
-		) ?? []
-	const completed = appointments?.filter((a: Doc<"appointments">) => a.status === "completed") ?? []
+		appointments?.filter((a) => a.status === "pending" || a.status === "confirmed") ?? []
+	const completed = appointments?.filter((a) => a.status === "completed") ?? []
 	const past =
-		appointments?.filter(
-			(a: Doc<"appointments">) => a.status === "completed" || a.status === "cancelled",
-		) ?? []
+		appointments?.filter((a) => a.status === "completed" || a.status === "cancelled") ?? []
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl py-8">
-				{/* Header row */}
 				<div className="flex items-center justify-between mb-6">
 					<div>
 						<h1 className="text-2xl font-bold text-(--text)">{t("dashboard.title")}</h1>
@@ -59,18 +68,19 @@ function CustomerDashboard() {
 					</div>
 				</div>
 
-				{/* Stats row */}
 				<div className="grid grid-cols-4 gap-3 mb-6">
-					{[
-						{ label: t("dashboard.stats.total"), value: appointments?.length ?? "—", icon: Calendar },
-						{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
-						{ label: t("dashboard.stats.completed"), value: completed.length, icon: CheckCircle },
-						{
-							label: t("dashboard.stats.cancelled"),
-							value: past.length - completed.length,
-							icon: XCircle,
-						},
-					].map(({ label, value, icon: Icon }) => (
+					{(
+						[
+							{ label: t("dashboard.stats.total"), value: appointments?.length ?? "—", icon: Calendar },
+							{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
+							{ label: t("dashboard.stats.completed"), value: completed.length, icon: CheckCircle },
+							{
+								label: t("dashboard.stats.cancelled"),
+								value: past.length - completed.length,
+								icon: XCircle,
+							},
+						] as const
+					).map(({ label, value, icon: Icon }) => (
 						<div key={label} className="card p-3 flex items-center gap-3">
 							<Icon size={16} className="text-(--gold) shrink-0" />
 							<div>
@@ -81,17 +91,12 @@ function CustomerDashboard() {
 					))}
 				</div>
 
-				{/* Upcoming */}
 				<section className="card p-5 mb-4">
 					<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.upcomingTitle")}</h2>
 					{appointments === undefined ? (
 						<div className="space-y-2">
-							{Array.from({ length: 3 }).map((_, i) => (
-								<Skeleton
-									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-									key={i}
-									className="h-12 w-full"
-								/>
+							{[0, 1, 2].map((i) => (
+								<Skeleton key={i} className="h-12 w-full" />
 							))}
 						</div>
 					) : upcoming.length === 0 ? (
@@ -103,22 +108,27 @@ function CustomerDashboard() {
 						</div>
 					) : (
 						<div className="divide-y divide-(--border)">
-							{upcoming.map((appt: Doc<"appointments">) => (
-								<AppointmentRow key={appt._id} appt={appt as Appointment} showActions />
+							{upcoming.map((appt) => (
+								<AppointmentRow
+									key={appt._id}
+									appt={appt as Appointment}
+									shop={shopMap.get(appt.barbershopId)}
+									showActions
+								/>
 							))}
 						</div>
 					)}
 				</section>
 
-				{/* Past appointments */}
 				{past.length > 0 && (
 					<section className="card p-5">
 						<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.pastTitle")}</h2>
 						<div className="divide-y divide-(--border)">
-							{past.slice(0, 8).map((appt: Doc<"appointments">) => (
+							{past.slice(0, 8).map((appt) => (
 								<AppointmentRow
 									key={appt._id}
 									appt={appt as Appointment}
+									shop={shopMap.get(appt.barbershopId)}
 									showRebook={appt.status === "completed"}
 								/>
 							))}
@@ -132,20 +142,17 @@ function CustomerDashboard() {
 
 function AppointmentRow({
 	appt,
+	shop,
 	showActions,
 	showRebook,
 }: {
 	appt: Appointment
+	shop?: Barbershop
 	showActions?: boolean
 	showRebook?: boolean
 }) {
 	const { t } = useTranslation()
-	const shop = useQuery(api.barbershops.getById, { id: appt.barbershopId }) as
-		| Barbershop
-		| null
-		| undefined
 	const updateStatus = useMutation(api.appointments.updateStatus)
-
 	const handleCancel = () =>
 		withToast(
 			() => updateStatus({ id: appt._id, status: "cancelled" }),
@@ -199,12 +206,8 @@ function DashSkeleton() {
 			<div className="page-wrap max-w-3xl py-8 space-y-4">
 				<Skeleton className="h-8 w-48" />
 				<div className="grid grid-cols-4 gap-3">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<Skeleton
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							key={i}
-							className="h-16 rounded-xl"
-						/>
+					{[0, 1, 2, 3].map((i) => (
+						<Skeleton key={i} className="h-16 rounded-xl" />
 					))}
 				</div>
 				<Skeleton className="h-48 rounded-xl" />

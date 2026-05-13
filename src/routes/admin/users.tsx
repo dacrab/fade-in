@@ -45,8 +45,7 @@ function AdminUsers() {
 
 				{!allUsers ? (
 					<div className="space-y-3">
-						{Array.from({ length: 6 }, (_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+						{[0, 1, 2, 3, 4, 5].map((i) => (
 							<Skeleton key={i} className="h-14 w-full rounded-xl" />
 						))}
 					</div>

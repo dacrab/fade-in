@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { PlusCircle, Scissors, Users } from "lucide-react"
+import { PlusCircle, Scissors } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
@@ -12,7 +12,6 @@ import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/business/overview")({ component: BusinessDashboard })
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: business dashboard has multiple data sources
 function BusinessDashboard() {
 	const { t } = useTranslation()
 	const { user } = useBusinessAuth()
@@ -20,45 +19,20 @@ function BusinessDashboard() {
 	const shop = useOwnerShop(user?.id) as Barbershop | undefined
 
 	const todayStr = new Date().toISOString().slice(0, 10)
-	const thisMonthStr = new Date().toISOString().slice(0, 7) // YYYY-MM
 	const todayAppts = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: todayStr } : "skip",
 	) as Appointment[] | undefined
-	const allAppts = useQuery(
-		api.appointments.listByShop,
-		shop ? { barbershopId: shop._id } : "skip",
-	) as Appointment[] | undefined
+	// Use server-side stats instead of loading ALL appointments
+	const stats = useQuery(api.appointments.getShopStats, shop ? { barbershopId: shop._id } : "skip")
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
 	)
 	const reviews = (reviewsResult?.page ?? undefined) as Review[] | undefined
 
-	const completedAppts = allAppts?.filter((a) => a.status === "completed") ?? []
-	const totalRevenue = completedAppts.reduce((sum, a) => sum + a.totalPrice, 0)
-	const monthRevenue = completedAppts
-		.filter((a) => a.date.startsWith(thisMonthStr))
-		.reduce((sum, a) => sum + a.totalPrice, 0)
 	const completionRate =
-		allAppts && allAppts.length > 0 ? Math.round((completedAppts.length / allAppts.length) * 100) : 0
-
-	// Deduplicate customers from appointments
-	const customerMap = new Map<string, { visits: number; totalSpent: number; lastDate: string }>()
-	for (const appt of allAppts ?? []) {
-		const id = appt.customerId as string
-		const existing = customerMap.get(id)
-		if (existing) {
-			existing.visits += 1
-			existing.totalSpent += appt.totalPrice
-			if (appt.date > existing.lastDate) existing.lastDate = appt.date
-		} else {
-			customerMap.set(id, { visits: 1, totalSpent: appt.totalPrice, lastDate: appt.date })
-		}
-	}
-	const customerEntries = [...customerMap.entries()].sort((a, b) =>
-		b[1].lastDate > a[1].lastDate ? 1 : -1,
-	)
+		stats && stats.totalCount > 0 ? Math.round((stats.completedCount / stats.totalCount) * 100) : 0
 
 	if (!user) return <DashSkeleton />
 
@@ -102,11 +76,11 @@ function BusinessDashboard() {
 						},
 						{
 							label: t("business.stats.totalRevenue"),
-							value: allAppts ? formatPrice(totalRevenue) : "—",
+							value: stats ? formatPrice(stats.totalRevenue) : "—",
 						},
 						{
 							label: t("business.stats.monthRevenue"),
-							value: allAppts ? formatPrice(monthRevenue) : "—",
+							value: stats ? formatPrice(stats.monthRevenue) : "—",
 						},
 						{
 							label: t("business.stats.avgRating"),
@@ -134,8 +108,7 @@ function BusinessDashboard() {
 				</div>
 				{todayAppts === undefined ? (
 					<div className="space-y-2">
-						{Array.from({ length: 3 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+						{[0, 1, 2].map((i) => (
 							<Skeleton key={i} className="h-12 w-full rounded-lg" />
 						))}
 					</div>
@@ -166,9 +139,9 @@ function BusinessDashboard() {
 			{/* Revenue Analytics */}
 			<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5">
 				<h2 className="text-xs font-medium text-(--text-muted) mb-5">{t("business.revenue.title")}</h2>
-				{allAppts === undefined ? (
+				{stats === undefined ? (
 					<Skeleton className="h-24 w-full" />
-				) : allAppts.length === 0 ? (
+				) : stats.totalCount === 0 ? (
 					<p className="text-sm text-(--text-subtle)">{t("business.revenue.noData")}</p>
 				) : (
 					<div className="space-y-4">
@@ -189,17 +162,17 @@ function BusinessDashboard() {
 								[
 									{
 										label: t("business.revenue.completed"),
-										count: completedAppts.length,
+										count: stats.completedCount,
 										color: "text-emerald-400",
 									},
 									{
 										label: t("business.revenue.pending"),
-										count: allAppts.filter((a) => a.status === "pending" || a.status === "confirmed").length,
+										count: stats.pendingCount,
 										color: "text-(--gold)",
 									},
 									{
 										label: t("business.revenue.cancelled"),
-										count: allAppts.filter((a) => a.status === "cancelled").length,
+										count: stats.cancelledCount,
 										color: "text-red-400",
 									},
 								] as const
@@ -210,49 +183,6 @@ function BusinessDashboard() {
 								</div>
 							))}
 						</div>
-					</div>
-				)}
-			</div>
-
-			{/* CRM: Customer list */}
-			<div className="mb-5">
-				<div className="flex items-center justify-between mb-4">
-					<h2 className="text-xs font-medium text-(--text-muted)">{t("business.crm.title")}</h2>
-					{customerEntries.length > 0 && (
-						<span className="text-xs text-(--text-subtle)">
-							{t("business.crm.totalCustomers")}: {customerEntries.length}
-						</span>
-					)}
-				</div>
-				{allAppts === undefined ? (
-					<div className="space-y-3">
-						{Array.from({ length: 3 }).map((_, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-10 w-full rounded-lg" />
-						))}
-					</div>
-				) : customerEntries.length === 0 ? (
-					<p className="text-sm text-(--text-subtle) py-4">{t("business.crm.noCustomers")}</p>
-				) : (
-					<div className="divide-y divide-white/4">
-						{customerEntries.slice(0, 10).map(([customerId, data]) => (
-							<div key={customerId} className="flex items-center justify-between py-3 gap-4">
-								<div className="w-7 h-7 rounded-full bg-(--gold)/10 flex items-center justify-center flex-shrink-0">
-									<Users size={12} className="text-(--gold)" />
-								</div>
-								<div className="flex-1 min-w-0">
-									<div className="text-xs text-(--text-muted)">
-										{t("business.crm.visits", { count: data.visits })}
-									</div>
-									<div className="text-xs text-(--text-subtle)">
-										{t("business.crm.lastVisit", { date: data.lastDate })}
-									</div>
-								</div>
-								<div className="text-sm font-medium text-(--gold) flex-shrink-0">
-									{formatPrice(data.totalSpent)}
-								</div>
-							</div>
-						))}
 					</div>
 				)}
 			</div>
@@ -296,8 +226,7 @@ function DashSkeleton() {
 			<div className="w-full max-w-4xl px-8 space-y-4">
 				<Skeleton className="h-8 w-48" />
 				<div className="grid grid-cols-4 gap-4">
-					{Array.from({ length: 4 }).map((_, i) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+					{[0, 1, 2, 3].map((i) => (
 						<Skeleton key={i} className="h-16 rounded-lg" />
 					))}
 				</div>

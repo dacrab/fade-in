@@ -25,6 +25,17 @@ const ROLE_NAV = {
 	admin: { labelKey: "nav.admin", icon: <ShieldCheck size={14} />, to: "/admin/overview" },
 } as const
 
+const NAV_LINK =
+	"relative text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200 py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-(--gold) after:transition-all after:duration-200 hover:after:w-full"
+const NAV_LINK_ACTIVE =
+	"relative text-sm font-medium text-(--gold) py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-(--gold)"
+
+const NAV_ITEMS = [
+	{ to: "/" as const, key: "nav.home" },
+	{ to: "/barbershops/listing" as const, key: "nav.barbershops" },
+	{ to: "/for-business" as const, key: "nav.forBusiness" },
+]
+
 export default function Header() {
 	const [mobileOpen, setMobileOpen] = useState(false)
 	const { user, logout } = useAuth()
@@ -62,7 +73,6 @@ export default function Header() {
 		<>
 			<header className="sticky top-0 z-50 border-b border-(--border) bg-(--bg)">
 				<nav className="page-wrap px-6 md:px-10 flex items-center justify-between h-18">
-					{/* Logo */}
 					<Link to="/" className="flex items-center gap-2.5 no-underline flex-shrink-0 group">
 						<Scissors
 							size={20}
@@ -74,41 +84,14 @@ export default function Header() {
 						</span>
 					</Link>
 
-					{/* Desktop Nav */}
 					<div className="hidden md:flex items-center gap-8">
-						<Link
-							to="/"
-							className="relative text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200 py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-(--gold) after:transition-all after:duration-200 hover:after:w-full"
-							activeProps={{
-								className:
-									"relative text-sm font-medium text-(--gold) py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-(--gold)",
-							}}
-						>
-							{t("nav.home")}
-						</Link>
-						<Link
-							to="/barbershops/listing"
-							className="relative text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200 py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-(--gold) after:transition-all after:duration-200 hover:after:w-full"
-							activeProps={{
-								className:
-									"relative text-sm font-medium text-(--gold) py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-(--gold)",
-							}}
-						>
-							{t("nav.barbershops")}
-						</Link>
-						<Link
-							to="/for-business"
-							className="relative text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200 py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-(--gold) after:transition-all after:duration-200 hover:after:w-full"
-							activeProps={{
-								className:
-									"relative text-sm font-medium text-(--gold) py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-(--gold)",
-							}}
-						>
-							{t("nav.forBusiness")}
-						</Link>
+						{NAV_ITEMS.map(({ to, key }) => (
+							<Link key={to} to={to} className={NAV_LINK} activeProps={{ className: NAV_LINK_ACTIVE }}>
+								{t(key)}
+							</Link>
+						))}
 					</div>
 
-					{/* Right side */}
 					<div className="flex items-center gap-3">
 						{user ? (
 							<Menu
@@ -141,9 +124,7 @@ export default function Header() {
 								</Link>
 							</div>
 						)}
-
 						<LanguageToggle />
-
 						<button
 							type="button"
 							className="md:hidden p-2 text-(--text) hover:text-(--gold) transition-colors"
@@ -155,32 +136,19 @@ export default function Header() {
 				</nav>
 			</header>
 
-			{/* Mobile menu — slide-down panel */}
 			{mobileOpen && (
 				<div className="fixed top-[72px] left-0 right-0 z-[60] bg-(--bg) border-b border-(--border) shadow-sm md:hidden">
 					<div className="flex flex-col px-6 py-6 gap-4">
-						<Link
-							to="/"
-							className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
-							onClick={() => setMobileOpen(false)}
-						>
-							{t("nav.home")}
-						</Link>
-						<Link
-							to="/barbershops/listing"
-							className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
-							onClick={() => setMobileOpen(false)}
-						>
-							{t("nav.barbershops")}
-						</Link>
-						<Link
-							to="/for-business"
-							className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
-							onClick={() => setMobileOpen(false)}
-						>
-							{t("nav.forBusiness")}
-						</Link>
-
+						{NAV_ITEMS.map(({ to, key }) => (
+							<Link
+								key={to}
+								to={to}
+								className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
+								onClick={() => setMobileOpen(false)}
+							>
+								{t(key)}
+							</Link>
+						))}
 						{user ? (
 							<>
 								<div className="w-full h-px bg-[#e8e0d8]" />

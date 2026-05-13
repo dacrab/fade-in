@@ -4,15 +4,6 @@ import type { Id } from "../../convex/_generated/dataModel"
 
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 
-/** Authenticated user data returned by useAuth hook */
-export interface AuthUser {
-	id: string
-	name: string
-	email: string
-	role: UserRole
-	avatarUrl?: string
-}
-
 /** Full user document from database */
 export interface User {
 	_id: Id<"users">

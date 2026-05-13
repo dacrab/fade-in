@@ -99,12 +99,8 @@ function BarberDashboard() {
 					</h2>
 					{appointments === undefined ? (
 						<div className="space-y-2">
-							{Array.from({ length: 4 }).map((_, i) => (
-								<Skeleton
-									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-									key={i}
-									className="h-12 w-full"
-								/>
+							{[0, 1, 2, 3].map((i) => (
+								<Skeleton key={i} className="h-12 w-full" />
 							))}
 						</div>
 					) : todayAppts.length === 0 ? (
