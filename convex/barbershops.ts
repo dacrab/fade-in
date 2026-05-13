@@ -14,15 +14,17 @@ export const list = query({
 		paginationOpts: paginationOptsValidator,
 	},
 	handler: async (ctx, args) => {
-		let baseQuery = ctx.db.query("barbershops")
-
-		if (args.city) {
-			baseQuery = baseQuery
-				.withIndex("by_city", (q) => q.eq("city", args.city as string))
-				.filter((q) => q.eq(q.field("isActive"), true))
-		} else {
-			baseQuery = baseQuery.withIndex("by_active", (q) => q.eq("isActive", true))
+		const getBaseQuery = () => {
+			if (args.city) {
+				return ctx.db
+					.query("barbershops")
+					.withIndex("by_city", (q) => q.eq("city", args.city as string))
+					.filter((q) => q.eq(q.field("isActive"), true))
+			}
+			return ctx.db.query("barbershops").withIndex("by_active", (q) => q.eq("isActive", true))
 		}
+
+		let baseQuery = getBaseQuery()
 
 		// Apply filters that can be done at DB level
 		if (args.minRating !== undefined) {

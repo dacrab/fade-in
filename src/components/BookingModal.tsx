@@ -6,7 +6,7 @@ import { useAuth } from "#/hooks/useAuth"
 import { formatDate, formatPrice } from "#/lib/format"
 import type { Barber, Barbershop, Service } from "#/types"
 import { api } from "../../convex/_generated/api"
-import type { Doc } from "../../convex/_generated/dataModel"
+import type { Doc, Id } from "../../convex/_generated/dataModel"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/Dialog"
 import { showToast } from "./ui/Toast"
 
