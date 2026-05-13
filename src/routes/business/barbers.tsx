@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Check, Pencil, PlusCircle, Scissors, Trash2, X } from "lucide-react"
+import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
@@ -89,15 +89,14 @@ function BusinessBarbers() {
 	}
 
 	return (
-		<main className="page-main">
-			<div className="page-wrap max-w-3xl">
-				<div className="flex items-center justify-between mb-6">
-					<div className="page-header">
-						<Link to="/business/overview" className="breadcrumb-back">
-							← {t("nav.business")}
-						</Link>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("business.barbers.title")}</h1>
+		<div className="px-8 py-8">
+			<div className="max-w-3xl mx-auto px-6 py-8">
+				<div className="flex items-start justify-between mb-5">
+					<div>
+						<Link to="/business/overview"></Link>
+						<h1 className="text-lg font-medium text-(--text) tracking-tight">
+							{t("business.barbers.title")}
+						</h1>
 					</div>
 					<button
 						type="button"
@@ -105,26 +104,26 @@ function BusinessBarbers() {
 							reset()
 							setShowForm(!showForm)
 						}}
-						className="btn btn-primary gap-2 text-sm"
+						className="btn btn-primary text-xs"
 					>
-						{showForm ? <X size={15} /> : <PlusCircle size={15} />}
+						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
 						{showForm ? t("common.cancel") : t("business.barbers.addBarber")}
 					</button>
 				</div>
 
 				{showForm && (
-					<div className="card p-5 mb-6 fade-up">
-						<h2 className="font-bold text-[var(--text)] mb-4">
+					<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5 animate-in fade-in slide-in-from-top-2 duration-200">
+						<h2 className="text-[11px] font-medium text-(--text-subtle) mb-5">
 							{editId ? t("common.edit") : t("business.barbers.addBarber")}
 						</h2>
-						<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+						<form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
 							<div>
-								<label className="form-label" htmlFor="barber-name">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="barber-name">
 									{t("form.nameStar")}
 								</label>
 								<input
 									id="barber-name"
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									placeholder={t("business.barbers.namePlaceholder")}
 									value={form.name}
 									onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -132,36 +131,40 @@ function BusinessBarbers() {
 								/>
 							</div>
 							<div>
-								<label className="form-label" htmlFor="barber-specs">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="barber-specs">
 									{t("business.barbers.specializationsLabel")}
 								</label>
 								<input
 									id="barber-specs"
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									placeholder={t("business.barbers.specializationsPlaceholder")}
 									value={form.specializations}
 									onChange={(e) => setForm((f) => ({ ...f, specializations: e.target.value }))}
 								/>
 							</div>
 							<div>
-								<label className="form-label" htmlFor="barber-bio">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="barber-bio">
 									{t("form.descriptionLabel")}
 								</label>
 								<textarea
 									id="barber-bio"
-									className="input resize-none"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
 									rows={2}
 									placeholder={t("business.barbers.bioPlaceholder")}
 									value={form.bio}
 									onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
 								/>
 							</div>
-							<div className="flex gap-2">
-								<button type="submit" className="btn btn-primary gap-1">
-									<Check size={15} />
+							<div className="flex gap-3">
+								<button type="submit" className="btn btn-primary text-xs">
+									<Check size={13} />
 									{editId ? t("common.save") : t("business.barbers.addBarber")}
 								</button>
-								<button type="button" onClick={reset} className="btn btn-secondary">
+								<button
+									type="button"
+									onClick={reset}
+									className="px-4 py-2 rounded-full border border-(--border) text-xs text-(--text-muted) hover:text-(--text-muted) transition-colors"
+								>
 									{t("common.cancel")}
 								</button>
 							</div>
@@ -173,38 +176,41 @@ function BusinessBarbers() {
 					<div className="space-y-3">
 						{Array.from({ length: 3 }, (_, i) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-							<Skeleton key={i} className="h-20 w-full rounded-xl" />
+							<Skeleton key={i} className="h-14 w-full rounded-lg" />
 						))}
 					</div>
 				) : barbers.length === 0 ? (
-					<div className="empty-state">
-						<Scissors size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="text-sm">{t("business.barbers.noBarbers")}</p>
-					</div>
+					<p className="text-sm text-(--text-subtle) py-8 text-center">
+						{t("business.barbers.noBarbers")}
+					</p>
 				) : (
-					<div className="space-y-3">
+					<div className="divide-y divide-white/4">
 						{barbers.map((b) => (
-							<div key={b._id} className="card p-4 flex items-center gap-4">
-								<div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[var(--gold)] flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
+							<div key={b._id} className="flex items-center gap-4 py-4 group">
+								<div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium text-(--gold) flex-shrink-0 bg-(--gold)/10">
 									{b.name.charAt(0)}
 								</div>
 								<div className="flex-1 min-w-0">
-									<div className="font-medium text-[var(--text)] text-sm">{b.name}</div>
+									<div className="text-sm text-(--text)">{b.name}</div>
 									{b.specializations.length > 0 && (
-										<div className="text-xs text-[var(--text-muted)]">{b.specializations.join(", ")}</div>
+										<div className="text-xs text-(--text-subtle) mt-0.5">{b.specializations.join(", ")}</div>
 									)}
-									{b.bio && <div className="text-xs text-[var(--text-subtle)] truncate">{b.bio}</div>}
+									{b.bio && <div className="text-xs text-(--text-subtle) truncate mt-0.5">{b.bio}</div>}
 								</div>
-								<div className="flex gap-1.5">
-									<button type="button" onClick={() => handleEdit(b)} className="icon-btn btn-bare">
-										<Pencil size={14} />
+								<div className="flex gap-1">
+									<button
+										type="button"
+										onClick={() => handleEdit(b)}
+										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--text-muted) transition-all"
+									>
+										<Pencil size={13} />
 									</button>
 									<button
 										type="button"
 										onClick={() => void handleDelete(b._id)}
-										className="icon-btn icon-btn-danger btn-bare"
+										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
 									>
-										<Trash2 size={14} />
+										<Trash2 size={13} />
 									</button>
 								</div>
 							</div>
@@ -212,6 +218,6 @@ function BusinessBarbers() {
 					</div>
 				)}
 			</div>
-		</main>
+		</div>
 	)
 }

@@ -24,7 +24,7 @@ function ShopRow({ shop, onVerify, onSuspend }: ShopRowProps) {
 		<div className="card p-4 flex flex-col sm:flex-row sm:items-center gap-3">
 			<div className="flex-1 min-w-0">
 				<div className="flex items-center gap-2 flex-wrap">
-					<span className="font-medium text-[var(--text)] text-sm">{shop.name}</span>
+					<span className="font-medium text-(--text) text-sm">{shop.name}</span>
 					{shop.isVerified && (
 						<span className="badge badge-green text-[10px]">
 							<Check size={9} /> {t("common.verified")}
@@ -34,7 +34,7 @@ function ShopRow({ shop, onVerify, onSuspend }: ShopRowProps) {
 						<span className="badge badge-red text-[10px]">{t("common.suspended")}</span>
 					)}
 				</div>
-				<div className="text-xs text-[var(--text-muted)]">
+				<div className="text-xs text-(--text-muted)">
 					{shop.address}, {shop.city} · {shop.rating.toFixed(1)}/5 ({shop.reviewCount})
 				</div>
 			</div>
@@ -74,7 +74,7 @@ function AdminShops() {
 
 	useEffect(() => {
 		if (!loading && (!user || user.role !== "admin")) {
-			void router.navigate({ to: "/home" })
+			void router.navigate({ to: "/" })
 		}
 	}, [user, loading, router])
 

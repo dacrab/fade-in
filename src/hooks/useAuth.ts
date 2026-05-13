@@ -15,9 +15,9 @@ export function useAuth() {
 	const user = viewer
 		? {
 				id: viewer._id,
-				name: viewer.name,
+				name: viewer.name ?? viewer.email,
 				email: viewer.email,
-				role: viewer.role as UserRole,
+				role: (viewer.role ?? "customer") as UserRole,
 				avatarUrl: viewer.avatarUrl,
 			}
 		: null

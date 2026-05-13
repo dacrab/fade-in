@@ -1,13 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { Calendar, Clock, Scissors } from "lucide-react"
+import { Calendar, DollarSign, Scissors } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop } from "#/types"
-import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/barber/overview")({ component: BarberDashboard })
@@ -20,95 +19,139 @@ function BarberDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "barber" && user.role !== "admin") navigate({ to: "/home" })
+		if (user.role !== "barber" && user.role !== "admin") navigate({ to: "/" })
 	}, [user, navigate])
 
-	// TODO: Add barbers.getByUserId query to resolve current user's barber profile
+	// TODO: resolve barber profile from user ID to get barberId for filtering
 	const appointments = useQuery(api.appointments.listByBarber, "skip") as Appointment[] | undefined
 
-	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
+	if (!user) return <Skeleton className="h-64 m-8 rounded-xl" />
+
+	const todayAppts = appointments?.filter((a) => a.date === selectedDate) ?? []
+	const completedToday = todayAppts.filter((a) => a.status === "completed")
+	const todayEarnings = completedToday.reduce((sum, a) => sum + a.totalPrice, 0)
+	const nextAppt = todayAppts
+		.filter((a) => a.status === "pending" || a.status === "confirmed")
+		.sort((a, b) => a.startTime.localeCompare(b.startTime))[0]
 
 	return (
 		<main className="page-main">
-			<div className="page-wrap max-w-4xl">
-				<div className="section-header mb-6">
+			<div className="page-wrap max-w-3xl py-8">
+				<div className="flex items-center justify-between mb-6">
 					<div>
-						<h1 className="text-2xl font-bold text-[var(--text)]">{t("barber.title")}</h1>
-						<p className="text-[var(--text-muted)] text-sm">{t("barber.subtitle")}</p>
+						<h1 className="text-2xl font-bold text-(--text)">{t("barber.title")}</h1>
+						<p className="text-sm text-(--text-muted)">{t("barber.subtitle")}</p>
 					</div>
-				</div>
-
-				{/* Date selector */}
-				<div className="card p-4 mb-6">
-					<label className="form-label" htmlFor="date-select">
-						{t("barber.selectDate")}
-					</label>
 					<input
-						id="date-select"
 						type="date"
-						className="input max-w-xs"
+						className="input w-auto"
 						value={selectedDate}
 						onChange={(e) => setSelectedDate(e.target.value)}
 					/>
 				</div>
 
-				{/* Appointments */}
-				<div className="card p-5">
-					<h2 className="font-bold text-[var(--text)] mb-4 flex items-center gap-2">
-						<Calendar size={18} className="text-[var(--gold)]" />
-						{t("barber.schedule")} - {formatDateShort(selectedDate)}
-					</h2>
+				{/* Quick stats for the day */}
+				<div className="grid grid-cols-3 gap-3 mb-6">
+					<div className="card p-3 flex items-center gap-3">
+						<Calendar size={16} className="text-(--gold) shrink-0" />
+						<div>
+							<div className="text-lg font-bold text-(--text) tabular-nums">{todayAppts.length}</div>
+							<div className="text-[11px] text-(--text-muted)">{t("barber.schedule")}</div>
+						</div>
+					</div>
+					<div className="card p-3 flex items-center gap-3">
+						<Scissors size={16} className="text-(--gold) shrink-0" />
+						<div>
+							<div className="text-lg font-bold text-(--text) tabular-nums">{completedToday.length}</div>
+							<div className="text-[11px] text-(--text-muted)">{t("status.completed")}</div>
+						</div>
+					</div>
+					<div className="card p-3 flex items-center gap-3">
+						<DollarSign size={16} className="text-(--gold) shrink-0" />
+						<div>
+							<div className="text-lg font-bold text-(--text) tabular-nums">
+								{formatPrice(todayEarnings)}
+							</div>
+							<div className="text-[11px] text-(--text-muted)">Earnings</div>
+						</div>
+					</div>
+				</div>
 
+				{/* Next appointment highlight */}
+				{nextAppt && (
+					<div className="card p-4 mb-4 border-l-2 border-l-(--gold)">
+						<div className="text-[11px] text-(--gold) font-medium mb-1">Next up</div>
+						<div className="flex items-center gap-3">
+							<span className="text-lg font-bold text-(--text) font-mono">{nextAppt.startTime}</span>
+							<span className="text-sm text-(--text-muted)">→ {nextAppt.endTime}</span>
+							<span className="ml-auto text-sm font-medium text-(--text)">
+								{formatPrice(nextAppt.totalPrice)}
+							</span>
+						</div>
+						{nextAppt.notes && <p className="text-xs text-(--text-muted) mt-1">{nextAppt.notes}</p>}
+					</div>
+				)}
+
+				{/* Schedule list */}
+				<section className="card p-5">
+					<h2 className="text-sm font-semibold text-(--text) mb-3">
+						{t("barber.schedule")} — {formatDateShort(selectedDate)}
+					</h2>
 					{appointments === undefined ? (
-						<div className="space-y-3">
-							{Array.from({ length: 5 }).map((_, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-								<Skeleton key={i} className="h-20 w-full rounded-xl" />
+						<div className="space-y-2">
+							{Array.from({ length: 4 }).map((_, i) => (
+								<Skeleton
+									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+									key={i}
+									className="h-12 w-full"
+								/>
 							))}
 						</div>
-					) : appointments.length === 0 ? (
-						<div className="empty-state">
-							<Clock size={32} className="mx-auto mb-2 opacity-30" />
-							<p className="text-sm">{t("barber.noAppointments")}</p>
-						</div>
+					) : todayAppts.length === 0 ? (
+						<p className="text-sm text-(--text-muted) py-4 text-center">{t("barber.noAppointments")}</p>
 					) : (
-						<div className="space-y-3">
-							{appointments.map((appt) => (
-								<AppointmentCard key={appt._id} appt={appt} />
-							))}
+						<div className="divide-y divide-(--border)">
+							{todayAppts
+								.sort((a, b) => a.startTime.localeCompare(b.startTime))
+								.map((appt) => (
+									<AppointmentRow key={appt._id} appt={appt} />
+								))}
 						</div>
 					)}
-				</div>
+				</section>
 			</div>
 		</main>
 	)
 }
 
-function AppointmentCard({ appt }: { appt: Appointment }) {
+function AppointmentRow({ appt }: { appt: Appointment }) {
 	const { t } = useTranslation()
 	const shop = useQuery(api.barbershops.getById, { id: appt.barbershopId }) as
 		| Barbershop
 		| null
 		| undefined
 
+	const statusColor =
+		appt.status === "confirmed" || appt.status === "completed"
+			? "bg-green-500"
+			: appt.status === "cancelled"
+				? "bg-red-400"
+				: "bg-amber-400"
+
 	return (
-		<div className="flex items-center gap-4 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-input)]">
-			<div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
-				<Scissors size={20} className="text-[var(--gold)]" />
-			</div>
+		<div className="flex items-center gap-3 py-3">
+			<span className="text-xs font-mono text-(--text-muted) w-20 shrink-0">
+				{appt.startTime} – {appt.endTime}
+			</span>
+			<span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
 			<div className="flex-1 min-w-0">
-				<div className="font-medium text-[var(--text)]">{shop?.name ?? "..."}</div>
-				<div className="text-sm text-[var(--text-muted)]">
-					{appt.startTime} - {appt.endTime}
-				</div>
-				{appt.notes && <div className="text-xs text-[var(--text-subtle)] mt-1">{appt.notes}</div>}
+				<span className="text-sm text-(--text) block truncate">{shop?.name ?? "…"}</span>
+				{appt.notes && <span className="text-xs text-(--text-subtle)">{appt.notes}</span>}
 			</div>
-			<div className="text-right">
-				<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(appt.totalPrice)}</div>
-				<span className={`badge text-xs ${STATUS_BADGE[appt.status]}`}>
-					{t(`status.${appt.status}`)}
-				</span>
-			</div>
+			<span className="text-sm font-medium text-(--text) tabular-nums">
+				{formatPrice(appt.totalPrice)}
+			</span>
+			<span className="text-[11px] text-(--text-muted)">{t(`status.${appt.status}`)}</span>
 		</div>
 	)
 }

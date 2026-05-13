@@ -18,7 +18,7 @@ function AdminDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "admin") navigate({ to: "/home" })
+		if (user.role !== "admin") navigate({ to: "/" })
 	}, [user, navigate])
 
 	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined
@@ -36,7 +36,7 @@ function AdminDashboard() {
 				<AdminNav />
 
 				<div className="page-main">
-					<h1 className="text-2xl font-bold text-[var(--text)] mb-6">{t("admin.overviewTitle")}</h1>
+					<h1 className="text-2xl font-bold text-(--text) mb-6">{t("admin.overviewTitle")}</h1>
 
 					<div className="stat-grid stat-grid-4">
 						{[
@@ -46,9 +46,9 @@ function AdminDashboard() {
 							{ label: t("admin.stats.owners"), value: owners, icon: Star },
 						].map(({ label, value, icon: Icon }) => (
 							<div key={label} className="card p-4">
-								<Icon size={18} className="text-[var(--gold)] mb-2" />
-								<div className="text-2xl font-bold text-[var(--text)]">{value}</div>
-								<div className="text-xs text-[var(--text-muted)]">{label}</div>
+								<Icon size={18} className="text-(--gold) mb-2" />
+								<div className="text-2xl font-bold text-(--text)">{value}</div>
+								<div className="text-xs text-(--text-muted)">{label}</div>
 							</div>
 						))}
 					</div>
@@ -56,7 +56,7 @@ function AdminDashboard() {
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						<div className="card p-5">
 							<div className="section-header">
-								<h2 className="font-bold text-[var(--text)]">{t("admin.recentShops")}</h2>
+								<h2 className="font-bold text-(--text)">{t("admin.recentShops")}</h2>
 								<Link to="/admin/shops" className="section-link">
 									{t("admin.shops.title")} →
 								</Link>
@@ -68,11 +68,11 @@ function AdminDashboard() {
 									{allShops.slice(0, 5).map((shop) => (
 										<div
 											key={shop._id}
-											className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0"
+											className="flex items-center gap-3 py-2 border-b border-(--border) last:border-0"
 										>
 											<div className="flex-1 min-w-0">
-												<div className="text-sm font-medium text-[var(--text)] truncate">{shop.name}</div>
-												<div className="text-xs text-[var(--text-muted)]">{shop.city}</div>
+												<div className="text-sm font-medium text-(--text) truncate">{shop.name}</div>
+												<div className="text-xs text-(--text-muted)">{shop.city}</div>
 											</div>
 											<span className={`badge text-[10px] ${shop.isVerified ? "badge-green" : "badge-gold"}`}>
 												{shop.isVerified ? t("common.verified") : t("admin.shops.pending")}
@@ -87,7 +87,7 @@ function AdminDashboard() {
 						</div>
 
 						<div className="card p-5">
-							<h2 className="font-bold text-[var(--text)] mb-4">{t("admin.userBreakdown")}</h2>
+							<h2 className="font-bold text-(--text) mb-4">{t("admin.userBreakdown")}</h2>
 							{!allUsers ? (
 								<Skeleton className="h-32 w-full" />
 							) : (
@@ -110,10 +110,10 @@ function AdminDashboard() {
 									).map(({ role, count, color }) => (
 										<div key={role}>
 											<div className="flex justify-between text-sm mb-1">
-												<span className="text-[var(--text-muted)]">{role}</span>
-												<span className="font-semibold text-[var(--text)]">{count}</span>
+												<span className="text-(--text-muted)">{role}</span>
+												<span className="font-semibold text-(--text)">{count}</span>
 											</div>
-											<div className="h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
+											<div className="h-1.5 rounded-full bg-(--border) overflow-hidden">
 												<div
 													className="h-full rounded-full transition-all"
 													style={{

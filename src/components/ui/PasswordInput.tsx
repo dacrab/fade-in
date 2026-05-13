@@ -4,7 +4,7 @@ import { useState } from "react"
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "type">
 
-export default function PasswordInput({ className = "input pr-10", ...props }: Props) {
+export default function PasswordInput({ className = "input pr-11", ...props }: Props) {
 	const [show, setShow] = useState(false)
 	return (
 		<div className="relative">
@@ -12,7 +12,7 @@ export default function PasswordInput({ className = "input pr-10", ...props }: P
 			<button
 				type="button"
 				onClick={() => setShow((v) => !v)}
-				className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)] btn-bare"
+				className="absolute right-3 top-1/2 -translate-y-1/2 text-(--text-subtle) hover:text-(--text-muted) transition-colors"
 			>
 				{show ? <EyeOff size={16} /> : <Eye size={16} />}
 			</button>

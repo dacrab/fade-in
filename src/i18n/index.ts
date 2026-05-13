@@ -4,8 +4,8 @@ import el from "./locales/el"
 import en from "./locales/en"
 
 export const LANGUAGES = {
-	en: { label: "English", flag: "🇬🇧" },
-	el: { label: "Ελληνικά", flag: "🇬🇷" },
+	en: { label: "English", flag: "EN" },
+	el: { label: "Ελληνικά", flag: "EL" },
 } as const
 
 export type Language = keyof typeof LANGUAGES

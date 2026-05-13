@@ -21,7 +21,7 @@ export const getAvailableSlots = query({
 	},
 })
 
-/** Creates a new appointment with pending status. */
+/** Creates a new appointment with pending status. Validates slot availability. */
 export const create = mutation({
 	args: {
 		customerId: v.id("users"),
@@ -37,6 +37,16 @@ export const create = mutation({
 	handler: async (ctx, args) => {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
+
+		// Validate slot is still available (prevent double-booking)
+		const existing = await ctx.db
+			.query("appointments")
+			.withIndex("by_barber", (q) => q.eq("barberId", args.barberId))
+			.filter((q) => q.and(q.eq(q.field("date"), args.date), q.neq(q.field("status"), "cancelled")))
+			.collect()
+
+		const conflict = existing.some((a) => args.startTime < a.endTime && args.endTime > a.startTime)
+		if (conflict) throw new ConvexError("This time slot is no longer available.")
 
 		return ctx.db.insert("appointments", {
 			...args,

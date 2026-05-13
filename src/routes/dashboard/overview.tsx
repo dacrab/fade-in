@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Calendar, CheckCircle, Clock, Heart, Scissors, User, XCircle } from "lucide-react"
+import { Calendar, CheckCircle, Clock, Heart, RefreshCw, User, XCircle } from "lucide-react"
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
@@ -8,7 +8,6 @@ import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop } from "#/types"
-import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
@@ -21,7 +20,7 @@ function CustomerDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "customer" && user.role !== "admin") navigate({ to: "/home" })
+		if (user.role !== "customer" && user.role !== "admin") navigate({ to: "/" })
 	}, [user, navigate])
 
 	const appointments = useQuery(
@@ -35,6 +34,7 @@ function CustomerDashboard() {
 		appointments?.filter(
 			(a: Doc<"appointments">) => a.status === "pending" || a.status === "confirmed",
 		) ?? []
+	const completed = appointments?.filter((a: Doc<"appointments">) => a.status === "completed") ?? []
 	const past =
 		appointments?.filter(
 			(a: Doc<"appointments">) => a.status === "completed" || a.status === "cancelled",
@@ -42,105 +42,109 @@ function CustomerDashboard() {
 
 	return (
 		<main className="page-main">
-			<div className="page-wrap max-w-4xl">
-				<div className="section-header">
+			<div className="page-wrap max-w-3xl py-8">
+				{/* Header row */}
+				<div className="flex items-center justify-between mb-6">
 					<div>
-						<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.title")}</h1>
-						<p className="text-[var(--text-muted)] text-sm">
-							{t("dashboard.welcome", { name: user.name })}
-						</p>
+						<h1 className="text-2xl font-bold text-(--text)">{t("dashboard.title")}</h1>
+						<p className="text-sm text-(--text-muted)">{t("dashboard.welcome", { name: user.name })}</p>
 					</div>
 					<div className="flex gap-2">
-						<Link to="/dashboard/favorites" className="btn btn-secondary gap-2 text-sm">
-							<Heart size={15} /> {t("dashboard.favorites")}
+						<Link to="/dashboard/favorites" className="btn btn-secondary text-xs gap-1.5">
+							<Heart size={13} /> {t("dashboard.favorites")}
 						</Link>
-						<Link to="/dashboard/profile" className="btn btn-secondary gap-2 text-sm">
-							<User size={15} /> {t("dashboard.profile")}
+						<Link to="/dashboard/profile" className="btn btn-secondary text-xs gap-1.5">
+							<User size={13} /> {t("dashboard.profile")}
 						</Link>
 					</div>
 				</div>
 
-				{/* Stats */}
-				<div className="stat-grid stat-grid-4 mb-8">
+				{/* Stats row */}
+				<div className="grid grid-cols-4 gap-3 mb-6">
 					{[
-						{
-							label: t("dashboard.stats.total"),
-							value: appointments?.length ?? "—",
-							icon: Calendar,
-						},
+						{ label: t("dashboard.stats.total"), value: appointments?.length ?? "—", icon: Calendar },
 						{ label: t("dashboard.stats.upcoming"), value: upcoming.length, icon: Clock },
-						{
-							label: t("dashboard.stats.completed"),
-							value:
-								appointments?.filter((a: Doc<"appointments">) => a.status === "completed").length ?? "—",
-							icon: CheckCircle,
-						},
+						{ label: t("dashboard.stats.completed"), value: completed.length, icon: CheckCircle },
 						{
 							label: t("dashboard.stats.cancelled"),
-							value:
-								appointments?.filter((a: Doc<"appointments">) => a.status === "cancelled").length ?? "—",
+							value: past.length - completed.length,
 							icon: XCircle,
 						},
 					].map(({ label, value, icon: Icon }) => (
-						<div key={label} className="card p-4">
-							<Icon size={18} className="text-[var(--gold)] mb-2" />
-							<div className="text-2xl font-bold text-[var(--text)]">{value}</div>
-							<div className="text-xs text-[var(--text-muted)]">{label}</div>
+						<div key={label} className="card p-3 flex items-center gap-3">
+							<Icon size={16} className="text-(--gold) shrink-0" />
+							<div>
+								<div className="text-lg font-bold text-(--text) tabular-nums">{value}</div>
+								<div className="text-[11px] text-(--text-muted)">{label}</div>
+							</div>
 						</div>
 					))}
 				</div>
 
 				{/* Upcoming */}
-				<div className="card p-5 mb-5">
-					<h2 className="font-bold text-[var(--text)] mb-4">{t("dashboard.upcomingTitle")}</h2>
+				<section className="card p-5 mb-4">
+					<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.upcomingTitle")}</h2>
 					{appointments === undefined ? (
-						<div className="space-y-3">
+						<div className="space-y-2">
 							{Array.from({ length: 3 }).map((_, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-								<Skeleton key={i} className="h-16 w-full rounded-xl" />
+								<Skeleton
+									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+									key={i}
+									className="h-12 w-full"
+								/>
 							))}
 						</div>
 					) : upcoming.length === 0 ? (
-						<div className="empty-state">
-							<Calendar size={32} className="mx-auto mb-2 opacity-30" />
-							<p className="text-sm">{t("dashboard.noUpcoming")}</p>
-							<Link to="/barbershops/listing" className="btn btn-primary mt-3 inline-flex text-sm">
+						<div className="text-center py-6">
+							<p className="text-sm text-(--text-muted) mb-3">{t("dashboard.noUpcoming")}</p>
+							<Link to="/barbershops/listing" className="btn btn-primary text-xs">
 								{t("common.bookNow")}
 							</Link>
 						</div>
 					) : (
-						<div className="space-y-3">
+						<div className="divide-y divide-(--border)">
 							{upcoming.map((appt: Doc<"appointments">) => (
-								<AppointmentRow key={appt._id} appt={appt as Appointment} />
+								<AppointmentRow key={appt._id} appt={appt as Appointment} showActions />
 							))}
 						</div>
 					)}
-				</div>
+				</section>
 
-				{/* Past */}
+				{/* Past appointments */}
 				{past.length > 0 && (
-					<div className="card p-5">
-						<h2 className="font-bold text-[var(--text)] mb-4">{t("dashboard.pastTitle")}</h2>
-						<div className="space-y-3">
-							{past.slice(0, 5).map((appt: Doc<"appointments">) => (
-								<AppointmentRow key={appt._id} appt={appt as Appointment} />
+					<section className="card p-5">
+						<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.pastTitle")}</h2>
+						<div className="divide-y divide-(--border)">
+							{past.slice(0, 8).map((appt: Doc<"appointments">) => (
+								<AppointmentRow
+									key={appt._id}
+									appt={appt as Appointment}
+									showRebook={appt.status === "completed"}
+								/>
 							))}
 						</div>
-					</div>
+					</section>
 				)}
 			</div>
 		</main>
 	)
 }
 
-function AppointmentRow({ appt }: { appt: Appointment }) {
+function AppointmentRow({
+	appt,
+	showActions,
+	showRebook,
+}: {
+	appt: Appointment
+	showActions?: boolean
+	showRebook?: boolean
+}) {
 	const { t } = useTranslation()
 	const shop = useQuery(api.barbershops.getById, { id: appt.barbershopId }) as
 		| Barbershop
 		| null
 		| undefined
 	const updateStatus = useMutation(api.appointments.updateStatus)
-	const canCancel = appt.status === "pending" || appt.status === "confirmed"
 
 	const handleCancel = () =>
 		withToast(
@@ -149,28 +153,41 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 			t("errors.updateStatusFailed"),
 		)
 
+	const statusColor =
+		appt.status === "confirmed" || appt.status === "completed"
+			? "bg-green-500"
+			: appt.status === "cancelled"
+				? "bg-red-400"
+				: "bg-amber-400"
+
 	return (
-		<div className="flex items-center gap-4 p-3 rounded-xl border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors bg-[var(--bg-input)]">
-			<div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[rgba(245,158,11,0.1)]">
-				<Scissors size={18} className="text-[var(--gold)]" />
-			</div>
+		<div className="flex items-center gap-3 py-3 group">
+			<span className="text-xs font-mono text-(--text-muted) w-11 shrink-0">{appt.startTime}</span>
+			<span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
 			<div className="flex-1 min-w-0">
-				<div className="font-medium text-[var(--text)] text-sm truncate">{shop?.name ?? "..."}</div>
-				<div className="text-xs text-[var(--text-muted)]">
-					{formatDateShort(appt.date)} {t("common.at")} {appt.startTime}
-				</div>
+				<span className="text-sm text-(--text) block truncate">{shop?.name ?? "…"}</span>
+				<span className="text-xs text-(--text-subtle)">{formatDateShort(appt.date)}</span>
 			</div>
-			<div className="text-sm font-bold text-[var(--gold)]">{formatPrice(appt.totalPrice)}</div>
-			<span className={`badge ${STATUS_BADGE[appt.status]}`}>{t(`status.${appt.status}`)}</span>
-			{canCancel && (
+			<span className="text-sm font-medium text-(--text) tabular-nums">
+				{formatPrice(appt.totalPrice)}
+			</span>
+			{showActions && (appt.status === "pending" || appt.status === "confirmed") && (
 				<button
 					type="button"
 					onClick={() => void handleCancel()}
-					className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors flex-shrink-0"
-					title={t("common.cancel")}
+					className="text-xs text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
 				>
-					<XCircle size={14} />
+					{t("common.cancel")}
 				</button>
+			)}
+			{showRebook && shop && (
+				<Link
+					to="/barbershops/$slug"
+					params={{ slug: shop.slug }}
+					className="text-xs text-(--gold) hover:underline opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+				>
+					<RefreshCw size={11} /> Rebook
+				</Link>
 			)}
 		</div>
 	)
@@ -179,15 +196,18 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 function DashSkeleton() {
 	return (
 		<main className="page-main">
-			<div className="page-wrap max-w-4xl space-y-6">
-				<Skeleton className="h-10 w-48" />
-				<div className="grid grid-cols-4 gap-4">
+			<div className="page-wrap max-w-3xl py-8 space-y-4">
+				<Skeleton className="h-8 w-48" />
+				<div className="grid grid-cols-4 gap-3">
 					{Array.from({ length: 4 }).map((_, i) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-						<Skeleton key={i} className="h-24 rounded-xl" />
+						<Skeleton
+							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+							key={i}
+							className="h-16 rounded-xl"
+						/>
 					))}
 				</div>
-				<Skeleton className="h-64 rounded-2xl" />
+				<Skeleton className="h-48 rounded-xl" />
 			</div>
 		</main>
 	)

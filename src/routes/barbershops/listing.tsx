@@ -32,11 +32,13 @@ function BarbershopsPage() {
 	const [view, setView] = useState<"list" | "map">("list")
 	const [showFilters, setShowFilters] = useState(false)
 
-	const shops = useQuery(api.barbershops.list, {
+	const shopsResult = useQuery(api.barbershops.list, {
 		city: city || undefined,
 		search: search || undefined,
 		minRating: minRating > 0 ? minRating : undefined,
-	}) as Barbershop[] | undefined
+		paginationOpts: { cursor: null, numItems: 50 },
+	})
+	const shops = (shopsResult?.page ?? undefined) as Barbershop[] | undefined
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault()
@@ -53,112 +55,128 @@ function BarbershopsPage() {
 
 	return (
 		<main className="page-main">
-			<div className="page-wrap">
-				<div className="mb-6">
-					<h1 className="text-3xl font-bold text-[var(--text)] mb-1">{t("barbershops.title")}</h1>
-					<p className="text-[var(--text-muted)] text-sm">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+				{/* Page Title */}
+				<div className="mb-10">
+					<h1 className="text-4xl sm:text-5xl font-bold text-(--text) tracking-tight">
+						{t("barbershops.title")}
+					</h1>
+					<p className="text-(--text-muted) text-sm mt-2 tracking-wide">
 						{shops === undefined ? t("common.loading") : t("barbershops.found", { count: shops.length })}
 					</p>
 				</div>
 
-				<form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 mb-4">
-					<div className="flex-1 relative">
-						<Search
-							size={16}
-							className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]"
-						/>
-						<input
-							className="input pl-9"
-							placeholder={t("barbershops.searchPlaceholder")}
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-						/>
-					</div>
-					<div className="relative sm:w-44">
-						<MapPin
-							size={16}
-							className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]"
-						/>
-						<input
-							className="input pl-9"
-							placeholder={t("home.cityPlaceholder")}
-							value={city}
-							onChange={(e) => setCity(e.target.value)}
-						/>
-					</div>
-					<button type="submit" className="btn btn-primary gap-2 whitespace-nowrap">
-						<Search size={15} />
-						{t("common.search")}
-					</button>
-					<button
-						type="button"
-						onClick={() => setShowFilters(!showFilters)}
-						className={`btn btn-secondary gap-2 ${showFilters ? "border-[var(--gold)]/50 text-[var(--gold)]" : ""}`}
-					>
-						<Filter size={15} />
-						{t("common.filter")}
-						{minRating > 0 && (
-							<span className="badge badge-gold py-0 px-1.5 text-[10px]">{minRating}+</span>
-						)}
-					</button>
-					<div className="flex rounded-lg overflow-hidden border border-[var(--border)]">
-						{(["list", "map"] as const).map((v) => (
-							<button
-								key={v}
-								type="button"
-								onClick={() => setView(v)}
-								className={`btn-bare px-3 py-2 flex items-center gap-1.5 text-xs font-medium transition-colors ${view === v ? "bg-[var(--gold)] text-black" : "bg-[var(--bg-card)] text-[var(--text-muted)]"}`}
-							>
-								{v === "list" ? <List size={14} /> : <MapIcon size={14} />}
-								<span className="hidden sm:inline">
-									{v === "list" ? t("barbershops.listView") : t("barbershops.mapView")}
+				{/* Search Bar + View Toggle */}
+				<form onSubmit={handleSearch} className="mb-6">
+					<div className="flex items-center gap-3">
+						<div className="flex-1 flex items-center rounded-full bg-(--bg-card) border border-[var(--gold)/15] overflow-hidden transition-all duration-300 focus-within:border-(--gold)/40 focus-within:shadow-[0_0_20px_var(--gold)/8]">
+							<div className="flex items-center pl-5 pr-2">
+								<Search size={16} className="text-(--text-subtle)" />
+							</div>
+							<input
+								className="flex-1 bg-transparent border-none outline-none py-3 text-sm text-(--text) placeholder:text-(--text-subtle)"
+								placeholder={t("barbershops.searchPlaceholder")}
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+							/>
+							<div className="w-px h-5 bg-(--border) opacity-50" />
+							<div className="flex items-center pl-2 pr-1">
+								<MapPin size={14} className="text-(--text-subtle)" />
+							</div>
+							<input
+								className="w-32 sm:w-40 bg-transparent border-none outline-none py-3 pr-4 text-sm text-(--text) placeholder:text-(--text-subtle)"
+								placeholder={t("home.cityPlaceholder")}
+								value={city}
+								onChange={(e) => setCity(e.target.value)}
+							/>
+						</div>
+
+						{/* Filter Toggle */}
+						<button
+							type="button"
+							onClick={() => setShowFilters(!showFilters)}
+							className={`relative flex items-center gap-1.5 px-4 py-3 rounded-full text-xs font-medium transition-all duration-300 ${
+								showFilters
+									? "bg-(--gold)/15 text-(--gold) border border-(--gold)/30"
+									: "bg-(--bg-card) text-(--text-muted) border border-[var(--gold)/10] hover:border-(--gold)/25 hover:text-(--text)"
+							}`}
+						>
+							<Filter size={14} />
+							<span className="hidden sm:inline">{t("common.filter")}</span>
+							{minRating > 0 && (
+								<span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-(--gold) text-white text-[9px] flex items-center justify-center font-bold">
+									{minRating}
 								</span>
-							</button>
-						))}
+							)}
+						</button>
+
+						{/* View Toggle - Pill Segmented Control */}
+						<div className="flex rounded-full bg-(--bg-card) border border-[var(--gold)/10] p-1">
+							{(["list", "map"] as const).map((v) => (
+								<button
+									key={v}
+									type="button"
+									onClick={() => setView(v)}
+									className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 ${
+										view === v
+											? "bg-(--gold) text-white shadow-[0_2px_8px_rgba(200,75,49,0.3)]"
+											: "text-(--text-muted) hover:text-(--text)"
+									}`}
+								>
+									{v === "list" ? <List size={13} /> : <MapIcon size={13} />}
+									<span className="hidden sm:inline">
+										{v === "list" ? t("barbershops.listView") : t("barbershops.mapView")}
+									</span>
+								</button>
+							))}
+						</div>
 					</div>
 				</form>
 
+				{/* Filter Panel - Inline, minimal */}
 				{showFilters && (
-					<div className="card p-5 mb-5 fade-up">
-						<div className="flex items-center justify-between mb-4">
-							<h3 className="text-sm font-semibold text-[var(--text)]">{t("common.filter")}</h3>
+					<div className="mb-5 px-1 animate-[fadeUp_0.3s_ease]">
+						<div className="flex items-center gap-6">
+							<div className="flex-1 max-w-sm">
+								<div className="flex items-center justify-between mb-2">
+									<p className="text-xs font-medium text-(--text-muted) tracking-wide uppercase">
+										{t("barbershops.minRating")}
+									</p>
+									<span className="text-sm font-semibold text-(--gold)">
+										{minRating === 0
+											? t("common.anyRating")
+											: t("barbershops.ratingAbove", { rating: minRating })}
+									</span>
+								</div>
+								<input
+									type="range"
+									min={0}
+									max={5}
+									step={0.5}
+									value={minRating}
+									onChange={(e) => setMinRating(Number(e.target.value))}
+									className="w-full h-1 rounded-full appearance-none cursor-pointer bg-(--border) accent-(--gold) [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-(--gold) [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(200,75,49,0.4)]"
+								/>
+								<div className="flex justify-between text-[10px] text-(--text-subtle) mt-1 tracking-wide">
+									<span>{t("common.anyRating")}</span>
+									<span>5</span>
+								</div>
+							</div>
 							{minRating > 0 && (
 								<button
 									type="button"
 									onClick={() => setMinRating(0)}
-									className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--error)] transition-colors btn-bare"
+									className="flex items-center gap-1 text-xs text-(--text-muted) hover:text-(--gold) transition-colors"
 								>
 									<X size={12} />
 									{t("common.reset")}
 								</button>
 							)}
 						</div>
-						<div>
-							<div className="flex items-center justify-between mb-2">
-								<p className="text-xs font-medium text-[var(--text-muted)]">{t("barbershops.minRating")}</p>
-								<span className="text-sm font-bold text-[var(--gold)]">
-									{minRating === 0
-										? t("common.anyRating")
-										: t("barbershops.ratingAbove", { rating: minRating })}
-								</span>
-							</div>
-							<input
-								type="range"
-								min={0}
-								max={5}
-								step={0.5}
-								value={minRating}
-								onChange={(e) => setMinRating(Number(e.target.value))}
-								className="w-full accent-[var(--gold)]"
-							/>
-							<div className="flex justify-between text-xs text-[var(--text-subtle)] mt-1">
-								<span>{t("common.anyRating")}</span>
-								<span>5</span>
-							</div>
-						</div>
 					</div>
 				)}
 
+				{/* Content */}
 				{view === "map" ? (
 					<MapView
 						shops={shops ?? []}
@@ -172,10 +190,12 @@ function BarbershopsPage() {
 						))}
 					</div>
 				) : shops.length === 0 ? (
-					<div className="empty-state">
-						<Scissors size={40} className="mx-auto mb-4 opacity-30" />
-						<p className="text-lg font-semibold text-[var(--text)] mb-1">{t("barbershops.noShops")}</p>
-						<p className="text-sm mb-4">{t("barbershops.noShopsHint")}</p>
+					<div className="flex flex-col items-center justify-center py-8 text-center">
+						<div className="w-20 h-20 rounded-full bg-[var(--gold)/8] flex items-center justify-center mb-6">
+							<Scissors size={32} className="text-(--gold)/40" />
+						</div>
+						<p className="text-xl font-semibold text-(--text) mb-2">{t("barbershops.noShops")}</p>
+						<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t("barbershops.noShopsHint")}</p>
 						{(search || city || minRating > 0) && (
 							<button
 								type="button"
@@ -184,7 +204,7 @@ function BarbershopsPage() {
 									setCity("")
 									setMinRating(0)
 								}}
-								className="btn btn-secondary text-sm"
+								className="px-6 py-2.5 rounded-full text-sm font-medium bg-(--bg-card) border border-[rgba(200,75,49,0.2)] text-(--text) hover:border-(--gold)/40 transition-all duration-300"
 							>
 								{t("barbershops.clearFilters")}
 							</button>

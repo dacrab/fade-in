@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
-import { ArrowLeft, PlusCircle, Save } from "lucide-react"
+import { PlusCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { showToast } from "#/components/ui/Toast"
@@ -36,6 +36,7 @@ const EMPTY: ShopForm = {
 function BusinessProfile() {
 	const { t } = useTranslation()
 	const { user } = useBusinessAuth()
+	const router = useRouter()
 
 	const [form, setForm] = useState(EMPTY)
 	const set =
@@ -95,6 +96,7 @@ function BusinessProfile() {
 					socialLinks,
 				})
 				showToast(t("errors.shopCreated"), "success")
+				void router.navigate({ to: "/business/overview" })
 			}
 		} catch {
 			showToast(t("errors.shopFailed"), "error")
@@ -104,48 +106,45 @@ function BusinessProfile() {
 	}
 
 	return (
-		<main className="page-main">
-			<div className="page-wrap max-w-2xl">
-				<div className="mb-6">
-					<Link
-						to="/business/overview"
-						className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
-					>
-						<ArrowLeft size={14} />
-						{t("nav.business")}
-					</Link>
-					<h1 className="text-2xl font-bold text-[var(--text)]">
+		<div className="px-8 py-8">
+			<div className="max-w-2xl mx-auto px-6 py-8">
+				<div className="mb-5">
+					<Link to="/business/overview"></Link>
+					<h1 className="text-lg font-medium text-(--text) tracking-tight">
 						{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}
 					</h1>
 				</div>
 
-				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
-					<div className="card p-5 space-y-4">
-						<h2 className="font-bold text-[var(--text)]">{t("business.profile.basicInfo")}</h2>
+				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-10">
+					{/* Basic Info */}
+					<div className="space-y-5">
+						<h2 className="text-[11px] font-medium text-(--text-subtle)">
+							{t("business.profile.basicInfo")}
+						</h2>
 						<div>
-							<label className="form-label" htmlFor="shop-name">
+							<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-name">
 								{t("form.nameStar")}
 							</label>
 							<input
-								className="input"
+								className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 								placeholder={t("business.profile.namePlaceholder")}
 								value={form.name}
 								onChange={set("name")}
 								required
 							/>
 							{form.name && (
-								<p className="text-xs text-[var(--text-muted)] mt-1">
+								<p className="text-[11px] text-(--text-subtle) mt-1.5">
 									{t("business.profile.urlPreview", { slug: slugify(form.name) })}
 								</p>
 							)}
 						</div>
 						<div>
-							<label className="form-label" htmlFor="shop-desc">
+							<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-desc">
 								{t("form.descriptionLabel")}
 							</label>
 							<textarea
 								id="shop-desc"
-								className="input resize-none"
+								className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
 								rows={3}
 								placeholder={t("business.profile.descPlaceholder")}
 								value={form.description}
@@ -154,11 +153,11 @@ function BusinessProfile() {
 						</div>
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<label className="form-label" htmlFor="shop-phone">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-phone">
 									{t("form.phoneLabel")}
 								</label>
 								<input
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									placeholder={t("business.profile.phonePlaceholder")}
 									value={form.phone}
 									onChange={set("phone")}
@@ -166,11 +165,11 @@ function BusinessProfile() {
 								/>
 							</div>
 							<div>
-								<label className="form-label" htmlFor="shop-city">
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-city">
 									{t("form.cityStar")}
 								</label>
 								<input
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									placeholder={t("form.cityPlaceholder")}
 									value={form.city}
 									onChange={set("city")}
@@ -179,11 +178,11 @@ function BusinessProfile() {
 							</div>
 						</div>
 						<div>
-							<label className="form-label" htmlFor="shop-address">
+							<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-address">
 								{t("form.addressStar")}
 							</label>
 							<input
-								className="input"
+								className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 								placeholder={t("business.profile.addressPlaceholder")}
 								value={form.address}
 								onChange={set("address")}
@@ -192,16 +191,19 @@ function BusinessProfile() {
 						</div>
 					</div>
 
-					<div className="card p-5 space-y-4">
-						<h2 className="font-bold text-[var(--text)]">{t("business.profile.socialLinks")}</h2>
+					{/* Social Links */}
+					<div className="space-y-5">
+						<h2 className="text-[11px] font-medium text-(--text-subtle)">
+							{t("business.profile.socialLinks")}
+						</h2>
 						{(["instagram", "facebook", "website"] as const).map((key) => (
 							<div key={key}>
-								<label className="form-label" htmlFor={`social-${key}`}>
+								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor={`social-${key}`}>
 									{t(`form.${key}Label`)}
 								</label>
 								<input
 									id={`social-${key}`}
-									className="input"
+									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 									placeholder="https://..."
 									value={form[key]}
 									onChange={set(key)}
@@ -211,12 +213,12 @@ function BusinessProfile() {
 						))}
 					</div>
 
-					<button type="submit" disabled={saving} className="btn btn-primary gap-2">
-						{shop ? <Save size={15} /> : <PlusCircle size={15} />}
+					<button type="submit" disabled={saving} className="btn btn-primary disabled:opacity-50">
+						{shop ? <Save size={14} /> : <PlusCircle size={14} />}
 						{saving ? t("common.loading") : shop ? t("common.save") : t("business.createShop")}
 					</button>
 				</form>
 			</div>
-		</main>
+		</div>
 	)
 }

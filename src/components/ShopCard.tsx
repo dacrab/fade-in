@@ -6,41 +6,45 @@ import type { Barbershop } from "#/types"
 export default function ShopCard({ shop }: { shop: Barbershop }) {
 	const { t } = useTranslation()
 	return (
-		<Link to="/barbershops/$slug" params={{ slug: shop.slug }} className="shop-card">
-			<div className="shop-card-img">
+		<Link
+			to="/barbershops/$slug"
+			params={{ slug: shop.slug }}
+			className="shop-card block bg-white rounded-[12px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] transition-shadow duration-300 overflow-hidden no-underline"
+		>
+			<div className="relative w-full h-44 overflow-hidden">
 				{shop.images[0] ? (
 					<img
 						src={shop.images[0]}
 						alt={shop.name}
-						className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+						className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
 					/>
 				) : (
-					<div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">
+					<div className="w-full h-full flex items-center justify-center bg-(--bg) text-(--gold)/40">
 						<Scissors size={36} />
 					</div>
 				)}
-				{shop.isVerified && (
-					<div className="absolute top-3 left-3 badge badge-gold text-[11px]">
-						<Check size={9} /> {t("common.verified")}
-					</div>
-				)}
 			</div>
-			<div className="shop-card-body">
-				<div className="flex items-start justify-between gap-2 mb-1">
-					<h3 className="font-bold text-[var(--text)] text-sm leading-tight">{shop.name}</h3>
-					<div className="flex items-center gap-1 flex-shrink-0">
-						<Star size={13} fill="currentColor" className="text-[var(--gold)]" />
-						<span className="text-sm font-semibold text-[var(--text)]">{shop.rating.toFixed(1)}</span>
-						<span className="text-xs text-[var(--text-muted)]">({shop.reviewCount})</span>
+			<div className="p-4">
+				<div className="flex items-center gap-1.5 mb-1">
+					<h3 className="font-bold text-(--text) text-[15px] leading-tight truncate">{shop.name}</h3>
+					{shop.isVerified && (
+						<span
+							className="flex-shrink-0 w-4 h-4 rounded-full bg-(--gold) flex items-center justify-center"
+							title={t("common.verified")}
+						>
+							<Check size={10} className="text-white" strokeWidth={3} />
+						</span>
+					)}
+					<div className="flex items-center gap-0.5 ml-auto">
+						<Star size={12} fill="var(--gold)" className="text-(--gold)" />
+						<span className="text-sm font-medium text-(--text)">{shop.rating.toFixed(1)}</span>
 					</div>
 				</div>
-				<div className="flex items-center gap-1 text-xs text-[var(--text-muted)] mb-3">
-					<MapPin size={12} />
-					{shop.address}, {shop.city}
-				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-xs text-[var(--text-subtle)]">{shop.city}</span>
-					<span className="text-xs font-semibold text-[var(--gold)]">{t("common.bookNow")} →</span>
+				<div className="flex items-center gap-1 text-xs text-(--text-muted)">
+					<MapPin size={11} className="flex-shrink-0" />
+					<span className="truncate">
+						{shop.address}, {shop.city}
+					</span>
 				</div>
 			</div>
 		</Link>

@@ -34,26 +34,26 @@ function ProfilePage() {
 
 	return (
 		<main className="page-main">
-			<div className="page-wrap max-w-xl">
-				<div className="mb-6">
-					<Link
-						to="/dashboard/overview"
-						className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] mb-2"
-					>
-						<ArrowLeft size={14} />
-						{t("nav.dashboard")}
-					</Link>
-					<h1 className="text-2xl font-bold text-[var(--text)]">{t("dashboard.profileTitle")}</h1>
-				</div>
+			<div className="page-wrap max-w-lg py-8">
+				<Link
+					to="/dashboard/overview"
+					className="inline-flex items-center gap-1.5 text-xs text-(--text-muted) hover:text-(--text) mb-4"
+				>
+					<ArrowLeft size={12} /> {t("nav.dashboard")}
+				</Link>
+				<h1 className="text-2xl font-bold text-(--text) mb-6">{t("dashboard.profileTitle")}</h1>
 
 				<div className="card p-6">
-					<div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border)]">
-						<div className="avatar avatar-lg">{user?.name.charAt(0).toUpperCase()}</div>
-						<div>
-							<h2 className="font-bold text-[var(--text)]">{user?.name}</h2>
-							<p className="text-sm text-[var(--text-muted)]">{user?.email}</p>
-							<span className="badge badge-gold mt-1">{user?.role}</span>
+					{/* User info */}
+					<div className="flex items-center gap-3 mb-6 pb-5 border-b border-(--border)">
+						<div className="w-10 h-10 rounded-lg bg-(--gold)/10 flex items-center justify-center text-sm font-bold text-(--gold)">
+							{(user?.name ?? user?.email)?.[0]?.toUpperCase() ?? "?"}
 						</div>
+						<div>
+							<div className="text-sm font-medium text-(--text)">{user?.name ?? user?.email}</div>
+							<div className="text-xs text-(--text-muted)">{user?.email}</div>
+						</div>
+						<span className="ml-auto badge badge-gold text-[10px]">{user?.role}</span>
 					</div>
 
 					<form onSubmit={(e) => void handleSave(e)} className="space-y-4">
@@ -84,16 +84,11 @@ function ProfilePage() {
 							<label className="form-label" htmlFor="profile-email">
 								{t("auth.emailLabel")}
 							</label>
-							<input
-								id="profile-email"
-								className="input opacity-50 cursor-not-allowed"
-								value={user?.email}
-								disabled
-							/>
-							<p className="text-xs text-[var(--text-muted)] mt-1">{t("dashboard.emailNote")}</p>
+							<input className="input opacity-50 cursor-not-allowed" value={user?.email} disabled />
+							<p className="text-xs text-(--text-subtle) mt-1">{t("dashboard.emailNote")}</p>
 						</div>
 						<button type="submit" disabled={saving} className="btn btn-primary gap-2">
-							<Save size={15} />
+							<Save size={14} />
 							{saving ? t("common.loading") : t("common.save")}
 						</button>
 					</form>

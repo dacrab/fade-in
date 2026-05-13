@@ -19,7 +19,7 @@ export function StarRating({
 	onRate,
 }: StarRatingProps) {
 	return (
-		<div className="flex items-center gap-0.5">
+		<div className="flex items-center gap-px">
 			{KEYS.slice(0, max).map((key, i) => (
 				<button
 					key={key}
@@ -28,13 +28,13 @@ export function StarRating({
 					className={cn(
 						"bg-transparent border-0 p-0",
 						interactive
-							? "cursor-pointer hover:scale-110 transition-transform"
+							? "cursor-pointer hover:scale-125 transition-transform"
 							: "cursor-default pointer-events-none",
 					)}
 				>
 					<Star
 						size={size}
-						className={i < Math.floor(rating) ? "star" : "star-empty"}
+						className={i < Math.floor(rating) ? "text-(--gold)" : "text-(--border)"}
 						fill={i < Math.floor(rating) ? "currentColor" : "none"}
 					/>
 				</button>

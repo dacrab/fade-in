@@ -33,7 +33,7 @@ export default function Header() {
 
 	const handleLogout = () => {
 		logout()
-		void router.navigate({ to: "/home" })
+		void router.navigate({ to: "/" })
 	}
 
 	const roleItem = user ? ROLE_NAV[user.role as keyof typeof ROLE_NAV] : undefined
@@ -59,118 +59,173 @@ export default function Header() {
 	]
 
 	return (
-		<header className="sticky top-0 z-50 border-b border-[var(--border)] backdrop-blur-lg bg-[var(--header-bg)]">
-			<nav className="page-wrap px-4 flex items-center gap-4 h-16">
-				<Link to="/home" className="flex items-center gap-2 no-underline flex-shrink-0">
-					<div className="gold-gradient flex items-center justify-center w-8 h-8 rounded-lg">
-						<Scissors size={16} className="text-black" />
+		<>
+			<header className="sticky top-0 z-50 border-b border-(--border) bg-(--bg)">
+				<nav className="page-wrap px-6 md:px-10 flex items-center justify-between h-18">
+					{/* Logo */}
+					<Link to="/" className="flex items-center gap-2.5 no-underline flex-shrink-0 group">
+						<Scissors
+							size={20}
+							strokeWidth={1.5}
+							className="text-(--gold) transition-transform duration-300 group-hover:rotate-[-12deg]"
+						/>
+						<span className="font-semibold text-[1.1rem] tracking-tight text-(--text)">
+							Fade<span className="text-(--gold)">In</span>
+						</span>
+					</Link>
+
+					{/* Desktop Nav */}
+					<div className="hidden md:flex items-center gap-8">
+						<Link
+							to="/"
+							className="relative text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200 py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-(--gold) after:transition-all after:duration-200 hover:after:w-full"
+							activeProps={{
+								className:
+									"relative text-sm font-medium text-(--gold) py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-(--gold)",
+							}}
+						>
+							{t("nav.home")}
+						</Link>
+						<Link
+							to="/barbershops/listing"
+							className="relative text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200 py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-(--gold) after:transition-all after:duration-200 hover:after:w-full"
+							activeProps={{
+								className:
+									"relative text-sm font-medium text-(--gold) py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-(--gold)",
+							}}
+						>
+							{t("nav.barbershops")}
+						</Link>
+						<Link
+							to="/for-business"
+							className="relative text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200 py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-(--gold) after:transition-all after:duration-200 hover:after:w-full"
+							activeProps={{
+								className:
+									"relative text-sm font-medium text-(--gold) py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-(--gold)",
+							}}
+						>
+							{t("nav.forBusiness")}
+						</Link>
 					</div>
-					<span className="font-bold text-lg tracking-tight text-[var(--text)]">
-						Fade<span className="gold-text">In</span>
-					</span>
-				</Link>
 
-				<div className="hidden md:flex items-center gap-1 ml-4">
-					<Link to="/home" className="nav-link" activeProps={{ className: "nav-link active" }}>
-						{t("nav.home")}
-					</Link>
-					<Link
-						to="/barbershops/listing"
-						className="nav-link"
-						activeProps={{ className: "nav-link active" }}
-					>
-						{t("nav.barbershops")}
-					</Link>
-					<Link to="/for-business" className="nav-link" activeProps={{ className: "nav-link active" }}>
-						{t("nav.forBusiness")}
-					</Link>
-				</div>
+					{/* Right side */}
+					<div className="flex items-center gap-3">
+						{user ? (
+							<Menu
+								align="end"
+								trigger={
+									<button
+										type="button"
+										className="flex items-center gap-2 py-1.5 px-1 rounded-full hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+									>
+										<div className="w-8 h-8 rounded-full bg-(--gold) text-white flex items-center justify-center text-xs font-medium">
+											{(user.name ?? user.email)?.[0]?.toUpperCase() ?? "?"}
+										</div>
+										<span className="hidden sm:block text-sm text-(--text) font-medium">
+											{user.name ?? user.email}
+										</span>
+									</button>
+								}
+								items={userMenuItems}
+							/>
+						) : (
+							<div className="hidden md:flex items-center gap-4">
+								<Link
+									to="/login"
+									className="text-sm font-medium text-(--text-muted) hover:text-(--gold) transition-colors duration-200"
+								>
+									{t("common.signIn")}
+								</Link>
+								<Link to="/register" className="btn btn-primary text-sm">
+									{t("common.getStarted")}
+								</Link>
+							</div>
+						)}
 
-				<div className="flex items-center gap-2 ml-auto">
-					{user ? (
-						<Menu
-							align="end"
-							trigger={
+						<LanguageToggle />
+
+						<button
+							type="button"
+							className="md:hidden p-2 text-(--text) hover:text-(--gold) transition-colors"
+							onClick={() => setMobileOpen((o) => !o)}
+						>
+							{mobileOpen ? <X size={20} /> : <MenuIcon size={20} />}
+						</button>
+					</div>
+				</nav>
+			</header>
+
+			{/* Mobile menu — slide-down panel */}
+			{mobileOpen && (
+				<div className="fixed top-[72px] left-0 right-0 z-[60] bg-(--bg) border-b border-(--border) shadow-sm md:hidden">
+					<div className="flex flex-col px-6 py-6 gap-4">
+						<Link
+							to="/"
+							className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
+							onClick={() => setMobileOpen(false)}
+						>
+							{t("nav.home")}
+						</Link>
+						<Link
+							to="/barbershops/listing"
+							className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
+							onClick={() => setMobileOpen(false)}
+						>
+							{t("nav.barbershops")}
+						</Link>
+						<Link
+							to="/for-business"
+							className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
+							onClick={() => setMobileOpen(false)}
+						>
+							{t("nav.forBusiness")}
+						</Link>
+
+						{user ? (
+							<>
+								<div className="w-full h-px bg-[#e8e0d8]" />
+								{roleItem && (
+									<Link
+										to={roleItem.to}
+										className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
+										onClick={() => setMobileOpen(false)}
+									>
+										{t(roleItem.labelKey)}
+									</Link>
+								)}
 								<button
 									type="button"
-									className="bg-card flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors text-sm cursor-pointer"
+									onClick={() => {
+										handleLogout()
+										setMobileOpen(false)
+									}}
+									className="text-base font-medium text-red-600 hover:text-red-700 transition-colors py-2 text-left"
 								>
-									<div className="avatar avatar-sm">{user.name.charAt(0).toUpperCase()}</div>
-									<span className="hidden sm:block text-[var(--text)]">{user.name}</span>
+									{t("common.signOut")}
 								</button>
-							}
-							items={userMenuItems}
-						/>
-					) : (
-						<div className="flex items-center gap-2">
-							<Link to="/login" className="btn btn-ghost text-sm px-4 py-2">
-								{t("common.signIn")}
-							</Link>
-							<Link to="/register" className="btn btn-primary text-sm px-4 py-2">
-								{t("common.getStarted")}
-							</Link>
-						</div>
-					)}
-
-					<LanguageToggle />
-
-					<button
-						type="button"
-						className="md:hidden icon-btn btn-bare"
-						onClick={() => setMobileOpen((o) => !o)}
-					>
-						{mobileOpen ? <X size={20} /> : <MenuIcon size={20} />}
-					</button>
-				</div>
-			</nav>
-
-			{mobileOpen && (
-				<div className="md:hidden bg-card border-t border-[var(--border)] px-4 py-4 flex flex-col gap-2">
-					<Link to="/home" className="nav-link" onClick={() => setMobileOpen(false)}>
-						{t("nav.home")}
-					</Link>
-					<Link to="/barbershops/listing" className="nav-link" onClick={() => setMobileOpen(false)}>
-						{t("nav.barbershops")}
-					</Link>
-					<Link to="/for-business" className="nav-link" onClick={() => setMobileOpen(false)}>
-						{t("nav.forBusiness")}
-					</Link>
-					{user ? (
-						<>
-							<hr className="divider my-1" />
-							{roleItem && (
-								<Link to={roleItem.to} className="nav-link" onClick={() => setMobileOpen(false)}>
-									{t(roleItem.labelKey)}
+							</>
+						) : (
+							<>
+								<div className="w-full h-px bg-[#e8e0d8]" />
+								<Link
+									to="/login"
+									className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
+									onClick={() => setMobileOpen(false)}
+								>
+									{t("common.signIn")}
 								</Link>
-							)}
-							<button
-								type="button"
-								onClick={() => {
-									handleLogout()
-									setMobileOpen(false)
-								}}
-								className="nav-link text-left text-[var(--error)] btn-bare"
-							>
-								{t("common.signOut")}
-							</button>
-						</>
-					) : (
-						<>
-							<hr className="divider my-1" />
-							<Link to="/login" className="nav-link" onClick={() => setMobileOpen(false)}>
-								{t("common.signIn")}
-							</Link>
-							<Link
-								to="/register"
-								className="btn btn-primary justify-center mt-1"
-								onClick={() => setMobileOpen(false)}
-							>
-								{t("common.getStarted")}
-							</Link>
-						</>
-					)}
+								<Link
+									to="/register"
+									className="btn btn-primary w-full justify-center"
+									onClick={() => setMobileOpen(false)}
+								>
+									{t("common.getStarted")}
+								</Link>
+							</>
+						)}
+					</div>
 				</div>
 			)}
-		</header>
+		</>
 	)
 }

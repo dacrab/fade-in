@@ -1,31 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#F59E0B"/>
-      <stop offset="100%" stop-color="#D97706"/>
-    </linearGradient>
-    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-    </linearGradient>
-  </defs>
+  <!-- Clean rounded square background -->
+  <rect width="64" height="64" rx="14" fill="#C84B31"/>
 
-  <!-- Background rounded square -->
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- Subtle top shine -->
-  <rect width="64" height="32" rx="14" fill="url(#shine)"/>
-
-  <!-- Scissors icon (centered, dark) -->
-  <!-- Left blade -->
-  <g transform="translate(32,32)" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Scissors: two blades crossing -->
+  <!-- Scissors icon (centered, white) -->
+  <g transform="translate(32,32)" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="-8" cy="-10" r="4" fill="none"/>
     <circle cx="8" cy="-10" r="4" fill="none"/>
-    <!-- Pivot dot -->
-    <circle cx="0" cy="0" r="1.5" fill="#0A0A0A"/>
-    <!-- Left blade line from circle to tip -->
+    <circle cx="0" cy="0" r="1.5" fill="#FFFFFF"/>
     <line x1="-5.2" y1="-7" x2="11" y2="12"/>
-    <!-- Right blade line from circle to tip -->
     <line x1="5.2" y1="-7" x2="-11" y2="12"/>
   </g>
 </svg>
