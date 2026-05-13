@@ -38,7 +38,7 @@ function CustomerDashboard() {
 	)
 	const shopMap = useMemo(() => {
 		const map = new Map<string, Barbershop>()
-		if (shopsRaw) for (const s of shopsRaw) map.set(s._id, s as Barbershop)
+		if (shopsRaw) for (const s of shopsRaw) if (s) map.set(s._id, s as Barbershop)
 		return map
 	}, [shopsRaw])
 
