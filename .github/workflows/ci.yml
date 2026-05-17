@@ -2,9 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
 
 concurrency:
   group: >-
@@ -16,17 +15,18 @@ permissions:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
+    uses: dacrab/.github-workflows/.github/workflows/bun-ci.yml@v1
+    with:
+      check-cmd: 'bun run check'
+      test-cmd: 'bun run test'
+      build-cmd: 'bun run build'
 
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Validate
-        run: bun run validate
-        env:
-          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
+  auto-merge:
+    needs: ci
+    permissions:
+      pull-requests: write
+      contents: write
+    uses: dacrab/.github-workflows/.github/workflows/dependabot-auto-merge.yml@v1
+    with:
+      target: minor
+      exclude: 'vite'
