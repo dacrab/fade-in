@@ -5,7 +5,7 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
-import type { User, UserRole } from "#/types"
+import type { UserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/admin/users")({ component: AdminUsers })
@@ -28,7 +28,7 @@ function AdminUsers() {
 		}
 	}, [user, loading, router])
 
-	const allUsers = useQuery(api.users.listAll) as User[] | undefined
+	const allUsers = useQuery(api.users.listAll)
 
 	return (
 		<main className="page-main">
@@ -68,12 +68,14 @@ function AdminUsers() {
 							>
 								<div className="flex items-center gap-2 min-w-0">
 									<div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 bg-(--gold) text-black">
-										{u.name.charAt(0).toUpperCase()}
+										{u.name?.charAt(0).toUpperCase() ?? "?"}
 									</div>
 									<span className="text-sm text-(--text) truncate">{u.name}</span>
 								</div>
 								<span className="text-sm text-(--text-muted) truncate">{u.email}</span>
-								<span className={`badge ${ROLE_BADGE[u.role]} w-fit`}>{u.role}</span>
+								<span className={`badge ${ROLE_BADGE[u.role ?? "customer"]} w-fit`}>
+									{u.role ?? "customer"}
+								</span>
 							</div>
 						))}
 					</div>

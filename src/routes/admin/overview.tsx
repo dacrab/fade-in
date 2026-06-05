@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next"
 import AdminNav from "#/components/AdminNav"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
-import type { Barbershop, User } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/admin/overview")({ component: AdminDashboard })
@@ -21,8 +20,8 @@ function AdminDashboard() {
 		if (user.role !== "admin") navigate({ to: "/" })
 	}, [user, navigate])
 
-	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined
-	const allUsers = useQuery(api.users.listAll) as User[] | undefined
+	const allShops = useQuery(api.barbershops.listAll)
+	const allUsers = useQuery(api.users.listAll)
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
 
@@ -99,7 +98,7 @@ function AdminDashboard() {
 											{
 												role: t("admin.roles.barbers"),
 												count: allUsers.filter((u) => u.role === "barber").length,
-												color: "#818CF8",
+												color: "var(--info)",
 											},
 											{
 												role: t("admin.roles.admins"),

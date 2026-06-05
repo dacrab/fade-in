@@ -133,13 +133,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 					{stepLabels.map((label, i) => (
 						<div
 							key={label}
-							className="flex items-center justify-center rounded-full text-xs font-semibold transition-all duration-300"
-							style={{
-								width: 28,
-								height: 28,
-								backgroundColor: i + 1 <= step ? "var(--gold)" : "#f0ebe5",
-								color: i + 1 <= step ? "#fff" : "#9c8b7a",
-							}}
+							className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold transition-all duration-300 ${i + 1 <= step ? "bg-(--gold) text-white" : "bg-(--bg-input) text-(--text-subtle)"}`}
 						>
 							{i + 1 < step ? <Check size={14} /> : i + 1}
 						</div>
@@ -162,10 +156,10 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											key={svc._id}
 											type="button"
 											onClick={() => toggleService(svc._id)}
-											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-white border-(--border) hover:border-stone-300"}`}
+											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-white border-(--border) hover:border-(--border-hover)"}`}
 										>
 											<div
-												className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${selected ? "bg-(--gold)" : "border-2 border-stone-300"}`}
+												className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${selected ? "bg-(--gold)" : "border-2 border-(--border)"}`}
 											>
 												{selected && <Check size={12} color="#fff" />}
 											</div>
@@ -196,7 +190,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											key={b._id}
 											type="button"
 											onClick={() => setSelectedBarber(b._id)}
-											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-white border-(--border) hover:border-stone-300"}`}
+											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-white border-(--border) hover:border-(--border-hover)"}`}
 										>
 											<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
 												{b.avatarUrl ? (
@@ -232,7 +226,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 					{step === 3 && (
 						<div className="space-y-5">
 							<div>
-								<label className="block text-sm font-medium text-stone-700 mb-2" htmlFor="booking-date">
+								<label className="block text-sm font-medium text-(--text) mb-2" htmlFor="booking-date">
 									{t("booking.pickDate")}
 								</label>
 								<input
@@ -246,7 +240,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 							</div>
 							{selectedDate && (
 								<div>
-									<p className="block text-sm font-medium text-stone-700 mb-3">
+									<p className="block text-sm font-medium text-(--text) mb-3">
 										{t("booking.availableSlots")}
 									</p>
 									{slots === undefined ? (
@@ -260,7 +254,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 													key={slot}
 													type="button"
 													onClick={() => setSelectedSlot(slot)}
-													className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${selectedSlot === slot ? "bg-(--gold) border-(--gold) text-white" : "bg-white border-(--border) text-stone-700 hover:border-(--gold)/40"}`}
+													className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${selectedSlot === slot ? "bg-(--gold) border-(--gold) text-white" : "bg-white border-(--border) text-(--text) hover:border-(--gold)/40"}`}
 												>
 													{slot}
 												</button>
@@ -270,7 +264,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 								</div>
 							)}
 							<div>
-								<label className="block text-sm font-medium text-stone-700 mb-2" htmlFor="booking-notes">
+								<label className="block text-sm font-medium text-(--text) mb-2" htmlFor="booking-notes">
 									{t("booking.notes")}
 								</label>
 								<textarea
@@ -307,8 +301,8 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 
 					{step === 5 && (
 						<div className="text-center py-10">
-							<div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-emerald-50 border-2 border-emerald-200">
-								<Check size={32} className="text-emerald-500" />
+							<div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-(--success)/10 border-2 border-(--success)/20">
+								<Check size={32} className="text-(--success)" />
 							</div>
 							<h3 className="text-xl font-bold text-(--text) mb-2">{t("booking.confirmed")}</h3>
 							<p className="text-(--text-muted) text-sm mb-8">
@@ -335,7 +329,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 							<button
 								type="button"
 								onClick={() => setStep((step - 1) as Step)}
-								className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-stone-700 hover:bg-(--bg-card-hover) transition-all duration-200 flex items-center gap-1 cursor-pointer"
+								className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-(--text) hover:bg-(--bg-card-hover) transition-all duration-200 flex items-center gap-1 cursor-pointer"
 							>
 								<ChevronLeft size={16} /> {t("common.back")}
 							</button>

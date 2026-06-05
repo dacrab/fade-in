@@ -7,7 +7,7 @@
 
 		/* Convex required */
 		"target": "ESNext",
-		"lib": ["ES2021", "dom"],
+		"lib": ["ES2022"],
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
 		"isolatedModules": true,
@@ -15,10 +15,8 @@
 		"types": ["node"],
 
 		/* Compat */
-		"jsx": "react-jsx",
 		"allowJs": false,
 		"skipLibCheck": true,
-		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true
 	},

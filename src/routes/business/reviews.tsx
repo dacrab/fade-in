@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Send } from "lucide-react"
 import { useState } from "react"
@@ -23,7 +23,7 @@ function BusinessReviews() {
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
 	)
-	const reviews = (reviewsResult?.page ?? undefined) as Review[] | undefined
+	const reviews = reviewsResult?.page as Review[] | undefined
 	const addReply = useMutation(api.reviews.addOwnerReply)
 	const [replyId, setReplyId] = useState<string | null>(null)
 	const [replyText, setReplyText] = useState("")
@@ -43,7 +43,6 @@ function BusinessReviews() {
 		<div className="px-8 py-8">
 			<div className="max-w-3xl mx-auto px-6 py-8">
 				<div className="mb-5">
-					<Link to="/business/overview"></Link>
 					<h1 className="text-lg font-medium text-(--text) tracking-tight">
 						{t("business.reviews.title")}
 					</h1>

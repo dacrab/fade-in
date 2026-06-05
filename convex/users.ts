@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { definedPatch } from "./validators"
 
 export const getViewer = query({
 	args: {},
@@ -29,11 +30,7 @@ export const updateProfile = mutation({
 		if (userId !== args.id) throw new ConvexError("Not authorized")
 
 		const { id, ...fields } = args
-		const patch: Record<string, unknown> = {}
-		for (const [key, val] of Object.entries(fields)) {
-			if (val !== undefined) patch[key] = val
-		}
-		return ctx.db.patch(id, patch)
+		return ctx.db.patch(id, definedPatch(fields))
 	},
 })
 

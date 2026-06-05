@@ -9,8 +9,6 @@ interface StarRatingProps {
 	onRate?: (rating: number) => void
 }
 
-const KEYS = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
-
 export function StarRating({
 	rating,
 	max = 5,
@@ -20,9 +18,10 @@ export function StarRating({
 }: StarRatingProps) {
 	return (
 		<div className="flex items-center gap-px">
-			{KEYS.slice(0, max).map((key, i) => (
+			{Array.from({ length: max }, (_, i) => (
 				<button
-					key={key}
+					// biome-ignore lint/suspicious/noArrayIndexKey: static list, order never changes
+					key={i}
 					type="button"
 					onClick={() => interactive && onRate?.(i + 1)}
 					className={cn(

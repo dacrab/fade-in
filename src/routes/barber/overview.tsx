@@ -6,7 +6,8 @@ import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
-import type { Appointment, Barbershop } from "#/types"
+import type { Appointment, AppointmentStatus, Barbershop } from "#/types"
+import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/barber/overview")({ component: BarberDashboard })
@@ -127,12 +128,7 @@ function AppointmentRow({ appt }: { appt: Appointment }) {
 		| null
 		| undefined
 
-	const statusColor =
-		appt.status === "confirmed" || appt.status === "completed"
-			? "bg-green-500"
-			: appt.status === "cancelled"
-				? "bg-red-400"
-				: "bg-amber-400"
+	const statusColor = STATUS_DOT[appt.status as AppointmentStatus]
 
 	return (
 		<div className="flex items-center gap-3 py-3">

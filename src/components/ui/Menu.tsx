@@ -37,7 +37,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 									onClick={item.onClick}
 									className={cn(
 										"flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg cursor-pointer transition-colors text-(--text-muted) hover:text-(--text) hover:bg-(--bg-card-hover)",
-										item.danger && "text-red-500 hover:text-red-600 hover:bg-red-50",
+										item.danger && "text-(--error) hover:text-(--error) hover:bg-(--error)/5",
 										item.disabled && "opacity-40 cursor-not-allowed",
 									)}
 								>

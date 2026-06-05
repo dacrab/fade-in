@@ -8,18 +8,12 @@ import { withToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
-import type { Appointment, AppointmentStatus } from "#/types"
+import type { AppointmentStatus } from "#/types"
+import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/appointments")({ component: BusinessAppointments })
-
-const STATUS_COLOR: Record<AppointmentStatus, string> = {
-	confirmed: "bg-emerald-500",
-	completed: "bg-(--text-subtle)",
-	cancelled: "bg-red-400",
-	pending: "bg-amber-400",
-}
 
 function BusinessAppointments() {
 	const { t } = useTranslation()
@@ -30,7 +24,7 @@ function BusinessAppointments() {
 	const appointments = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip",
-	) as Appointment[] | undefined
+	)
 	const updateStatus = useMutation(api.appointments.updateStatus)
 
 	const handleStatus = (id: Id<"appointments">, status: AppointmentStatus) =>
@@ -68,9 +62,9 @@ function BusinessAppointments() {
 					{appointments && appointments.length > 0 && (
 						<div className="flex gap-4 mb-4 text-xs text-(--text-muted)">
 							<span>{appointments.length} total</span>
-							{pending.length > 0 && <span className="text-amber-500">{pending.length} pending</span>}
+							{pending.length > 0 && <span className="text-(--gold)">{pending.length} pending</span>}
 							{confirmed.length > 0 && (
-								<span className="text-emerald-500">{confirmed.length} confirmed</span>
+								<span className="text-(--success)">{confirmed.length} confirmed</span>
 							)}
 							{completed.length > 0 && (
 								<span className="text-(--text-subtle)">{completed.length} done</span>
@@ -99,7 +93,9 @@ function BusinessAppointments() {
 											<div className="text-sm font-mono font-medium text-(--text)">{appt.startTime}</div>
 											<div className="text-[11px] font-mono text-(--text-subtle)">{appt.endTime}</div>
 										</div>
-										<span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLOR[appt.status]}`} />
+										<span
+											className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[appt.status as AppointmentStatus]}`}
+										/>
 										<div className="flex-1 min-w-0">
 											<div className="text-sm text-(--text) truncate">{appt.notes || "—"}</div>
 											<div className="text-xs text-(--text-subtle)">{formatPrice(appt.totalPrice)}</div>
@@ -110,7 +106,7 @@ function BusinessAppointments() {
 													<button
 														type="button"
 														onClick={() => void handleStatus(appt._id, "confirmed")}
-														className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors"
+														className="p-1.5 rounded-md bg-(--success)/10 text-(--success) hover:bg-(--success)/20 transition-colors"
 														title={t("business.appointments.confirm")}
 													>
 														<Check size={13} />
@@ -118,7 +114,7 @@ function BusinessAppointments() {
 													<button
 														type="button"
 														onClick={() => void handleStatus(appt._id, "cancelled")}
-														className="p-1.5 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+														className="p-1.5 rounded-md bg-(--error)/10 text-(--error) hover:bg-(--error)/20 transition-colors"
 														title={t("business.appointments.cancel")}
 													>
 														<X size={13} />

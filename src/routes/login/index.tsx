@@ -22,7 +22,7 @@ function LoginPage() {
 		try {
 			await login(email, password)
 			showToast(t("errors.welcomeBack"), "success")
-			void router.navigate({ to: "/dashboard/overview" })
+			router.navigate({ to: "/dashboard/overview" })
 		} catch {
 			showToast(t("errors.loginFailed"), "error")
 		} finally {
@@ -86,7 +86,7 @@ function LoginPage() {
 
 					<p className="mt-6 text-center text-sm text-(--text-muted)">
 						{t("auth.noAccount")}{" "}
-						<Link to="/register" className="text-(--gold) hover:underline no-underline font-medium">
+						<Link to="/register" className="text-(--gold) hover:underline font-medium">
 							{t("common.createAccount")}
 						</Link>
 					</p>

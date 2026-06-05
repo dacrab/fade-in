@@ -37,7 +37,7 @@ function BarbershopsPage() {
 		minRating: minRating > 0 ? minRating : undefined,
 		paginationOpts: { cursor: null, numItems: 50 },
 	})
-	const shops = (shopsResult?.page ?? undefined) as Barbershop[] | undefined
+	const shops = shopsResult?.page as Barbershop[] | undefined
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault()

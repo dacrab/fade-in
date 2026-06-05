@@ -1,5 +1,10 @@
 import { v } from "convex/values"
 
+/** Strip undefined values from an object (for partial DB patches). */
+export function definedPatch<T extends Record<string, unknown>>(obj: T): Partial<T> {
+	return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined)) as Partial<T>
+}
+
 const dayHours = v.object({ open: v.string(), close: v.string(), closed: v.boolean() })
 
 export const workingHoursValidator = v.optional(

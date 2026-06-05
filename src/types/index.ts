@@ -132,6 +132,14 @@ export const STATUS_BADGE: Record<AppointmentStatus, string> = {
 	cancelled: "badge-red",
 }
 
+/** Dot color classes for appointment status indicators */
+export const STATUS_DOT: Record<AppointmentStatus, string> = {
+	pending: "bg-amber-400",
+	confirmed: "bg-green-500",
+	completed: "bg-green-500",
+	cancelled: "bg-red-400",
+}
+
 // Review
 
 export interface Review {

@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { definedPatch } from "./validators"
 
 export const listByShop = query({
 	args: { barbershopId: v.id("barbershops") },
@@ -56,15 +57,8 @@ export const update = mutation({
 		const shop = await ctx.db.get(service.barbershopId)
 		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
 
-		const { id, name, description, price, durationMinutes, category, isActive } = args
-		return ctx.db.patch(id, {
-			...(name !== undefined && { name }),
-			...(description !== undefined && { description }),
-			...(price !== undefined && { price }),
-			...(durationMinutes !== undefined && { durationMinutes }),
-			...(category !== undefined && { category }),
-			...(isActive !== undefined && { isActive }),
-		})
+		const { id, ...fields } = args
+		return ctx.db.patch(id, definedPatch(fields))
 	},
 })
 

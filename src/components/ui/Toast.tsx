@@ -37,8 +37,8 @@ export async function withToast<T>(
 }
 
 const TOAST_CONFIG = {
-	success: { icon: CheckCircle, borderColor: "#16a34a" },
-	error: { icon: AlertCircle, borderColor: "#dc2626" },
+	success: { icon: CheckCircle, borderColor: "var(--success)" },
+	error: { icon: AlertCircle, borderColor: "var(--error)" },
 	info: { icon: Info, borderColor: "var(--gold)" },
 } as const
 
@@ -60,10 +60,10 @@ export function ToastContainer() {
 					<div
 						key={toast.id}
 						className="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-white shadow-md border border-(--border) animate-in slide-in-from-top-2"
-						style={{ borderLeft: `3px solid ${borderColor}` }}
+						style={{ borderLeft: `3px solid ${borderColor}`, color: borderColor } as React.CSSProperties}
 					>
-						<Icon size={15} className="flex-shrink-0" style={{ color: borderColor }} />
-						<span className="text-[13px] text-stone-700 font-medium">{toast.message}</span>
+						<Icon size={15} className="flex-shrink-0" />
+						<span className="text-[13px] text-(--text) font-medium">{toast.message}</span>
 					</div>
 				)
 			})}

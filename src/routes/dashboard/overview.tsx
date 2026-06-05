@@ -7,7 +7,8 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
-import type { Appointment, Barbershop } from "#/types"
+import type { Appointment, AppointmentStatus, Barbershop } from "#/types"
+import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -24,7 +25,7 @@ function CustomerDashboard() {
 
 	const appointments = useQuery(
 		api.appointments.listByCustomer,
-		user ? { customerId: user.id as Id<"users"> } : "skip",
+		user ? { customerId: user.id } : "skip",
 	)
 
 	// Batch fetch all unique shops referenced by appointments (fixes N+1)
@@ -38,7 +39,7 @@ function CustomerDashboard() {
 	)
 	const shopMap = useMemo(() => {
 		const map = new Map<string, Barbershop>()
-		if (shopsRaw) for (const s of shopsRaw) if (s) map.set(s._id, s as Barbershop)
+		if (shopsRaw) for (const s of shopsRaw) if (s) map.set(s._id, s)
 		return map
 	}, [shopsRaw])
 
@@ -111,7 +112,7 @@ function CustomerDashboard() {
 							{upcoming.map((appt) => (
 								<AppointmentRow
 									key={appt._id}
-									appt={appt as Appointment}
+									appt={appt}
 									shop={shopMap.get(appt.barbershopId)}
 									showActions
 								/>
@@ -127,7 +128,7 @@ function CustomerDashboard() {
 							{past.slice(0, 8).map((appt) => (
 								<AppointmentRow
 									key={appt._id}
-									appt={appt as Appointment}
+									appt={appt}
 									shop={shopMap.get(appt.barbershopId)}
 									showRebook={appt.status === "completed"}
 								/>
@@ -160,12 +161,7 @@ function AppointmentRow({
 			t("errors.updateStatusFailed"),
 		)
 
-	const statusColor =
-		appt.status === "confirmed" || appt.status === "completed"
-			? "bg-green-500"
-			: appt.status === "cancelled"
-				? "bg-red-400"
-				: "bg-amber-400"
+	const statusColor = STATUS_DOT[appt.status as AppointmentStatus]
 
 	return (
 		<div className="flex items-center gap-3 py-3 group">
@@ -182,7 +178,7 @@ function AppointmentRow({
 				<button
 					type="button"
 					onClick={() => void handleCancel()}
-					className="text-xs text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+					className="text-xs text-(--error) opacity-0 group-hover:opacity-100 transition-opacity"
 				>
 					{t("common.cancel")}
 				</button>

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useState } from "react"
@@ -26,12 +26,10 @@ function BusinessBarbers() {
 
 	const [form, setForm] = useState<BarberForm>(EMPTY)
 	const [showForm, setShowForm] = useState(false)
-	const [editId, setEditId] = useState<string | null>(null)
+	const [editId, setEditId] = useState<Id<"barbers"> | null>(null)
 
 	const shop = useOwnerShop(user?.id)
-	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip") as
-		| Barber[]
-		| undefined
+	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip")
 
 	const createBarber = useMutation(api.barbers.create)
 	const updateBarber = useMutation(api.barbers.update)
@@ -53,7 +51,7 @@ function BusinessBarbers() {
 		try {
 			if (editId) {
 				await updateBarber({
-					id: editId as Id<"barbers">,
+					id: editId,
 					name: form.name,
 					bio: form.bio || undefined,
 					specializations: specs,
@@ -93,7 +91,6 @@ function BusinessBarbers() {
 			<div className="max-w-3xl mx-auto px-6 py-8">
 				<div className="flex items-start justify-between mb-5">
 					<div>
-						<Link to="/business/overview"></Link>
 						<h1 className="text-lg font-medium text-(--text) tracking-tight">
 							{t("business.barbers.title")}
 						</h1>
@@ -123,7 +120,7 @@ function BusinessBarbers() {
 								</label>
 								<input
 									id="barber-name"
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className="input w-full text-sm"
 									placeholder={t("business.barbers.namePlaceholder")}
 									value={form.name}
 									onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -136,7 +133,7 @@ function BusinessBarbers() {
 								</label>
 								<input
 									id="barber-specs"
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className="input w-full text-sm"
 									placeholder={t("business.barbers.specializationsPlaceholder")}
 									value={form.specializations}
 									onChange={(e) => setForm((f) => ({ ...f, specializations: e.target.value }))}

@@ -256,14 +256,6 @@ const el = {
 			cancelled: "Ακυρωμένα",
 			noData: "Δεν υπάρχουν δεδομένα ακόμα.",
 		},
-		crm: {
-			title: "ΠΕΛΑΤΕΣ",
-			totalCustomers: "Συνολικοί πελάτες",
-			visits_one: "{{count}} επίσκεψη",
-			visits_other: "{{count}} επισκέψεις",
-			lastVisit: "Τελευταία επίσκεψη: {{date}}",
-			noCustomers: "Δεν υπάρχουν πελάτες ακόμα.",
-		},
 		appointments: {
 			title: "Ραντεβού",
 			clearFilter: "Καθαρισμός",
@@ -363,11 +355,8 @@ const el = {
 	footer: {
 		rights: "© {{year}} FadeIn. Με επιφύλαξη παντός δικαιώματος.",
 		links: {
-			about: "Σχετικά",
 			privacy: "Απόρρητο",
 			terms: "Όροι",
-			login: "Σύνδεση",
-			register: "Δημιουργία λογαριασμού",
 		},
 	},
 
@@ -383,11 +372,23 @@ const el = {
 	barber: {
 		title: "Το Πρόγραμμά μου",
 		subtitle: "Δείτε τα επερχόμενα ραντεβού σας.",
-		selectDate: "Επιλογή ημερομηνίας",
 		schedule: "Πρόγραμμα",
 		noAppointments: "Δεν υπάρχουν ραντεβού για αυτή την ημερομηνία.",
 	},
 
+	resetPassword: {
+		title: "Επαναφορά Κωδικού",
+		subtitle: "Εισάγετε το email σας για να λάβετε οδηγίες επαναφοράς",
+		emailLabel: "Email",
+		emailPlaceholder: "your@email.com",
+		sendLink: "Αποστολή Συνδέσμου",
+		sending: "Αποστολή…",
+		checkEmail: "Ελέγξτε το email σας για οδηγίες επαναφοράς.",
+		backToLogin: "Επιστροφή στη σύνδεση",
+		rememberPassword: "Θυμάστε τον κωδικό σας;",
+		sentSuccess: "Οι οδηγίες επαναφοράς στάλθηκαν στο email σας",
+		sentFailed: "Απέτυχε η αποστολή οδηγιών επαναφοράς",
+	},
 	errors: {
 		notFoundTitle: "Η σελίδα δεν βρέθηκε",
 		notFoundMessage: "Η σελίδα που ψάχνετε δεν υπάρχει ή έχει μετακινηθεί.",

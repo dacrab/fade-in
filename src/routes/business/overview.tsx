@@ -6,7 +6,7 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
-import type { Appointment, Barbershop, Review } from "#/types"
+import type { Review } from "#/types"
 import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -16,20 +16,20 @@ function BusinessDashboard() {
 	const { t } = useTranslation()
 	const { user } = useBusinessAuth()
 
-	const shop = useOwnerShop(user?.id) as Barbershop | undefined
+	const shop = useOwnerShop(user?.id)
 
 	const todayStr = new Date().toISOString().slice(0, 10)
 	const todayAppts = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: todayStr } : "skip",
-	) as Appointment[] | undefined
+	)
 	// Use server-side stats instead of loading ALL appointments
 	const stats = useQuery(api.appointments.getShopStats, shop ? { barbershopId: shop._id } : "skip")
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
 	)
-	const reviews = (reviewsResult?.page ?? undefined) as Review[] | undefined
+	const reviews = reviewsResult?.page as Review[] | undefined
 
 	const completionRate =
 		stats && stats.totalCount > 0 ? Math.round((stats.completedCount / stats.totalCount) * 100) : 0
@@ -163,7 +163,7 @@ function BusinessDashboard() {
 									{
 										label: t("business.revenue.completed"),
 										count: stats.completedCount,
-										color: "text-emerald-400",
+										color: "text-(--success)",
 									},
 									{
 										label: t("business.revenue.pending"),
@@ -173,7 +173,7 @@ function BusinessDashboard() {
 									{
 										label: t("business.revenue.cancelled"),
 										count: stats.cancelledCount,
-										color: "text-red-400",
+										color: "text-(--error)",
 									},
 								] as const
 							).map(({ label, count, color }) => (

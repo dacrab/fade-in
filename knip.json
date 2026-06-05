@@ -11,17 +11,14 @@
 	"project": ["src/**/*.{ts,tsx}", "convex/**/*.ts"],
 	"ignoreDependencies": [
 		"@tanstack/router-plugin",
-		"@tanstack/react-router-devtools",
-		"@tanstack/react-devtools",
 		"@tanstack/devtools-event-client",
-		"@tanstack/react-router-ssr-query",
+		"@tanstack/devtools-vite",
 		"@convex-dev/react-query",
 		"tailwindcss",
 		"@tailwindcss/typography",
 		"@testing-library/dom",
 		"@testing-library/react",
-		"@testing-library/user-event",
-		"react-leaflet"
+		"@testing-library/user-event"
 	],
 	"ignoreExportsUsedInFile": true
 }
