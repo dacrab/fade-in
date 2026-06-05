@@ -9,7 +9,7 @@ export default function ShopCard({ shop }: { shop: Barbershop }) {
 		<Link
 			to="/barbershops/$slug"
 			params={{ slug: shop.slug }}
-			className="shop-card block bg-white rounded-[12px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] transition-shadow duration-300 overflow-hidden no-underline"
+			className="shop-card block bg-white rounded-[12px] shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden no-underline"
 		>
 			<div className="relative w-full h-44 overflow-hidden">
 				{shop.images[0] ? (
@@ -36,7 +36,7 @@ export default function ShopCard({ shop }: { shop: Barbershop }) {
 						</span>
 					)}
 					<div className="flex items-center gap-0.5 ml-auto">
-						<Star size={12} fill="var(--gold)" className="text-(--gold)" />
+						<Star size={12} fill="currentColor" className="text-(--gold)" />
 						<span className="text-sm font-medium text-(--text)">{shop.rating.toFixed(1)}</span>
 					</div>
 				</div>

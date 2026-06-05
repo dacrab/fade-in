@@ -54,7 +54,7 @@ function ShopProfilePage() {
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
 	)
-	const reviews = (reviewsResult?.page ?? undefined) as Review[] | undefined
+	const reviews = reviewsResult?.page as Review[] | undefined
 
 	if (shop === undefined) return <ShopProfileSkeleton />
 	if (!shop)

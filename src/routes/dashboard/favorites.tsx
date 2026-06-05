@@ -4,26 +4,22 @@ import { ArrowLeft, Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
-import type { Barbershop, User } from "#/types"
+import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/favorites")({ component: FavoritesPage })
 
 function FavoritesPage() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const userData = useQuery(api.users.getById, user ? { id: user.id as Id<"users"> } : "skip") as
-		| User
-		| null
-		| undefined
+	const userData = useQuery(api.users.getById, user ? { id: user.id } : "skip")
 	const favoriteIds = userData?.favoriteShopIds ?? []
 
 	const shopsRaw = useQuery(
 		api.barbershops.listByIds,
 		favoriteIds.length > 0 ? { ids: favoriteIds } : "skip",
 	)
-	const shops = (shopsRaw ?? []) as Barbershop[]
+	const shops = (shopsRaw?.filter(Boolean) ?? []) as Barbershop[]
 
 	return (
 		<main className="page-main">

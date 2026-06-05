@@ -12,6 +12,26 @@ const searchSchema = z.object({
 	role: z.enum(["customer", "owner"]).optional(),
 })
 
+const STRENGTH_STYLE: Record<string, { bar: string; text: string }> = {
+	weak: { bar: "bg-(--strength-weak)", text: "text-(--strength-weak)" },
+	fair: { bar: "bg-(--strength-fair)", text: "text-(--strength-fair)" },
+	good: { bar: "bg-(--strength-good)", text: "text-(--strength-good)" },
+	strong: { bar: "bg-(--strength-strong)", text: "text-(--strength-strong)" },
+}
+
+const getStrength = (pw: string) => {
+	if (!pw) return { score: 0, key: "weak" }
+	let s = 0
+	if (pw.length >= 8) s++
+	if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++
+	if (/\d/.test(pw)) s++
+	if (/[^A-Za-z0-9]/.test(pw)) s++
+	if (s <= 1) return { score: 1, key: "weak" }
+	if (s === 2) return { score: 2, key: "fair" }
+	if (s === 3) return { score: 3, key: "good" }
+	return { score: 4, key: "strong" }
+}
+
 export const Route = createFileRoute("/register/")({
 	validateSearch: searchSchema,
 	component: RegisterPage,
@@ -29,18 +49,6 @@ function RegisterPage() {
 	const { register } = useAuth()
 	const router = useRouter()
 
-	const getStrength = (pw: string) => {
-		if (!pw) return { score: 0, key: "weak", color: "#EF4444" }
-		let s = 0
-		if (pw.length >= 8) s++
-		if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++
-		if (/\d/.test(pw)) s++
-		if (/[^A-Za-z0-9]/.test(pw)) s++
-		if (s <= 1) return { score: 1, key: "weak", color: "#EF4444" }
-		if (s === 2) return { score: 2, key: "fair", color: "#F59E0B" }
-		if (s === 3) return { score: 3, key: "good", color: "#22C55E" }
-		return { score: 4, key: "strong", color: "#16A34A" }
-	}
 	const strength = getStrength(password)
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -149,12 +157,11 @@ function RegisterPage() {
 										{[1, 2, 3, 4].map((i) => (
 											<div
 												key={i}
-												className="h-1 flex-1 rounded-full transition-colors duration-200"
-												style={{ backgroundColor: i <= strength.score ? strength.color : "var(--border)" }}
+												className={`h-1 flex-1 rounded-full transition-colors duration-200 ${i <= strength.score ? STRENGTH_STYLE[strength.key].bar : "bg-(--border)"}`}
 											/>
 										))}
 									</div>
-									<p className="text-xs mt-1" style={{ color: strength.color }}>
+									<p className={`text-xs mt-1 ${STRENGTH_STYLE[strength.key].text}`}>
 										{t(`auth.strength.${strength.key}`)}
 									</p>
 								</div>

@@ -38,12 +38,12 @@ const NAV_ITEMS = [
 
 export default function Header() {
 	const [mobileOpen, setMobileOpen] = useState(false)
-	const { user, logout } = useAuth()
+	const { user, signOut } = useAuth()
 	const router = useRouter()
 	const { t } = useTranslation()
 
 	const handleLogout = () => {
-		logout()
+		signOut()
 		void router.navigate({ to: "/" })
 	}
 
@@ -151,7 +151,7 @@ export default function Header() {
 						))}
 						{user ? (
 							<>
-								<div className="w-full h-px bg-[#e8e0d8]" />
+								<div className="w-full h-px bg-(--border)" />
 								{roleItem && (
 									<Link
 										to={roleItem.to}
@@ -167,14 +167,14 @@ export default function Header() {
 										handleLogout()
 										setMobileOpen(false)
 									}}
-									className="text-base font-medium text-red-600 hover:text-red-700 transition-colors py-2 text-left"
+									className="text-base font-medium text-(--error) hover:text-red-700 transition-colors py-2 text-left"
 								>
 									{t("common.signOut")}
 								</button>
 							</>
 						) : (
 							<>
-								<div className="w-full h-px bg-[#e8e0d8]" />
+								<div className="w-full h-px bg-(--border)" />
 								<Link
 									to="/login"
 									className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"

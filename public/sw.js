@@ -19,14 +19,12 @@ self.addEventListener("activate", (event) => {
 })
 
 self.addEventListener("fetch", (event) => {
-  // Network-first for API/Convex calls, cache-first for static assets
   const url = new URL(event.request.url)
-  if (url.pathname.startsWith("/api") || url.hostname.includes("convex")) {
-    return // Let network handle these
-  }
-  event.respondWith(
-    fetch(event.request).catch(() =>
-      caches.match(event.request).then((cached) => cached ?? caches.match("/"))
+  if (!url.pathname.startsWith("/api") && !url.hostname.includes("convex")) {
+    event.respondWith(
+      fetch(event.request).catch(() =>
+        caches.match(event.request).then((cached) => cached ?? caches.match("/"))
+      )
     )
-  )
+  }
 })

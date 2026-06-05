@@ -256,14 +256,6 @@ const en = {
 			cancelled: "Cancelled",
 			noData: "No appointment data yet.",
 		},
-		crm: {
-			title: "CUSTOMERS",
-			totalCustomers: "Total customers",
-			visits_one: "{{count}} visit",
-			visits_other: "{{count}} visits",
-			lastVisit: "Last visit: {{date}}",
-			noCustomers: "No customers yet.",
-		},
 		appointments: {
 			title: "Appointments",
 			clearFilter: "Clear",
@@ -363,11 +355,8 @@ const en = {
 	footer: {
 		rights: "© {{year}} FadeIn. All rights reserved.",
 		links: {
-			about: "About",
 			privacy: "Privacy",
 			terms: "Terms",
-			login: "Sign in",
-			register: "Create account",
 		},
 	},
 
@@ -383,11 +372,23 @@ const en = {
 	barber: {
 		title: "My Schedule",
 		subtitle: "View your upcoming appointments.",
-		selectDate: "Select date",
 		schedule: "Schedule",
 		noAppointments: "No appointments for this date.",
 	},
 
+	resetPassword: {
+		title: "Reset Password",
+		subtitle: "Enter your email to receive reset instructions",
+		emailLabel: "Email",
+		emailPlaceholder: "your@email.com",
+		sendLink: "Send Reset Link",
+		sending: "Sending…",
+		checkEmail: "Check your email for reset instructions.",
+		backToLogin: "Back to login",
+		rememberPassword: "Remember your password?",
+		sentSuccess: "Reset instructions sent to your email",
+		sentFailed: "Failed to send reset email",
+	},
 	errors: {
 		notFoundTitle: "Page not found",
 		notFoundMessage: "The page you're looking for doesn't exist or has been moved.",

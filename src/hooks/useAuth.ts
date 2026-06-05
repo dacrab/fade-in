@@ -28,6 +28,5 @@ export function useAuth() {
 			signIn("password", { email, password, flow: "signIn" }),
 		register: (email: string, password: string, name: string, role: UserRole) =>
 			signIn("password", { email, password, flow: "signUp", name, role }),
-		logout: () => signOut(),
 	}
 }

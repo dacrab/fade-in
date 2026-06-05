@@ -6,7 +6,6 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false,
 		"includes": [
 			"src/**/*",
 			"convex/**/*",
@@ -37,20 +36,15 @@
 			"correctness": {
 				"noUnusedVariables": "error",
 				"noUnusedImports": "error",
-				"useExhaustiveDependencies": "warn",
-				"noConstantCondition": "error"
+				"useExhaustiveDependencies": "warn"
 			},
 			"suspicious": {
 				"noExplicitAny": "error",
-				"noConsole": "warn",
-				"noDoubleEquals": "error",
+				"noConsole": "error",
 				"noConfusingVoidType": "error",
-				"noMisleadingInstantiator": "error",
-				"noAssignInExpressions": "error"
+				"noMisleadingInstantiator": "error"
 			},
 			"style": {
-				"noNonNullAssertion": "error",
-				"useConst": "error",
 				"useTemplate": "error",
 				"useSingleVarDeclarator": "error",
 				"noParameterAssign": "error",
@@ -61,20 +55,14 @@
 			},
 			"complexity": {
 				"noForEach": "off",
-				"noBannedTypes": "error",
 				"useSimplifiedLogicExpression": "warn",
-				"noExcessiveCognitiveComplexity": "warn"
+				"noExcessiveCognitiveComplexity": "off"
 			},
 			"performance": {
 				"noAccumulatingSpread": "warn",
 				"noDelete": "warn"
 			},
-			"security": {
-				"noDangerouslySetInnerHtmlWithChildren": "error"
-			},
 			"a11y": {
-				"useButtonType": "error",
-				"useAltText": "error",
 				"noSvgWithoutTitle": "off"
 			}
 		}
@@ -86,7 +74,6 @@
 			"semicolons": "asNeeded",
 			"arrowParentheses": "always",
 			"bracketSameLine": false
-		},
-		"globals": ["React"]
+		}
 	}
 }

@@ -78,7 +78,7 @@ function AdminShops() {
 		}
 	}, [user, loading, router])
 
-	const allShops = useQuery(api.barbershops.listAll) as Barbershop[] | undefined
+	const allShops = useQuery(api.barbershops.listAll)
 	const verify = useMutation(api.barbershops.verify)
 	const suspend = useMutation(api.barbershops.suspend)
 

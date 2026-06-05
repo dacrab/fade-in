@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
 import { PlusCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -11,7 +11,7 @@ import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/business/profile")({ component: BusinessProfile })
 
-interface ShopForm extends Record<string, string> {
+interface ShopForm {
 	name: string
 	description: string
 	phone: string
@@ -31,9 +31,6 @@ const EMPTY: ShopForm = {
 	facebook: "",
 	website: "",
 }
-const INPUT =
-	"w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
-
 function BusinessProfile() {
 	const { t } = useTranslation()
 	const { user } = useBusinessAuth()
@@ -109,7 +106,6 @@ function BusinessProfile() {
 		<div className="px-8 py-8">
 			<div className="max-w-2xl mx-auto px-6 py-8">
 				<div className="mb-5">
-					<Link to="/business/overview"></Link>
 					<h1 className="text-lg font-medium text-(--text) tracking-tight">
 						{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}
 					</h1>
@@ -126,7 +122,7 @@ function BusinessProfile() {
 								{t("form.nameStar")}
 							</label>
 							<input
-								className={INPUT}
+								className="input w-full text-sm"
 								placeholder={t("business.profile.namePlaceholder")}
 								value={form.name}
 								onChange={set("name")}
@@ -144,7 +140,7 @@ function BusinessProfile() {
 							</label>
 							<textarea
 								id="shop-desc"
-								className={`${INPUT} resize-none`}
+								className="input w-full text-sm resize-none"
 								rows={3}
 								placeholder={t("business.profile.descPlaceholder")}
 								value={form.description}
@@ -157,7 +153,7 @@ function BusinessProfile() {
 									{t("form.phoneLabel")}
 								</label>
 								<input
-									className={INPUT}
+									className="input w-full text-sm"
 									placeholder={t("business.profile.phonePlaceholder")}
 									value={form.phone}
 									onChange={set("phone")}
@@ -169,7 +165,7 @@ function BusinessProfile() {
 									{t("form.cityStar")}
 								</label>
 								<input
-									className={INPUT}
+									className="input w-full text-sm"
 									placeholder={t("form.cityPlaceholder")}
 									value={form.city}
 									onChange={set("city")}
@@ -182,7 +178,7 @@ function BusinessProfile() {
 								{t("form.addressStar")}
 							</label>
 							<input
-								className={INPUT}
+								className="input w-full text-sm"
 								placeholder={t("business.profile.addressPlaceholder")}
 								value={form.address}
 								onChange={set("address")}
@@ -203,7 +199,7 @@ function BusinessProfile() {
 								</label>
 								<input
 									id={`social-${key}`}
-									className={INPUT}
+									className="input w-full text-sm"
 									placeholder="https://..."
 									value={form[key]}
 									onChange={set(key)}

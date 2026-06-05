@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useState } from "react"
@@ -14,7 +14,7 @@ import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/services")({ component: BusinessServices })
 
-interface ServiceForm extends Record<string, string> {
+interface ServiceForm {
 	name: string
 	description: string
 	price: string
@@ -56,9 +56,7 @@ function BusinessServices() {
 	}
 
 	const shop = useOwnerShop(user?.id)
-	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as
-		| Service[]
-		| undefined
+	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")
 
 	const createService = useMutation(api.services.create)
 	const updateService = useMutation(api.services.update)
@@ -72,7 +70,7 @@ function BusinessServices() {
 		try {
 			if (editId) {
 				await updateService({
-					id: editId as Id<"services">,
+					id: editId,
 					name: form.name,
 					description: form.description || undefined,
 					price,
@@ -122,7 +120,6 @@ function BusinessServices() {
 			<div className="max-w-3xl mx-auto px-6 py-8">
 				<div className="flex items-start justify-between mb-5">
 					<div>
-						<Link to="/business/overview"></Link>
 						<h1 className="text-lg font-medium text-(--text) tracking-tight">
 							{t("business.services.title")}
 						</h1>
@@ -154,7 +151,7 @@ function BusinessServices() {
 									{t("form.nameStar")}
 								</label>
 								<input
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className="input w-full text-sm"
 									id="svc-name"
 									placeholder={t("business.services.namePlaceholder")}
 									value={form.name}
@@ -167,7 +164,7 @@ function BusinessServices() {
 									{t("form.priceLabel")} *
 								</label>
 								<input
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className="input w-full text-sm"
 									type="number"
 									step="0.01"
 									min="0"
@@ -182,7 +179,7 @@ function BusinessServices() {
 									{t("form.durationLabel")} *
 								</label>
 								<input
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className="input w-full text-sm"
 									type="number"
 									min="5"
 									step="5"
@@ -214,7 +211,7 @@ function BusinessServices() {
 									{t("form.descriptionLabel")}
 								</label>
 								<input
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+									className="input w-full text-sm"
 									placeholder={t("form.optional")}
 									value={form.description}
 									onChange={set("description")}
@@ -249,7 +246,7 @@ function BusinessServices() {
 					</p>
 				) : (
 					<div className="divide-y divide-white/4">
-						{services.map((svc: Service) => (
+						{services.map((svc) => (
 							<div key={svc._id} className="flex items-center gap-4 py-4 group">
 								<div className="flex-1 min-w-0">
 									<div className="text-sm text-(--text)">{svc.name}</div>

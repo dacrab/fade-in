@@ -2,7 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server"
 import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { socialLinksValidator, workingHoursValidator } from "./validators"
+import { definedPatch, socialLinksValidator, workingHoursValidator } from "./validators"
 
 /** Lists active barbershops with filters applied at the DB level where possible. */
 export const list = query({
@@ -162,11 +162,7 @@ export const update = mutation({
 		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
 
 		const { id, ...fields } = args
-		const patch: Record<string, unknown> = {}
-		for (const [key, val] of Object.entries(fields)) {
-			if (val !== undefined) patch[key] = val
-		}
-		return ctx.db.patch(id, patch)
+		return ctx.db.patch(id, definedPatch(fields))
 	},
 })
 
