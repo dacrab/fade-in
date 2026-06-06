@@ -71,7 +71,7 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 
 			const goldIcon = L.divIcon({
 				html:
-					'<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,var(--gold),#A63D28);transform:rotate(-45deg);border:2px solid #FAF7F2;box-shadow:0 4px 12px rgba(200,75,49,0.4);display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(45deg)"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></div>',
+					'<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,var(--gold),var(--gold-dark));transform:rotate(-45deg);border:2px solid var(--bg);box-shadow:0 4px 12px rgba(200,75,49,0.4);display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(45deg)"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></div>',
 				className: "",
 				iconSize: [32, 32],
 				iconAnchor: [16, 32],
@@ -107,12 +107,12 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 			<div ref={mapContainerRef} className="w-full h-full" />
 			{shopsWithCoords.length === 0 && (
 				<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-					<MapPin size={28} className="mb-2 text-[#9C9590] opacity-40" />
-					<p className="text-sm font-medium text-[#F2EDE8]">{t("map.noLocations")}</p>
-					<p className="text-xs mt-1 text-[#9C9590]">{t("map.noLocationsHint")}</p>
+					<MapPin size={28} className="mb-2 text-(--text-subtle) opacity-40" />
+					<p className="text-sm font-medium text-white/70">{t("map.noLocations")}</p>
+					<p className="text-xs mt-1 text-(--text-subtle)">{t("map.noLocationsHint")}</p>
 				</div>
 			)}
-			<div className="absolute bottom-3 right-3 px-3 py-1 rounded-full text-[11px] font-medium text-[#F2EDE8] bg-black/40 backdrop-blur-md border border-white/8 z-[1000]">
+			<div className="absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-medium text-white/70 bg-black/40 backdrop-blur-md border border-white/8 z-[1000]">
 				{t("map.shopsOnMap", { count: shopsWithCoords.length })}
 			</div>
 		</div>

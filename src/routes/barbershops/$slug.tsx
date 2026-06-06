@@ -23,7 +23,7 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
 import { withToast } from "#/components/ui/Toast"
 import { capitalizeFirst, formatPrice, formatRelative } from "#/lib/format"
-import type { Barber, Barbershop, Review, Service, WeekDay } from "#/types"
+import type { Barber, Review, Service, WeekDay } from "#/types"
 import { WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProf
 function ShopProfilePage() {
 	const { t } = useTranslation()
 	const { slug } = Route.useParams()
-	const shop = useQuery(api.barbershops.getBySlug, { slug }) as Barbershop | null | undefined
+	const shop = useQuery(api.barbershops.getBySlug, { slug })
 	const [bookingOpen, setBookingOpen] = useState(false)
 	const [showQr, setShowQr] = useState(false)
 	const bookingUrl =
@@ -44,17 +44,13 @@ function ShopProfilePage() {
 			t("shop.linkCopied"),
 			t("shop.linkCopyFailed"),
 		)
-	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip") as
-		| Service[]
-		| undefined
-	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip") as
-		| Barber[]
-		| undefined
+	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")
+	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip")
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
 	)
-	const reviews = reviewsResult?.page as Review[] | undefined
+	const reviews = reviewsResult?.page
 
 	if (shop === undefined) return <ShopProfileSkeleton />
 	if (!shop)
@@ -166,7 +162,7 @@ function ShopProfilePage() {
 									{services.map((svc: Service) => (
 										<div
 											key={svc._id}
-											className="flex items-center justify-between py-4 px-4 rounded-xl hover:bg-[rgba(200,75,49,0.04)] transition-colors duration-200 group"
+											className="flex items-center justify-between py-4 px-4 rounded-xl hover:bg-(--gold)/[0.04] transition-colors duration-200 group"
 										>
 											<div className="flex-1">
 												<div className="font-medium text-(--text) text-sm group-hover:text-(--gold) transition-colors">
@@ -208,9 +204,9 @@ function ShopProfilePage() {
 									{barbers.map((b: Barber) => (
 										<div
 											key={b._id}
-											className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-(--bg-card) border border-[var(--gold)/10] min-w-30 flex-shrink-0 hover:border-(--gold)/30 transition-all duration-300"
+											className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-(--bg-card) border border-[(--gold)/10] min-w-30 flex-shrink-0 hover:border-(--gold)/30 transition-all duration-300"
 										>
-											<div className="w-14 h-14 rounded-full overflow-hidden bg-[var(--gold)/8] flex items-center justify-center ring-2 ring-[var(--gold)/15]">
+											<div className="w-14 h-14 rounded-full overflow-hidden bg-[var(--gold)/8] flex items-center justify-center ring-2 ring-[(--gold)/15]">
 												{b.avatarUrl ? (
 													<img src={b.avatarUrl} alt={b.name} className="w-full h-full object-cover" />
 												) : (
@@ -275,12 +271,12 @@ function ShopProfilePage() {
 					<div className="space-y-5">
 						{/* Booking CTA - Sticky */}
 						<div className="lg:sticky lg:top-6">
-							<div className="rounded-2xl bg-(--bg-card) border border-[rgba(200,75,49,0.12)] p-6 mb-5">
+							<div className="rounded-2xl bg-(--bg-card) border border-(--gold)/12 p-6 mb-5">
 								<h3 className="font-bold text-(--text) mb-4 text-lg">{t("shop.bookAppointment")}</h3>
 								<button
 									type="button"
 									onClick={() => setBookingOpen(true)}
-									className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-(--gold) text-white font-medium text-sm hover:bg-(--gold-dark) transition-all duration-300 shadow-[0_4px_16px_rgba(200,75,49,0.25)] hover:shadow-[0_6px_24px_rgba(200,75,49,0.35)]"
+									className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-(--gold) text-white font-medium text-sm hover:bg-(--gold-dark) transition-all duration-300 shadow-[0_4px_16px_var(--gold)/25] hover:shadow-[0_6px_24px_var(--gold)/35]"
 								>
 									<Calendar size={16} /> {t("common.bookNow")}
 								</button>
@@ -288,7 +284,7 @@ function ShopProfilePage() {
 
 							{/* Working Hours */}
 							{shop.workingHours && (
-								<div className="rounded-2xl bg-(--bg-card) border border-[var(--gold)/8] p-6 mb-5">
+								<div className="rounded-2xl bg-(--bg-card) border border-[(--gold)/8] p-6 mb-5">
 									<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2 text-sm">
 										<Clock size={14} className="text-(--gold)" /> {t("shop.hours")}
 									</h3>
@@ -311,7 +307,7 @@ function ShopProfilePage() {
 							)}
 
 							{/* Share / QR - Subtle */}
-							<div className="rounded-2xl bg-(--bg-card) border border-[var(--gold)/8] p-5">
+							<div className="rounded-2xl bg-(--bg-card) border border-[(--gold)/8] p-5">
 								<div className="flex items-center gap-2 mb-3">
 									<Share2 size={13} className="text-(--text-subtle)" />
 									<span className="text-xs font-medium text-(--text-muted)">{t("shop.shareTitle")}</span>
@@ -325,7 +321,7 @@ function ShopProfilePage() {
 									<button
 										type="button"
 										onClick={() => void handleCopyLink()}
-										className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--gold)/8] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:bg-[var(--gold)/15] transition-all"
+										className="flex-shrink-0 w-8 h-8 rounded-full bg-[(--gold)/8] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:bg-[(--gold)/15] transition-all"
 										title={t("shop.copyLink")}
 									>
 										<Copy size={13} />
@@ -339,7 +335,7 @@ function ShopProfilePage() {
 									<QrCode size={12} /> {showQr ? t("shop.hideQr") : t("shop.showQr")}
 								</button>
 								{showQr && (
-									<div className="flex justify-center mt-3 p-4 bg-white rounded-xl">
+									<div className="flex justify-center mt-3 p-4 bg-(--bg-card) rounded-xl">
 										<QRCodeSVG value={bookingUrl} size={140} />
 									</div>
 								)}
@@ -353,7 +349,7 @@ function ShopProfilePage() {
 											href={shop.socialLinks.instagram}
 											target="_blank"
 											rel="noreferrer"
-											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[var(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
+											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
 										>
 											<Link2 size={15} />
 										</a>
@@ -363,7 +359,7 @@ function ShopProfilePage() {
 											href={shop.socialLinks.facebook}
 											target="_blank"
 											rel="noreferrer"
-											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[var(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
+											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
 										>
 											<Share2 size={15} />
 										</a>
@@ -373,7 +369,7 @@ function ShopProfilePage() {
 											href={shop.socialLinks.website}
 											target="_blank"
 											rel="noreferrer"
-											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[var(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
+											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
 										>
 											<Globe size={15} />
 										</a>

@@ -145,7 +145,7 @@ function BusinessBarbers() {
 								</label>
 								<textarea
 									id="barber-bio"
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
+									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
 									rows={2}
 									placeholder={t("business.barbers.bioPlaceholder")}
 									value={form.bio}
@@ -204,7 +204,7 @@ function BusinessBarbers() {
 									<button
 										type="button"
 										onClick={() => void handleDelete(b._id)}
-										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
+										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--error) transition-all"
 									>
 										<Trash2 size={13} />
 									</button>

@@ -156,12 +156,12 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											key={svc._id}
 											type="button"
 											onClick={() => toggleService(svc._id)}
-											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-white border-(--border) hover:border-(--border-hover)"}`}
+											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
 										>
 											<div
 												className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${selected ? "bg-(--gold)" : "border-2 border-(--border)"}`}
 											>
-												{selected && <Check size={12} color="#fff" />}
+												{selected && <Check size={12} className="text-(--bg-card)" />}
 											</div>
 											<div className="flex-1 min-w-0">
 												<div className="font-medium text-(--text) text-sm">{svc.name}</div>
@@ -190,7 +190,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											key={b._id}
 											type="button"
 											onClick={() => setSelectedBarber(b._id)}
-											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-white border-(--border) hover:border-(--border-hover)"}`}
+											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
 										>
 											<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
 												{b.avatarUrl ? (
@@ -213,7 +213,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											</div>
 											{selected && (
 												<div className="w-6 h-6 rounded-full flex items-center justify-center bg-(--gold)">
-													<Check size={14} color="#fff" />
+													<Check size={14} className="text-(--bg-card)" />
 												</div>
 											)}
 										</button>
@@ -232,7 +232,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 								<input
 									id="booking-date"
 									type="date"
-									className="w-full rounded-lg border border-(--border) bg-white px-4 py-2.5 text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold)"
+									className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-4 py-2.5 text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold)"
 									min={minDate}
 									value={selectedDate}
 									onChange={(e) => pickDate(e.target.value)}
@@ -254,7 +254,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 													key={slot}
 													type="button"
 													onClick={() => setSelectedSlot(slot)}
-													className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${selectedSlot === slot ? "bg-(--gold) border-(--gold) text-white" : "bg-white border-(--border) text-(--text) hover:border-(--gold)/40"}`}
+													className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${selectedSlot === slot ? "bg-(--gold) border-(--gold) text-white" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--gold)/40"}`}
 												>
 													{slot}
 												</button>
@@ -269,7 +269,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 								</label>
 								<textarea
 									id="booking-notes"
-									className="w-full rounded-lg border border-(--border) bg-white px-4 py-2.5 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold) resize-none"
+									className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-4 py-2.5 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold) resize-none"
 									rows={3}
 									placeholder={t("booking.notesPlaceholder")}
 									value={notes}
@@ -282,7 +282,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 					{step === 4 && (
 						<div className="space-y-5">
 							<h3 className="font-semibold text-(--text)">{t("booking.summary")}</h3>
-							<div className="rounded-xl p-5 space-y-3 bg-white border border-(--border)">
+							<div className="rounded-xl p-5 space-y-3 bg-(--bg-card) border border-(--border)">
 								{summaryRows.map(([label, val]) => (
 									<div key={label} className="flex justify-between text-sm">
 										<span className="text-(--text-muted)">{label}</span>
@@ -329,7 +329,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 							<button
 								type="button"
 								onClick={() => setStep((step - 1) as Step)}
-								className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-(--text) hover:bg-(--bg-card-hover) transition-all duration-200 flex items-center gap-1 cursor-pointer"
+								className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-(--text) hover:bg-(--bg-input) transition-all duration-200 flex items-center gap-1 cursor-pointer"
 							>
 								<ChevronLeft size={16} /> {t("common.back")}
 							</button>

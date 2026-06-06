@@ -1,11 +1,10 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucide-react"
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
+import { useAdminAuth } from "#/hooks/useAdminAuth"
 import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -69,14 +68,7 @@ function ShopRow({ shop, onVerify, onSuspend }: ShopRowProps) {
 
 function AdminShops() {
 	const { t } = useTranslation()
-	const { user, loading } = useAuth()
-	const router = useRouter()
-
-	useEffect(() => {
-		if (!loading && (!user || user.role !== "admin")) {
-			void router.navigate({ to: "/" })
-		}
-	}, [user, loading, router])
+	useAdminAuth()
 
 	const allShops = useQuery(api.barbershops.listAll)
 	const verify = useMutation(api.barbershops.verify)

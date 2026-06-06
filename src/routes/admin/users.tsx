@@ -1,10 +1,9 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Users } from "lucide-react"
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { useAuth } from "#/hooks/useAuth"
+import { useAdminAuth } from "#/hooks/useAdminAuth"
 import type { UserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -19,14 +18,7 @@ const ROLE_BADGE: Record<UserRole, string> = {
 
 function AdminUsers() {
 	const { t } = useTranslation()
-	const { user, loading } = useAuth()
-	const router = useRouter()
-
-	useEffect(() => {
-		if (!loading && (!user || user.role !== "admin")) {
-			void router.navigate({ to: "/" })
-		}
-	}, [user, loading, router])
+	useAdminAuth()
 
 	const allUsers = useQuery(api.users.listAll)
 

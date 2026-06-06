@@ -33,11 +33,11 @@ function ResetPasswordPage() {
 			<div className="w-full max-w-md">
 				<div className="text-center mb-8">
 					<Link to="/" className="auth-logo">
-						<div className="auth-logo-icon gold-gradient">
+						<div className="auth-logo-icon text-(--gold)">
 							<Scissors size={20} className="text-black" />
 						</div>
 						<span className="text-2xl font-bold text-(--text)">
-							Fade<span className="gold-text">In</span>
+							Fade<span className="text-(--gold)">In</span>
 						</span>
 					</Link>
 					<h1 className="text-2xl font-bold text-(--text) mb-1">{t("resetPassword.title")}</h1>

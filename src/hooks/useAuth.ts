@@ -21,7 +21,6 @@ export function useAuth() {
 	return {
 		user,
 		loading: viewer === undefined,
-		isLoggedIn: !!user,
 		signIn,
 		signOut,
 		login: (email: string, password: string) =>

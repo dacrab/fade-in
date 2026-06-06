@@ -21,10 +21,10 @@ export default function AdminNav() {
 					<Link
 						key={to}
 						to={to}
-						className="flex items-center gap-2.5 px-3 py-2 text-sm text-(--text-muted) rounded-lg border-l-2 border-transparent transition-colors hover:text-(--text) hover:bg-(--bg-card-hover)"
+						className="flex items-center gap-2.5 px-3 py-2 text-sm text-(--text-muted) rounded-lg border-l-2 border-transparent transition-colors hover:text-(--text) hover:bg-(--bg-input)"
 						activeProps={{
 							className:
-								"flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg border-l-2 border-(--gold) text-(--text) bg-(--bg-card-hover)",
+								"flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg border-l-2 border-(--gold) text-(--text) bg-(--bg-input)",
 						}}
 					>
 						<Icon size={16} />

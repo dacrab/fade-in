@@ -172,7 +172,7 @@ export const verify = mutation({
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
 		const user = await ctx.db.get(userId)
-		if (!user || user.role !== "admin") throw new ConvexError("Not authorized")
+		if (user?.role !== "admin") throw new ConvexError("Not authorized")
 		return ctx.db.patch(args.id, { isVerified: args.isVerified })
 	},
 })
@@ -183,19 +183,8 @@ export const suspend = mutation({
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
 		const user = await ctx.db.get(userId)
-		if (!user || user.role !== "admin") throw new ConvexError("Not authorized")
+		if (user?.role !== "admin") throw new ConvexError("Not authorized")
 		return ctx.db.patch(args.id, { isActive: args.isActive })
-	},
-})
-
-export const updateImages = mutation({
-	args: { id: v.id("barbershops"), images: v.array(v.string()) },
-	handler: async (ctx, args) => {
-		const userId = await getAuthUserId(ctx)
-		if (!userId) throw new ConvexError("Not authenticated")
-		const shop = await ctx.db.get(args.id)
-		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
-		await ctx.db.patch(args.id, { images: args.images })
 	},
 })
 
@@ -214,7 +203,7 @@ export const listAll = query({
 		const userId = await getAuthUserId(ctx)
 		if (!userId) return []
 		const user = await ctx.db.get(userId)
-		if (!user || user.role !== "admin") return []
+		if (user?.role !== "admin") return []
 		return ctx.db.query("barbershops").collect()
 	},
 })

@@ -6,7 +6,6 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
-import type { Review } from "#/types"
 import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -29,7 +28,7 @@ function BusinessDashboard() {
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
 	)
-	const reviews = reviewsResult?.page as Review[] | undefined
+	const reviews = reviewsResult?.page
 
 	const completionRate =
 		stats && stats.totalCount > 0 ? Math.round((stats.completedCount / stats.totalCount) * 100) : 0

@@ -7,7 +7,7 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
-import type { Appointment, AppointmentStatus, Barbershop } from "#/types"
+import type { Appointment, Barbershop } from "#/types"
 import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -20,7 +20,7 @@ function CustomerDashboard() {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (user && user.role !== "customer" && user.role !== "admin") navigate({ to: "/" })
+		if (user && user.role !== "customer" && user.role !== "admin") void navigate({ to: "/" })
 	}, [user, navigate])
 
 	const appointments = useQuery(
@@ -161,7 +161,7 @@ function AppointmentRow({
 			t("errors.updateStatusFailed"),
 		)
 
-	const statusColor = STATUS_DOT[appt.status as AppointmentStatus]
+	const statusColor = STATUS_DOT[appt.status]
 
 	return (
 		<div className="flex items-center gap-3 py-3 group">
