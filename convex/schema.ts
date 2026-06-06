@@ -46,9 +46,12 @@ export default defineSchema({
 		bio: v.optional(v.string()),
 		specializations: v.array(v.string()),
 		avatarUrl: v.optional(v.string()),
+		userId: v.optional(v.id("users")),
 		workingHours: workingHoursValidator,
 		isActive: v.boolean(),
-	}).index("by_shop", ["barbershopId"]),
+	})
+		.index("by_shop", ["barbershopId"])
+		.index("by_user", ["userId"]),
 
 	services: defineTable({
 		barbershopId: v.id("barbershops"),

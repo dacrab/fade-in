@@ -22,6 +22,8 @@ const el = {
 		anyRating: "Οποιαδήποτε",
 		at: "στις",
 		min: "λεπτά",
+		addToFavorites: "Προσθήκη στα αγαπημένα",
+		removeFromFavorites: "Αφαίρεση από αγαπημένα",
 	},
 
 	nav: {
@@ -222,6 +224,10 @@ const el = {
 		profileTitle: "Το Προφίλ μου",
 		phonePlaceholder: "+30 6900 000000",
 		emailNote: "Το email δεν μπορεί να αλλαχθεί.",
+		leaveReview: "Γράψτε κριτική",
+		reviewTitle: "Αξιολογήστε την εμπειρία σας",
+		reviewPlaceholder: "Πείτε σε άλλους για την εμπειρία σας…",
+		reviewSubmitted: "Η κριτική υποβλήθηκε!",
 	},
 
 	business: {
@@ -403,8 +409,11 @@ const el = {
 		registrationFailed: "Η εγγραφή απέτυχε. Δοκιμάστε ξανά.",
 		loginFailed: "Η σύνδεση απέτυχε. Ελέγξτε τα στοιχεία σας.",
 		profileSaved: "Το προφίλ αποθηκεύτηκε!",
-		profileFailed: "Αποτυχία ενημέρωσης προφίλ.",
+		profileFailed: "Αποτυχία αποθήκευσης προφίλ",
 		replyAdded: "Η απάντηση προστέθηκε!",
+		reviewAdded: "Η κριτική υποβλήθηκε!",
+		reviewFailed: "Αποτυχία υποβολής κριτικής",
+		alreadyReviewed: "Έχετε ήδη αξιολογήσει αυτό το ραντεβού",
 		replyFailed: "Αποτυχία προσθήκης απάντησης.",
 		barberSaved: "Ο κουρέας αποθηκεύτηκε!",
 		barberFailed: "Αποτυχία αποθήκευσης κουρέα.",
