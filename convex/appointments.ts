@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
 import { generateSlots } from "../src/lib/slots"
+import { sendEmail } from "./auth"
 import { mutation, query } from "./_generated/server"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
@@ -68,7 +69,7 @@ export const create = mutation({
 		const conflict = existing.some((a) => args.startTime < a.endTime && args.endTime > a.startTime)
 		if (conflict) throw new ConvexError("This time slot is no longer available.")
 
-		return ctx.db.insert("appointments", {
+		const appointmentId = await ctx.db.insert("appointments", {
 			customerId: userId,
 			barbershopId: args.barbershopId,
 			barberId: args.barberId,
@@ -81,6 +82,32 @@ export const create = mutation({
 			status: "pending",
 			createdAt: Date.now(),
 		})
+
+		// Send booking confirmation email (best-effort)
+		try {
+			const [customer, shop, barber] = await Promise.all([
+				ctx.db.get(userId),
+				ctx.db.get(args.barbershopId),
+				ctx.db.get(args.barberId),
+			])
+			if (customer?.email) {
+				await sendEmail(
+					customer.email,
+					`Booking Confirmed — ${shop?.name ?? "Barbershop"}`,
+					`<p>Hi ${customer.name ?? "there"},</p>
+					<p>Your booking at <strong>${shop?.name ?? "Barbershop"}</strong> is confirmed!</p>
+					<p><strong>Barber:</strong> ${barber?.name ?? "—"}<br>
+					<strong>Date:</strong> ${args.date}<br>
+					<strong>Time:</strong> ${args.startTime} – ${args.endTime}<br>
+					<strong>Total:</strong> €${(totalPrice / 100).toFixed(2)}</p>
+					<p>See you there!<br>— The FadeIn Team</p>`,
+				)
+			}
+		} catch {
+			// Email failure should not block the booking
+		}
+
+		return appointmentId
 	},
 })
 

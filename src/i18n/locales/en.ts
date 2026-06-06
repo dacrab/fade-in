@@ -22,6 +22,8 @@ const en = {
 		anyRating: "Any",
 		at: "at",
 		min: "min",
+		addToFavorites: "Add to favorites",
+		removeFromFavorites: "Remove from favorites",
 	},
 
 	nav: {
@@ -222,6 +224,10 @@ const en = {
 		profileTitle: "My Profile",
 		phonePlaceholder: "+30 6900 000000",
 		emailNote: "Email cannot be changed.",
+		leaveReview: "Leave a review",
+		reviewTitle: "Rate your experience",
+		reviewPlaceholder: "Tell others about your experience…",
+		reviewSubmitted: "Review submitted!",
 	},
 
 	business: {
@@ -403,8 +409,11 @@ const en = {
 		registrationFailed: "Registration failed. Please try again.",
 		loginFailed: "Sign-in failed. Check your credentials.",
 		profileSaved: "Profile saved!",
-		profileFailed: "Failed to update profile.",
+		profileFailed: "Failed to save profile",
 		replyAdded: "Reply added!",
+		reviewAdded: "Review submitted!",
+		reviewFailed: "Failed to submit review",
+		alreadyReviewed: "You've already reviewed this appointment",
 		replyFailed: "Failed to add reply.",
 		barberSaved: "Barber saved!",
 		barberFailed: "Failed to save barber.",

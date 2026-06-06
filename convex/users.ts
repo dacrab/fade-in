@@ -34,6 +34,26 @@ export const updateProfile = mutation({
 	},
 })
 
+export const toggleFavorite = mutation({
+	args: { barbershopId: v.id("barbershops") },
+	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const user = await ctx.db.get(userId)
+		if (!user) throw new ConvexError("Not found")
+
+		const favorites = user.favoriteShopIds ?? []
+		const exists = favorites.some((id) => id === args.barbershopId)
+
+		return ctx.db.patch(userId, {
+			favoriteShopIds: exists
+				? favorites.filter((id) => id !== args.barbershopId)
+				: [...favorites, args.barbershopId],
+		})
+	},
+})
+
 /** Admin only — returns all users. */
 export const listAll = query({
 	args: {},

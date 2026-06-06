@@ -23,8 +23,11 @@ function BarberDashboard() {
 		if (user.role !== "barber" && user.role !== "admin") void navigate({ to: "/" })
 	}, [user, navigate])
 
-	// TODO: resolve barber profile from user ID to get barberId for filtering
-	const appointments = useQuery(api.appointments.listByBarber, "skip")
+	const barber = useQuery(api.barbers.getByUserId, user ? { userId: user.id } : "skip")
+	const appointments = useQuery(
+		api.appointments.listByBarber,
+		barber ? { barberId: barber._id } : "skip",
+	)
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-xl" />
 

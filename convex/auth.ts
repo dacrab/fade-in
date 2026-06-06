@@ -1,5 +1,11 @@
 import { Password } from "@convex-dev/auth/providers/Password"
 import { convexAuth } from "@convex-dev/auth/server"
+import { Resend } from "resend"
+
+function getResend(): Resend | null {
+	const key = process.env.RESEND_API_KEY
+	return key ? new Resend(key) : null
+}
 
 export const { auth, signIn, signOut, store } = convexAuth({
 	providers: [
@@ -15,10 +21,21 @@ export const { auth, signIn, signOut, store } = convexAuth({
 				id: "password-reset",
 				type: "email",
 				name: "Password Reset",
-				from: "noreply@fadein.app",
+				from: process.env.RESEND_FROM ?? "noreply@fadein.app",
 				maxAge: 60 * 60,
-				sendVerificationRequest: async ({ identifier: _email, token: _token, url: _url }) => {
-					// In production, integrate an email provider (Resend, SendGrid, etc.)
+				sendVerificationRequest: async ({ identifier: email, url }) => {
+					const resend = getResend()
+					if (!resend) {
+						// biome-ignore lint/suspicious/noConsole: operational warning when email not configured
+						console.warn("RESEND_API_KEY not set — password reset email not sent")
+						return
+					}
+					await resend.emails.send({
+						from: process.env.RESEND_FROM ?? "FadeIn <noreply@fadein.app>",
+						to: [email],
+						subject: "Reset your FadeIn password",
+						html: `<p>Click <a href="${url}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+					})
 				},
 			},
 		}),
@@ -47,3 +64,19 @@ export const { auth, signIn, signOut, store } = convexAuth({
 		},
 	},
 })
+
+/** Send an email notification via Resend. Returns silently if not configured. */
+export async function sendEmail(to: string, subject: string, html: string) {
+	const resend = getResend()
+	if (!resend) {
+		// biome-ignore lint/suspicious/noConsole: operational warning when email not configured
+		console.warn("RESEND_API_KEY not set — email not sent")
+		return
+	}
+	await resend.emails.send({
+		from: process.env.RESEND_FROM ?? "FadeIn <noreply@fadein.app>",
+		to: [to],
+		subject,
+		html,
+	})
+}

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Calendar, CheckCircle, Clock, Heart, RefreshCw, User, XCircle } from "lucide-react"
-import { useEffect, useMemo } from "react"
+import { Calendar, CheckCircle, Clock, Heart, RefreshCw, Star, User, XCircle } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
@@ -131,6 +131,7 @@ function CustomerDashboard() {
 									appt={appt}
 									shop={shopMap.get(appt.barbershopId)}
 									showRebook={appt.status === "completed"}
+									showReview={appt.status === "completed"}
 								/>
 							))}
 						</div>
@@ -146,51 +147,126 @@ function AppointmentRow({
 	shop,
 	showActions,
 	showRebook,
+	showReview,
 }: {
 	appt: Appointment
 	shop?: Barbershop
 	showActions?: boolean
 	showRebook?: boolean
+	showReview?: boolean
 }) {
 	const { t } = useTranslation()
 	const updateStatus = useMutation(api.appointments.updateStatus)
+	const hasReview = useQuery(api.reviews.hasReview, { appointmentId: appt._id })
+	const createReview = useMutation(api.reviews.create)
+	const [showForm, setShowForm] = useState(false)
+	const [rating, setRating] = useState(5)
+	const [comment, setComment] = useState("")
+	const [submitting, setSubmitting] = useState(false)
+
 	const handleCancel = () =>
-		withToast(
+		void withToast(
 			() => updateStatus({ id: appt._id, status: "cancelled" }),
 			t("status.cancelled"),
 			t("errors.updateStatusFailed"),
 		)
 
+	const handleSubmitReview = async () => {
+		if (comment.trim().length === 0) return
+		setSubmitting(true)
+		await withToast(
+			() => createReview({ appointmentId: appt._id, rating, comment: comment.trim() }),
+			t("errors.reviewAdded"),
+			t("errors.reviewFailed"),
+		)
+		setSubmitting(false)
+		setShowForm(false)
+	}
+
 	const statusColor = STATUS_DOT[appt.status]
 
 	return (
-		<div className="flex items-center gap-3 py-3 group">
-			<span className="text-xs font-mono text-(--text-muted) w-11 shrink-0">{appt.startTime}</span>
-			<span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
-			<div className="flex-1 min-w-0">
-				<span className="text-sm text-(--text) block truncate">{shop?.name ?? "…"}</span>
-				<span className="text-xs text-(--text-subtle)">{formatDateShort(appt.date)}</span>
+		<div>
+			<div className="flex items-center gap-3 py-3 group">
+				<span className="text-xs font-mono text-(--text-muted) w-11 shrink-0">{appt.startTime}</span>
+				<span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
+				<div className="flex-1 min-w-0">
+					<span className="text-sm text-(--text) block truncate">{shop?.name ?? "…"}</span>
+					<span className="text-xs text-(--text-subtle)">{formatDateShort(appt.date)}</span>
+				</div>
+				<span className="text-sm font-medium text-(--text) tabular-nums">
+					{formatPrice(appt.totalPrice)}
+				</span>
+				{showActions && (appt.status === "pending" || appt.status === "confirmed") && (
+					<button
+						type="button"
+						onClick={() => void handleCancel()}
+						className="text-xs text-(--error) opacity-0 group-hover:opacity-100 transition-opacity"
+					>
+						{t("common.cancel")}
+					</button>
+				)}
+				{showRebook && shop && (
+					<Link
+						to="/barbershops/$slug"
+						params={{ slug: shop.slug }}
+						className="text-xs text-(--gold) hover:underline opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+					>
+						<RefreshCw size={11} /> Rebook
+					</Link>
+				)}
+				{showReview && showRebook && hasReview === false && (
+					<button
+						type="button"
+						onClick={() => setShowForm(!showForm)}
+						className="text-xs text-(--gold) hover:underline opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+					>
+						<Star size={11} /> {t("dashboard.leaveReview")}
+					</button>
+				)}
 			</div>
-			<span className="text-sm font-medium text-(--text) tabular-nums">
-				{formatPrice(appt.totalPrice)}
-			</span>
-			{showActions && (appt.status === "pending" || appt.status === "confirmed") && (
-				<button
-					type="button"
-					onClick={() => void handleCancel()}
-					className="text-xs text-(--error) opacity-0 group-hover:opacity-100 transition-opacity"
-				>
-					{t("common.cancel")}
-				</button>
-			)}
-			{showRebook && shop && (
-				<Link
-					to="/barbershops/$slug"
-					params={{ slug: shop.slug }}
-					className="text-xs text-(--gold) hover:underline opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
-				>
-					<RefreshCw size={11} /> Rebook
-				</Link>
+			{showForm && (
+				<div className="ml-14 mb-3 p-3 rounded-lg bg-(--bg-input) border border-(--border) space-y-2">
+					<div className="flex items-center gap-1">
+						{[1, 2, 3, 4, 5].map((star) => (
+							<button
+								key={star}
+								type="button"
+								onClick={() => setRating(star)}
+								className="p-0.5 cursor-pointer"
+							>
+								<Star
+									size={16}
+									className={star <= rating ? "text-(--gold) fill-(--gold)" : "text-(--border-hover)"}
+								/>
+							</button>
+						))}
+					</div>
+					<textarea
+						className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-3 py-2 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 resize-none"
+						rows={2}
+						placeholder={t("dashboard.reviewPlaceholder")}
+						value={comment}
+						onChange={(e) => setComment(e.target.value)}
+					/>
+					<div className="flex justify-end gap-2">
+						<button
+							type="button"
+							onClick={() => setShowForm(false)}
+							className="text-xs text-(--text-muted) px-3 py-1.5"
+						>
+							{t("common.cancel")}
+						</button>
+						<button
+							type="button"
+							onClick={() => void handleSubmitReview()}
+							disabled={submitting || comment.trim().length === 0}
+							className="btn btn-primary text-xs"
+						>
+							{t("common.save")}
+						</button>
+					</div>
+				</div>
 			)}
 		</div>
 	)

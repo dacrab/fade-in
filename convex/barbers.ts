@@ -14,6 +14,18 @@ export const listByShop = query({
 	},
 })
 
+export const getByUserId = query({
+	args: { userId: v.id("users") },
+	handler: async (ctx, args) => {
+		const barbers = await ctx.db
+			.query("barbers")
+			.withIndex("by_user", (q) => q.eq("userId", args.userId))
+			.filter((q) => q.eq(q.field("isActive"), true))
+			.collect()
+		return barbers[0] ?? null
+	},
+})
+
 export const create = mutation({
 	args: {
 		barbershopId: v.id("barbershops"),
@@ -39,6 +51,27 @@ export const create = mutation({
 	},
 })
 
+export const linkToUser = mutation({
+	args: { barberId: v.id("barbers") },
+	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const barber = await ctx.db.get(args.barberId)
+		if (!barber) throw new ConvexError("Barber not found")
+
+		// Only the shop owner or the barber themselves can link
+		const shop = await ctx.db.get(barber.barbershopId)
+		if (!shop) throw new ConvexError("Shop not found")
+
+		const user = await ctx.db.get(userId)
+		if (shop.ownerId !== userId && user?.role !== "admin" && user?.role !== "barber")
+			throw new ConvexError("Not authorized")
+
+		return ctx.db.patch(args.barberId, { userId })
+	},
+})
+
 export const update = mutation({
 	args: {
 		id: v.id("barbers"),
@@ -46,6 +79,7 @@ export const update = mutation({
 		bio: v.optional(v.string()),
 		specializations: v.optional(v.array(v.string())),
 		avatarUrl: v.optional(v.string()),
+		userId: v.optional(v.id("users")),
 		workingHours: workingHoursValidator,
 		isActive: v.optional(v.boolean()),
 	},
