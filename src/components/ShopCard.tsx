@@ -9,7 +9,7 @@ export default function ShopCard({ shop }: { shop: Barbershop }) {
 		<Link
 			to="/barbershops/$slug"
 			params={{ slug: shop.slug }}
-			className="shop-card block bg-white rounded-[12px] shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden no-underline"
+			className="shop-card block bg-(--bg-card) rounded-[12px] shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden no-underline"
 		>
 			<div className="relative w-full h-44 overflow-hidden">
 				{shop.images[0] ? (

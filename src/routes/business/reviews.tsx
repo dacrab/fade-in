@@ -8,7 +8,6 @@ import { withToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatRelative } from "#/lib/format"
-import type { Review } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -23,7 +22,7 @@ function BusinessReviews() {
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
 	)
-	const reviews = reviewsResult?.page as Review[] | undefined
+	const reviews = reviewsResult?.page
 	const addReply = useMutation(api.reviews.addOwnerReply)
 	const [replyId, setReplyId] = useState<string | null>(null)
 	const [replyText, setReplyText] = useState("")
@@ -87,7 +86,7 @@ function BusinessReviews() {
 								) : replyId === r._id ? (
 									<div className="flex gap-2 mt-3">
 										<input
-											className="flex-1 bg-white border border-(--border) rounded-lg px-3 py-2 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+											className="flex-1 bg-(--bg-card) border border-(--border) rounded-lg px-3 py-2 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 											placeholder={t("business.reviews.replyPlaceholder")}
 											value={replyText}
 											onChange={(e) => setReplyText(e.target.value)}

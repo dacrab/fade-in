@@ -89,7 +89,7 @@ function RegisterPage() {
 					</span>
 				</Link>
 
-				<div className="bg-white rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-8">
+				<div className="bg-(--bg-card) rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-8">
 					<h1 className="text-2xl font-bold text-(--text) mb-1 text-center">
 						{t("auth.registerTitle")}
 					</h1>

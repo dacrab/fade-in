@@ -17,7 +17,7 @@ export function DialogContent({
 			<BaseDialog.Backdrop className="fixed inset-0 bg-black/30 z-50" />
 			<BaseDialog.Popup
 				className={cn(
-					"fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] bg-white rounded-2xl shadow-xl border border-(--border) overflow-hidden",
+					"fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] bg-(--bg-card) rounded-2xl shadow-xl border border-(--border) overflow-hidden",
 					className,
 				)}
 			>

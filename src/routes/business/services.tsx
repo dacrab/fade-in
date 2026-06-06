@@ -195,7 +195,7 @@ function BusinessServices() {
 								</label>
 								<select
 									id="svc-category"
-									className="w-full bg-white border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) focus:outline-none focus:border-(--gold) transition-colors"
+									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) focus:outline-none focus:border-(--gold) transition-colors"
 									value={form.category}
 									onChange={set("category")}
 								>
@@ -266,7 +266,7 @@ function BusinessServices() {
 									<button
 										type="button"
 										onClick={() => void handleDelete(svc._id)}
-										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
+										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--error) transition-all"
 									>
 										<Trash2 size={13} />
 									</button>

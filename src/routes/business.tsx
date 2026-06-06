@@ -3,7 +3,6 @@ import { BarChart3, Calendar, Check, MessageSquare, Scissors, Settings, Users } 
 import { useTranslation } from "react-i18next"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import type { Barbershop } from "#/types"
 
 export const Route = createFileRoute("/business")({ component: BusinessLayout })
 
@@ -19,7 +18,7 @@ const NAV_LINK_DEFS = [
 function BusinessLayout() {
 	const { t } = useTranslation()
 	const { user } = useBusinessAuth()
-	const shop = useOwnerShop(user?.id) as Barbershop | undefined
+	const shop = useOwnerShop(user?.id)
 
 	return (
 		<div className="flex flex-1">

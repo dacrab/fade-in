@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
-import type { Appointment, AppointmentStatus, Barbershop } from "#/types"
+import type { Appointment } from "#/types"
 import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -20,11 +20,11 @@ function BarberDashboard() {
 
 	useEffect(() => {
 		if (!user) return
-		if (user.role !== "barber" && user.role !== "admin") navigate({ to: "/" })
+		if (user.role !== "barber" && user.role !== "admin") void navigate({ to: "/" })
 	}, [user, navigate])
 
 	// TODO: resolve barber profile from user ID to get barberId for filtering
-	const appointments = useQuery(api.appointments.listByBarber, "skip") as Appointment[] | undefined
+	const appointments = useQuery(api.appointments.listByBarber, "skip")
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-xl" />
 
@@ -123,12 +123,9 @@ function BarberDashboard() {
 
 function AppointmentRow({ appt }: { appt: Appointment }) {
 	const { t } = useTranslation()
-	const shop = useQuery(api.barbershops.getById, { id: appt.barbershopId }) as
-		| Barbershop
-		| null
-		| undefined
+	const shop = useQuery(api.barbershops.getById, { id: appt.barbershopId })
 
-	const statusColor = STATUS_DOT[appt.status as AppointmentStatus]
+	const statusColor = STATUS_DOT[appt.status]
 
 	return (
 		<div className="flex items-center gap-3 py-3">

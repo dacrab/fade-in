@@ -137,7 +137,7 @@ export default function Header() {
 			</header>
 
 			{mobileOpen && (
-				<div className="fixed top-[72px] left-0 right-0 z-[60] bg-(--bg) border-b border-(--border) shadow-sm md:hidden">
+				<div className="fixed top-(--header-height) left-0 right-0 z-[60] bg-(--bg) border-b border-(--border) shadow-sm md:hidden">
 					<div className="flex flex-col px-6 py-6 gap-4">
 						{NAV_ITEMS.map(({ to, key }) => (
 							<Link
@@ -167,7 +167,7 @@ export default function Header() {
 										handleLogout()
 										setMobileOpen(false)
 									}}
-									className="text-base font-medium text-(--error) hover:text-red-700 transition-colors py-2 text-left"
+									className="text-base font-medium text-(--error) hover:text-(--error) transition-colors py-2 text-left"
 								>
 									{t("common.signOut")}
 								</button>

@@ -93,9 +93,7 @@ function BusinessAppointments() {
 											<div className="text-sm font-mono font-medium text-(--text)">{appt.startTime}</div>
 											<div className="text-[11px] font-mono text-(--text-subtle)">{appt.endTime}</div>
 										</div>
-										<span
-											className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[appt.status as AppointmentStatus]}`}
-										/>
+										<span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[appt.status]}`} />
 										<div className="flex-1 min-w-0">
 											<div className="text-sm text-(--text) truncate">{appt.notes || "—"}</div>
 											<div className="text-xs text-(--text-subtle)">{formatPrice(appt.totalPrice)}</div>
@@ -176,7 +174,7 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 				<button
 					type="button"
 					onClick={() => shift(-1)}
-					className="p-1 rounded-md hover:bg-(--bg-card-hover) text-(--text-muted) transition-colors"
+					className="p-1 rounded-md hover:bg-(--bg-input) text-(--text-muted) transition-colors"
 				>
 					<ChevronLeft size={16} />
 				</button>
@@ -184,7 +182,7 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 				<button
 					type="button"
 					onClick={() => shift(1)}
-					className="p-1 rounded-md hover:bg-(--bg-card-hover) text-(--text-muted) transition-colors"
+					className="p-1 rounded-md hover:bg-(--bg-input) text-(--text-muted) transition-colors"
 				>
 					<ChevronRight size={16} />
 				</button>
@@ -213,7 +211,7 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 							key={day}
 							type="button"
 							onClick={() => onSelect(dateStr)}
-							className={`w-8 h-8 rounded-md text-xs font-medium transition-colors mx-auto flex items-center justify-center ${isSelected ? "bg-(--gold) text-white" : isToday ? "border border-(--gold) text-(--gold)" : "text-(--text-muted) hover:bg-(--bg-card-hover) hover:text-(--text)"}`}
+							className={`w-8 h-8 rounded-md text-xs font-medium transition-colors mx-auto flex items-center justify-center ${isSelected ? "bg-(--gold) text-white" : isToday ? "border border-(--gold) text-(--gold)" : "text-(--text-muted) hover:bg-(--bg-input) hover:text-(--text)"}`}
 						>
 							{day}
 						</button>

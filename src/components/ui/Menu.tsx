@@ -26,7 +26,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 			<BaseMenu.Trigger render={trigger} />
 			<BaseMenu.Portal>
 				<BaseMenu.Positioner align={align} sideOffset={16}>
-					<BaseMenu.Popup className="min-w-[11rem] rounded-xl border border-(--border) bg-white shadow-lg p-1.5">
+					<BaseMenu.Popup className="min-w-[11rem] rounded-xl border border-(--border) bg-(--bg-card) shadow-lg p-1.5">
 						{items.map((item) =>
 							item.separator ? (
 								<BaseMenu.Separator key={item.id} className="my-1.5 h-px mx-2 bg-(--bg-input)" />
@@ -36,7 +36,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
 									disabled={item.disabled}
 									onClick={item.onClick}
 									className={cn(
-										"flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg cursor-pointer transition-colors text-(--text-muted) hover:text-(--text) hover:bg-(--bg-card-hover)",
+										"flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg cursor-pointer transition-colors text-(--text-muted) hover:text-(--text) hover:bg-(--bg-input)",
 										item.danger && "text-(--error) hover:text-(--error) hover:bg-(--error)/5",
 										item.disabled && "opacity-40 cursor-not-allowed",
 									)}
