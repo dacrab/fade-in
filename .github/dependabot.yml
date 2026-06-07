@@ -8,12 +8,20 @@ updates:
     time: "03:00"
     timezone: Europe/Athens
   open-pull-requests-limit: 3
+  versioning-strategy: increase
   groups:
     all-non-major:
       patterns: ["*"]
       update-types: ["patch", "minor"]
   labels: [dependencies]
   rebase-strategy: auto
+  commit-message:
+    prefix: chore
+    include: scope
+  cooldown:
+    default-days: 3
+    semver-minor-days: 7
+    semver-major-days: 14
 - package-ecosystem: github-actions
   directory: /
   schedule:
