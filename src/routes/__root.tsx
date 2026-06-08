@@ -8,12 +8,19 @@ import {
 	useRouter,
 } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
+import * as Sentry from "@sentry/react"
 import Footer from "#/components/Footer"
 import Header from "#/components/Header"
 import { ToastContainer } from "#/components/ui/Toast"
 import ConvexProvider from "#/integrations/convex/provider"
+import { initClientSentry } from "#/sentry.client"
 import "../i18n"
 import appCss from "../styles.css?url"
+
+// Initialize client-side Sentry
+if (typeof window !== "undefined") {
+	initClientSentry()
+}
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -92,7 +99,9 @@ function RootDocument() {
 				<ConvexProvider>
 					<Header />
 					<div className="flex-1">
-						<Outlet />
+						<Sentry.ErrorBoundary fallback={<div>Something went wrong</div>}>
+							<Outlet />
+						</Sentry.ErrorBoundary>
 					</div>
 					<Footer />
 					<ToastContainer />
