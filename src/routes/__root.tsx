@@ -13,14 +13,8 @@ import Footer from "#/components/Footer"
 import Header from "#/components/Header"
 import { ToastContainer } from "#/components/ui/Toast"
 import ConvexProvider from "#/integrations/convex/provider"
-import { initClientSentry } from "#/sentry.client"
 import "../i18n"
 import appCss from "../styles.css?url"
-
-// Initialize client-side Sentry
-if (typeof window !== "undefined") {
-	initClientSentry()
-}
 
 export const Route = createRootRoute({
 	head: () => ({
