@@ -1,7 +1,7 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin"
 import tailwindcss from "@tailwindcss/vite"
 import { devtools } from "@tanstack/devtools-vite"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
-import { sentryVitePlugin } from "@sentry/vite-plugin"
 import viteReact from "@vitejs/plugin-react"
 import { defineConfig } from "vitest/config"
 
@@ -16,12 +16,16 @@ export default defineConfig({
 		...(isTest ? [] : [devtools(), tanstackStart()]),
 		tailwindcss(),
 		viteReact(),
-		...(isTest ? [] : [sentryVitePlugin({
-			org: process.env.SENTRY_ORG,
-			project: process.env.SENTRY_PROJECT,
-			authToken: process.env.SENTRY_AUTH_TOKEN,
-			telemetry: false,
-		})]),
+		...(isTest
+			? []
+			: [
+					sentryVitePlugin({
+						org: process.env.SENTRY_ORG,
+						project: process.env.SENTRY_PROJECT,
+						authToken: process.env.SENTRY_AUTH_TOKEN,
+						telemetry: false,
+					}),
+				]),
 	],
 	ssr: {
 		external: ["react", "react-dom"],

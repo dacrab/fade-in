@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react"
 import type { ErrorComponentProps } from "@tanstack/react-router"
 import {
 	createRootRoute,
@@ -8,7 +9,6 @@ import {
 	useRouter,
 } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
-import * as Sentry from "@sentry/react"
 import Footer from "#/components/Footer"
 import Header from "#/components/Header"
 import { ToastContainer } from "#/components/ui/Toast"
