@@ -20,5 +20,6 @@
 		"@testing-library/react",
 		"@testing-library/user-event"
 	],
-	"ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "ignoreBinaries": ["doppler"]
 }
