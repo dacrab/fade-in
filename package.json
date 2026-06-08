@@ -6,8 +6,8 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "doppler run -- vite dev",
+    "build": "doppler run -- vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
