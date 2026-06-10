@@ -11,10 +11,7 @@ function polarToken(): string {
 	return token
 }
 
-async function polarPost<T = unknown>(
-	path: string,
-	body: Record<string, unknown>,
-): Promise<T> {
+async function polarPost<T = unknown>(path: string, body: Record<string, unknown>): Promise<T> {
 	const res = await fetch(`${POLAR_BASE}${path}`, {
 		method: "POST",
 		headers: {
@@ -31,8 +28,10 @@ async function polarPost<T = unknown>(
 	return data as T
 }
 
-const runQ = (ctx: any, name: string, args: any) => ctx.runQuery(name, args)
-const runM = (ctx: any, name: string, args: any) => ctx.runMutation(name, args)
+// biome-ignore lint/suspicious/noExplicitAny: Convex ctx type not easily expressed here
+const runQ = (ctx: any, name: string, args: unknown) => ctx.runQuery(name, args)
+// biome-ignore lint/suspicious/noExplicitAny: Convex ctx type not easily expressed here
+const runM = (ctx: any, name: string, args: unknown) => ctx.runMutation(name, args)
 
 export const createCheckoutSession = action({
 	args: {
@@ -66,11 +65,6 @@ export const createCheckoutSession = action({
 			endTime: args.endTime,
 			notes: args.notes,
 		})
-
-		const [shop, barber] = await Promise.all([
-			runQ(ctx, "barbershops:getById", { id: args.barbershopId }),
-			runQ(ctx, "barbers:getById", { id: args.barberId }),
-		])
 
 		const user = await runQ(ctx, "users:getById", { id: userId })
 

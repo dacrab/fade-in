@@ -13,7 +13,7 @@ const toHex = (buf: ArrayBuffer): string =>
 async function verifySignature(payload: string, header: string, secret: string): Promise<boolean> {
 	const parts = Object.fromEntries(header.split(",").map((p) => p.split("=") as [string, string]))
 	const { t: timestamp, v1: sig } = parts
-	if (!timestamp || !sig) return false
+	if (!(timestamp && sig)) return false
 	if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false
 
 	const key = await crypto.subtle.importKey(
