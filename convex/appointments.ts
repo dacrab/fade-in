@@ -167,12 +167,11 @@ export const listByShop = query({
 		date: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
-		if (args.date) {
+		const date = args.date
+		if (date) {
 			return ctx.db
 				.query("appointments")
-				.withIndex("by_shop_date", (q) =>
-					q.eq("barbershopId", args.barbershopId).eq("date", args.date as string),
-				)
+				.withIndex("by_shop_date", (q) => q.eq("barbershopId", args.barbershopId).eq("date", date))
 				.order("desc")
 				.collect()
 		}
@@ -193,7 +192,8 @@ export const listByBarber = query({
 			.order("desc")
 			.collect()
 
-		return args.date ? appts.filter((a) => a.date === args.date) : appts
+		const date = args.date
+		return date ? appts.filter((a) => a.date === date) : appts
 	},
 })
 
