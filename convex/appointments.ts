@@ -197,6 +197,34 @@ export const listByBarber = query({
 	},
 })
 
+export const confirmFromCheckout = mutation({
+	args: {
+		stripeSessionId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const appt = await ctx.db
+			.query("appointments")
+			.withIndex("by_stripe_session", (q) => q.eq("stripeSessionId", args.stripeSessionId))
+			.unique()
+		if (!appt) throw new ConvexError("Appointment not found for session")
+		if (appt.status !== "pending") return // already confirmed
+		await ctx.db.patch(appt._id, { status: "confirmed", paymentStatus: "paid" })
+	},
+})
+
+export const setStripeSession = mutation({
+	args: {
+		id: v.id("appointments"),
+		stripeSessionId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		await ctx.db.patch(args.id, {
+			stripeSessionId: args.stripeSessionId,
+			paymentStatus: "unpaid",
+		})
+	},
+})
+
 /** Server-side stats for business dashboard — avoids loading all appointments client-side */
 export const getShopStats = query({
 	args: { barbershopId: v.id("barbershops") },
