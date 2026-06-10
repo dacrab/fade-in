@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react"
+import { useAction, useQuery } from "convex/react"
 import { Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -47,7 +47,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 			: "skip",
 	)
 
-	const createAppointment = useMutation(api.appointments.create)
+	const createCheckout = useAction(api.payments.createCheckoutSession)
 
 	const minDate = (() => {
 		const d = new Date()
@@ -74,7 +74,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 			const [startH, startM] = selectedSlot.split(":").map(Number)
 			const endMinutes = (startH ?? 0) * 60 + (startM ?? 0) + totalDuration
 			const endTime = `${String(Math.floor(endMinutes / 60)).padStart(2, "0")}:${String(endMinutes % 60).padStart(2, "0")}`
-			await createAppointment({
+			const result = await createCheckout({
 				barbershopId: shop._id,
 				barberId: selectedBarber,
 				serviceIds: selectedServices,
@@ -83,10 +83,9 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 				endTime,
 				notes: notes || undefined,
 			})
-			setStep(5)
+			if (result.url) window.location.href = result.url
 		} catch {
 			showToast(t("booking.failed"), "error")
-		} finally {
 			setLoading(false)
 		}
 	}

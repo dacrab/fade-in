@@ -3,6 +3,11 @@ import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { definedPatch, workingHoursValidator } from "./validators"
 
+export const getById = query({
+	args: { id: v.id("barbers") },
+	handler: async (ctx, args) => ctx.db.get(args.id),
+})
+
 export const listByShop = query({
 	args: { barbershopId: v.id("barbershops") },
 	handler: async (ctx, args) => {

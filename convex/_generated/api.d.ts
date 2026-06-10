@@ -13,6 +13,7 @@ import type * as auth from "../auth.js";
 import type * as barbers from "../barbers.js";
 import type * as barbershops from "../barbershops.js";
 import type * as http from "../http.js";
+import type * as payments from "../payments.js";
 import type * as reviews from "../reviews.js";
 import type * as services from "../services.js";
 import type * as users from "../users.js";
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   barbers: typeof barbers;
   barbershops: typeof barbershops;
   http: typeof http;
+  payments: typeof payments;
   reviews: typeof reviews;
   services: typeof services;
   users: typeof users;

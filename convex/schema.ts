@@ -79,12 +79,15 @@ export default defineSchema({
 			v.literal("cancelled"),
 		),
 		notes: v.optional(v.string()),
+		stripeSessionId: v.optional(v.string()),
+		paymentStatus: v.optional(v.union(v.literal("unpaid"), v.literal("paid"))),
 		createdAt: v.number(),
 	})
 		.index("by_customer", ["customerId"])
 		.index("by_shop", ["barbershopId"])
 		.index("by_shop_date", ["barbershopId", "date"])
-		.index("by_barber", ["barberId"]),
+		.index("by_barber", ["barberId"])
+		.index("by_stripe_session", ["stripeSessionId"]),
 
 	reviews: defineTable({
 		customerId: v.id("users"),
