@@ -199,12 +199,12 @@ export const listByBarber = query({
 
 export const confirmFromCheckout = mutation({
 	args: {
-		stripeSessionId: v.string(),
+		polarCheckoutId: v.string(),
 	},
 	handler: async (ctx, args) => {
 		const appt = await ctx.db
 			.query("appointments")
-			.withIndex("by_stripe_session", (q) => q.eq("stripeSessionId", args.stripeSessionId))
+			.withIndex("by_polar_checkout", (q) => q.eq("polarCheckoutId", args.polarCheckoutId))
 			.unique()
 		if (!appt) throw new ConvexError("Appointment not found for session")
 		if (appt.status !== "pending") return // already confirmed
@@ -212,14 +212,14 @@ export const confirmFromCheckout = mutation({
 	},
 })
 
-export const setStripeSession = mutation({
+export const setPolarCheckout = mutation({
 	args: {
 		id: v.id("appointments"),
-		stripeSessionId: v.string(),
+		polarCheckoutId: v.string(),
 	},
 	handler: async (ctx, args) => {
 		await ctx.db.patch(args.id, {
-			stripeSessionId: args.stripeSessionId,
+			polarCheckoutId: args.polarCheckoutId,
 			paymentStatus: "unpaid",
 		})
 	},

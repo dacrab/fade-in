@@ -1,18 +1,37 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
-import Stripe from "stripe"
 import type { Doc } from "./_generated/dataModel"
 import { action } from "./_generated/server"
 
-function getStripe() {
-	const key = process.env.STRIPE_SECRET_KEY
-	if (!key) throw new ConvexError("STRIPE_SECRET_KEY not set")
-	return new Stripe(key)
+const POLAR_BASE = "https://api.polar.sh/v1"
+
+function polarToken(): string {
+	const token = process.env.POLAR_ACCESS_TOKEN
+	if (!token) throw new ConvexError("POLAR_ACCESS_TOKEN not set")
+	return token
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: self-referencing api circular type
+async function polarPost<T = unknown>(
+	path: string,
+	body: Record<string, unknown>,
+): Promise<T> {
+	const res = await fetch(`${POLAR_BASE}${path}`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${polarToken()}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(body),
+	})
+	const data = await res.json()
+	if (!res.ok) {
+		const msg = data.detail?.[0]?.msg || data.error || "Polar API error"
+		throw new ConvexError(msg)
+	}
+	return data as T
+}
+
 const runQ = (ctx: any, name: string, args: any) => ctx.runQuery(name, args)
-// biome-ignore lint/suspicious/noExplicitAny: self-referencing api circular type
 const runM = (ctx: any, name: string, args: any) => ctx.runMutation(name, args)
 
 export const createCheckoutSession = action({
@@ -28,8 +47,6 @@ export const createCheckoutSession = action({
 	handler: async (ctx, args) => {
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
-
-		const stripe = getStripe()
 
 		const services = await Promise.all(
 			args.serviceIds.map((id) => runQ(ctx, "services:getById", { id })),
@@ -55,33 +72,22 @@ export const createCheckoutSession = action({
 			runQ(ctx, "barbers:getById", { id: args.barberId }),
 		])
 
-		const session = await stripe.checkout.sessions.create({
-			mode: "payment",
-			payment_method_types: ["card"],
-			line_items: [
-				{
-					price_data: {
-						currency: "eur",
-						product_data: {
-							name: `${(services as (Doc<"services"> | null)[]).map((s) => s?.name).join(" + ")} — ${(shop as Doc<"barbershops"> | null)?.name ?? "Barbershop"}`,
-							description: `${(barber as Doc<"barbers"> | null)?.name ?? "\u2014"} \u00b7 ${args.date} ${args.startTime}`,
-						},
-						unit_amount: totalPrice,
-					},
-					quantity: 1,
-				},
-			],
-			customer_email: (await runQ(ctx, "users:getById", { id: userId }))?.email,
+		const user = await runQ(ctx, "users:getById", { id: userId })
+
+		const checkout = await polarPost<{ id: string; url: string }>("/checkouts/", {
+			amount: totalPrice,
+			currency: "eur",
+			customer_email: (user as { email?: string })?.email,
 			metadata: { appointmentId },
 			success_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
 			cancel_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
 		})
 
-		await runM(ctx, "appointments:setStripeSession", {
+		await runM(ctx, "appointments:setPolarCheckout", {
 			id: appointmentId,
-			stripeSessionId: session.id,
+			polarCheckoutId: checkout.id,
 		})
 
-		return { url: session.url, appointmentId }
+		return { url: checkout.url, appointmentId }
 	},
 })
