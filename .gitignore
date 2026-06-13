@@ -51,3 +51,4 @@ PLAN.md
 research-reports/
 .vercel
 .env.vercel
+.env*.local
