@@ -52,3 +52,4 @@ research-reports/
 .vercel
 .env.vercel
 .env*.local
+package-lock.json
