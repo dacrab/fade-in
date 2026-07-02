@@ -249,3 +249,73 @@ export const getShopStats = query({
 		}
 	},
 })
+
+export const getById = query({
+	args: { id: v.id("appointments") },
+	handler: async (ctx, args) => ctx.db.get(args.id),
+})
+
+export const reschedule = mutation({
+	args: {
+		id: v.id("appointments"),
+		date: v.string(),
+		startTime: v.string(),
+		endTime: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) throw new ConvexError("Not authenticated")
+
+		const appt = await ctx.db.get(args.id)
+		if (!appt) throw new ConvexError("Not found")
+		if (appt.customerId !== userId) throw new ConvexError("Not authorized")
+
+		return ctx.db.patch(args.id, {
+			date: args.date,
+			startTime: args.startTime,
+			endTime: args.endTime,
+		})
+	},
+})
+
+/** Admin: returns all appointments with customer/shop/barber names for the data table. */
+export const listAllWithDetails = query({
+	args: {},
+	handler: async (ctx) => {
+		const userId = await getAuthUserId(ctx)
+		if (!userId) return []
+		const user = await ctx.db.get(userId)
+		if (user?.role !== "admin") return []
+
+		const all = await ctx.db.query("appointments").order("desc").collect()
+		type DocRef = { _id: string; name?: string }
+		const customers = new Map(
+			((await Promise.all(all.map((a) => ctx.db.get(a.customerId)))) as (DocRef | undefined)[])
+				.filter((u): u is DocRef => u != null)
+				.map((u) => [u._id, u]),
+		)
+		const shops = new Map(
+			((await Promise.all(all.map((a) => ctx.db.get(a.barbershopId)))) as (DocRef | undefined)[])
+				.filter((s): s is DocRef => s != null)
+				.map((s) => [s._id, s]),
+		)
+		const barbers = new Map(
+			((await Promise.all(all.map((a) => ctx.db.get(a.barberId)))) as (DocRef | undefined)[])
+				.filter((b): b is DocRef => b != null)
+				.map((b) => [b._id, b]),
+		)
+
+		return all.map((a) => ({
+			_id: a._id,
+			date: a.date,
+			startTime: a.startTime,
+			endTime: a.endTime,
+			totalPrice: a.totalPrice,
+			status: a.status,
+			paymentStatus: a.paymentStatus,
+			shopName: shops.get(a.barbershopId)?.name ?? "—",
+			barberName: barbers.get(a.barberId)?.name ?? "—",
+			customerName: customers.get(a.customerId)?.name ?? "—",
+		}))
+	},
+})

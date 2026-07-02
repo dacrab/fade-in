@@ -115,12 +115,14 @@ export interface Appointment {
 	barbershopId: Id<"barbershops">
 	barberId: Id<"barbers">
 	serviceIds: Id<"services">[]
-	date: string // YYYY-MM-DD
-	startTime: string // HH:MM
-	endTime: string // HH:MM
-	totalPrice: number // cents
+	date: string
+	startTime: string
+	endTime: string
+	totalPrice: number
 	status: AppointmentStatus
 	notes?: string
+	polarCheckoutId?: string
+	paymentStatus?: "unpaid" | "paid"
 	createdAt: number
 }
 

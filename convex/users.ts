@@ -1,6 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { internalMutation, mutation, query } from "./_generated/server"
 import { definedPatch } from "./validators"
 
 export const getViewer = query({
@@ -51,6 +51,29 @@ export const toggleFavorite = mutation({
 				? favorites.filter((id) => id !== args.barbershopId)
 				: [...favorites, args.barbershopId],
 		})
+	},
+})
+
+/** Ensures a user exists (used by internal auth flow from actions). */
+export const ensureCurrentUser = internalMutation({
+	args: {},
+	handler: async (ctx) => {
+		const identity = await ctx.auth.getUserIdentity()
+		if (!identity) throw new ConvexError("Not authenticated")
+
+		const existing = await ctx.db
+			.query("users")
+			.withIndex("by_email", (q) => q.eq("email", identity.email ?? ""))
+			.first()
+		if (existing) return existing
+
+		const newId = await ctx.db.insert("users", {
+			email: identity.email ?? "",
+			name: identity.name ?? identity.email ?? "",
+			role: "customer",
+			avatarUrl: identity.pictureUrl ?? undefined,
+		})
+		return ctx.db.get(newId)
 	},
 })
 
