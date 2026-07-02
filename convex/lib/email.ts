@@ -8,7 +8,6 @@ function getResend(): Resend | null {
 export async function sendEmail(to: string, subject: string, html: string) {
 	const resend = getResend()
 	if (!resend) {
-		console.warn("RESEND_API_KEY not set — email not sent")
 		return
 	}
 	await resend.emails.send({
