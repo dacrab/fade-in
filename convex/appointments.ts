@@ -2,7 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
 import { generateSlots } from "../src/lib/slots"
 import { mutation, query } from "./_generated/server"
-import { sendEmail } from "./auth"
+import { sendEmail } from "./lib/email"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const TIME_RE = /^\d{2}:\d{2}$/
