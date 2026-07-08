@@ -1,26 +1,10 @@
 import type { Id } from "../../convex/_generated/dataModel"
 
-// User & Auth
-
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 
-/** Full user document from database */
-export interface User {
-	_id: Id<"users">
-	_creationTime: number
-	name: string
-	email: string
-	phone?: string
-	role: UserRole
-	avatarUrl?: string
-	favoriteShopIds?: Id<"barbershops">[]
-}
-
-// Working Hours
-
 export interface DayHours {
-	open: string // HH:MM
-	close: string // HH:MM
+	open: string
+	close: string
 	closed: boolean
 }
 
@@ -45,15 +29,11 @@ export const WEEK_DAYS: WeekDay[] = [
 	"sunday",
 ]
 
-// Social Links
-
 export interface SocialLinks {
 	instagram?: string
 	facebook?: string
 	website?: string
 }
-
-// Barbershop
 
 export interface Barbershop {
 	_id: Id<"barbershops">
@@ -76,8 +56,6 @@ export interface Barbershop {
 	socialLinks?: SocialLinks
 }
 
-// Barber
-
 export interface Barber {
 	_id: Id<"barbers">
 	_creationTime: number
@@ -90,21 +68,17 @@ export interface Barber {
 	isActive: boolean
 }
 
-// Service
-
 export interface Service {
 	_id: Id<"services">
 	_creationTime: number
 	barbershopId: Id<"barbershops">
 	name: string
 	description?: string
-	price: number // cents
+	price: number
 	durationMinutes: number
 	category: string
 	isActive: boolean
 }
-
-// Appointment
 
 export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled"
 
@@ -141,8 +115,6 @@ export const STATUS_DOT: Record<AppointmentStatus, string> = {
 	completed: "bg-green-500",
 	cancelled: "bg-red-400",
 }
-
-// Review
 
 export interface Review {
 	_id: Id<"reviews">
