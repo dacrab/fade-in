@@ -84,8 +84,10 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 				notes: notes || undefined,
 			})
 			if (result.url) window.location.href = result.url
+			else showToast(t("booking.failed"), "error")
 		} catch {
 			showToast(t("booking.failed"), "error")
+		} finally {
 			setLoading(false)
 		}
 	}

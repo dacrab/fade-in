@@ -31,8 +31,10 @@ export async function withToast<T>(
 		const result = await fn()
 		showToast(success, "success")
 		return result
-	} catch {
+	} catch (e) {
 		showToast(error, "error")
+		// biome-ignore lint/suspicious/noConsole: surface swallowed errors for debugging
+		console.error(e)
 	}
 }
 
