@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useQuery } from "convex/react"
+import type { FunctionReference } from "convex/server"
 import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { DataTable } from "#/components/ui/DataTable"
@@ -8,18 +9,11 @@ import { useAdminAuth } from "#/hooks/useAdminAuth"
 import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
-interface AppointmentRow {
-	_id: string
-	date: string
-	startTime: string
-	endTime: string
-	totalPrice: number
-	status: string
-	paymentStatus?: string
-	shopName: string
-	barberName: string
-	customerName: string
-}
+type ListAllWithDetails = (typeof api.appointments)["listAllWithDetails"]
+type AppointmentRow = Extract<
+	ListAllWithDetails,
+	FunctionReference<"query", "public">
+>["_returnType"][number]
 
 export const Route = createFileRoute("/admin/appointments")({ component: AdminAppointments })
 
@@ -133,7 +127,7 @@ function AdminAppointments() {
 				) : (
 					<DataTable
 						columns={columns}
-						data={data as AppointmentRow[]}
+						data={data}
 						searchable
 						searchPlaceholder={t("admin.appointments.colCustomer")}
 					/>
