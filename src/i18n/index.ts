@@ -12,12 +12,16 @@ export type Language = keyof typeof LANGUAGES
 
 const STORAGE_KEY = "fadein_lang"
 
+function isLanguage(val: string | null): val is Language {
+	return val !== null && Object.keys(LANGUAGES).includes(val)
+}
+
 function getInitialLanguage(): Language {
 	try {
-		const stored = localStorage.getItem(STORAGE_KEY) as Language | null
-		if (stored && stored in LANGUAGES) return stored
-		const browser = navigator.language.split("-")[0] as Language
-		if (browser in LANGUAGES) return browser
+		const stored = localStorage.getItem(STORAGE_KEY)
+		if (isLanguage(stored)) return stored
+		const browser = navigator.language.split("-")[0]
+		if (isLanguage(browser)) return browser
 	} catch {
 		// SSR fallback
 	}
