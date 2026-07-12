@@ -2,6 +2,14 @@ import type { Id } from "../../convex/_generated/dataModel"
 
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 
+/** Whether a user can manage a barbershop (owner or platform admin). */
+export function isOwnerOrAdmin(user: { role?: UserRole } | null | undefined): boolean {
+	return user?.role === "owner" || user?.role === "admin"
+}
+
+/** Default page size for paginated backend queries. */
+export const PAGE_SIZE = 50
+
 export interface DayHours {
 	open: string
 	close: string

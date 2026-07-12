@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "convex/react"
 import { Calendar, CheckCircle, Clock, Heart, RefreshCw, Star, User, XCircle } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "#/components/ui/Skeleton"
+import { Skeleton, SkeletonRows } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
@@ -95,11 +95,7 @@ function CustomerDashboard() {
 				<section className="card p-5 mb-4">
 					<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.upcomingTitle")}</h2>
 					{appointments === undefined ? (
-						<div className="space-y-2">
-							{[0, 1, 2].map((i) => (
-								<Skeleton key={i} className="h-12 w-full" />
-							))}
-						</div>
+						<SkeletonRows count={3} className="h-12" />
 					) : upcoming.length === 0 ? (
 						<div className="text-center py-6">
 							<p className="text-sm text-(--text-muted) mb-3">{t("dashboard.noUpcoming")}</p>
@@ -212,7 +208,7 @@ function AppointmentRow({
 						params={{ slug: shop.slug }}
 						className="text-xs text-(--gold) hover:underline opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
 					>
-						<RefreshCw size={11} /> Rebook
+						<RefreshCw size={11} /> {t("dashboard.rebook")}
 					</Link>
 				)}
 				{showReview && showRebook && hasReview === false && (
@@ -278,9 +274,7 @@ function DashSkeleton() {
 			<div className="page-wrap max-w-3xl py-8 space-y-4">
 				<Skeleton className="h-8 w-48" />
 				<div className="grid grid-cols-4 gap-3">
-					{[0, 1, 2, 3].map((i) => (
-						<Skeleton key={i} className="h-16 rounded-xl" />
-					))}
+					<SkeletonRows count={4} className="h-16 rounded-xl" />
 				</div>
 				<Skeleton className="h-48 rounded-xl" />
 			</div>

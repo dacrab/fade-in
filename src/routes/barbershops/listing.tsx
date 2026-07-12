@@ -7,6 +7,7 @@ import { z } from "zod"
 import MapView from "#/components/MapView"
 import ShopCard from "#/components/ShopCard"
 import { ShopCardSkeleton } from "#/components/ui/Skeleton"
+import { PAGE_SIZE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 const searchSchema = z.object({
@@ -34,7 +35,7 @@ function BarbershopsPage() {
 		city: city || undefined,
 		search: search || undefined,
 		minRating: minRating > 0 ? minRating : undefined,
-		paginationOpts: { cursor: null, numItems: 50 },
+		paginationOpts: { cursor: null, numItems: PAGE_SIZE },
 	})
 	const shops = shopsResult?.page
 

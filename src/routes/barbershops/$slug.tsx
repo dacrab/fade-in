@@ -24,7 +24,7 @@ import { StarRating } from "#/components/ui/StarRating"
 import { withToast } from "#/components/ui/Toast"
 import { capitalizeFirst, formatPrice, formatRelative } from "#/lib/format"
 import type { Barber, Review, Service, WeekDay } from "#/types"
-import { WEEK_DAYS } from "#/types"
+import { PAGE_SIZE, WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProfilePage })
@@ -48,7 +48,7 @@ function ShopProfilePage() {
 	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip")
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
-		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
+		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: PAGE_SIZE } } : "skip",
 	)
 	const reviews = reviewsResult?.page
 

@@ -22,7 +22,7 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDate, formatPrice } from "#/lib/format"
-import type { Appointment } from "#/types"
+import { type Appointment, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -58,7 +58,11 @@ function BookingPage() {
 	const reschedule = useMutation(api.appointments.reschedule)
 
 	const [showReschedule, setShowReschedule] = useState(false)
-	const minDate = new Date().toISOString().split("T")[0]
+	const minDate = (() => {
+		const d = new Date()
+		d.setDate(d.getDate() + 1)
+		return d.toISOString().split("T")[0]
+	})()
 
 	const rescheduleForm = useForm({
 		defaultValues: { date: "", startTime: "", endTime: "" },
@@ -97,11 +101,7 @@ function BookingPage() {
 		<main className="page-main">
 			<div className="page-wrap max-w-2xl py-8">
 				<Link
-					to={
-						user?.role === "owner" || user?.role === "admin"
-							? "/business/appointments"
-							: "/dashboard/overview"
-					}
+					to={isOwnerOrAdmin(user) ? "/business/appointments" : "/dashboard/overview"}
 					className="inline-flex items-center gap-1.5 text-sm text-(--text-muted) hover:text-(--gold) transition-colors mb-6"
 				>
 					<ArrowLeft size={15} />
@@ -154,13 +154,7 @@ function BookingPage() {
 								</div>
 								<div className="flex items-center gap-2">
 									<span
-										className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
-											appt.status === "confirmed" || appt.status === "completed"
-												? "bg-(--success)/10 text-(--success)"
-												: appt.status === "cancelled"
-													? "bg-(--error)/10 text-(--error)"
-													: "bg-(--gold)/10 text-(--gold)"
-										}`}
+										className={`badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${STATUS_BADGE[appt.status]}`}
 									>
 										{appt.status === "confirmed" && <CheckCircle size={11} />}
 										{appt.status === "completed" && <CheckCircle size={11} />}
@@ -280,7 +274,7 @@ function BookingPage() {
 											</button>
 										</>
 									)}
-									{(user?.role === "owner" || user?.role === "admin") && shop?.ownerId === user?.id && (
+									{isOwnerOrAdmin(user) && shop?.ownerId === user?.id && (
 										<button
 											type="button"
 											onClick={() => setShowReschedule(!showReschedule)}
