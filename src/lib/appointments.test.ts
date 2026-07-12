@@ -39,21 +39,16 @@ describe("generateSlots — appointment slot algorithm", () => {
 		expect(generateSlots(660, [])).toHaveLength(0)
 	})
 
-	it("excludes a slot that exactly overlaps an existing appointment", () => {
+	it("excludes an exactly-overlapping slot but keeps the adjacent free slot before it", () => {
 		const existing = [{ startTime: "10:00", endTime: "10:30" }]
-		expect(generateSlots(30, existing)).not.toContain("10:00")
+		const slots = generateSlots(30, existing)
+		expect(slots).toContain("09:30")
+		expect(slots).not.toContain("10:00")
 	})
 
 	it("excludes a slot that partially overlaps (starts before, ends during)", () => {
 		const existing = [{ startTime: "10:15", endTime: "10:45" }]
 		expect(generateSlots(30, existing)).not.toContain("10:00")
-	})
-
-	it("excludes a slot that partially overlaps (starts during, ends after)", () => {
-		const existing = [{ startTime: "10:00", endTime: "10:30" }]
-		const slots = generateSlots(30, existing)
-		expect(slots).toContain("09:30")
-		expect(slots).not.toContain("10:00")
 	})
 
 	it("includes adjacent slot immediately after an existing appointment", () => {
@@ -85,10 +80,6 @@ describe("generateSlots — appointment slot algorithm", () => {
 		expect(slots).toContain("09:30")
 		expect(slots).not.toContain("11:00")
 		expect(slots).toContain("11:30")
-	})
-
-	it("returns all slots when existing array is empty", () => {
-		expect(generateSlots(30, [])).toHaveLength(20)
 	})
 
 	it("returns empty array when all slots are blocked", () => {

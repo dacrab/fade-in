@@ -38,25 +38,26 @@ const elKeys = extractKeys(el as unknown as Record<string, unknown>)
 
 describe("i18n locale parity — English ↔ Greek", () => {
 	// Key existence
-	it("every English key exists in the Greek locale", () => {
-		const missing = enKeys.filter((k) => !elKeys.includes(k))
-		expect(missing, `Keys in EN missing from EL: ${missing.join(", ")}`).toHaveLength(0)
-	})
-
-	it("every Greek key exists in the English locale", () => {
-		const extra = elKeys.filter((k) => !enKeys.includes(k))
-		expect(extra, `Keys in EL missing from EN: ${extra.join(", ")}`).toHaveLength(0)
+	it.each([
+		["English", enKeys, elKeys],
+		["Greek", elKeys, enKeys],
+	])("every %s key exists in the other locale", (label, sourceKeys, otherKeys) => {
+		const missing = sourceKeys.filter((k) => !otherKeys.includes(k))
+		expect(
+			missing,
+			`Keys in ${label} missing from the other locale: ${missing.join(", ")}`,
+		).toHaveLength(0)
 	})
 
 	// value completeness
-	it("no English value is an empty string", () => {
-		const empty = enKeys.filter((k) => getByPath(en as unknown as Record<string, unknown>, k) === "")
-		expect(empty, `EN keys with empty values: ${empty.join(", ")}`).toHaveLength(0)
-	})
-
-	it("no Greek value is an empty string", () => {
-		const empty = elKeys.filter((k) => getByPath(el as unknown as Record<string, unknown>, k) === "")
-		expect(empty, `EL keys with empty values: ${empty.join(", ")}`).toHaveLength(0)
+	it.each([
+		["English", en, enKeys],
+		["Greek", el, elKeys],
+	])("no %s value is an empty string", (label, locale, keys) => {
+		const empty = keys.filter(
+			(k) => getByPath(locale as unknown as Record<string, unknown>, k) === "",
+		)
+		expect(empty, `${label} keys with empty values: ${empty.join(", ")}`).toHaveLength(0)
 	})
 
 	// value types match
