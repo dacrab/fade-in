@@ -1,5 +1,6 @@
+import * as Sentry from "@sentry/react"
 import { AlertCircle, CheckCircle, Info } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 
 type ToastType = "success" | "error" | "info"
 
@@ -9,17 +10,24 @@ interface Toast {
 	message: string
 }
 
+const TOAST_TTL = 4000
+
+let toasts: Toast[] = []
 let toastId = 0
-let globalSetToasts: React.Dispatch<React.SetStateAction<Toast[]>> | null = null
+const listeners = new Set<() => void>()
+
+function emit() {
+	for (const listener of listeners) listener()
+}
 
 export function showToast(message: string, type: ToastType = "info") {
-	if (globalSetToasts) {
-		const id = ++toastId
-		globalSetToasts((prev) => [...prev, { id, type, message }])
-		setTimeout(() => {
-			globalSetToasts?.((prev) => prev.filter((t) => t.id !== id))
-		}, 4000)
-	}
+	const id = ++toastId
+	toasts = [...toasts, { id, type, message }]
+	emit()
+	setTimeout(() => {
+		toasts = toasts.filter((t) => t.id !== id)
+		emit()
+	}, TOAST_TTL)
 }
 
 export async function withToast<T>(
@@ -33,8 +41,7 @@ export async function withToast<T>(
 		return result
 	} catch (e) {
 		showToast(error, "error")
-		// biome-ignore lint/suspicious/noConsole: surface swallowed errors for debugging
-		console.error(e)
+		Sentry.captureException(e)
 	}
 }
 
@@ -45,18 +52,19 @@ const TOAST_CONFIG = {
 } as const
 
 export function ToastContainer() {
-	const [toasts, setToasts] = useState<Toast[]>([])
-
-	useEffect(() => {
-		globalSetToasts = setToasts
-		return () => {
-			globalSetToasts = null
-		}
-	}, [])
+	const current = useSyncExternalStore(
+		(cb) => {
+			listeners.add(cb)
+			return () => {
+				listeners.delete(cb)
+			}
+		},
+		() => toasts,
+	)
 
 	return (
 		<div className="toast-container">
-			{toasts.map((toast) => {
+			{current.map((toast) => {
 				const { icon: Icon, borderColor } = TOAST_CONFIG[toast.type]
 				return (
 					<div

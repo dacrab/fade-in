@@ -6,6 +6,8 @@ import { auth } from "./auth"
 const http = httpRouter()
 auth.addHttpRoutes(http)
 
+const WEBHOOK_TIMESTAMP_TOLERANCE_S = 300
+
 const enc = new TextEncoder()
 const toHex = (buf: ArrayBuffer): string =>
 	Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, "0")).join("")
@@ -14,7 +16,7 @@ async function verifySignature(payload: string, header: string, secret: string):
 	const parts = Object.fromEntries(header.split(",").map((p) => p.split("=") as [string, string]))
 	const { t: timestamp, v1: sig } = parts
 	if (!(timestamp && sig)) return false
-	if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false
+	if (Math.abs(Date.now() / 1000 - Number(timestamp)) > WEBHOOK_TIMESTAMP_TOLERANCE_S) return false
 
 	const key = await crypto.subtle.importKey(
 		"raw",

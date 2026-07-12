@@ -228,6 +228,7 @@ const en = {
 		reviewTitle: "Rate your experience",
 		reviewPlaceholder: "Tell others about your experience…",
 		reviewSubmitted: "Review submitted!",
+		rebook: "Rebook",
 	},
 
 	business: {

@@ -6,7 +6,7 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
-import { STATUS_BADGE } from "#/types"
+import { PAGE_SIZE, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/business/overview")({ component: BusinessDashboard })
@@ -26,7 +26,7 @@ function BusinessDashboard() {
 	const stats = useQuery(api.appointments.getShopStats, shop ? { barbershopId: shop._id } : "skip")
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
-		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
+		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: PAGE_SIZE } } : "skip",
 	)
 	const reviews = reviewsResult?.page
 

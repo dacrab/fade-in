@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "convex/react"
 import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "#/components/ui/Skeleton"
+import { SkeletonRows } from "#/components/ui/Skeleton"
 import { showToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
@@ -99,7 +99,7 @@ function BusinessServices() {
 			{
 				name: svc.name,
 				description: svc.description ?? "",
-				price: (svc.price / 100).toFixed(2),
+				price: formatPrice(svc.price),
 				durationMinutes: String(svc.durationMinutes),
 				category: svc.category,
 			},
@@ -235,11 +235,7 @@ function BusinessServices() {
 				)}
 
 				{services === undefined ? (
-					<div className="space-y-3">
-						{[0, 1, 2, 3].map((i) => (
-							<Skeleton key={i} className="h-14 w-full rounded-lg" />
-						))}
-					</div>
+					<SkeletonRows count={4} className="h-14 rounded-lg" />
 				) : services.length === 0 ? (
 					<p className="text-sm text-(--text-subtle) py-8 text-center">
 						{t("business.services.noServices")}

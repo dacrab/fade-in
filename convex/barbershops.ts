@@ -44,14 +44,15 @@ export const list = query({
 					s.city.toLowerCase().includes(term) ||
 					s.address.toLowerCase().includes(term),
 			)
-			// Manual pagination over filtered results
+			// Manual offset-based cursor pagination over filtered results
 			const numItems = args.paginationOpts.numItems
-			const startIdx = 0 // For cursor-based, this is simplified
+			const startIdx = args.paginationOpts.cursor ? Number(args.paginationOpts.cursor) || 0 : 0
 			const page = filtered.slice(startIdx, startIdx + numItems)
+			const nextIdx = startIdx + numItems
 			return {
 				page,
-				isDone: page.length < numItems,
-				continueCursor: page.length < numItems ? null : "done",
+				isDone: nextIdx >= filtered.length,
+				continueCursor: nextIdx >= filtered.length ? null : String(nextIdx),
 			}
 		}
 

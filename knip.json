@@ -4,6 +4,10 @@
 		"src/routes/**/*.{ts,tsx}",
 		"src/router.tsx",
 		"src/routes/__root.tsx",
+		"src/client.tsx",
+		"src/server.ts",
+		"src/sentry.client.ts",
+		"src/sentry.server.ts",
 		"src/integrations/convex/provider.tsx",
 		"src/i18n/index.ts",
 		"convex/**/*.ts"
@@ -12,7 +16,6 @@
 	"ignoreDependencies": [
 		"@tanstack/router-plugin",
 		"@tanstack/devtools-event-client",
-		"@tanstack/devtools-vite",
 		"@convex-dev/react-query",
 		"tailwindcss",
 		"@tailwindcss/typography",

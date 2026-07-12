@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values"
 import { mutation } from "./_generated/server"
-import { requireUser } from "./lib/auth"
+import { requireOwner, requireUser } from "./lib/auth"
 
 export const generateUploadUrl = mutation({
 	handler: async (ctx) => {
@@ -15,10 +15,10 @@ export const saveShopImage = mutation({
 		storageId: v.id("_storage"),
 	},
 	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
+		await requireOwner(ctx, args.barbershopId)
 
 		const shop = await ctx.db.get(args.barbershopId)
-		if (!shop || shop.ownerId !== user._id) throw new ConvexError("Not authorized")
+		if (!shop) throw new ConvexError("Barbershop not found")
 
 		const url = await ctx.storage.getUrl(args.storageId)
 		if (!url) throw new ConvexError("Failed to get uploaded file URL")
@@ -37,10 +37,10 @@ export const removeShopImage = mutation({
 		imageUrl: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
+		await requireOwner(ctx, args.barbershopId)
 
 		const shop = await ctx.db.get(args.barbershopId)
-		if (!shop || shop.ownerId !== user._id) throw new ConvexError("Not authorized")
+		if (!shop) throw new ConvexError("Barbershop not found")
 
 		await ctx.db.patch(args.barbershopId, {
 			images: shop.images.filter((url) => url !== args.imageUrl),
@@ -54,13 +54,10 @@ export const saveBarberAvatar = mutation({
 		storageId: v.id("_storage"),
 	},
 	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
-
 		const barber = await ctx.db.get(args.barberId)
 		if (!barber) throw new ConvexError("Barber not found")
 
-		const shop = await ctx.db.get(barber.barbershopId)
-		if (!shop || shop.ownerId !== user._id) throw new ConvexError("Not authorized")
+		await requireOwner(ctx, barber.barbershopId)
 
 		const url = await ctx.storage.getUrl(args.storageId)
 		if (!url) throw new ConvexError("Failed to get uploaded file URL")

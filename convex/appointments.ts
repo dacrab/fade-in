@@ -1,11 +1,35 @@
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
+import { centsToEur } from "../src/lib/money"
 import { generateSlots } from "../src/lib/slots"
+import type { Doc, Id } from "./_generated/dataModel"
+import type { MutationCtx, QueryCtx } from "./_generated/server"
 import { mutation, query } from "./_generated/server"
 import { sendEmail } from "./lib/email"
+import { computeServiceTotal } from "./lib/services"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const TIME_RE = /^\d{2}:\d{2}$/
+const MAX_DURATION_MINUTES = 480
+
+/**
+ * Returns non-cancelled appointments for a barbershop/date/barber. Shared by
+ * slot availability and creation so conflict detection stays consistent.
+ */
+async function getActiveAppointments(
+	ctx: QueryCtx | MutationCtx,
+	{
+		barbershopId,
+		date,
+		barberId,
+	}: { barbershopId: Id<"barbershops">; date: string; barberId: Id<"barbers"> },
+) {
+	return ctx.db
+		.query("appointments")
+		.withIndex("by_shop_date", (q) => q.eq("barbershopId", barbershopId).eq("date", date))
+		.filter((q) => q.and(q.eq(q.field("barberId"), barberId), q.neq(q.field("status"), "cancelled")))
+		.collect()
+}
 
 export const getAvailableSlots = query({
 	args: {
@@ -16,16 +40,14 @@ export const getAvailableSlots = query({
 	},
 	handler: async (ctx, args) => {
 		if (!DATE_RE.test(args.date)) throw new ConvexError("Invalid date format")
-		if (args.durationMinutes < 1 || args.durationMinutes > 480)
+		if (args.durationMinutes < 1 || args.durationMinutes > MAX_DURATION_MINUTES)
 			throw new ConvexError("Invalid duration")
 
-		const existing = await ctx.db
-			.query("appointments")
-			.withIndex("by_shop_date", (q) => q.eq("barbershopId", args.barbershopId).eq("date", args.date))
-			.filter((q) =>
-				q.and(q.eq(q.field("barberId"), args.barberId), q.neq(q.field("status"), "cancelled")),
-			)
-			.collect()
+		const existing = await getActiveAppointments(ctx, {
+			barbershopId: args.barbershopId,
+			date: args.date,
+			barberId: args.barberId,
+		})
 
 		return generateSlots(args.durationMinutes, existing)
 	},
@@ -49,22 +71,19 @@ export const create = mutation({
 			throw new ConvexError("Invalid time format")
 		if (args.serviceIds.length === 0) throw new ConvexError("At least one service required")
 
-		// Compute price server-side from services
-		const services = await Promise.all(args.serviceIds.map((id) => ctx.db.get(id)))
-		const totalPrice = services.reduce((sum, s) => {
-			if (!s?.isActive) throw new ConvexError("Invalid service")
-			if (s.barbershopId !== args.barbershopId) throw new ConvexError("Service not from this shop")
-			return sum + s.price
-		}, 0)
+		// Compute price server-side from services (also validates each service)
+		const totalPrice = await computeServiceTotal(
+			(id) => ctx.db.get(id),
+			args.serviceIds,
+			args.barbershopId,
+		)
 
 		// Validate slot is still available
-		const existing = await ctx.db
-			.query("appointments")
-			.withIndex("by_shop_date", (q) => q.eq("barbershopId", args.barbershopId).eq("date", args.date))
-			.filter((q) =>
-				q.and(q.eq(q.field("barberId"), args.barberId), q.neq(q.field("status"), "cancelled")),
-			)
-			.collect()
+		const existing = await getActiveAppointments(ctx, {
+			barbershopId: args.barbershopId,
+			date: args.date,
+			barberId: args.barberId,
+		})
 
 		const conflict = existing.some((a) => args.startTime < a.endTime && args.endTime > a.startTime)
 		if (conflict) throw new ConvexError("This time slot is no longer available.")
@@ -99,7 +118,7 @@ export const create = mutation({
 					<p><strong>Barber:</strong> ${barber?.name ?? "—"}<br>
 					<strong>Date:</strong> ${args.date}<br>
 					<strong>Time:</strong> ${args.startTime} – ${args.endTime}<br>
-					<strong>Total:</strong> €${(totalPrice / 100).toFixed(2)}</p>
+					<strong>Total:</strong> ${centsToEur(totalPrice)}</p>
 					<p>See you there!<br>— The FadeIn Team</p>`,
 				)
 			}
@@ -235,7 +254,8 @@ export const getShopStats = query({
 			.collect()
 
 		const completed = allAppts.filter((a) => a.status === "completed")
-		const thisMonth = new Date().toISOString().slice(0, 7)
+		const now = new Date()
+		const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
 
 		return {
 			totalRevenue: completed.reduce((sum, a) => sum + a.totalPrice, 0),
@@ -288,20 +308,19 @@ export const listAllWithDetails = query({
 		if (user?.role !== "admin") return []
 
 		const all = await ctx.db.query("appointments").order("desc").collect()
-		type DocRef = { _id: string; name?: string }
-		const customers = new Map(
-			((await Promise.all(all.map((a) => ctx.db.get(a.customerId)))) as (DocRef | undefined)[])
-				.filter((u): u is DocRef => u != null)
+		const customers = new Map<Id<"users">, Doc<"users">>(
+			(await Promise.all(all.map((a) => ctx.db.get(a.customerId))))
+				.filter((u): u is Doc<"users"> => u != null)
 				.map((u) => [u._id, u]),
 		)
-		const shops = new Map(
-			((await Promise.all(all.map((a) => ctx.db.get(a.barbershopId)))) as (DocRef | undefined)[])
-				.filter((s): s is DocRef => s != null)
+		const shops = new Map<Id<"barbershops">, Doc<"barbershops">>(
+			(await Promise.all(all.map((a) => ctx.db.get(a.barbershopId))))
+				.filter((s): s is Doc<"barbershops"> => s != null)
 				.map((s) => [s._id, s]),
 		)
-		const barbers = new Map(
-			((await Promise.all(all.map((a) => ctx.db.get(a.barberId)))) as (DocRef | undefined)[])
-				.filter((b): b is DocRef => b != null)
+		const barbers = new Map<Id<"barbers">, Doc<"barbers">>(
+			(await Promise.all(all.map((a) => ctx.db.get(a.barberId))))
+				.filter((b): b is Doc<"barbers"> => b != null)
 				.map((b) => [b._id, b]),
 		)
 

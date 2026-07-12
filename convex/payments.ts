@@ -9,6 +9,7 @@ import { ConvexError, v } from "convex/values"
 import type { ActionCtx } from "./_generated/server"
 import { action } from "./_generated/server"
 import { create as createAppointment, setPolarCheckout } from "./appointments"
+import { computeServiceTotal } from "./lib/services"
 import { getById as getServiceById } from "./services"
 import { getById as getUserById } from "./users"
 
@@ -65,12 +66,11 @@ export const createCheckoutSession = action({
 		const userId = await getAuthUserId(ctx)
 		if (!userId) throw new ConvexError("Not authenticated")
 
-		const services = await Promise.all(args.serviceIds.map((id) => runQ(ctx, getServiceById, { id })))
-		const totalPrice = services.reduce((sum, s) => {
-			if (!s?.isActive) throw new ConvexError("Invalid service")
-			if (s.barbershopId !== args.barbershopId) throw new ConvexError("Service not from this shop")
-			return sum + s.price
-		}, 0)
+		const totalPrice = await computeServiceTotal(
+			(id) => runQ(ctx, getServiceById, { id }),
+			args.serviceIds,
+			args.barbershopId,
+		)
 
 		const appointmentId = await runM(ctx, createAppointment, {
 			barbershopId: args.barbershopId,
@@ -89,8 +89,8 @@ export const createCheckoutSession = action({
 			currency: "eur",
 			customer_email: user?.email,
 			metadata: { appointmentId },
-			success_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
-			cancel_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
+			success_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
+			cancel_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
 		})
 
 		await runM(ctx, setPolarCheckout, {

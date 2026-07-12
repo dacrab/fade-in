@@ -6,6 +6,18 @@ export function Skeleton({ className }: { className?: string }) {
 	return <div className={cn(SKELETON, className)} />
 }
 
+/** Renders a vertical list of skeleton placeholders (common loading pattern). */
+export function SkeletonRows({ count, className }: { count: number; className?: string }) {
+	return (
+		<>
+			{Array.from({ length: count }, (_, i) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: static placeholder list
+				<Skeleton key={i} className={cn("w-full", className)} />
+			))}
+		</>
+	)
+}
+
 export function ShopCardSkeleton() {
 	return (
 		<div className="bg-(--bg-card) rounded-2xl border border-(--border) shadow-sm overflow-hidden">

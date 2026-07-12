@@ -228,6 +228,7 @@ const el = {
 		reviewTitle: "Αξιολογήστε την εμπειρία σας",
 		reviewPlaceholder: "Πείτε σε άλλους για την εμπειρία σας…",
 		reviewSubmitted: "Η κριτική υποβλήθηκε!",
+		rebook: "Επανακράτηση",
 	},
 
 	business: {

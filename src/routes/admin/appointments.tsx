@@ -6,6 +6,7 @@ import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { DataTable } from "#/components/ui/DataTable"
 import { useAdminAuth } from "#/hooks/useAdminAuth"
+import { formatPrice } from "#/lib/format"
 import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -97,7 +98,7 @@ function AdminAppointments() {
 				<div className="flex items-center gap-1">
 					<Euro size={13} className="text-(--text-subtle)" />
 					<span className="text-sm font-medium text-(--text)">
-						{(row.original.totalPrice / 100).toFixed(2)}
+						{formatPrice(row.original.totalPrice)}
 					</span>
 				</div>
 			),

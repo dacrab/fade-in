@@ -1,6 +1,8 @@
 import { Password } from "@convex-dev/auth/providers/Password"
 import { convexAuth } from "@convex-dev/auth/server"
-import { getResend } from "./lib/email"
+import { DEFAULT_FROM, getResend } from "./lib/email"
+
+const ONE_HOUR_S = 60 * 60
 
 export const { auth, signIn, signOut, store } = convexAuth({
 	providers: [
@@ -16,8 +18,8 @@ export const { auth, signIn, signOut, store } = convexAuth({
 				id: "password-reset",
 				type: "email",
 				name: "Password Reset",
-				from: process.env.RESEND_FROM ?? "noreply@fadein.app",
-				maxAge: 60 * 60,
+				from: process.env.RESEND_FROM ?? DEFAULT_FROM,
+				maxAge: ONE_HOUR_S,
 				sendVerificationRequest: async ({ identifier: email, url }) => {
 					const resend = getResend()
 					if (!resend) {
@@ -26,7 +28,7 @@ export const { auth, signIn, signOut, store } = convexAuth({
 						return
 					}
 					await resend.emails.send({
-						from: process.env.RESEND_FROM ?? "FadeIn <noreply@fadein.app>",
+						from: process.env.RESEND_FROM ?? DEFAULT_FROM,
 						to: [email],
 						subject: "Reset your FadeIn password",
 						html: `<p>Click <a href="${url}">here</a> to reset your password. This link expires in 1 hour.</p>`,

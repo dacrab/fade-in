@@ -8,6 +8,7 @@ import { withToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatRelative } from "#/lib/format"
+import { PAGE_SIZE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -20,7 +21,7 @@ function BusinessReviews() {
 	const shop = useOwnerShop(user?.id)
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
-		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 50 } } : "skip",
+		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: PAGE_SIZE } } : "skip",
 	)
 	const reviews = reviewsResult?.page
 	const addReply = useMutation(api.reviews.addOwnerReply)
