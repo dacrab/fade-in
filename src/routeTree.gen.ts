@@ -27,6 +27,7 @@ import { Route as BusinessOverviewRouteImport } from './routes/business/overview
 import { Route as BusinessBarbersRouteImport } from './routes/business/barbers'
 import { Route as BusinessAppointmentsRouteImport } from './routes/business/appointments'
 import { Route as BookingIdRouteImport } from './routes/booking/$id'
+import { Route as BookingIdManageRouteImport } from './routes/booking/$id.manage'
 import { Route as BarbershopsListingRouteImport } from './routes/barbershops/listing'
 import { Route as BarbershopsSlugRouteImport } from './routes/barbershops/$slug'
 import { Route as BarberOverviewRouteImport } from './routes/barber/overview'
@@ -125,6 +126,11 @@ const BookingIdRoute = BookingIdRouteImport.update({
   path: '/booking/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookingIdManageRoute = BookingIdManageRouteImport.update({
+  id: '/booking/$id/manage',
+  path: '/booking/$id/manage',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BarbershopsListingRoute = BarbershopsListingRouteImport.update({
   id: '/barbershops/listing',
   path: '/barbershops/listing',
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
   '/booking/$id': typeof BookingIdRoute
+  '/booking/$id/manage': typeof BookingIdManageRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
   '/business/barbers': typeof BusinessBarbersRoute
   '/business/overview': typeof BusinessOverviewRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
   '/booking/$id': typeof BookingIdRoute
+  '/booking/$id/manage': typeof BookingIdManageRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
   '/business/barbers': typeof BusinessBarbersRoute
   '/business/overview': typeof BusinessOverviewRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
   '/booking/$id': typeof BookingIdRoute
+  '/booking/$id/manage': typeof BookingIdManageRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
   '/business/barbers': typeof BusinessBarbersRoute
   '/business/overview': typeof BusinessOverviewRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/barbershops/$slug'
     | '/barbershops/listing'
     | '/booking/$id'
+    | '/booking/$id/manage'
     | '/business/appointments'
     | '/business/barbers'
     | '/business/overview'
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/barbershops/$slug'
     | '/barbershops/listing'
     | '/booking/$id'
+    | '/booking/$id/manage'
     | '/business/appointments'
     | '/business/barbers'
     | '/business/overview'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/barbershops/$slug'
     | '/barbershops/listing'
     | '/booking/$id'
+    | '/booking/$id/manage'
     | '/business/appointments'
     | '/business/barbers'
     | '/business/overview'
@@ -338,6 +350,7 @@ export interface RootRouteChildren {
   BarbershopsSlugRoute: typeof BarbershopsSlugRoute
   BarbershopsListingRoute: typeof BarbershopsListingRoute
   BookingIdRoute: typeof BookingIdRoute
+  BookingIdManageRoute: typeof BookingIdManageRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardOverviewRoute: typeof DashboardOverviewRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
@@ -477,6 +490,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/booking/$id/manage': {
+      id: '/booking/$id/manage'
+      path: '/booking/$id/manage'
+      fullPath: '/booking/$id/manage'
+      preLoaderRoute: typeof BookingIdManageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/barbershops/listing': {
       id: '/barbershops/listing'
       path: '/barbershops/listing'
@@ -562,6 +582,7 @@ const rootRouteChildren: RootRouteChildren = {
   BarbershopsSlugRoute: BarbershopsSlugRoute,
   BarbershopsListingRoute: BarbershopsListingRoute,
   BookingIdRoute: BookingIdRoute,
+  BookingIdManageRoute: BookingIdManageRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardOverviewRoute: DashboardOverviewRoute,
   DashboardProfileRoute: DashboardProfileRoute,

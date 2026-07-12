@@ -2,10 +2,11 @@ import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
 import { centsToEur } from "../src/lib/money"
 import { generateSlots } from "../src/lib/slots"
+import { generateManageToken, verifyManageToken } from "../src/lib/token"
 import type { Doc, Id } from "./_generated/dataModel"
 import type { MutationCtx, QueryCtx } from "./_generated/server"
 import { mutation, query } from "./_generated/server"
-import { sendEmail } from "./lib/email"
+import { confirmationEmailHtml, reminderEmailHtml, sendEmail } from "./lib/email"
 import { computeServiceTotal } from "./lib/services"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
@@ -102,7 +103,7 @@ export const create = mutation({
 			createdAt: Date.now(),
 		})
 
-		// Send booking confirmation email (best-effort)
+		// Send booking confirmation email with manage link (best-effort)
 		try {
 			const [customer, shop, barber] = await Promise.all([
 				ctx.db.get(userId),
@@ -110,16 +111,25 @@ export const create = mutation({
 				ctx.db.get(args.barberId),
 			])
 			if (customer?.email) {
+				const token = await generateManageToken(
+					appointmentId,
+					customer.email,
+					process.env.RESEND_API_KEY ?? "",
+				)
+				const manageUrl = `${process.env.CONVEX_SITE_URL ?? ""}/booking/${appointmentId}/manage?token=${token}`
 				await sendEmail(
 					customer.email,
 					`Booking Confirmed — ${shop?.name ?? "Barbershop"}`,
-					`<p>Hi ${customer.name ?? "there"},</p>
-					<p>Your booking at <strong>${shop?.name ?? "Barbershop"}</strong> is confirmed!</p>
-					<p><strong>Barber:</strong> ${barber?.name ?? "—"}<br>
-					<strong>Date:</strong> ${args.date}<br>
-					<strong>Time:</strong> ${args.startTime} – ${args.endTime}<br>
-					<strong>Total:</strong> ${centsToEur(totalPrice)}</p>
-					<p>See you there!<br>— The FadeIn Team</p>`,
+					confirmationEmailHtml({
+						customerName: customer.name ?? "there",
+						shopName: shop?.name ?? "Barbershop",
+						barberName: barber?.name ?? "—",
+						date: args.date,
+						startTime: args.startTime,
+						endTime: args.endTime,
+						total: centsToEur(totalPrice),
+						manageUrl,
+					}),
 				)
 			}
 		} catch {
@@ -295,6 +305,132 @@ export const reschedule = mutation({
 			startTime: args.startTime,
 			endTime: args.endTime,
 		})
+	},
+})
+
+export const cancelByToken = mutation({
+	args: {
+		id: v.id("appointments"),
+		token: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const appt = await ctx.db.get(args.id)
+		if (!appt) throw new ConvexError("Appointment not found")
+		if (appt.status === "cancelled") throw new ConvexError("Already cancelled")
+		if (appt.status === "completed") throw new ConvexError("Cannot cancel a completed appointment")
+
+		const customer = await ctx.db.get(appt.customerId)
+		if (!customer?.email) throw new ConvexError("Customer email not found")
+
+		const valid = await verifyManageToken(
+			args.token,
+			args.id,
+			customer.email,
+			process.env.RESEND_API_KEY ?? "",
+		)
+		if (!valid) throw new ConvexError("Invalid or expired link")
+
+		await ctx.db.patch(args.id, { status: "cancelled" })
+
+		// Notify shop owner
+		try {
+			const shop = await ctx.db.get(appt.barbershopId)
+			const owner = shop?.ownerId ? await ctx.db.get(shop.ownerId) : null
+			if (owner?.email) {
+				await sendEmail(
+					owner.email,
+					`Appointment Cancelled — ${customer.name ?? "A customer"}`,
+					`<p>The appointment on <strong>${appt.date}</strong> at ${appt.startTime} has been cancelled by the customer via self-service.</p>`,
+				)
+			}
+		} catch {
+			// Best-effort
+		}
+
+		return { success: true }
+	},
+})
+
+export const requestRescheduleByToken = mutation({
+	args: {
+		id: v.id("appointments"),
+		token: v.string(),
+		message: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		const appt = await ctx.db.get(args.id)
+		if (!appt) throw new ConvexError("Appointment not found")
+		if (appt.status === "cancelled") throw new ConvexError("Appointment is cancelled")
+		if (appt.status === "completed") throw new ConvexError("Appointment is completed")
+
+		const customer = await ctx.db.get(appt.customerId)
+		if (!customer?.email) throw new ConvexError("Customer email not found")
+
+		const valid = await verifyManageToken(
+			args.token,
+			args.id,
+			customer.email,
+			process.env.RESEND_API_KEY ?? "",
+		)
+		if (!valid) throw new ConvexError("Invalid or expired link")
+
+		// Notify the shop owner of the reschedule request
+		try {
+			const shop = await ctx.db.get(appt.barbershopId)
+			const owner = shop?.ownerId ? await ctx.db.get(shop.ownerId) : null
+			if (owner?.email) {
+				await sendEmail(
+					owner.email,
+					`Reschedule Request — ${appt.date} at ${appt.startTime}`,
+					`<p><strong>${customer.name ?? "A customer"}</strong> has requested to reschedule their appointment.</p>
+					<p><strong>Original:</strong> ${appt.date} at ${appt.startTime} – ${appt.endTime}<br>
+					${args.message ? `<strong>Message:</strong> ${args.message}` : ""}</p>
+					<p>Please contact them to arrange a new time.</p>`,
+				)
+			}
+		} catch {
+			// Best-effort
+		}
+
+		return { success: true }
+	},
+})
+
+export const sendReminder = mutation({
+	args: {
+		id: v.id("appointments"),
+	},
+	handler: async (ctx, args) => {
+		const appt = await ctx.db.get(args.id)
+		if (!appt) throw new ConvexError("Appointment not found")
+		if (appt.status === "cancelled") throw new ConvexError("Appointment is cancelled")
+
+		const [customer, shop, barber] = await Promise.all([
+			ctx.db.get(appt.customerId),
+			ctx.db.get(appt.barbershopId),
+			ctx.db.get(appt.barberId),
+		])
+
+		if (!customer?.email) throw new ConvexError("Customer email not found")
+
+		const token = await generateManageToken(args.id, customer.email, process.env.RESEND_API_KEY ?? "")
+		const manageUrl = `${process.env.CONVEX_SITE_URL ?? ""}/booking/${args.id}/manage?token=${token}`
+
+		await sendEmail(
+			customer.email,
+			`Reminder — Your appointment at ${shop?.name ?? "Barbershop"} is soon!`,
+			reminderEmailHtml({
+				customerName: customer.name ?? "there",
+				shopName: shop?.name ?? "Barbershop",
+				barberName: barber?.name ?? "—",
+				date: appt.date,
+				startTime: appt.startTime,
+				endTime: appt.endTime,
+				manageUrl,
+			}),
+		)
+
+		return { success: true }
 	},
 })
 
