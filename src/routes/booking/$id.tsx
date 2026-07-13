@@ -23,9 +23,8 @@ import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDate, formatPrice } from "#/lib/format"
 import { type Appointment, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
-import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
+import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/booking/$id")({ component: BookingPage })
 
@@ -96,7 +95,7 @@ function BookingPage() {
 	const appt = appointment as Appointment | null
 
 	const selectedServices =
-		appt && 		services ? services.filter((s: Doc<"services">) => appt.serviceIds.includes(s._id)) : []
+		appt && services ? services.filter((s: Doc<"services">) => appt.serviceIds.includes(s._id)) : []
 
 	return (
 		<main className="page-main">

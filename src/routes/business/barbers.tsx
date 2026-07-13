@@ -8,9 +8,8 @@ import { showToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import type { Barber } from "#/types"
-import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
+import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/barbers")({ component: BusinessBarbers })
 

@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next"
 import AdminNav from "#/components/AdminNav"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAdminAuth } from "#/hooks/useAdminAuth"
-import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
+import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/admin/overview")({ component: AdminDashboard })
 
@@ -19,12 +19,9 @@ function AdminDashboard() {
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
 
-	const verified =
-		allShops?.filter((s: Doc<"barbershops">) => s.isVerified).length ?? 0
-	const owners =
-		allUsers?.filter((u: Doc<"users">) => u.role === "owner").length ?? 0
-	const customers =
-		allUsers?.filter((u: Doc<"users">) => u.role === "customer").length ?? 0
+	const verified = allShops?.filter((s: Doc<"barbershops">) => s.isVerified).length ?? 0
+	const owners = allUsers?.filter((u: Doc<"users">) => u.role === "owner").length ?? 0
+	const customers = allUsers?.filter((u: Doc<"users">) => u.role === "customer").length ?? 0
 
 	return (
 		<main>

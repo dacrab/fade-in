@@ -8,8 +8,8 @@ import MapView from "#/components/MapView"
 import ShopCard from "#/components/ShopCard"
 import { ShopCardSkeleton } from "#/components/ui/Skeleton"
 import { PAGE_SIZE } from "#/types"
-import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
+import type { Doc } from "../../../convex/_generated/dataModel"
 
 const searchSchema = z.object({
 	q: z.string().optional(),

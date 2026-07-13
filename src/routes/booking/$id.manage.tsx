@@ -1,19 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { useMutation, useQuery } from "convex/react"
+import { useQuery } from "convex/react"
 import {
 	AlertCircle,
 	ArrowLeft,
 	Calendar,
 	CheckCircle,
 	Clock,
-	RefreshCw,
 	Scissors,
 	User,
 	XCircle,
 } from "lucide-react"
-import { useState } from "react"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { withToast } from "#/components/ui/Toast"
 import { formatDate, formatPrice } from "#/lib/format"
 import { type Appointment, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -35,36 +32,8 @@ function ManagePage() {
 	)
 	const barber = useQuery(api.barbers.getById, appointment ? { id: appointment.barberId } : "skip")
 
-	const cancelByToken = useMutation((api.appointments as any).cancelByToken)
-	const requestRescheduleByToken = useMutation((api.appointments as any).requestRescheduleByToken)
-
-	const [rescheduleMessage, setRescheduleMessage] = useState("")
-	const [showRescheduleForm, setShowRescheduleForm] = useState(false)
-
 	const isTokenValid = token.length > 0
 	const appt = appointment as Appointment | null
-
-	const handleCancel = () =>
-		void withToast(
-			() => cancelByToken({ id: id as Id<"appointments">, token }),
-			"Appointment cancelled",
-			"Failed to cancel. Check your link.",
-		)
-
-	const handleRescheduleRequest = () =>
-		void withToast(
-			async () => {
-				await requestRescheduleByToken({
-					id: id as Id<"appointments">,
-					token,
-					message: rescheduleMessage || undefined,
-				})
-				setShowRescheduleForm(false)
-				setRescheduleMessage("")
-			},
-			"Reschedule request sent. The shop will contact you.",
-			"Failed to send request.",
-		)
 
 	return (
 		<main className="page-main">
@@ -166,70 +135,7 @@ function ManagePage() {
 									</div>
 								)}
 							</div>
-
-							{(appt.status === "pending" || appt.status === "confirmed") && isTokenValid && (
-								<div className="px-6 py-4 border-t border-(--border) bg-(--bg-input)/30 flex flex-col gap-3">
-									<div className="flex items-center gap-3">
-										<button
-											type="button"
-											onClick={() => void handleCancel()}
-											className="px-4 py-2 rounded-full border border-(--error)/20 text-xs text-(--error) hover:bg-(--error)/5 transition-colors"
-										>
-											Cancel appointment
-										</button>
-										<button
-											type="button"
-											onClick={() => setShowRescheduleForm(!showRescheduleForm)}
-											className="btn btn-secondary text-xs gap-1.5"
-										>
-											<RefreshCw size={13} />
-											Request reschedule
-										</button>
-									</div>
-								</div>
-							)}
 						</div>
-
-						{showRescheduleForm && (
-							<div className="mt-4 rounded-xl border border-(--border) bg-(--bg-card) p-5">
-								<h3 className="text-sm font-semibold text-(--text) mb-2">Request Reschedule</h3>
-								<p className="text-xs text-(--text-muted) mb-4">
-									Your reschedule request will be sent to the shop. They will contact you to arrange a new
-									time.
-								</p>
-								<div className="space-y-3">
-									<div>
-										<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="reschedule-msg">
-											Message (optional)
-										</label>
-										<textarea
-											id="reschedule-msg"
-											className="input w-full text-sm resize-none"
-											rows={3}
-											placeholder="Tell us your preferred dates/times..."
-											value={rescheduleMessage}
-											onChange={(e) => setRescheduleMessage(e.target.value)}
-										/>
-									</div>
-									<div className="flex gap-3">
-										<button
-											type="button"
-											onClick={() => void handleRescheduleRequest()}
-											className="btn btn-primary text-xs"
-										>
-											Send request
-										</button>
-										<button
-											type="button"
-											onClick={() => setShowRescheduleForm(false)}
-											className="px-4 py-2 rounded-full border border-(--border) text-xs text-(--text-muted)"
-										>
-											Cancel
-										</button>
-									</div>
-								</div>
-							</div>
-						)}
 					</>
 				)}
 			</div>
