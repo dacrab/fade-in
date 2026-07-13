@@ -1,9 +1,9 @@
+import { useSignIn } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { Scissors } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
 
 export const Route = createFileRoute("/reset-password/")({ component: ResetPasswordPage })
 
@@ -12,15 +12,27 @@ function ResetPasswordPage() {
 	const [email, setEmail] = useState("")
 	const [loading, setLoading] = useState(false)
 	const [sent, setSent] = useState(false)
-	const { signIn } = useAuth()
+	const { signIn } = useSignIn()
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
+		if (!signIn) return
 		setLoading(true)
 		try {
-			await signIn("password", { email, flow: "reset" })
-			setSent(true)
-			showToast(t("resetPassword.sentSuccess"), "success")
+			const { error } = await signIn.create({ identifier: email })
+			if (error) {
+				showToast(error.message, "error")
+				return
+			}
+			const result = await signIn.resetPasswordEmailCode.sendCode()
+			if (result.error) {
+				showToast(result.error.message, "error")
+				return
+			}
+			if (signIn.status === "needs_new_password") {
+				setSent(true)
+				showToast(t("resetPassword.sentSuccess"), "success")
+			}
 		} catch {
 			showToast(t("resetPassword.sentFailed"), "error")
 		} finally {

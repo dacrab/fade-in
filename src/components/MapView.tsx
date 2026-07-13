@@ -1,3 +1,4 @@
+import "leaflet/dist/leaflet.css"
 import { MapPin } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 import { useTranslation } from "react-i18next"

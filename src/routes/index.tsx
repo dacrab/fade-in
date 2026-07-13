@@ -5,6 +5,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"
 import { ShopCardSkeleton } from "#/components/ui/Skeleton"
+import type { Doc } from "../../convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api"
 
 export const Route = createFileRoute("/")({ component: HomePage })
@@ -114,7 +115,7 @@ function HomePage() {
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{featured.map((shop) => (
+							{featured.map((shop: Doc<"barbershops">) => (
 								<ShopCard key={shop._id} shop={shop} />
 							))}
 						</div>

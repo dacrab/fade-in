@@ -1,10 +1,8 @@
 import { httpRouter } from "convex/server"
 import { api } from "./_generated/api"
 import { httpAction } from "./_generated/server"
-import { auth } from "./auth"
 
 const http = httpRouter()
-auth.addHttpRoutes(http)
 
 const WEBHOOK_TIMESTAMP_TOLERANCE_S = 300
 

@@ -1,3 +1,4 @@
+import { useSignUp } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { Scissors } from "lucide-react"
 import { useState } from "react"
@@ -5,7 +6,6 @@ import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
 import type { UserRole } from "#/types"
 
 const searchSchema = z.object({
@@ -46,7 +46,7 @@ function RegisterPage() {
 	const [confirmPassword, setConfirmPassword] = useState("")
 	const [role, setRole] = useState<UserRole>(roleParam ?? "customer")
 	const [loading, setLoading] = useState(false)
-	const { register } = useAuth()
+	const { signUp } = useSignUp()
 	const router = useRouter()
 
 	const strength = getStrength(password)
@@ -65,11 +65,23 @@ function RegisterPage() {
 			showToast(t("errors.passwordMismatch"), "error")
 			return
 		}
+		if (!signUp) return
 		setLoading(true)
 		try {
-			await register(email, password, name, role)
-			showToast(t("errors.accountCreated"), "success")
-			void router.navigate({ to: role === "owner" ? "/business/overview" : "/dashboard/overview" })
+			const { error } = await signUp.create({
+				emailAddress: email,
+				password,
+				firstName: name,
+			})
+			if (error) {
+				showToast(error.message, "error")
+				return
+			}
+			if (signUp.status === "complete") {
+				await signUp.finalize()
+				showToast(t("errors.accountCreated"), "success")
+				void router.navigate({ to: role === "owner" ? "/business/overview" : "/dashboard/overview" })
+			}
 		} catch {
 			showToast(t("errors.registrationFailed"), "error")
 		} finally {
@@ -95,7 +107,6 @@ function RegisterPage() {
 					</h1>
 					<p className="text-sm text-(--text-muted) mb-6 text-center">{t("auth.registerSubtitle")}</p>
 
-					{/* Role toggle — segmented control */}
 					<div className="flex rounded-lg bg-(--bg) border border-(--border) p-1 mb-6">
 						{(["customer", "owner"] as const).map((r) => (
 							<button

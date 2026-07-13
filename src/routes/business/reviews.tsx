@@ -9,6 +9,7 @@ import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatRelative } from "#/lib/format"
 import { PAGE_SIZE } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -69,7 +70,7 @@ function BusinessReviews() {
 					</p>
 				) : (
 					<div className="space-y-0 divide-y divide-white/4">
-						{reviews.map((r) => (
+						{reviews.map((r: Doc<"reviews">) => (
 							<div key={r._id} className="py-5">
 								<div className="flex items-center justify-between mb-2">
 									<div className="flex items-baseline gap-1.5">

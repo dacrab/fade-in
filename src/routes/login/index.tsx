@@ -1,10 +1,10 @@
+import { useSignIn } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { Scissors } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
 
 export const Route = createFileRoute("/login/")({ component: LoginPage })
 
@@ -13,16 +13,24 @@ function LoginPage() {
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [loading, setLoading] = useState(false)
-	const { login } = useAuth()
+	const { signIn } = useSignIn()
 	const router = useRouter()
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
+		if (!signIn) return
 		setLoading(true)
 		try {
-			await login(email, password)
-			showToast(t("errors.welcomeBack"), "success")
-			void router.navigate({ to: "/dashboard/overview" })
+			const { error } = await signIn.create({ identifier: email, password })
+			if (error) {
+				showToast(error.message, "error")
+				return
+			}
+			if (signIn.status === "complete") {
+				await signIn.finalize()
+				showToast(t("errors.welcomeBack"), "success")
+				void router.navigate({ to: "/dashboard/overview" })
+			}
 		} catch {
 			showToast(t("errors.loginFailed"), "error")
 		} finally {

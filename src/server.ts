@@ -1,8 +1,6 @@
-import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/server"
 import { initServerSentry } from "./sentry.server"
+import { startInstance } from "./start"
 
 initServerSentry()
 
-const fetch = createStartHandler(defaultStreamHandler)
-
-export default { fetch }
+export default startInstance
