@@ -8,8 +8,9 @@ import { withToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
-import type { AppointmentStatus } from "#/types"
 import { STATUS_DOT } from "#/types"
+import type { AppointmentStatus } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -34,9 +35,9 @@ function BusinessAppointments() {
 			t("errors.updateStatusFailed"),
 		)
 
-	const pending = appointments?.filter((a) => a.status === "pending") ?? []
-	const confirmed = appointments?.filter((a) => a.status === "confirmed") ?? []
-	const completed = appointments?.filter((a) => a.status === "completed") ?? []
+	const pending = appointments?.filter((a: Doc<"appointments">) => a.status === "pending") ?? []
+	const confirmed = appointments?.filter((a: Doc<"appointments">) => a.status === "confirmed") ?? []
+	const completed = appointments?.filter((a: Doc<"appointments">) => a.status === "completed") ?? []
 
 	return (
 		<div className="px-8 py-8">
@@ -86,8 +87,10 @@ function BusinessAppointments() {
 					) : (
 						<div className="divide-y divide-(--border)">
 							{[...appointments]
-								.sort((a, b) => a.startTime.localeCompare(b.startTime))
-								.map((appt) => (
+								.sort((a: Doc<"appointments">, b: Doc<"appointments">) =>
+									a.startTime.localeCompare(b.startTime),
+								)
+								.map((appt: Doc<"appointments">) => (
 									<div key={appt._id} className="flex items-center gap-4 py-3 group">
 										<div className="w-16 shrink-0">
 											<div className="text-sm font-mono font-medium text-(--text)">{appt.startTime}</div>

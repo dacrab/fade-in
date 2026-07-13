@@ -8,6 +8,7 @@ import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment } from "#/types"
 import { STATUS_DOT } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/barber/overview")({ component: BarberDashboard })
@@ -31,12 +32,23 @@ function BarberDashboard() {
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-xl" />
 
-	const todayAppts = appointments?.filter((a) => a.date === selectedDate) ?? []
-	const completedToday = todayAppts.filter((a) => a.status === "completed")
-	const todayEarnings = completedToday.reduce((sum, a) => sum + a.totalPrice, 0)
+	const todayAppts =
+		appointments?.filter((a: Doc<"appointments">) => a.date === selectedDate) ?? []
+	const completedToday = todayAppts.filter(
+		(a: Doc<"appointments">) => a.status === "completed",
+	)
+	const todayEarnings = completedToday.reduce(
+		(sum: number, a: Doc<"appointments">) => sum + a.totalPrice,
+		0,
+	)
 	const nextAppt = todayAppts
-		.filter((a) => a.status === "pending" || a.status === "confirmed")
-		.sort((a, b) => a.startTime.localeCompare(b.startTime))[0]
+		.filter(
+			(a: Doc<"appointments">) =>
+				a.status === "pending" || a.status === "confirmed",
+		)
+		.sort((a: Doc<"appointments">, b: Doc<"appointments">) =>
+			a.startTime.localeCompare(b.startTime),
+		)[0]
 
 	return (
 		<main className="page-main">
@@ -112,8 +124,10 @@ function BarberDashboard() {
 					) : (
 						<div className="divide-y divide-(--border)">
 							{todayAppts
-								.sort((a, b) => a.startTime.localeCompare(b.startTime))
-								.map((appt) => (
+								.sort((a: Doc<"appointments">, b: Doc<"appointments">) =>
+									a.startTime.localeCompare(b.startTime),
+								)
+								.map((appt: Doc<"appointments">) => (
 									<AppointmentRow key={appt._id} appt={appt} />
 								))}
 						</div>

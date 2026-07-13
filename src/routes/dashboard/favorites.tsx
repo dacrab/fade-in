@@ -4,6 +4,7 @@ import { ArrowLeft, Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"
 import { useAuth } from "#/hooks/useAuth"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/dashboard/favorites")({ component: FavoritesPage })
@@ -18,7 +19,7 @@ function FavoritesPage() {
 		api.barbershops.listByIds,
 		favoriteIds.length > 0 ? { ids: favoriteIds } : "skip",
 	)
-	const shops = shopsRaw?.filter((s): s is NonNullable<typeof s> => s != null) ?? []
+	const shops = shopsRaw?.filter((s: Doc<"barbershops"> | null): s is Doc<"barbershops"> => s != null) ?? []
 
 	return (
 		<main className="page-main">
@@ -42,7 +43,7 @@ function FavoritesPage() {
 					</div>
 				) : (
 					<div className="shop-grid">
-						{shops.map((shop) => (
+						{shops.map((shop: Doc<"barbershops">) => (
 							<ShopCard key={shop._id} shop={shop} />
 						))}
 					</div>

@@ -19,7 +19,7 @@ import { type Appointment, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
-export const Route = createFileRoute("/booking/$id/manage")({ component: ManagePage })
+export const Route = createFileRoute("/booking/$id/manage" as any)({ component: ManagePage })
 
 function ManagePage() {
 	const { id } = Route.useParams()
@@ -35,8 +35,8 @@ function ManagePage() {
 	)
 	const barber = useQuery(api.barbers.getById, appointment ? { id: appointment.barberId } : "skip")
 
-	const cancelByToken = useMutation(api.appointments.cancelByToken)
-	const requestRescheduleByToken = useMutation(api.appointments.requestRescheduleByToken)
+	const cancelByToken = useMutation((api.appointments as any).cancelByToken)
+	const requestRescheduleByToken = useMutation((api.appointments as any).requestRescheduleByToken)
 
 	const [rescheduleMessage, setRescheduleMessage] = useState("")
 	const [showRescheduleForm, setShowRescheduleForm] = useState(false)

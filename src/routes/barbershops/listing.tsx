@@ -8,6 +8,7 @@ import MapView from "#/components/MapView"
 import ShopCard from "#/components/ShopCard"
 import { ShopCardSkeleton } from "#/components/ui/Skeleton"
 import { PAGE_SIZE } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 
 const searchSchema = z.object({
@@ -210,7 +211,7 @@ function BarbershopsPage() {
 					</div>
 				) : (
 					<div className="shop-grid">
-						{shops.map((shop) => (
+						{shops.map((shop: Doc<"barbershops">) => (
 							<ShopCard key={shop._id} shop={shop} />
 						))}
 					</div>

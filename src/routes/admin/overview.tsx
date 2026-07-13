@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import AdminNav from "#/components/AdminNav"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAdminAuth } from "#/hooks/useAdminAuth"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/admin/overview")({ component: AdminDashboard })
@@ -18,9 +19,12 @@ function AdminDashboard() {
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
 
-	const verified = allShops?.filter((s) => s.isVerified).length ?? 0
-	const owners = allUsers?.filter((u) => u.role === "owner").length ?? 0
-	const customers = allUsers?.filter((u) => u.role === "customer").length ?? 0
+	const verified =
+		allShops?.filter((s: Doc<"barbershops">) => s.isVerified).length ?? 0
+	const owners =
+		allUsers?.filter((u: Doc<"users">) => u.role === "owner").length ?? 0
+	const customers =
+		allUsers?.filter((u: Doc<"users">) => u.role === "customer").length ?? 0
 
 	return (
 		<main>
@@ -57,7 +61,7 @@ function AdminDashboard() {
 								<Skeleton className="h-32 w-full" />
 							) : (
 								<div className="space-y-2">
-									{allShops.slice(0, 5).map((shop) => (
+									{allShops.slice(0, 5).map((shop: Doc<"barbershops">) => (
 										<div
 											key={shop._id}
 											className="flex items-center gap-3 py-2 border-b border-(--border) last:border-0"
@@ -90,12 +94,12 @@ function AdminDashboard() {
 											{ role: t("admin.roles.owners"), count: owners, color: "var(--success)" },
 											{
 												role: t("admin.roles.barbers"),
-												count: allUsers.filter((u) => u.role === "barber").length,
+												count: allUsers.filter((u: Doc<"users">) => u.role === "barber").length,
 												color: "var(--info)",
 											},
 											{
 												role: t("admin.roles.admins"),
-												count: allUsers.filter((u) => u.role === "admin").length,
+												count: allUsers.filter((u: Doc<"users">) => u.role === "admin").length,
 												color: "var(--error)",
 											},
 										] as const
