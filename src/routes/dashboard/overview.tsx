@@ -9,9 +9,8 @@ import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop } from "#/types"
 import { STATUS_DOT } from "#/types"
-import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
+import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/overview")({ component: CustomerDashboard })
 
@@ -50,8 +49,7 @@ function CustomerDashboard() {
 		appointments?.filter(
 			(a: Doc<"appointments">) => a.status === "pending" || a.status === "confirmed",
 		) ?? []
-	const completed =
-		appointments?.filter((a: Doc<"appointments">) => a.status === "completed") ?? []
+	const completed = appointments?.filter((a: Doc<"appointments">) => a.status === "completed") ?? []
 	const past =
 		appointments?.filter(
 			(a: Doc<"appointments">) => a.status === "completed" || a.status === "cancelled",

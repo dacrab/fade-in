@@ -5,15 +5,16 @@ import { useTranslation } from "react-i18next"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop } from "#/types"
-import type { Id } from "../../convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api"
+import type { Id } from "../../convex/_generated/dataModel"
 
 export default function ShopCard({ shop }: { shop: Barbershop }) {
 	const { t } = useTranslation()
 	const { user } = useAuth()
 	const userData = useQuery(api.users.getById, user ? { id: user.id } : "skip")
 	const toggleFavorite = useMutation(api.users.toggleFavorite)
-	const isFavorited = userData?.favoriteShopIds?.some((id: Id<"barbershops">) => id === shop._id) ?? false
+	const isFavorited =
+		userData?.favoriteShopIds?.some((id: Id<"barbershops">) => id === shop._id) ?? false
 
 	const handleToggleFav = (e: React.MouseEvent) => {
 		e.preventDefault()

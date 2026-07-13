@@ -5,8 +5,8 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"
 import { ShopCardSkeleton } from "#/components/ui/Skeleton"
-import type { Doc } from "../../convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api"
+import type { Doc } from "../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/")({ component: HomePage })
 

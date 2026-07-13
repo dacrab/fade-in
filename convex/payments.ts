@@ -43,14 +43,8 @@ export const createCheckoutSession = action({
 		endTime: v.string(),
 		notes: v.optional(v.string()),
 	},
-	handler: async (
-			ctx,
-			args,
-		): Promise<{ url: string; appointmentId: Id<"appointments"> }> => {
-		const user = (await ctx.runMutation(
-			api.users.ensureCurrentUser,
-			{},
-		)) as Doc<"users">
+	handler: async (ctx, args): Promise<{ url: string; appointmentId: Id<"appointments"> }> => {
+		const user = (await ctx.runMutation(api.users.ensureCurrentUser, {})) as Doc<"users">
 
 		const services = await Promise.all(
 			args.serviceIds.map((id: Id<"services">) => runQ(ctx, "services:getById", { id })),

@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAdminAuth } from "#/hooks/useAdminAuth"
 import type { UserRole } from "#/types"
-import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
+import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/admin/users")({ component: AdminUsers })
 

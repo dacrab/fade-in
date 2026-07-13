@@ -9,9 +9,8 @@ import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
 import type { Service } from "#/types"
-import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
+import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/services")({ component: BusinessServices })
 
