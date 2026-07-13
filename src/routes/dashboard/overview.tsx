@@ -9,6 +9,7 @@ import { useAuth } from "#/hooks/useAuth"
 import { formatDateShort, formatPrice } from "#/lib/format"
 import type { Appointment, Barbershop } from "#/types"
 import { STATUS_DOT } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -46,10 +47,15 @@ function CustomerDashboard() {
 	if (!user) return <DashSkeleton />
 
 	const upcoming =
-		appointments?.filter((a) => a.status === "pending" || a.status === "confirmed") ?? []
-	const completed = appointments?.filter((a) => a.status === "completed") ?? []
+		appointments?.filter(
+			(a: Doc<"appointments">) => a.status === "pending" || a.status === "confirmed",
+		) ?? []
+	const completed =
+		appointments?.filter((a: Doc<"appointments">) => a.status === "completed") ?? []
 	const past =
-		appointments?.filter((a) => a.status === "completed" || a.status === "cancelled") ?? []
+		appointments?.filter(
+			(a: Doc<"appointments">) => a.status === "completed" || a.status === "cancelled",
+		) ?? []
 
 	return (
 		<main className="page-main">
@@ -105,7 +111,7 @@ function CustomerDashboard() {
 						</div>
 					) : (
 						<div className="divide-y divide-(--border)">
-							{upcoming.map((appt) => (
+							{upcoming.map((appt: Doc<"appointments">) => (
 								<AppointmentRow
 									key={appt._id}
 									appt={appt}
@@ -121,7 +127,7 @@ function CustomerDashboard() {
 					<section className="card p-5">
 						<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.pastTitle")}</h2>
 						<div className="divide-y divide-(--border)">
-							{past.slice(0, 8).map((appt) => (
+							{past.slice(0, 8).map((appt: Doc<"appointments">) => (
 								<AppointmentRow
 									key={appt._id}
 									appt={appt}

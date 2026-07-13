@@ -1,17 +1,7 @@
-import { getAuthUserId } from "@convex-dev/auth/server"
-import type {
-	DefaultFunctionArgs,
-	FunctionReference,
-	RegisteredMutation,
-	RegisteredQuery,
-} from "convex/server"
 import { ConvexError, v } from "convex/values"
-import type { ActionCtx } from "./_generated/server"
+import { api } from "./_generated/api"
+import type { Doc, Id } from "./_generated/dataModel"
 import { action } from "./_generated/server"
-import { create as createAppointment, setPolarCheckout } from "./appointments"
-import { computeServiceTotal } from "./lib/services"
-import { getById as getServiceById } from "./services"
-import { getById as getUserById } from "./users"
 
 const POLAR_BASE = "https://api.polar.sh/v1"
 
@@ -38,19 +28,10 @@ async function polarPost<T = unknown>(path: string, body: Record<string, unknown
 	return data as T
 }
 
-type QueryArgs<F> = F extends RegisteredQuery<"public", infer A, unknown> ? A : never
-type MutationArgs<F> = F extends RegisteredMutation<"public", infer A, unknown> ? A : never
-
-const runQ = <F extends RegisteredQuery<"public", DefaultFunctionArgs, unknown>>(
-	ctx: ActionCtx,
-	name: F,
-	args: QueryArgs<F>,
-) => ctx.runQuery(name as unknown as FunctionReference<"query", "public">, args)
-const runM = <F extends RegisteredMutation<"public", DefaultFunctionArgs, unknown>>(
-	ctx: ActionCtx,
-	name: F,
-	args: MutationArgs<F>,
-) => ctx.runMutation(name as unknown as FunctionReference<"mutation", "public">, args)
+// biome-ignore lint/suspicious/noExplicitAny: Convex ctx type not easily expressed here
+const runQ = (ctx: any, name: string, args: unknown) => ctx.runQuery(name, args)
+// biome-ignore lint/suspicious/noExplicitAny: Convex ctx type not easily expressed here
+const runM = (ctx: any, name: string, args: unknown) => ctx.runMutation(name, args)
 
 export const createCheckoutSession = action({
 	args: {
@@ -62,17 +43,28 @@ export const createCheckoutSession = action({
 		endTime: v.string(),
 		notes: v.optional(v.string()),
 	},
-	handler: async (ctx, args) => {
-		const userId = await getAuthUserId(ctx)
-		if (!userId) throw new ConvexError("Not authenticated")
+	handler: async (
+			ctx,
+			args,
+		): Promise<{ url: string; appointmentId: Id<"appointments"> }> => {
+		const user = (await ctx.runMutation(
+			api.users.ensureCurrentUser,
+			{},
+		)) as Doc<"users">
 
-		const totalPrice = await computeServiceTotal(
-			(id) => runQ(ctx, getServiceById, { id }),
-			args.serviceIds,
-			args.barbershopId,
+		const services = await Promise.all(
+			args.serviceIds.map((id: Id<"services">) => runQ(ctx, "services:getById", { id })),
+		)
+		const totalPrice = (services as (Doc<"services"> | null)[]).reduce(
+			(sum: number, s: Doc<"services"> | null) => {
+				if (!s?.isActive) throw new ConvexError("Invalid service")
+				if (s.barbershopId !== args.barbershopId) throw new ConvexError("Service not from this shop")
+				return sum + s.price
+			},
+			0,
 		)
 
-		const appointmentId = await runM(ctx, createAppointment, {
+		const appointmentId: Id<"appointments"> = await runM(ctx, "appointments:create", {
 			barbershopId: args.barbershopId,
 			barberId: args.barberId,
 			serviceIds: args.serviceIds,
@@ -82,18 +74,19 @@ export const createCheckoutSession = action({
 			notes: args.notes,
 		})
 
-		const user = await runQ(ctx, getUserById, { id: userId })
-
-		const checkout = await polarPost<{ id: string; url: string }>("/checkouts/", {
+		const checkout: { id: string; url: string } = await polarPost<{
+			id: string
+			url: string
+		}>("/checkouts/", {
 			amount: totalPrice,
 			currency: "eur",
-			customer_email: user?.email,
+			customer_email: user.email,
 			metadata: { appointmentId },
-			success_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
-			cancel_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
+			success_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
+			cancel_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
 		})
 
-		await runM(ctx, setPolarCheckout, {
+		await runM(ctx, "appointments:setPolarCheckout", {
 			id: appointmentId,
 			polarCheckoutId: checkout.id,
 		})

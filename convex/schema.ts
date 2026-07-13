@@ -1,11 +1,10 @@
-import { authTables } from "@convex-dev/auth/server"
 import { defineSchema, defineTable } from "convex/server"
 import { v } from "convex/values"
 import { socialLinksValidator, workingHoursValidator } from "./validators"
 
 export default defineSchema({
-	...authTables,
 	users: defineTable({
+		clerkId: v.string(),
 		name: v.optional(v.string()),
 		email: v.string(),
 		phone: v.optional(v.string()),
@@ -15,7 +14,9 @@ export default defineSchema({
 		avatarUrl: v.optional(v.string()),
 		favoriteShopIds: v.optional(v.array(v.id("barbershops"))),
 		emailVerified: v.optional(v.boolean()),
-	}).index("by_email", ["email"]),
+	})
+		.index("by_email", ["email"])
+		.index("by_clerkId", ["clerkId"]),
 
 	barbershops: defineTable({
 		name: v.string(),
@@ -57,7 +58,7 @@ export default defineSchema({
 		barbershopId: v.id("barbershops"),
 		name: v.string(),
 		description: v.optional(v.string()),
-		price: v.number(), // cents
+		price: v.number(),
 		durationMinutes: v.number(),
 		category: v.string(),
 		isActive: v.boolean(),
@@ -68,10 +69,10 @@ export default defineSchema({
 		barbershopId: v.id("barbershops"),
 		barberId: v.id("barbers"),
 		serviceIds: v.array(v.id("services")),
-		date: v.string(), // YYYY-MM-DD
-		startTime: v.string(), // HH:MM
-		endTime: v.string(), // HH:MM
-		totalPrice: v.number(), // cents
+		date: v.string(),
+		startTime: v.string(),
+		endTime: v.string(),
+		totalPrice: v.number(),
 		status: v.union(
 			v.literal("pending"),
 			v.literal("confirmed"),
