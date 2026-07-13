@@ -34,6 +34,7 @@ import { Route as AdminShopsRouteImport } from './routes/admin/shops'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin/appointments'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
 import { Route as BookingIdRouteImport } from './routes/booking/$id'
+import { Route as BookingIdManageRouteImport } from './routes/booking/$id.manage'
 
 const BusinessRoute = BusinessRouteImport.update({
   id: '/business',
@@ -160,6 +161,11 @@ const BookingIdRoute = BookingIdRouteImport.update({
   path: '/booking/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookingIdManageRoute = BookingIdManageRouteImport.update({
+  id: '/booking/$id/manage',
+  path: '/booking/$id/manage',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/barber/overview': typeof BarberOverviewRoute
   '/booking/$id': typeof BookingIdRoute
+  '/booking/$id/manage': typeof BookingIdManageRoute
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/barber/overview': typeof BarberOverviewRoute
   '/booking/$id': typeof BookingIdRoute
+  '/booking/$id/manage': typeof BookingIdManageRoute
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/barber/overview': typeof BarberOverviewRoute
   '/booking/$id': typeof BookingIdRoute
+  '/booking/$id/manage': typeof BookingIdManageRoute
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/barber/overview'
     | '/booking/$id'
+    | '/booking/$id/manage'
     | '/barbershops/$slug'
     | '/barbershops/listing'
     | '/business/appointments'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/barber/overview'
     | '/booking/$id'
+    | '/booking/$id/manage'
     | '/barbershops/$slug'
     | '/barbershops/listing'
     | '/business/appointments'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/barber/overview'
     | '/booking/$id'
+    | '/booking/$id/manage'
     | '/barbershops/$slug'
     | '/barbershops/listing'
     | '/business/appointments'
@@ -338,6 +350,7 @@ export interface RootRouteChildren {
   BarbershopsSlugRoute: typeof BarbershopsSlugRoute
   BarbershopsListingRoute: typeof BarbershopsListingRoute
   BookingIdRoute: typeof BookingIdRoute
+  BookingIdManageRoute: typeof BookingIdManageRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardOverviewRoute: typeof DashboardOverviewRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
@@ -505,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/booking/$id/manage': {
+      id: '/booking/$id/manage'
+      path: '/booking/$id/manage'
+      fullPath: '/booking/$id/manage'
+      preLoaderRoute: typeof BookingIdManageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/admin/users'
@@ -562,6 +582,7 @@ const rootRouteChildren: RootRouteChildren = {
   BarbershopsSlugRoute: BarbershopsSlugRoute,
   BarbershopsListingRoute: BarbershopsListingRoute,
   BookingIdRoute: BookingIdRoute,
+  BookingIdManageRoute: BookingIdManageRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardOverviewRoute: DashboardOverviewRoute,
   DashboardProfileRoute: DashboardProfileRoute,

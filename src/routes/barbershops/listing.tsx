@@ -44,7 +44,7 @@ function BarbershopsPage() {
 		e.preventDefault()
 		void navigate({
 			to: "/barbershops/listing",
-			search: (prev) => ({
+			search: (prev: z.infer<typeof searchSchema>) => ({
 				...prev,
 				q: search || undefined,
 				city: city || undefined,
