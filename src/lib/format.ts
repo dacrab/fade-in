@@ -1,8 +1,7 @@
 import { format, formatDistanceToNow, parseISO } from "date-fns"
-import { centsToEur } from "./money"
 
 export function formatPrice(cents: number): string {
-	return centsToEur(cents)
+	return `€${(cents / 100).toFixed(2)}`
 }
 
 export function formatDate(dateStr: string): string {

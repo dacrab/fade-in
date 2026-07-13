@@ -23,6 +23,7 @@ import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDate, formatPrice } from "#/lib/format"
 import { type Appointment, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -95,7 +96,7 @@ function BookingPage() {
 	const appt = appointment as Appointment | null
 
 	const selectedServices =
-		appt && services ? services.filter((s) => appt.serviceIds.includes(s._id)) : []
+		appt && 		services ? services.filter((s: Doc<"services">) => appt.serviceIds.includes(s._id)) : []
 
 	return (
 		<main className="page-main">
@@ -217,7 +218,7 @@ function BookingPage() {
 											{t("booking.summaryFields.services")}
 										</p>
 										<div className="flex flex-wrap gap-1.5">
-											{selectedServices.map((s) => (
+											{selectedServices.map((s: Doc<"services">) => (
 												<span
 													key={s._id}
 													className="px-2.5 py-1 rounded-full bg-(--gold)/8 text-(--gold) text-xs font-medium"

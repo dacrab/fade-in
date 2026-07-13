@@ -1,6 +1,6 @@
-import { getAuthUserId } from "@convex-dev/auth/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { requireUser } from "./lib/auth"
 import { definedPatch, workingHoursValidator } from "./validators"
 
 export const getById = query({
@@ -41,8 +41,8 @@ export const create = mutation({
 		workingHours: workingHoursValidator,
 	},
 	handler: async (ctx, args) => {
-		const userId = await getAuthUserId(ctx)
-		if (!userId) throw new ConvexError("Not authenticated")
+		const user = await requireUser(ctx)
+		const userId = user._id
 
 		const shop = await ctx.db.get(args.barbershopId)
 		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
@@ -53,6 +53,26 @@ export const create = mutation({
 			specializations: specializations ?? [],
 			isActive: true,
 		})
+	},
+})
+
+export const linkToUser = mutation({
+	args: { barberId: v.id("barbers") },
+	handler: async (ctx, args) => {
+		const user = await requireUser(ctx)
+		const userId = user._id
+
+		const barber = await ctx.db.get(args.barberId)
+		if (!barber) throw new ConvexError("Barber not found")
+
+		// Only the shop owner or the barber themselves can link
+		const shop = await ctx.db.get(barber.barbershopId)
+		if (!shop) throw new ConvexError("Shop not found")
+
+		if (shop.ownerId !== userId && user.role !== "admin" && user.role !== "barber")
+			throw new ConvexError("Not authorized")
+
+		return ctx.db.patch(args.barberId, { userId })
 	},
 })
 
@@ -68,8 +88,8 @@ export const update = mutation({
 		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		const userId = await getAuthUserId(ctx)
-		if (!userId) throw new ConvexError("Not authenticated")
+		const user = await requireUser(ctx)
+		const userId = user._id
 
 		const barber = await ctx.db.get(args.id)
 		if (!barber) throw new ConvexError("Not found")
@@ -85,8 +105,8 @@ export const update = mutation({
 export const remove = mutation({
 	args: { id: v.id("barbers") },
 	handler: async (ctx, args) => {
-		const userId = await getAuthUserId(ctx)
-		if (!userId) throw new ConvexError("Not authenticated")
+		const user = await requireUser(ctx)
+		const userId = user._id
 
 		const barber = await ctx.db.get(args.id)
 		if (!barber) throw new ConvexError("Not found")

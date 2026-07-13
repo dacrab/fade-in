@@ -1,7 +1,7 @@
-import { getAuthUserId } from "@convex-dev/auth/server"
 import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { requireUser } from "./lib/auth"
 
 export const listByShop = query({
 	args: {
@@ -24,8 +24,8 @@ export const create = mutation({
 		comment: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const userId = await getAuthUserId(ctx)
-		if (!userId) throw new ConvexError("Not authenticated")
+		const user = await requireUser(ctx)
+		const userId = user._id
 
 		const appt = await ctx.db.get(args.appointmentId)
 		if (!appt) throw new ConvexError("Appointment not found")
@@ -83,8 +83,8 @@ export const addOwnerReply = mutation({
 		ownerReply: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const userId = await getAuthUserId(ctx)
-		if (!userId) throw new ConvexError("Not authenticated")
+		const user = await requireUser(ctx)
+		const userId = user._id
 
 		if (args.ownerReply.trim().length === 0) throw new ConvexError("Reply cannot be empty")
 

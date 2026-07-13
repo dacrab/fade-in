@@ -8,6 +8,7 @@ import { showToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import type { Barber } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -181,7 +182,7 @@ function BusinessBarbers() {
 					</p>
 				) : (
 					<div className="divide-y divide-white/4">
-						{barbers.map((b) => (
+						{barbers.map((b: Doc<"barbers">) => (
 							<div key={b._id} className="flex items-center gap-4 py-4 group">
 								<div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium text-(--gold) flex-shrink-0 bg-(--gold)/10">
 									{b.name.charAt(0)}

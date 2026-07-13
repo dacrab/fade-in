@@ -9,6 +9,7 @@ import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
 import type { Service } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -242,7 +243,7 @@ function BusinessServices() {
 					</p>
 				) : (
 					<div className="divide-y divide-white/4">
-						{services.map((svc) => (
+						{services.map((svc: Doc<"services">) => (
 							<div key={svc._id} className="flex items-center gap-4 py-4 group">
 								<div className="flex-1 min-w-0">
 									<div className="text-sm text-(--text)">{svc.name}</div>

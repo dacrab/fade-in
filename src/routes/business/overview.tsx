@@ -7,6 +7,7 @@ import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice } from "#/lib/format"
 import { PAGE_SIZE, STATUS_BADGE } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/business/overview")({ component: BusinessDashboard })
@@ -115,7 +116,7 @@ function BusinessDashboard() {
 					<p className="text-sm text-(--text-subtle) py-4">{t("business.noToday")}</p>
 				) : (
 					<div className="divide-y divide-white/4">
-						{todayAppts.map((appt) => (
+						{todayAppts.map((appt: Doc<"appointments">) => (
 							<div key={appt._id} className="flex items-center gap-4 py-3">
 								<span className="font-mono text-sm font-medium text-(--gold) w-12">{appt.startTime}</span>
 								<div className="flex-1 min-w-0">
@@ -203,7 +204,7 @@ function BusinessDashboard() {
 					<p className="text-sm text-(--text-subtle)">{t("business.noReviewsYet")}</p>
 				) : (
 					<div className="space-y-3">
-						{reviews.slice(0, 3).map((r) => (
+						{reviews.slice(0, 3).map((r: Doc<"reviews">) => (
 							<div key={r._id} className="border-b border-(--border) pb-3 last:border-0 last:pb-0">
 								<div className="flex items-center gap-2 mb-1">
 									<span className="text-sm font-medium text-(--gold)">{r.rating.toFixed(1)}</span>

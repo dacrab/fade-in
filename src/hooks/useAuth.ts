@@ -1,12 +1,18 @@
-import { useAuthActions } from "@convex-dev/auth/react"
-import { useQuery } from "convex/react"
+import { useClerk, useUser } from "@clerk/tanstack-react-start"
+import { useMutation, useQuery } from "convex/react"
+import { useEffect } from "react"
 import type { UserRole } from "#/types"
 import { api } from "../../convex/_generated/api"
 
-/** Provides the current authenticated user and auth actions. */
 export function useAuth() {
-	const { signIn, signOut } = useAuthActions()
+	const { signOut } = useClerk()
+	const { user: clerkUser, isLoaded } = useUser()
 	const viewer = useQuery(api.users.getViewer)
+	const ensureCurrentUser = useMutation(api.users.ensureCurrentUser)
+
+	useEffect(() => {
+		if (isLoaded && clerkUser) void ensureCurrentUser()
+	}, [isLoaded, clerkUser, ensureCurrentUser])
 
 	const user = viewer
 		? {
@@ -21,11 +27,13 @@ export function useAuth() {
 	return {
 		user,
 		loading: viewer === undefined,
-		signIn,
+		signIn: async () => {},
 		signOut,
-		login: (email: string, password: string) =>
-			signIn("password", { email, password, flow: "signIn" }),
-		register: (email: string, password: string, name: string, role: UserRole) =>
-			signIn("password", { email, password, flow: "signUp", name, role }),
+		login: () => {
+			throw new Error("Use Clerk's useSignIn hook directly")
+		},
+		register: () => {
+			throw new Error("Use Clerk's useSignUp hook directly")
+		},
 	}
 }

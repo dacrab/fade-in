@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAdminAuth } from "#/hooks/useAdminAuth"
 import type { UserRole } from "#/types"
+import type { Doc } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/admin/users")({ component: AdminUsers })
@@ -53,7 +54,7 @@ function AdminUsers() {
 							<span>{t("admin.users.colEmail")}</span>
 							<span>{t("admin.users.colRole")}</span>
 						</div>
-						{allUsers.map((u, i) => (
+						{allUsers.map((u: Doc<"users">, i: number) => (
 							<div
 								key={u._id}
 								className={`grid grid-cols-3 gap-4 px-4 py-3 items-center ${i < allUsers.length - 1 ? "border-b border-(--border)" : ""}`}
@@ -65,7 +66,7 @@ function AdminUsers() {
 									<span className="text-sm text-(--text) truncate">{u.name}</span>
 								</div>
 								<span className="text-sm text-(--text-muted) truncate">{u.email}</span>
-								<span className={`badge ${ROLE_BADGE[u.role ?? "customer"]} w-fit`}>
+								<span className={`badge ${ROLE_BADGE[(u.role ?? "customer") as UserRole]} w-fit`}>
 									{u.role ?? "customer"}
 								</span>
 							</div>

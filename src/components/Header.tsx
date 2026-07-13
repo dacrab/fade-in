@@ -1,3 +1,4 @@
+import { useClerk } from "@clerk/tanstack-react-start"
 import { Link, useRouter } from "@tanstack/react-router"
 import {
 	Building2,
@@ -38,13 +39,13 @@ const NAV_ITEMS = [
 
 export default function Header() {
 	const [mobileOpen, setMobileOpen] = useState(false)
-	const { user, signOut } = useAuth()
+	const { signOut } = useClerk()
+	const { user } = useAuth()
 	const router = useRouter()
 	const { t } = useTranslation()
 
 	const handleLogout = () => {
 		signOut()
-		void router.navigate({ to: "/" })
 	}
 
 	const roleItem = user ? ROLE_NAV[user.role as keyof typeof ROLE_NAV] : undefined
