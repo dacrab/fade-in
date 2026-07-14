@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values"
 import { api } from "./_generated/api"
 import type { Doc, Id } from "./_generated/dataModel"
 import { action } from "./_generated/server"
+import { computeServiceTotal } from "./lib/services"
 
 const POLAR_BASE = "https://api.polar.sh/v1"
 
@@ -46,16 +47,10 @@ export const createCheckoutSession = action({
 	handler: async (ctx, args): Promise<{ url: string; appointmentId: Id<"appointments"> }> => {
 		const user = (await ctx.runMutation(api.users.ensureCurrentUser, {})) as Doc<"users">
 
-		const services = await Promise.all(
-			args.serviceIds.map((id: Id<"services">) => runQ(ctx, "services:getById", { id })),
-		)
-		const totalPrice = (services as (Doc<"services"> | null)[]).reduce(
-			(sum: number, s: Doc<"services"> | null) => {
-				if (!s?.isActive) throw new ConvexError("Invalid service")
-				if (s.barbershopId !== args.barbershopId) throw new ConvexError("Service not from this shop")
-				return sum + s.price
-			},
-			0,
+		const totalPrice = await computeServiceTotal(
+			(id: Id<"services">) => runQ(ctx, "services:getById", { id }) as Promise<Doc<"services"> | null>,
+			args.serviceIds,
+			args.barbershopId,
 		)
 
 		const appointmentId: Id<"appointments"> = await runM(ctx, "appointments:create", {

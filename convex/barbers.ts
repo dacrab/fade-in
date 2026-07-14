@@ -56,26 +56,6 @@ export const create = mutation({
 	},
 })
 
-export const linkToUser = mutation({
-	args: { barberId: v.id("barbers") },
-	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
-		const userId = user._id
-
-		const barber = await ctx.db.get(args.barberId)
-		if (!barber) throw new ConvexError("Barber not found")
-
-		// Only the shop owner or the barber themselves can link
-		const shop = await ctx.db.get(barber.barbershopId)
-		if (!shop) throw new ConvexError("Shop not found")
-
-		if (shop.ownerId !== userId && user.role !== "admin" && user.role !== "barber")
-			throw new ConvexError("Not authorized")
-
-		return ctx.db.patch(args.barberId, { userId })
-	},
-})
-
 export const update = mutation({
 	args: {
 		id: v.id("barbers"),

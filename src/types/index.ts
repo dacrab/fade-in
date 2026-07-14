@@ -1,4 +1,12 @@
-import type { Id } from "../../convex/_generated/dataModel"
+import type { Id, TableNames } from "../../convex/_generated/dataModel"
+
+/**
+ * Safely casts a string to a Convex Id<T>. Convex IDs are branded strings;
+ * at runtime Route.useParams() returns strings that are valid IDs.
+ */
+export function asId<T extends TableNames>(id: string): Id<T> {
+	return id as Id<T>
+}
 
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 

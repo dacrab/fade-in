@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/profile")({ component: ProfilePage })
 
@@ -24,8 +23,7 @@ function ProfilePage() {
 		if (!user) return
 		setSaving(true)
 		await withToast(
-			() =>
-				updateProfile({ id: user.id as Id<"users">, name: form.name, phone: form.phone || undefined }),
+			() => updateProfile({ id: user.id, name: form.name, phone: form.phone || undefined }),
 			t("errors.profileSaved"),
 			t("errors.profileFailed"),
 		)
