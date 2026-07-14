@@ -22,9 +22,9 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { formatDate, formatPrice } from "#/lib/format"
-import { type Appointment, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
+import { asId, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Doc, Id } from "../../../convex/_generated/dataModel"
+import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/booking/$id")({ component: BookingPage })
 
@@ -43,7 +43,7 @@ function BookingPage() {
 	)
 	const payment = searchParams.get("payment")
 
-	const appointment = useQuery(api.appointments.getById, { id: id as Id<"appointments"> })
+	const appointment = useQuery(api.appointments.getById, { id: asId<"appointments">(id) })
 	const shop = useQuery(
 		api.barbershops.getById,
 		appointment ? { id: appointment.barbershopId } : "skip",
@@ -71,7 +71,7 @@ function BookingPage() {
 			await withToast(
 				() =>
 					reschedule({
-						id: id as Id<"appointments">,
+						id: asId<"appointments">(id),
 						date: value.date,
 						startTime: value.startTime,
 						endTime: value.endTime,
@@ -86,13 +86,13 @@ function BookingPage() {
 
 	const handleCancel = () =>
 		void withToast(
-			() => updateStatus({ id: id as Id<"appointments">, status: "cancelled" }),
+			() => updateStatus({ id: asId<"appointments">(id), status: "cancelled" }),
 			t("status.cancelled"),
 			t("errors.updateStatusFailed"),
 		)
 
 	const isLoading = appointment === undefined
-	const appt = appointment as Appointment | null
+	const appt = appointment ?? null
 
 	const selectedServices =
 		appt && services ? services.filter((s: Doc<"services">) => appt.serviceIds.includes(s._id)) : []

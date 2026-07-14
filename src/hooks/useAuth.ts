@@ -27,13 +27,6 @@ export function useAuth() {
 	return {
 		user,
 		loading: viewer === undefined,
-		signIn: async () => {},
 		signOut,
-		login: () => {
-			throw new Error("Use Clerk's useSignIn hook directly")
-		},
-		register: () => {
-			throw new Error("Use Clerk's useSignUp hook directly")
-		},
 	}
 }

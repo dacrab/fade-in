@@ -3,6 +3,7 @@ import { generateSlots } from "../src/lib/slots"
 import { mutation, query } from "./_generated/server"
 import { getCurrentUser, requireUser } from "./lib/auth"
 import { sendEmail } from "./lib/email"
+import { computeServiceTotal } from "./lib/services"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const TIME_RE = /^\d{2}:\d{2}$/
@@ -49,13 +50,11 @@ export const create = mutation({
 			throw new ConvexError("Invalid time format")
 		if (args.serviceIds.length === 0) throw new ConvexError("At least one service required")
 
-		// Compute price server-side from services
-		const services = await Promise.all(args.serviceIds.map((id) => ctx.db.get(id)))
-		const totalPrice = services.reduce((sum, s) => {
-			if (!s?.isActive) throw new ConvexError("Invalid service")
-			if (s.barbershopId !== args.barbershopId) throw new ConvexError("Service not from this shop")
-			return sum + s.price
-		}, 0)
+		const totalPrice = await computeServiceTotal(
+			(id) => ctx.db.get(id),
+			args.serviceIds,
+			args.barbershopId,
+		)
 
 		// Validate slot is still available
 		const existing = await ctx.db

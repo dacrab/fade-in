@@ -12,9 +12,8 @@ import {
 } from "lucide-react"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { formatDate, formatPrice } from "#/lib/format"
-import { type Appointment, STATUS_BADGE } from "#/types"
+import { asId, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/booking/$id/manage")({ component: ManagePage })
 
@@ -25,7 +24,7 @@ function ManagePage() {
 	)
 	const token = searchParams.get("token") ?? ""
 
-	const appointment = useQuery(api.appointments.getById, { id: id as Id<"appointments"> })
+	const appointment = useQuery(api.appointments.getById, { id: asId<"appointments">(id) })
 	const shop = useQuery(
 		api.barbershops.getById,
 		appointment ? { id: appointment.barbershopId } : "skip",
@@ -33,7 +32,7 @@ function ManagePage() {
 	const barber = useQuery(api.barbers.getById, appointment ? { id: appointment.barberId } : "skip")
 
 	const isTokenValid = token.length > 0
-	const appt = appointment as Appointment | null
+	const appt = appointment ?? null
 
 	return (
 		<main className="page-main">
@@ -69,74 +68,72 @@ function ManagePage() {
 						</Link>
 					</div>
 				) : (
-					<>
-						<div className="rounded-2xl border border-(--border) bg-(--bg-card) overflow-hidden">
-							<div className="p-6 pb-4 border-b border-(--border)">
-								<div className="flex items-center gap-4 mb-3">
-									<div className="w-12 h-12 rounded-xl bg-(--gold)/10 flex items-center justify-center">
-										<Scissors size={22} className="text-(--gold)" />
-									</div>
-									<div>
-										<h1 className="text-lg font-bold text-(--text)">{shop?.name ?? "Barbershop"}</h1>
-										<p className="text-xs text-(--text-muted) mt-0.5">
-											{shop?.address}, {shop?.city}
-										</p>
-									</div>
+					<div className="rounded-2xl border border-(--border) bg-(--bg-card) overflow-hidden">
+						<div className="p-6 pb-4 border-b border-(--border)">
+							<div className="flex items-center gap-4 mb-3">
+								<div className="w-12 h-12 rounded-xl bg-(--gold)/10 flex items-center justify-center">
+									<Scissors size={22} className="text-(--gold)" />
 								</div>
-								<span
-									className={`badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${STATUS_BADGE[appt.status]}`}
-								>
-									{appt.status === "confirmed" || appt.status === "completed" ? (
-										<CheckCircle size={11} />
-									) : appt.status === "cancelled" ? (
-										<XCircle size={11} />
-									) : (
-										<Clock size={11} />
-									)}
-									{appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
-								</span>
+								<div>
+									<h1 className="text-lg font-bold text-(--text)">{shop?.name ?? "Barbershop"}</h1>
+									<p className="text-xs text-(--text-muted) mt-0.5">
+										{shop?.address}, {shop?.city}
+									</p>
+								</div>
 							</div>
-
-							<div className="p-6 space-y-5">
-								<div className="grid grid-cols-2 gap-5">
-									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">Date</p>
-										<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
-											<Calendar size={14} className="text-(--text-subtle)" />
-											{formatDate(appt.date)}
-										</p>
-									</div>
-									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">Time</p>
-										<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
-											<Clock size={14} className="text-(--text-subtle)" />
-											{appt.startTime} – {appt.endTime}
-										</p>
-									</div>
-									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">Barber</p>
-										<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
-											<User size={14} className="text-(--text-subtle)" />
-											{barber?.name ?? "—"}
-										</p>
-									</div>
-									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">Total</p>
-										<p className="text-sm font-bold text-(--gold)">{formatPrice(appt.totalPrice)}</p>
-									</div>
-								</div>
-
-								{shop?.phone && (
-									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">Shop phone</p>
-										<a href={`tel:${shop.phone}`} className="text-sm text-(--gold) hover:underline">
-											{shop.phone}
-										</a>
-									</div>
+							<span
+								className={`badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${STATUS_BADGE[appt.status]}`}
+							>
+								{appt.status === "confirmed" || appt.status === "completed" ? (
+									<CheckCircle size={11} />
+								) : appt.status === "cancelled" ? (
+									<XCircle size={11} />
+								) : (
+									<Clock size={11} />
 								)}
-							</div>
+								{appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
+							</span>
 						</div>
-					</>
+
+						<div className="p-6 space-y-5">
+							<div className="grid grid-cols-2 gap-5">
+								<div>
+									<p className="text-[11px] text-(--text-subtle) mb-1">Date</p>
+									<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
+										<Calendar size={14} className="text-(--text-subtle)" />
+										{formatDate(appt.date)}
+									</p>
+								</div>
+								<div>
+									<p className="text-[11px] text-(--text-subtle) mb-1">Time</p>
+									<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
+										<Clock size={14} className="text-(--text-subtle)" />
+										{appt.startTime} – {appt.endTime}
+									</p>
+								</div>
+								<div>
+									<p className="text-[11px] text-(--text-subtle) mb-1">Barber</p>
+									<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
+										<User size={14} className="text-(--text-subtle)" />
+										{barber?.name ?? "—"}
+									</p>
+								</div>
+								<div>
+									<p className="text-[11px] text-(--text-subtle) mb-1">Total</p>
+									<p className="text-sm font-bold text-(--gold)">{formatPrice(appt.totalPrice)}</p>
+								</div>
+							</div>
+
+							{shop?.phone && (
+								<div>
+									<p className="text-[11px] text-(--text-subtle) mb-1">Shop phone</p>
+									<a href={`tel:${shop.phone}`} className="text-sm text-(--gold) hover:underline">
+										{shop.phone}
+									</a>
+								</div>
+							)}
+						</div>
+					</div>
 				)}
 			</div>
 		</main>
