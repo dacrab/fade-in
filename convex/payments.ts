@@ -29,9 +29,9 @@ async function polarPost<T = unknown>(path: string, body: Record<string, unknown
 	return data as T
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Convex ctx type not easily expressed here
+// biome-ignore lint/suspicious/noExplicitAny: Convex action ctx cannot be typed with string-based runQuery/runMutation
 const runQ = (ctx: any, name: string, args: unknown) => ctx.runQuery(name, args)
-// biome-ignore lint/suspicious/noExplicitAny: Convex ctx type not easily expressed here
+// biome-ignore lint/suspicious/noExplicitAny: Convex action ctx cannot be typed with string-based runQuery/runMutation
 const runM = (ctx: any, name: string, args: unknown) => ctx.runMutation(name, args)
 
 export const createCheckoutSession = action({

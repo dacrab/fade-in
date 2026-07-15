@@ -247,7 +247,7 @@ function BusinessServices() {
 								<div className="flex-1 min-w-0">
 									<div className="text-sm text-(--text)">{svc.name}</div>
 									<div className="text-xs text-(--text-subtle) mt-0.5">
-										{svc.durationMinutes} min · {t(`business.services.categories.${svc.category}` as const)}
+										{svc.durationMinutes} min · {t(`business.services.categories.${svc.category}`)}
 									</div>
 								</div>
 								<div className="text-sm font-medium text-(--gold)">{formatPrice(svc.price)}</div>

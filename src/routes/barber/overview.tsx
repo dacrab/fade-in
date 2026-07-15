@@ -82,7 +82,7 @@ function BarberDashboard() {
 							<div className="text-lg font-bold text-(--text) tabular-nums">
 								{formatPrice(todayEarnings)}
 							</div>
-							<div className="text-[11px] text-(--text-muted)">Earnings</div>
+							<div className="text-[11px] text-(--text-muted)">{t("barber.earnings")}</div>
 						</div>
 					</div>
 				</div>
