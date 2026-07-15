@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import {
 	AlertCircle,
@@ -10,19 +10,26 @@ import {
 	User,
 	XCircle,
 } from "lucide-react"
+import { useTranslation } from "react-i18next"
+import { z } from "zod"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { formatDate, formatPrice } from "#/lib/format"
 import { asId, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
-export const Route = createFileRoute("/booking/$id/manage")({ component: ManagePage })
+const searchSchema = z.object({
+	token: z.string().optional(),
+})
+
+export const Route = createFileRoute("/booking/$id/manage")({
+	validateSearch: searchSchema,
+	component: ManagePage,
+})
 
 function ManagePage() {
+	const { t } = useTranslation()
 	const { id } = Route.useParams()
-	const searchParams = new URLSearchParams(
-		typeof window !== "undefined" ? window.location.search : "",
-	)
-	const token = searchParams.get("token") ?? ""
+	const { token } = useSearch({ from: "/booking/$id/manage" })
 
 	const appointment = useQuery(api.appointments.getById, { id: asId<"appointments">(id) })
 	const shop = useQuery(
@@ -31,7 +38,7 @@ function ManagePage() {
 	)
 	const barber = useQuery(api.barbers.getById, appointment ? { id: appointment.barberId } : "skip")
 
-	const isTokenValid = token.length > 0
+	const isTokenValid = (token?.length ?? 0) > 0
 	const appt = appointment ?? null
 
 	return (
@@ -42,15 +49,13 @@ function ManagePage() {
 					className="inline-flex items-center gap-1.5 text-sm text-(--text-muted) hover:text-(--gold) transition-colors mb-6"
 				>
 					<ArrowLeft size={15} />
-					Back to home
+					{t("errors.backHome")}
 				</Link>
 
 				{!isTokenValid && (
 					<div className="rounded-xl border border-(--gold)/20 bg-(--gold)/5 p-4 mb-6 flex items-center gap-3">
 						<AlertCircle size={20} className="text-(--gold) shrink-0" />
-						<p className="text-sm text-(--text-muted)">
-							No manage link provided. Check your email for the full link.
-						</p>
+						<p className="text-sm text-(--text-muted)">{t("manage.noToken")}</p>
 					</div>
 				)}
 
@@ -59,12 +64,10 @@ function ManagePage() {
 				) : !appt ? (
 					<div className="text-center py-16">
 						<XCircle size={48} className="mx-auto mb-4 text-(--text-subtle)" />
-						<h1 className="text-xl font-bold text-(--text) mb-2">Appointment not found</h1>
-						<p className="text-sm text-(--text-muted) mb-6">
-							This appointment doesn't exist or has been removed.
-						</p>
+						<h1 className="text-xl font-bold text-(--text) mb-2">{t("manage.notFound")}</h1>
+						<p className="text-sm text-(--text-muted) mb-6">{t("manage.notFoundMessage")}</p>
 						<Link to="/" className="btn btn-primary">
-							Back to home
+							{t("errors.backHome")}
 						</Link>
 					</div>
 				) : (
@@ -75,7 +78,7 @@ function ManagePage() {
 									<Scissors size={22} className="text-(--gold)" />
 								</div>
 								<div>
-									<h1 className="text-lg font-bold text-(--text)">{shop?.name ?? "Barbershop"}</h1>
+									<h1 className="text-lg font-bold text-(--text)">{shop?.name ?? t("manage.shop")}</h1>
 									<p className="text-xs text-(--text-muted) mt-0.5">
 										{shop?.address}, {shop?.city}
 									</p>
@@ -91,42 +94,44 @@ function ManagePage() {
 								) : (
 									<Clock size={11} />
 								)}
-								{appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
+								{t(`status.${appt.status}`)}
 							</span>
 						</div>
 
 						<div className="p-6 space-y-5">
 							<div className="grid grid-cols-2 gap-5">
 								<div>
-									<p className="text-[11px] text-(--text-subtle) mb-1">Date</p>
+									<p className="text-[11px] text-(--text-subtle) mb-1">{t("booking.summaryFields.date")}</p>
 									<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
 										<Calendar size={14} className="text-(--text-subtle)" />
 										{formatDate(appt.date)}
 									</p>
 								</div>
 								<div>
-									<p className="text-[11px] text-(--text-subtle) mb-1">Time</p>
+									<p className="text-[11px] text-(--text-subtle) mb-1">{t("booking.summaryFields.time")}</p>
 									<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
 										<Clock size={14} className="text-(--text-subtle)" />
 										{appt.startTime} – {appt.endTime}
 									</p>
 								</div>
 								<div>
-									<p className="text-[11px] text-(--text-subtle) mb-1">Barber</p>
+									<p className="text-[11px] text-(--text-subtle) mb-1">
+										{t("booking.summaryFields.barber")}
+									</p>
 									<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
 										<User size={14} className="text-(--text-subtle)" />
 										{barber?.name ?? "—"}
 									</p>
 								</div>
 								<div>
-									<p className="text-[11px] text-(--text-subtle) mb-1">Total</p>
+									<p className="text-[11px] text-(--text-subtle) mb-1">{t("booking.summaryFields.total")}</p>
 									<p className="text-sm font-bold text-(--gold)">{formatPrice(appt.totalPrice)}</p>
 								</div>
 							</div>
 
 							{shop?.phone && (
 								<div>
-									<p className="text-[11px] text-(--text-subtle) mb-1">Shop phone</p>
+									<p className="text-[11px] text-(--text-subtle) mb-1">{t("form.phoneLabel")}</p>
 									<a href={`tel:${shop.phone}`} className="text-sm text-(--gold) hover:underline">
 										{shop.phone}
 									</a>

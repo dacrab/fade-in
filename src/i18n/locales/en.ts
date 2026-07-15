@@ -380,7 +380,15 @@ const en = {
 		title: "My Schedule",
 		subtitle: "View your upcoming appointments.",
 		schedule: "Schedule",
+		earnings: "Earnings",
 		noAppointments: "No appointments for this date.",
+	},
+
+	manage: {
+		noToken: "No manage link provided. Check your email for the full link.",
+		notFound: "Appointment not found",
+		notFoundMessage: "This appointment doesn't exist or has been removed.",
+		shop: "Barbershop",
 	},
 
 	resetPassword: {

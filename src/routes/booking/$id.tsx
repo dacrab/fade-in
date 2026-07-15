@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import {
 	AlertCircle,
@@ -26,7 +26,14 @@ import { asId, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
 
-export const Route = createFileRoute("/booking/$id")({ component: BookingPage })
+const searchSchema = z.object({
+	payment: z.enum(["success", "canceled"]).optional(),
+})
+
+export const Route = createFileRoute("/booking/$id")({
+	validateSearch: searchSchema,
+	component: BookingPage,
+})
 
 const rescheduleSchema = z.object({
 	date: z.string().min(1, "Date is required"),
@@ -38,10 +45,7 @@ function BookingPage() {
 	const { t } = useTranslation()
 	const { id } = Route.useParams()
 	const { user } = useAuth()
-	const searchParams = new URLSearchParams(
-		typeof window !== "undefined" ? window.location.search : "",
-	)
-	const payment = searchParams.get("payment")
+	const { payment } = useSearch({ from: "/booking/$id" })
 
 	const appointment = useQuery(api.appointments.getById, { id: asId<"appointments">(id) })
 	const shop = useQuery(
