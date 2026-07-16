@@ -66,16 +66,14 @@ function NotFound() {
 	)
 }
 
-function RouteError({ error }: ErrorComponentProps) {
+function RouteError(_props: ErrorComponentProps) {
 	const { t } = useTranslation()
 	const router = useRouter()
 
 	return (
 		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
 			<h1 className="text-xl font-bold text-(--text)">{t("errors.errorTitle")}</h1>
-			<p className="text-sm text-(--text-muted) max-w-sm">
-				{error instanceof Error ? error.message : t("errors.errorMessage")}
-			</p>
+			<p className="text-sm text-(--text-muted) max-w-sm">{t("errors.errorMessage")}</p>
 			<button type="button" onClick={() => router.invalidate()} className="btn btn-primary mt-4">
 				{t("errors.tryAgain")}
 			</button>

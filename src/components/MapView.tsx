@@ -31,8 +31,8 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 		if (!mapContainerRef.current || mapRef.current) return
 
 		import("leaflet").then((L) => {
-			const iconProto = L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown }
-			iconProto._getIconUrl = undefined
+			const iconProto = L.Icon.Default.prototype
+			Object.assign(iconProto, { _getIconUrl: undefined })
 			L.Icon.Default.mergeOptions({
 				iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
 				iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",

@@ -10,6 +10,11 @@ import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/admin/users")({ component: AdminUsers })
 
+function parseUserRole(role: string | null | undefined): UserRole {
+	if (role === "customer" || role === "owner" || role === "barber" || role === "admin") return role
+	return "customer"
+}
+
 const ROLE_BADGE: Record<UserRole, string> = {
 	customer: "badge-gray",
 	owner: "badge-gold",
@@ -66,7 +71,7 @@ function AdminUsers() {
 									<span className="text-sm text-(--text) truncate">{u.name}</span>
 								</div>
 								<span className="text-sm text-(--text-muted) truncate">{u.email}</span>
-								<span className={`badge ${ROLE_BADGE[(u.role ?? "customer") as UserRole]} w-fit`}>
+								<span className={`badge ${ROLE_BADGE[parseUserRole(u.role)]} w-fit`}>
 									{u.role ?? "customer"}
 								</span>
 							</div>

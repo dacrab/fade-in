@@ -104,7 +104,7 @@ export function DataTable<TData extends { _id: string }>({
 												{{
 													asc: <ChevronUp size={12} />,
 													desc: <ChevronDown size={12} />,
-												}[header.column.getIsSorted() as string] ??
+												}[String(header.column.getIsSorted())] ??
 													(header.column.getCanSort() ? (
 														<ChevronsUpDown size={12} className="opacity-30" />
 													) : null)}

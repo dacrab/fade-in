@@ -19,10 +19,15 @@ export function useAuth() {
 				id: viewer._id,
 				name: viewer.name ?? viewer.email,
 				email: viewer.email,
-				role: (viewer.role ?? "customer") as UserRole,
+				role: parseUserRole(viewer.role),
 				avatarUrl: viewer.avatarUrl,
 			}
 		: null
+
+	function parseUserRole(role: string | null | undefined): UserRole {
+		if (role === "customer" || role === "owner" || role === "barber" || role === "admin") return role
+		return "customer"
+	}
 
 	return {
 		user,

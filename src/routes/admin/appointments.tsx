@@ -74,8 +74,15 @@ function AdminAppointments() {
 			accessorKey: "status",
 			enableSorting: true,
 			cell: ({ row }) => {
-				const status = row.original.status as keyof typeof STATUS_BADGE
-				return <span className={`badge ${STATUS_BADGE[status]} w-fit`}>{row.original.status}</span>
+				const status = row.original.status
+				if (
+					status !== "pending" &&
+					status !== "confirmed" &&
+					status !== "completed" &&
+					status !== "cancelled"
+				)
+					return null
+				return <span className={`badge ${STATUS_BADGE[status]} w-fit`}>{status}</span>
 			},
 		},
 		{
