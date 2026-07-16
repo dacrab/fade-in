@@ -12,6 +12,11 @@ import { showToast } from "./ui/Toast"
 
 type Step = 1 | 2 | 3 | 4 | 5
 
+function clampStep(n: number): Step {
+	if (n === 1 || n === 2 || n === 3 || n === 4 || n === 5) return n
+	return n < 1 ? 1 : 5
+}
+
 export default function BookingModal({ shop, onClose }: { shop: Barbershop; onClose: () => void }) {
 	const { t } = useTranslation()
 	const { user } = useAuth()
@@ -329,7 +334,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 						{step > 1 && (
 							<button
 								type="button"
-								onClick={() => setStep((step - 1) as Step)}
+								onClick={() => setStep(clampStep(step - 1))}
 								className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-(--text) hover:bg-(--bg-input) transition-all duration-200 flex items-center gap-1 cursor-pointer"
 							>
 								<ChevronLeft size={16} /> {t("common.back")}
@@ -337,7 +342,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 						)}
 						<button
 							type="button"
-							onClick={() => (step === 4 ? void handleConfirm() : setStep((step + 1) as Step))}
+							onClick={() => (step === 4 ? void handleConfirm() : setStep(clampStep(step + 1)))}
 							disabled={!canNext || loading}
 							className="rounded-lg flex-1 py-2.5 text-sm font-medium text-white transition-all duration-200 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed bg-(--gold) hover:bg-(--gold-dark) cursor-pointer"
 						>

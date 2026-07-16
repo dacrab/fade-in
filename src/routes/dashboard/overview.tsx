@@ -30,8 +30,8 @@ function CustomerDashboard() {
 
 	// Batch fetch all unique shops referenced by appointments (fixes N+1)
 	const shopIds = useMemo(() => {
-		if (!appointments) return []
-		return [...new Set(appointments.map((a) => a.barbershopId))] as Id<"barbershops">[]
+		if (!appointments) return [] as Id<"barbershops">[]
+		return Array.from(new Set<Id<"barbershops">>(appointments.map((a) => a.barbershopId)))
 	}, [appointments])
 	const shopsRaw = useQuery(
 		api.barbershops.listByIds,

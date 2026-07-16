@@ -14,11 +14,15 @@ export const list = query({
 		paginationOpts: paginationOptsValidator,
 	},
 	handler: async (ctx, args) => {
+		const city = args.city
+		const minRating = args.minRating
+		const isVerified = args.isVerified
+
 		const getBaseQuery = () => {
-			if (args.city) {
+			if (city) {
 				return ctx.db
 					.query("barbershops")
-					.withIndex("by_city", (q) => q.eq("city", args.city as string))
+					.withIndex("by_city", (q) => q.eq("city", city))
 					.filter((q) => q.eq(q.field("isActive"), true))
 			}
 			return ctx.db.query("barbershops").withIndex("by_active", (q) => q.eq("isActive", true))
@@ -27,11 +31,11 @@ export const list = query({
 		let baseQuery = getBaseQuery()
 
 		// Apply filters that can be done at DB level
-		if (args.minRating !== undefined) {
-			baseQuery = baseQuery.filter((q) => q.gte(q.field("rating"), args.minRating as number))
+		if (minRating !== undefined) {
+			baseQuery = baseQuery.filter((q) => q.gte(q.field("rating"), minRating))
 		}
-		if (args.isVerified !== undefined) {
-			baseQuery = baseQuery.filter((q) => q.eq(q.field("isVerified"), args.isVerified as boolean))
+		if (isVerified !== undefined) {
+			baseQuery = baseQuery.filter((q) => q.eq(q.field("isVerified"), isVerified))
 		}
 
 		// For search, we must still post-filter but do it BEFORE pagination

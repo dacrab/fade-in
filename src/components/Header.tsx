@@ -48,7 +48,7 @@ export default function Header() {
 		signOut()
 	}
 
-	const roleItem = user ? ROLE_NAV[user.role as keyof typeof ROLE_NAV] : undefined
+	const roleItem = user ? ROLE_NAV[user.role] : undefined
 	const userMenuItems = [
 		...(roleItem
 			? [

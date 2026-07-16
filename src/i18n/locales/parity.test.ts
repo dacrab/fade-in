@@ -9,13 +9,15 @@ import { describe, expect, it } from "vitest"
 import el from "./el"
 import en from "./en"
 
+type I18nRecord = Record<string, unknown>
+
 // Recursively extract all dot-separated key paths from a nested object
-function extractKeys(obj: Record<string, unknown>, prefix = ""): string[] {
+function extractKeys(obj: I18nRecord, prefix = ""): string[] {
 	const keys: string[] = []
 	for (const [key, value] of Object.entries(obj)) {
 		const path = prefix ? `${prefix}.${key}` : key
 		if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-			keys.push(...extractKeys(value as Record<string, unknown>, path))
+			keys.push(...extractKeys(value as I18nRecord, path))
 		} else {
 			keys.push(path)
 		}
@@ -24,17 +26,17 @@ function extractKeys(obj: Record<string, unknown>, prefix = ""): string[] {
 }
 
 // Resolve a dot-path in a nested object
-function getByPath(obj: Record<string, unknown>, path: string): unknown {
+function getByPath(obj: I18nRecord, path: string): unknown {
 	return path.split(".").reduce<unknown>((acc, part) => {
 		if (acc !== null && typeof acc === "object") {
-			return (acc as Record<string, unknown>)[part]
+			return (acc as I18nRecord)[part]
 		}
 		return undefined
 	}, obj)
 }
 
-const enKeys = extractKeys(en as unknown as Record<string, unknown>)
-const elKeys = extractKeys(el as unknown as Record<string, unknown>)
+const enKeys = extractKeys(en as I18nRecord)
+const elKeys = extractKeys(el as I18nRecord)
 
 describe("i18n locale parity — English ↔ Greek", () => {
 	// Key existence
@@ -54,9 +56,7 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		["English", en, enKeys],
 		["Greek", el, elKeys],
 	])("no %s value is an empty string", (label, locale, keys) => {
-		const empty = keys.filter(
-			(k) => getByPath(locale as unknown as Record<string, unknown>, k) === "",
-		)
+		const empty = keys.filter((k) => getByPath(locale as I18nRecord, k) === "")
 		expect(empty, `${label} keys with empty values: ${empty.join(", ")}`).toHaveLength(0)
 	})
 
@@ -65,25 +65,19 @@ describe("i18n locale parity — English ↔ Greek", () => {
 	// non-string, non-array leaf values.
 	it("all leaf values are strings or arrays (no unexpected object leaves)", () => {
 		const isLeaf = (v: unknown) => typeof v === "string" || Array.isArray(v)
-		const badEn = enKeys.filter(
-			(k) => !isLeaf(getByPath(en as unknown as Record<string, unknown>, k)),
-		)
-		const badEl = elKeys.filter(
-			(k) => !isLeaf(getByPath(el as unknown as Record<string, unknown>, k)),
-		)
+		const badEn = enKeys.filter((k) => !isLeaf(getByPath(en as I18nRecord, k)))
+		const badEl = elKeys.filter((k) => !isLeaf(getByPath(el as I18nRecord, k)))
 		expect(badEn, `EN non-string/array values: ${badEn.join(", ")}`).toHaveLength(0)
 		expect(badEl, `EL non-string/array values: ${badEl.join(", ")}`).toHaveLength(0)
 	})
 
 	// Arrays in i18n (e.g. feature lists) must have matching lengths in both locales
 	it("array values have the same length in both locales", () => {
-		const arrayKeys = enKeys.filter((k) =>
-			Array.isArray(getByPath(en as unknown as Record<string, unknown>, k)),
-		)
+		const arrayKeys = enKeys.filter((k) => Array.isArray(getByPath(en as I18nRecord, k)))
 		const mismatched: string[] = []
 		for (const k of arrayKeys) {
-			const enArr = getByPath(en as unknown as Record<string, unknown>, k) as unknown[]
-			const elArr = getByPath(el as unknown as Record<string, unknown>, k) as unknown[]
+			const enArr = getByPath(en as I18nRecord, k) as unknown[]
+			const elArr = getByPath(el as I18nRecord, k) as unknown[]
 			if (!Array.isArray(elArr) || enArr.length !== elArr.length) {
 				mismatched.push(k)
 			}

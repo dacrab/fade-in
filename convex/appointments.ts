@@ -165,6 +165,9 @@ export const listByShop = query({
 		date: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
+		const user = await getCurrentUser(ctx)
+		if (!user) return []
+
 		const date = args.date
 		if (date) {
 			return ctx.db
@@ -184,6 +187,9 @@ export const listByShop = query({
 export const listByBarber = query({
 	args: { barberId: v.id("barbers"), date: v.optional(v.string()) },
 	handler: async (ctx, args) => {
+		const user = await getCurrentUser(ctx)
+		if (!user) return []
+
 		const appts = await ctx.db
 			.query("appointments")
 			.withIndex("by_barber", (q) => q.eq("barberId", args.barberId))
@@ -216,6 +222,7 @@ export const setPolarCheckout = mutation({
 		polarCheckoutId: v.string(),
 	},
 	handler: async (ctx, args) => {
+		await requireUser(ctx)
 		await ctx.db.patch(args.id, {
 			polarCheckoutId: args.polarCheckoutId,
 			paymentStatus: "unpaid",
