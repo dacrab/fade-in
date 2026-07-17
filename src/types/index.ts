@@ -1,21 +1,15 @@
 import type { Id, TableNames } from "../../convex/_generated/dataModel"
 
-/**
- * Safely casts a string to a Convex Id<T>. Convex IDs are branded strings;
- * at runtime Route.useParams() returns strings that are valid IDs.
- */
 export function asId<T extends TableNames>(id: string): Id<T> {
 	return id as Id<T>
 }
 
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 
-/** Whether a user can manage a barbershop (owner or platform admin). */
 export function isOwnerOrAdmin(user: { role?: UserRole } | null | undefined): boolean {
 	return user?.role === "owner" || user?.role === "admin"
 }
 
-/** Default page size for paginated backend queries. */
 export const PAGE_SIZE = 50
 
 export interface DayHours {
@@ -116,7 +110,6 @@ export interface Appointment {
 	createdAt: number
 }
 
-/** Badge CSS classes for appointment statuses */
 export const STATUS_BADGE: Record<AppointmentStatus, string> = {
 	pending: "badge-gold",
 	confirmed: "badge-green",
@@ -124,7 +117,6 @@ export const STATUS_BADGE: Record<AppointmentStatus, string> = {
 	cancelled: "badge-red",
 }
 
-/** Dot color classes for appointment status indicators */
 export const STATUS_DOT: Record<AppointmentStatus, string> = {
 	pending: "bg-amber-400",
 	confirmed: "bg-green-500",

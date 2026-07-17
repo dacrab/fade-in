@@ -60,7 +60,6 @@ function BarberDashboard() {
 					/>
 				</div>
 
-				{/* Quick stats for the day */}
 				<div className="grid grid-cols-3 gap-3 mb-6">
 					<div className="card p-3 flex items-center gap-3">
 						<Calendar size={16} className="text-(--gold) shrink-0" />
@@ -87,7 +86,6 @@ function BarberDashboard() {
 					</div>
 				</div>
 
-				{/* Next appointment highlight */}
 				{nextAppt && (
 					<div className="card p-4 mb-4 border-l-2 border-l-(--gold)">
 						<div className="text-[11px] text-(--gold) font-medium mb-1">Next up</div>
@@ -102,7 +100,6 @@ function BarberDashboard() {
 					</div>
 				)}
 
-				{/* Schedule list */}
 				<section className="card p-5">
 					<h2 className="text-sm font-semibold text-(--text) mb-3">
 						{t("barber.schedule")} — {formatDateShort(selectedDate)}

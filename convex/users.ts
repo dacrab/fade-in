@@ -52,7 +52,6 @@ export const toggleFavorite = mutation({
 	},
 })
 
-/** Admin only — returns all users. */
 export const ensureCurrentUser = mutation({
 	args: {},
 	handler: async (ctx) => {

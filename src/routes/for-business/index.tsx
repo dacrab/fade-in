@@ -16,7 +16,6 @@ function ForBusinessPage() {
 
 	return (
 		<main>
-			{/* Hero */}
 			<section className="px-4 pt-16 pb-12">
 				<div className="page-wrap max-w-4xl">
 					<p className="text-[11px] text-(--gold) font-medium mb-6 fade-up">{t("forBusiness.badge")}</p>
@@ -39,7 +38,6 @@ function ForBusinessPage() {
 				</div>
 			</section>
 
-			{/* Features */}
 			<section className="px-4 py-8 border-t border-white/6">
 				<div className="page-wrap max-w-4xl">
 					<p className="text-[11px] text-(--text-muted) font-medium mb-3">

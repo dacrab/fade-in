@@ -42,7 +42,6 @@ function ProfilePage() {
 				<h1 className="text-2xl font-bold text-(--text) mb-6">{t("dashboard.profileTitle")}</h1>
 
 				<div className="card p-6">
-					{/* User info */}
 					<div className="flex items-center gap-3 mb-6 pb-5 border-b border-(--border)">
 						<div className="w-10 h-10 rounded-lg bg-(--gold)/10 flex items-center justify-center text-sm font-bold text-(--gold)">
 							{(user?.name ?? user?.email)?.[0]?.toUpperCase() ?? "?"}

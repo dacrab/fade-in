@@ -112,7 +112,6 @@ function BusinessProfile() {
 				</div>
 
 				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-10">
-					{/* Basic Info */}
 					<div className="space-y-5">
 						<h2 className="text-[11px] font-medium text-(--text-subtle)">
 							{t("business.profile.basicInfo")}
@@ -187,7 +186,6 @@ function BusinessProfile() {
 						</div>
 					</div>
 
-					{/* Social Links */}
 					<div className="space-y-5">
 						<h2 className="text-[11px] font-medium text-(--text-subtle)">
 							{t("business.profile.socialLinks")}

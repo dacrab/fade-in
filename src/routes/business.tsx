@@ -22,7 +22,6 @@ function BusinessLayout() {
 
 	return (
 		<div className="flex flex-1">
-			{/* Persistent sidebar */}
 			<aside className="w-56 flex-shrink-0 hidden md:flex flex-col py-8 px-5 border-r border-(--border)">
 				{shop && (
 					<div className="mb-5">
@@ -53,7 +52,6 @@ function BusinessLayout() {
 				</nav>
 			</aside>
 
-			{/* Page content */}
 			<div className="flex-1 overflow-auto">
 				<Outlet />
 			</div>

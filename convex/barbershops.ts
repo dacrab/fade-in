@@ -4,7 +4,6 @@ import { mutation, query } from "./_generated/server"
 import { getCurrentUser, requireUser } from "./lib/auth"
 import { definedPatch, socialLinksValidator, workingHoursValidator } from "./validators"
 
-/** Lists active barbershops with filters applied at the DB level where possible. */
 export const list = query({
 	args: {
 		city: v.optional(v.string()),
@@ -30,7 +29,6 @@ export const list = query({
 
 		let baseQuery = getBaseQuery()
 
-		// Apply filters that can be done at DB level
 		if (minRating !== undefined) {
 			baseQuery = baseQuery.filter((q) => q.gte(q.field("rating"), minRating))
 		}
@@ -38,7 +36,6 @@ export const list = query({
 			baseQuery = baseQuery.filter((q) => q.eq(q.field("isVerified"), isVerified))
 		}
 
-		// For search, we must still post-filter but do it BEFORE pagination
 		if (args.search) {
 			const term = args.search.toLowerCase()
 			const all = await baseQuery.collect()
@@ -48,7 +45,6 @@ export const list = query({
 					s.city.toLowerCase().includes(term) ||
 					s.address.toLowerCase().includes(term),
 			)
-			// Manual offset-based cursor pagination over filtered results
 			const numItems = args.paginationOpts.numItems
 			const startIdx = args.paginationOpts.cursor ? Number(args.paginationOpts.cursor) || 0 : 0
 			const page = filtered.slice(startIdx, startIdx + numItems)
@@ -64,12 +60,10 @@ export const list = query({
 	},
 })
 
-/** Returns top-rated verified shops. */
 export const getFeatured = query({
 	args: { limit: v.optional(v.number()) },
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 6
-		// Collect verified active shops and sort by rating
 		const shops = await ctx.db
 			.query("barbershops")
 			.withIndex("by_active", (q) => q.eq("isActive", true))
@@ -105,7 +99,6 @@ export const listByOwner = query({
 	},
 })
 
-/** Creates a new barbershop. ownerId derived from auth. Slug uniqueness enforced. */
 export const create = mutation({
 	args: {
 		name: v.string(),
@@ -124,7 +117,6 @@ export const create = mutation({
 		const user = await requireUser(ctx)
 		const userId = user._id
 
-		// Enforce slug uniqueness
 		const existing = await ctx.db
 			.query("barbershops")
 			.withIndex("by_slug", (q) => q.eq("slug", args.slug))
@@ -197,7 +189,6 @@ export const listByIds = query({
 	},
 })
 
-/** Admin only — returns all shops. */
 export const listAll = query({
 	args: {},
 	handler: async (ctx) => {
@@ -208,7 +199,6 @@ export const listAll = query({
 	},
 })
 
-/** Platform stats for homepage — lightweight aggregation. */
 export const getStats = query({
 	args: {},
 	handler: async (ctx) => {
@@ -222,7 +212,6 @@ export const getStats = query({
 				? Math.round((shops.reduce((sum, s) => sum + s.rating, 0) / shops.length) * 10) / 10
 				: 0
 
-		// Count unique customers from users table instead of scanning all appointments
 		const customers = await ctx.db
 			.query("users")
 			.filter((q) => q.eq(q.field("role"), "customer"))

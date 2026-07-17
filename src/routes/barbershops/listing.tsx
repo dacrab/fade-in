@@ -56,7 +56,6 @@ function BarbershopsPage() {
 	return (
 		<main className="page-main">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				{/* Page Title */}
 				<div className="mb-10">
 					<h1 className="text-4xl sm:text-5xl font-bold text-(--text) tracking-tight">
 						{t("barbershops.title")}
@@ -66,7 +65,6 @@ function BarbershopsPage() {
 					</p>
 				</div>
 
-				{/* Search Bar + View Toggle */}
 				<form onSubmit={handleSearch} className="mb-6">
 					<div className="flex items-center gap-3">
 						<div className="flex-1 flex items-center rounded-full bg-(--bg-card) border border-[(--gold)/15] overflow-hidden transition-all duration-300 focus-within:border-(--gold)/40 focus-within:shadow-[0_0_20px_var(--gold)/8]">
@@ -91,7 +89,6 @@ function BarbershopsPage() {
 							/>
 						</div>
 
-						{/* Filter Toggle */}
 						<button
 							type="button"
 							onClick={() => setShowFilters(!showFilters)}
@@ -110,7 +107,6 @@ function BarbershopsPage() {
 							)}
 						</button>
 
-						{/* View Toggle - Pill Segmented Control */}
 						<div className="flex rounded-full bg-(--bg-card) border border-[(--gold)/10] p-1">
 							{(["list", "map"] as const).map((v) => (
 								<button
@@ -133,7 +129,6 @@ function BarbershopsPage() {
 					</div>
 				</form>
 
-				{/* Filter Panel - Inline, minimal */}
 				{showFilters && (
 					<div className="mb-5 px-1 animate-[fadeUp_0.3s_ease]">
 						<div className="flex items-center gap-6">
@@ -176,7 +171,6 @@ function BarbershopsPage() {
 					</div>
 				)}
 
-				{/* Content */}
 				{view === "map" ? (
 					<MapView
 						shops={shops ?? []}
