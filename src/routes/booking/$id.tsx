@@ -125,7 +125,6 @@ function BookingPage() {
 					</div>
 				) : (
 					<>
-						{/* Payment status banner */}
 						{payment === "success" && (
 							<div className="rounded-xl border border-(--success)/20 bg-(--success)/5 p-4 mb-6 flex items-center gap-3">
 								<CheckCircle size={20} className="text-(--success) shrink-0" />
@@ -140,7 +139,6 @@ function BookingPage() {
 						)}
 
 						<div className="rounded-2xl border border-(--border) bg-(--bg-card) overflow-hidden">
-							{/* Header */}
 							<div className="p-6 pb-4 border-b border-(--border)">
 								<div className="flex items-center gap-4 mb-3">
 									<div className="w-12 h-12 rounded-xl bg-(--gold)/10 flex items-center justify-center">
@@ -181,7 +179,6 @@ function BookingPage() {
 								</div>
 							</div>
 
-							{/* Details */}
 							<div className="p-6 space-y-5">
 								<div className="grid grid-cols-2 gap-5">
 									<div>
@@ -256,7 +253,6 @@ function BookingPage() {
 								)}
 							</div>
 
-							{/* Actions */}
 							{(appt.status === "pending" || appt.status === "confirmed") && (
 								<div className="px-6 py-4 border-t border-(--border) bg-(--bg-input)/30 flex items-center gap-3">
 									{appt.customerId === user?.id && (
@@ -292,7 +288,6 @@ function BookingPage() {
 							)}
 						</div>
 
-						{/* Reschedule form */}
 						{showReschedule && (
 							<div className="mt-4 rounded-xl border border-(--border) bg-(--bg-card) p-5">
 								<h3 className="text-sm font-semibold text-(--text) mb-4">{t("booking.rescheduleTitle")}</h3>

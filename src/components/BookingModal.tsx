@@ -134,7 +134,6 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 					</DialogDescription>
 				</DialogHeader>
 
-				{/* Step dots */}
 				<div className="flex items-center justify-center px-5 py-4 gap-3">
 					{stepLabels.map((label, i) => (
 						<div

@@ -28,9 +28,7 @@ function HomePage() {
 
 	return (
 		<main className="bg-(--bg)">
-			{/* Hero */}
 			<section className="relative px-4 pt-16 pb-10">
-				{/* Subtle pattern */}
 				<div className="pointer-events-none absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMSIgZmlsbD0iIzAwMCIvPjwvc3ZnPg==')]" />
 				<div className="page-wrap relative max-w-3xl">
 					<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-(--text) mb-4 font-serif">
@@ -40,7 +38,6 @@ function HomePage() {
 						{t("home.heroSubtitle")}
 					</p>
 
-					{/* Search form */}
 					<form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 max-w-xl mb-6">
 						<div className="flex-1 relative">
 							<Search
@@ -95,7 +92,6 @@ function HomePage() {
 				</div>
 			</section>
 
-			{/* Featured */}
 			<section className="px-4 py-8">
 				<div className="page-wrap">
 					<h2 className="text-2xl font-bold text-(--text) mb-5">{t("home.featured")}</h2>
@@ -123,7 +119,6 @@ function HomePage() {
 				</div>
 			</section>
 
-			{/* How it works */}
 			<section className="px-4 py-8 border-t border-(--border)">
 				<div className="page-wrap">
 					<h2 className="text-2xl font-bold text-(--text) mb-2">{t("home.howTitle")}</h2>
@@ -145,7 +140,6 @@ function HomePage() {
 				</div>
 			</section>
 
-			{/* CTA */}
 			<section className="px-4 py-8">
 				<div className="page-wrap">
 					<div className="bg-(--gold)/5 border border-(--gold)/10 rounded-xl px-8 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">

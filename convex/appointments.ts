@@ -56,7 +56,6 @@ export const create = mutation({
 			args.barbershopId,
 		)
 
-		// Validate slot is still available
 		const existing = await ctx.db
 			.query("appointments")
 			.withIndex("by_shop_date", (q) => q.eq("barbershopId", args.barbershopId).eq("date", args.date))
@@ -82,7 +81,6 @@ export const create = mutation({
 			createdAt: Date.now(),
 		})
 
-		// Send booking confirmation email (best-effort)
 		try {
 			const [customer, shop, barber] = await Promise.all([
 				ctx.db.get(userId),
@@ -102,9 +100,7 @@ export const create = mutation({
 					<p>See you there!<br>— The FadeIn Team</p>`,
 				)
 			}
-		} catch {
-			// Email failure should not block the booking
-		}
+		} catch {}
 
 		return appointmentId
 	},
@@ -127,13 +123,11 @@ export const updateStatus = mutation({
 		const appt = await ctx.db.get(args.id)
 		if (!appt) throw new ConvexError("Not found")
 
-		// Customer can only cancel their own appointments
 		if (appt.customerId === userId) {
 			if (args.status !== "cancelled") throw new ConvexError("Customers can only cancel appointments")
 			return ctx.db.patch(args.id, { status: args.status })
 		}
 
-		// Shop owner can confirm/complete/cancel
 		const shop = await ctx.db.get(appt.barbershopId)
 		if (!shop) throw new ConvexError("Shop not found")
 
@@ -282,7 +276,6 @@ export const listAllWithDetails = query({
 	},
 })
 
-/** Server-side stats for business dashboard — avoids loading all appointments client-side */
 export const getShopStats = query({
 	args: { barbershopId: v.id("barbershops") },
 	handler: async (ctx, args) => {

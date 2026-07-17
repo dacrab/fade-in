@@ -34,7 +34,6 @@ export const create = mutation({
 		if (args.rating < 1 || args.rating > 5) throw new ConvexError("Rating must be 1-5")
 		if (args.comment.trim().length === 0) throw new ConvexError("Comment cannot be empty")
 
-		// Check for existing review
 		const existing = await ctx.db
 			.query("reviews")
 			.filter((q) => q.eq(q.field("appointmentId"), args.appointmentId))
@@ -50,7 +49,6 @@ export const create = mutation({
 			createdAt: Date.now(),
 		})
 
-		// Recompute shop rating
 		const allReviews = await ctx.db
 			.query("reviews")
 			.withIndex("by_shop", (q) => q.eq("barbershopId", appt.barbershopId))

@@ -23,7 +23,6 @@ function BusinessDashboard() {
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: todayStr } : "skip",
 	)
-	// Use server-side stats instead of loading ALL appointments
 	const stats = useQuery(api.appointments.getShopStats, shop ? { barbershopId: shop._id } : "skip")
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
@@ -66,7 +65,6 @@ function BusinessDashboard() {
 				</p>
 			</div>
 
-			{/* Stat cards - horizontal with left border accent */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
 				{(
 					[
@@ -95,7 +93,6 @@ function BusinessDashboard() {
 				))}
 			</div>
 
-			{/* Today's appointments */}
 			<div className="mb-5">
 				<div className="flex items-center justify-between mb-4">
 					<h2 className="text-xs font-medium text-(--text-muted)">{t("business.todayTitle")}</h2>
@@ -136,7 +133,6 @@ function BusinessDashboard() {
 				)}
 			</div>
 
-			{/* Revenue Analytics */}
 			<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5">
 				<h2 className="text-xs font-medium text-(--text-muted) mb-5">{t("business.revenue.title")}</h2>
 				{stats === undefined ? (
@@ -187,7 +183,6 @@ function BusinessDashboard() {
 				)}
 			</div>
 
-			{/* Recent reviews */}
 			<div>
 				<div className="flex items-center justify-between mb-4">
 					<h2 className="text-xs font-medium text-(--text-muted)">{t("business.recentReviews")}</h2>

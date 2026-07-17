@@ -73,7 +73,6 @@ function ShopProfilePage() {
 
 	return (
 		<main className="page-main">
-			{/* Hero Image - Full Width Bleed */}
 			<div className="relative w-full h-[50vh] min-h-90 max-h-130 overflow-hidden">
 				{shop.images[0] ? (
 					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover" />
@@ -82,10 +81,8 @@ function ShopProfilePage() {
 						<Scissors size={80} className="text-(--text-subtle) opacity-30" />
 					</div>
 				)}
-				{/* Gradient Overlay */}
 				<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-				{/* Back Button */}
 				<Link
 					to="/barbershops/listing"
 					className="absolute top-6 left-6 flex items-center gap-1.5 px-4 py-2 rounded-full bg-black/30 border border-white/10 text-white/90 text-sm font-medium hover:bg-black/50 transition-all duration-300"
@@ -93,14 +90,12 @@ function ShopProfilePage() {
 					<ChevronLeft size={16} /> {t("shop.back")}
 				</Link>
 
-				{/* Verified Badge */}
 				{shop.isVerified && (
 					<div className="absolute top-6 right-6 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--gold)/90 text-white text-xs font-medium">
 						<Check size={12} /> {t("common.verified")}
 					</div>
 				)}
 
-				{/* Shop Name Overlaid */}
 				<div className="absolute bottom-0 left-0 right-0 px-6 sm:px-8 pb-8">
 					<div className="max-w-7xl mx-auto">
 						<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-2">
@@ -125,12 +120,9 @@ function ShopProfilePage() {
 				</div>
 			</div>
 
-			{/* Content */}
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					{/* Main Content */}
 					<div className="lg:col-span-2 space-y-10">
-						{/* Rating + Description */}
 						<div>
 							<div className="flex items-center gap-3 mb-4">
 								<div className="flex items-center gap-2">
@@ -146,7 +138,6 @@ function ShopProfilePage() {
 							)}
 						</div>
 
-						{/* Services */}
 						<section>
 							<h2 className="text-xl font-bold text-(--text) mb-5 tracking-tight">{t("shop.services")}</h2>
 							{!services ? (
@@ -186,7 +177,6 @@ function ShopProfilePage() {
 							)}
 						</section>
 
-						{/* Barbers - Horizontal Scroll */}
 						<section>
 							<h2 className="text-xl font-bold text-(--text) mb-5 tracking-tight">
 								{t("shop.ourBarbers")}
@@ -225,7 +215,6 @@ function ShopProfilePage() {
 							)}
 						</section>
 
-						{/* Reviews - Editorial Style */}
 						<section>
 							<div className="flex items-baseline gap-4 mb-6">
 								<h2 className="text-xl font-bold text-(--text) tracking-tight">{t("shop.reviewsTitle")}</h2>
@@ -267,9 +256,7 @@ function ShopProfilePage() {
 						</section>
 					</div>
 
-					{/* Sidebar */}
 					<div className="space-y-5">
-						{/* Booking CTA - Sticky */}
 						<div className="lg:sticky lg:top-6">
 							<div className="rounded-2xl bg-(--bg-card) border border-(--gold)/12 p-6 mb-5">
 								<h3 className="font-bold text-(--text) mb-4 text-lg">{t("shop.bookAppointment")}</h3>
@@ -282,7 +269,6 @@ function ShopProfilePage() {
 								</button>
 							</div>
 
-							{/* Working Hours */}
 							{shop.workingHours && (
 								<div className="rounded-2xl bg-(--bg-card) border border-[(--gold)/8] p-6 mb-5">
 									<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2 text-sm">
@@ -341,7 +327,6 @@ function ShopProfilePage() {
 								)}
 							</div>
 
-							{/* Social Links */}
 							{shop.socialLinks && (
 								<div className="flex items-center gap-2 mt-4 px-2">
 									{shop.socialLinks.instagram && (

@@ -22,9 +22,7 @@ function getInitialLanguage(): Language {
 		if (isLanguage(stored)) return stored
 		const browser = navigator.language.split("-")[0]
 		if (isLanguage(browser)) return browser
-	} catch {
-		// SSR fallback
-	}
+	} catch {}
 	return "en"
 }
 
@@ -36,7 +34,7 @@ void i18n.use(initReactI18next).init({
 	lng: getInitialLanguage(),
 	fallbackLng: "en",
 	interpolation: {
-		escapeValue: false, // React already escapes
+		escapeValue: false,
 	},
 })
 
@@ -44,9 +42,7 @@ export function setLanguage(lang: Language): void {
 	void i18n.changeLanguage(lang)
 	try {
 		localStorage.setItem(STORAGE_KEY, lang)
-	} catch {
-		// Ignore
-	}
+	} catch {}
 }
 
 export default i18n

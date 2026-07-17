@@ -7,12 +7,9 @@ export function getResend(): Resend | null {
 	return key ? new Resend(key) : null
 }
 
-/** Send an email notification via Resend. Returns silently if not configured. */
 export async function sendEmail(to: string, subject: string, html: string) {
 	const resend = getResend()
-	if (!resend) {
-		return
-	}
+	if (!resend) return
 	await resend.emails.send({
 		from: process.env.RESEND_FROM ?? DEFAULT_FROM,
 		to: [to],

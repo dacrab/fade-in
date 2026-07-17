@@ -20,10 +20,10 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 
 	const shopsWithCoords = useMemo(
 		() =>
-			shops.filter(
-				(s): s is Barbershop & { lat: number; lng: number } =>
-					s.lat !== undefined && s.lng !== undefined,
-			),
+			shops.filter((s) => s.lat !== undefined && s.lng !== undefined) as (Barbershop & {
+				lat: number
+				lng: number
+			})[],
 		[shops],
 	)
 

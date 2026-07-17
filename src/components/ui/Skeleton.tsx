@@ -6,7 +6,6 @@ export function Skeleton({ className }: { className?: string }) {
 	return <div className={cn(SKELETON, className)} />
 }
 
-/** Renders a vertical list of skeleton placeholders (common loading pattern). */
 export function SkeletonRows({ count, className }: { count: number; className?: string }) {
 	return (
 		<>

@@ -7,7 +7,7 @@ const http = httpRouter()
 const WEBHOOK_TIMESTAMP_TOLERANCE_S = 300
 
 const enc = new TextEncoder()
-const toHex = (buf: ArrayBuffer): string =>
+const toHex = (buf: ArrayBuffer) =>
 	Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, "0")).join("")
 
 async function verifySignature(payload: string, header: string, secret: string): Promise<boolean> {

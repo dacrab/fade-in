@@ -44,9 +44,7 @@ export default function Header() {
 	const router = useRouter()
 	const { t } = useTranslation()
 
-	const handleLogout = () => {
-		signOut()
-	}
+	const handleLogout = () => signOut()
 
 	const roleItem = user ? ROLE_NAV[user.role] : undefined
 	const userMenuItems = [
