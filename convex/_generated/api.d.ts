@@ -18,7 +18,6 @@ import type * as lib_services from "../lib/services.js";
 import type * as payments from "../payments.js";
 import type * as reviews from "../reviews.js";
 import type * as services from "../services.js";
-import type * as storage from "../storage.js";
 import type * as users from "../users.js";
 import type * as validators from "../validators.js";
 
@@ -39,7 +38,6 @@ declare const fullApi: ApiFromModules<{
   payments: typeof payments;
   reviews: typeof reviews;
   services: typeof services;
-  storage: typeof storage;
   users: typeof users;
   validators: typeof validators;
 }>;
