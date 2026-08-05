@@ -1,18 +1,13 @@
 import { useClerk, useUser } from "@clerk/tanstack-react-start"
-import { useMutation, useQuery } from "convex/react"
-import { useEffect } from "react"
-import type { UserRole } from "#/types"
+import { useQuery } from "convex/react"
+import { parseUserRole } from "#/types"
 import { api } from "../../convex/_generated/api"
+import type { Id } from "../../convex/_generated/dataModel"
 
 export function useAuth() {
 	const { signOut } = useClerk()
-	const { user: clerkUser, isLoaded } = useUser()
+	const { isLoaded } = useUser()
 	const viewer = useQuery(api.users.getViewer)
-	const ensureCurrentUser = useMutation(api.users.ensureCurrentUser)
-
-	useEffect(() => {
-		if (isLoaded && clerkUser) void ensureCurrentUser()
-	}, [isLoaded, clerkUser, ensureCurrentUser])
 
 	const user = viewer
 		? {
@@ -21,17 +16,14 @@ export function useAuth() {
 				email: viewer.email,
 				role: parseUserRole(viewer.role),
 				avatarUrl: viewer.avatarUrl,
+				favoriteShopIds: viewer.favoriteShopIds ?? ([] as Id<"barbershops">[]),
 			}
 		: null
-
-	function parseUserRole(role: string | null | undefined): UserRole {
-		if (role === "customer" || role === "owner" || role === "barber" || role === "admin") return role
-		return "customer"
-	}
 
 	return {
 		user,
 		loading: viewer === undefined,
 		signOut,
+		isLoaded,
 	}
 }

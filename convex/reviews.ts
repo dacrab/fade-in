@@ -67,6 +67,10 @@ export const create = mutation({
 export const hasReview = query({
 	args: { appointmentId: v.id("appointments") },
 	handler: async (ctx, args) => {
+		const user = await requireUser(ctx)
+		const appt = await ctx.db.get(args.appointmentId)
+		if (!appt || appt.customerId !== user._id) return true
+
 		const existing = await ctx.db
 			.query("reviews")
 			.filter((q) => q.eq(q.field("appointmentId"), args.appointmentId))

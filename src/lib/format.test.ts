@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest"
 import {
-	capitalizeFirst,
 	formatDate,
 	formatDateShort,
 	formatPrice,
 	formatRelative,
+	nextDayIso,
 	slugify,
+	todayIso,
 } from "./format"
 
 describe("formatPrice", () => {
@@ -67,30 +68,18 @@ describe("formatRelative", () => {
 	})
 })
 
-describe("capitalizeFirst", () => {
-	it("capitalizes the first letter of a lowercase word", () => {
-		expect(capitalizeFirst("hello")).toBe("Hello")
+describe("todayIso / nextDayIso", () => {
+	it("returns ISO dates in the expected shape", () => {
+		expect(todayIso()).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+		expect(nextDayIso()).toMatch(/^\d{4}-\d{2}-\d{2}$/)
 	})
 
-	it("leaves an already-capitalized word unchanged", () => {
-		expect(capitalizeFirst("World")).toBe("World")
-	})
-
-	it("handles a single lowercase character", () => {
-		expect(capitalizeFirst("a")).toBe("A")
-	})
-
-	it("handles an empty string", () => {
-		expect(capitalizeFirst("")).toBe("")
-	})
-
-	it("only capitalizes the first character, not the rest", () => {
-		expect(capitalizeFirst("hELLO")).toBe("HELLO")
-	})
-
-	it("handles strings with leading spaces", () => {
-		const result = capitalizeFirst(" hello")
-		expect(result[0]).toBe(" ")
+	it("nextDayIso is exactly one day after todayIso", () => {
+		const today = todayIso()
+		const next = nextDayIso()
+		const todayMs = new Date(`${today}T00:00:00`).getTime()
+		const nextMs = new Date(`${next}T00:00:00`).getTime()
+		expect(nextMs - todayMs).toBe(24 * 60 * 60 * 1000)
 	})
 })
 

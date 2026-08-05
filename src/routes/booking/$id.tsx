@@ -1,4 +1,3 @@
-import { useForm } from "@tanstack/react-form"
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import {
@@ -21,7 +20,8 @@ import { z } from "zod"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
-import { formatDate, formatPrice } from "#/lib/format"
+import { useFormatters } from "#/hooks/useFormatters"
+import { nextDayIso } from "#/lib/format"
 import { asId, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
@@ -35,14 +35,17 @@ export const Route = createFileRoute("/booking/$id")({
 	component: BookingPage,
 })
 
-const rescheduleSchema = z.object({
-	date: z.string().min(1, "Date is required"),
-	startTime: z.string().min(1, "Time is required"),
-	endTime: z.string().min(1, "End time is required"),
-})
+interface RescheduleValues {
+	date: string
+	startTime: string
+	endTime: string
+}
+
+const EMPTY_RESCHEDULE: RescheduleValues = { date: "", startTime: "", endTime: "" }
 
 function BookingPage() {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const { id } = Route.useParams()
 	const { user } = useAuth()
 	const { payment } = useSearch({ from: "/booking/$id" })
@@ -62,31 +65,30 @@ function BookingPage() {
 	const reschedule = useMutation(api.appointments.reschedule)
 
 	const [showReschedule, setShowReschedule] = useState(false)
-	const minDate = (() => {
-		const d = new Date()
-		d.setDate(d.getDate() + 1)
-		return d.toISOString().split("T")[0]
-	})()
+	const [rescheduleValues, setRescheduleValues] = useState<RescheduleValues>(EMPTY_RESCHEDULE)
+	const [rescheduling, setRescheduling] = useState(false)
+	const minDate = nextDayIso()
 
-	const rescheduleForm = useForm({
-		defaultValues: { date: "", startTime: "", endTime: "" },
-		validators: { onChange: rescheduleSchema },
-		onSubmit: async ({ value }) => {
-			await withToast(
-				() =>
-					reschedule({
-						id: asId<"appointments">(id),
-						date: value.date,
-						startTime: value.startTime,
-						endTime: value.endTime,
-					}),
-				t("booking.rescheduled"),
-				t("errors.rescheduleFailed"),
-			)
-			setShowReschedule(false)
-			rescheduleForm.reset()
-		},
-	})
+	const handleReschedule = async () => {
+		setRescheduling(true)
+		await withToast(
+			() =>
+				reschedule({
+					id: asId<"appointments">(id),
+					date: rescheduleValues.date,
+					startTime: rescheduleValues.startTime,
+					endTime: rescheduleValues.endTime,
+				}),
+			t("booking.rescheduled"),
+			t("errors.rescheduleFailed"),
+		)
+		setRescheduling(false)
+		setShowReschedule(false)
+		setRescheduleValues(EMPTY_RESCHEDULE)
+	}
+
+	const setRescheduleField = (field: keyof RescheduleValues) => (value: string) =>
+		setRescheduleValues((prev) => ({ ...prev, [field]: value }))
 
 	const handleCancel = () =>
 		void withToast(
@@ -106,7 +108,7 @@ function BookingPage() {
 			<div className="page-wrap max-w-2xl py-8">
 				<Link
 					to={isOwnerOrAdmin(user) ? "/business/appointments" : "/dashboard/overview"}
-					className="inline-flex items-center gap-1.5 text-sm text-(--text-muted) hover:text-(--gold) transition-colors mb-6"
+					className="inline-flex items-center gap-1.5 muted-sm hover:text-(--gold) transition-colors mb-6"
 				>
 					<ArrowLeft size={15} />
 					{t("common.back")}
@@ -118,7 +120,7 @@ function BookingPage() {
 					<div className="text-center py-16">
 						<XCircle size={48} className="mx-auto mb-4 text-(--text-subtle)" />
 						<h1 className="text-xl font-bold text-(--text) mb-2">{t("booking.notFound")}</h1>
-						<p className="text-sm text-(--text-muted) mb-6">{t("booking.notFoundMessage")}</p>
+						<p className="muted-sm mb-6">{t("booking.notFoundMessage")}</p>
 						<Link to="/" className="btn btn-primary">
 							{t("errors.backHome")}
 						</Link>
@@ -128,17 +130,17 @@ function BookingPage() {
 						{payment === "success" && (
 							<div className="rounded-xl border border-(--success)/20 bg-(--success)/5 p-4 mb-6 flex items-center gap-3">
 								<CheckCircle size={20} className="text-(--success) shrink-0" />
-								<p className="text-sm text-(--text) font-medium">{t("booking.paymentSuccess")}</p>
+								<p className="main-sm font-medium">{t("booking.paymentSuccess")}</p>
 							</div>
 						)}
 						{payment === "canceled" && (
 							<div className="rounded-xl border border-(--gold)/20 bg-(--gold)/5 p-4 mb-6 flex items-center gap-3">
 								<AlertCircle size={20} className="text-(--gold) shrink-0" />
-								<p className="text-sm text-(--text) font-medium">{t("booking.paymentCanceled")}</p>
+								<p className="main-sm font-medium">{t("booking.paymentCanceled")}</p>
 							</div>
 						)}
 
-						<div className="rounded-2xl border border-(--border) bg-(--bg-card) overflow-hidden">
+						<div className="card-lg">
 							<div className="p-6 pb-4 border-b border-(--border)">
 								<div className="flex items-center gap-4 mb-3">
 									<div className="w-12 h-12 rounded-xl bg-(--gold)/10 flex items-center justify-center">
@@ -147,7 +149,7 @@ function BookingPage() {
 									<div>
 										<h1 className="text-lg font-bold text-(--text)">{shop?.name ?? "—"}</h1>
 										{shop && (
-											<p className="text-xs text-(--text-muted) flex items-center gap-1 mt-0.5">
+											<p className="muted-xs flex items-center gap-1 mt-0.5">
 												<MapPin size={11} />
 												{shop.address}, {shop.city}
 											</p>
@@ -182,33 +184,29 @@ function BookingPage() {
 							<div className="p-6 space-y-5">
 								<div className="grid grid-cols-2 gap-5">
 									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">{t("booking.summaryFields.date")}</p>
-										<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
+										<p className="detail-label">{t("booking.summaryFields.date")}</p>
+										<p className="detail-value">
 											<Calendar size={14} className="text-(--text-subtle)" />
-											{formatDate(appt.date)}
+											{f.formatDate(appt.date)}
 										</p>
 									</div>
 									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">{t("booking.summaryFields.time")}</p>
-										<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
+										<p className="detail-label">{t("booking.summaryFields.time")}</p>
+										<p className="detail-value">
 											<Clock size={14} className="text-(--text-subtle)" />
 											{appt.startTime} – {appt.endTime}
 										</p>
 									</div>
 									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">
-											{t("booking.summaryFields.barber")}
-										</p>
-										<p className="text-sm font-medium text-(--text) flex items-center gap-1.5">
+										<p className="detail-label">{t("booking.summaryFields.barber")}</p>
+										<p className="detail-value">
 											<User size={14} className="text-(--text-subtle)" />
 											{barber?.name ?? "—"}
 										</p>
 									</div>
 									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">
-											{t("booking.summaryFields.total")}
-										</p>
-										<p className="text-sm font-bold text-(--gold)">{formatPrice(appt.totalPrice)}</p>
+										<p className="detail-label">{t("booking.summaryFields.total")}</p>
+										<p className="text-sm font-bold text-(--gold)">{f.formatPrice(appt.totalPrice)}</p>
 									</div>
 								</div>
 
@@ -232,16 +230,14 @@ function BookingPage() {
 
 								{appt.notes && (
 									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">{t("booking.notes")}</p>
-										<p className="text-sm text-(--text-muted) bg-(--bg-input) rounded-lg px-3 py-2">
-											{appt.notes}
-										</p>
+										<p className="detail-label">{t("booking.notes")}</p>
+										<p className="muted-sm bg-(--bg-input) rounded-lg px-3 py-2">{appt.notes}</p>
 									</div>
 								)}
 
 								{shop?.phone && (
 									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-1">{t("form.phoneLabel")}</p>
+										<p className="detail-label">{t("form.phoneLabel")}</p>
 										<a
 											href={`tel:${shop.phone}`}
 											className="text-sm text-(--gold) hover:underline flex items-center gap-1.5"
@@ -260,7 +256,7 @@ function BookingPage() {
 											<button
 												type="button"
 												onClick={() => setShowReschedule(!showReschedule)}
-												className="btn btn-secondary text-xs gap-1.5"
+												className="btn btn-secondary btn-sm"
 											>
 												<RefreshCw size={13} />
 												{t("booking.reschedule")}
@@ -278,7 +274,7 @@ function BookingPage() {
 										<button
 											type="button"
 											onClick={() => setShowReschedule(!showReschedule)}
-											className="btn btn-secondary text-xs gap-1.5"
+											className="btn btn-secondary btn-sm"
 										>
 											<RefreshCw size={13} />
 											{t("booking.reschedule")}
@@ -295,76 +291,60 @@ function BookingPage() {
 									onSubmit={(e) => {
 										e.preventDefault()
 										e.stopPropagation()
-										void rescheduleForm.handleSubmit()
+										void handleReschedule()
 									}}
 									className="space-y-4"
 								>
-									<rescheduleForm.Field name="date">
-										{(field) => (
-											<div>
-												<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="reschedule-date">
-													{t("booking.pickDate")}
-												</label>
-												<input
-													id="reschedule-date"
-													type="date"
-													className="input w-full text-sm"
-													min={minDate}
-													value={field.state.value}
-													onChange={(e) => field.handleChange(e.target.value)}
-												/>
-											</div>
-										)}
-									</rescheduleForm.Field>
+									<div>
+										<label className="field-label" htmlFor="reschedule-date">
+											{t("booking.pickDate")}
+										</label>
+										<input
+											id="reschedule-date"
+											type="date"
+											className="input w-full text-sm"
+											min={minDate}
+											value={rescheduleValues.date}
+											onChange={(e) => setRescheduleField("date")(e.target.value)}
+										/>
+									</div>
 									<div className="grid grid-cols-2 gap-4">
-										<rescheduleForm.Field name="startTime">
-											{(field) => (
-												<div>
-													<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="reschedule-start">
-														{t("booking.startTime")}
-													</label>
-													<input
-														id="reschedule-start"
-														type="time"
-														className="input w-full text-sm"
-														value={field.state.value}
-														onChange={(e) => field.handleChange(e.target.value)}
-													/>
-												</div>
-											)}
-										</rescheduleForm.Field>
-										<rescheduleForm.Field name="endTime">
-											{(field) => (
-												<div>
-													<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="reschedule-end">
-														{t("booking.endTime")}
-													</label>
-													<input
-														id="reschedule-end"
-														type="time"
-														className="input w-full text-sm"
-														value={field.state.value}
-														onChange={(e) => field.handleChange(e.target.value)}
-													/>
-												</div>
-											)}
-										</rescheduleForm.Field>
+										<div>
+											<label className="field-label" htmlFor="reschedule-start">
+												{t("booking.startTime")}
+											</label>
+											<input
+												id="reschedule-start"
+												type="time"
+												className="input w-full text-sm"
+												value={rescheduleValues.startTime}
+												onChange={(e) => setRescheduleField("startTime")(e.target.value)}
+											/>
+										</div>
+										<div>
+											<label className="field-label" htmlFor="reschedule-end">
+												{t("booking.endTime")}
+											</label>
+											<input
+												id="reschedule-end"
+												type="time"
+												className="input w-full text-sm"
+												value={rescheduleValues.endTime}
+												onChange={(e) => setRescheduleField("endTime")(e.target.value)}
+											/>
+										</div>
 									</div>
 									<div className="flex gap-3">
-										<rescheduleForm.Subscribe selector={(state) => [state.isSubmitting]}>
-											{([isSubmitting]) => (
-												<button type="submit" disabled={isSubmitting} className="btn btn-primary text-xs">
-													{isSubmitting ? t("common.loading") : t("booking.rescheduleConfirm")}
-												</button>
-											)}
-										</rescheduleForm.Subscribe>
+										<button type="submit" disabled={rescheduling} className="btn btn-primary btn-sm">
+											{rescheduling ? t("common.loading") : t("booking.rescheduleConfirm")}
+										</button>
 										<button
 											type="button"
 											onClick={() => {
 												setShowReschedule(false)
-												rescheduleForm.reset()
+												setRescheduleValues(EMPTY_RESCHEDULE)
 											}}
-											className="px-4 py-2 rounded-full border border-(--border) text-xs text-(--text-muted)"
+											className="px-4 py-2 rounded-full border border-(--border) muted-xs"
 										>
 											{t("common.cancel")}
 										</button>
@@ -381,7 +361,7 @@ function BookingPage() {
 
 function BookingSkeleton() {
 	return (
-		<div className="rounded-2xl border border-(--border) bg-(--bg-card) overflow-hidden">
+		<div className="card-lg">
 			<div className="p-6 border-b border-(--border)">
 				<div className="flex items-center gap-4 mb-3">
 					<Skeleton className="w-12 h-12 rounded-xl" />

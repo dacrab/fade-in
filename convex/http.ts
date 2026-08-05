@@ -1,5 +1,5 @@
 import { httpRouter } from "convex/server"
-import { api } from "./_generated/api"
+import { internal } from "./_generated/api"
 import { httpAction } from "./_generated/server"
 
 const http = httpRouter()
@@ -47,17 +47,17 @@ http.route({
 			return new Response("Invalid signature", { status: 400 })
 		}
 
-		const event = JSON.parse(body)
+		let event: { type?: unknown; data?: { status?: unknown; id?: unknown } }
+		try {
+			event = JSON.parse(body)
+		} catch {
+			return new Response("Invalid JSON", { status: 400 })
+		}
 
-		if (
-			typeof event.type === "string" &&
-			event.type === "checkout.created" &&
-			typeof event.data?.status === "string" &&
-			event.data.status === "succeeded"
-		) {
+		if (event.type === "checkout.created" && event.data?.status === "succeeded") {
 			const checkoutId = event.data.id
 			if (typeof checkoutId === "string" && checkoutId) {
-				await ctx.runMutation(api.appointments.confirmFromCheckout, {
+				await ctx.runMutation(internal.appointments.confirmFromCheckout, {
 					polarCheckoutId: checkoutId,
 				})
 			}

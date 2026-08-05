@@ -65,7 +65,7 @@ export function DialogDescription({
 	className?: string
 }) {
 	return (
-		<BaseDialog.Description className={cn("text-sm text-(--text-muted) leading-relaxed", className)}>
+		<BaseDialog.Description className={cn("muted-sm leading-relaxed", className)}>
 			{children}
 		</BaseDialog.Description>
 	)

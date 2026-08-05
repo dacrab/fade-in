@@ -12,8 +12,7 @@ dist-ssr
 
 # Env files — never commit secrets
 .env
-.env.local
-.env.*.local
+.env.*
 *.local
 
 # Convex auto-generated files are committed so CI can build without a dev server
@@ -50,6 +49,4 @@ PLAN.md
 # Research reports (AI-generated, not part of the app)
 research-reports/
 .vercel
-.env.vercel
-.env*.local
 package-lock.json

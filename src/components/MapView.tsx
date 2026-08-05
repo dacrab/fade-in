@@ -1,12 +1,21 @@
 import "leaflet/dist/leaflet.css"
 import { MapPin } from "lucide-react"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import type { Barbershop } from "#/types"
+
+const leafletPromise = import("leaflet")
 
 interface MapViewProps {
 	shops: Barbershop[]
 	onShopClick?: (slug: string) => void
+}
+
+function escapeHtml(str: string): string {
+	return str.replace(
+		/[&<>"']/g,
+		(ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] as string,
+	)
 }
 
 const DEFAULT_CENTER: [number, number] = [37.9838, 23.7275]
@@ -17,6 +26,7 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	const mapRef = useRef<L.Map | null>(null)
 	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const markersRef = useRef<L.Marker[]>([])
+	const [ready, setReady] = useState(false)
 
 	const shopsWithCoords = useMemo(
 		() =>
@@ -30,7 +40,10 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	useEffect(() => {
 		if (!mapContainerRef.current || mapRef.current) return
 
-		import("leaflet").then((L) => {
+		let cancelled = false
+
+		void leafletPromise.then((L) => {
+			if (cancelled || !mapContainerRef.current) return
 			const iconProto = L.Icon.Default.prototype
 			Object.assign(iconProto, { _getIconUrl: undefined })
 			L.Icon.Default.mergeOptions({
@@ -38,7 +51,6 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 				iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
 				shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 			})
-			if (!mapContainerRef.current) return
 			const map = L.map(mapContainerRef.current, {
 				center: DEFAULT_CENTER,
 				zoom: DEFAULT_ZOOM,
@@ -50,19 +62,19 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 				maxZoom: 19,
 			}).addTo(map)
 			mapRef.current = map
+			setReady(true)
 		})
 
 		return () => {
-			if (mapRef.current) {
-				mapRef.current.remove()
-				mapRef.current = null
-			}
+			cancelled = true
+			mapRef.current?.remove()
+			mapRef.current = null
 		}
 	}, [])
 
 	useEffect(() => {
-		if (!mapRef.current) return
-		import("leaflet").then((L) => {
+		if (!ready) return
+		void leafletPromise.then((L) => {
 			if (!mapRef.current) return
 
 			for (const m of markersRef.current) m.remove()
@@ -86,10 +98,10 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 					.addTo(mapRef.current)
 					.bindPopup(
 						`<div style="font-family:'Inter',system-ui,sans-serif;min-width:160px;padding:4px;">
-						<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#1A1714;">${shop.name}</div>
-						<div style="font-size:12px;color:#6B6560;margin-bottom:6px;">${shop.address}, ${shop.city}</div>
+						<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#1A1714;">${escapeHtml(shop.name)}</div>
+						<div style="font-size:12px;color:#6B6560;margin-bottom:6px;">${escapeHtml(shop.address)}, ${escapeHtml(shop.city)}</div>
 						<div style="font-size:12px;color:var(--gold);margin-bottom:8px;">${shop.rating.toFixed(1)} / 5 (${t("map.reviewsCount", { count: shop.reviewCount })})</div>
-						<a href="/barbershops/${shop.slug}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,var(--gold),#A63D28);color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">${t("map.bookNowArrow")} →</a>
+						<a href="/barbershops/${escapeHtml(shop.slug)}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,var(--gold),#A63D28);color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">${t("map.bookNowArrow")} →</a>
 					</div>`,
 						{ className: "fadein-popup" },
 					)
@@ -101,7 +113,7 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 
 			if (bounds.length > 0) mapRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 })
 		})
-	}, [shopsWithCoords, onShopClick, t])
+	}, [ready, shopsWithCoords, onShopClick, t])
 
 	return (
 		<div className="relative rounded-2xl overflow-hidden border border-white/6 h-125">

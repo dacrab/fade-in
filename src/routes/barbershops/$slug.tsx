@@ -22,7 +22,8 @@ import BookingModal from "#/components/BookingModal"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
 import { withToast } from "#/components/ui/Toast"
-import { capitalizeFirst, formatPrice, formatRelative } from "#/lib/format"
+import { useFormatters } from "#/hooks/useFormatters"
+import { formatPrice } from "#/lib/format"
 import type { Barber, Review, Service, WeekDay } from "#/types"
 import { PAGE_SIZE, WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProf
 
 function ShopProfilePage() {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const { slug } = Route.useParams()
 	const shop = useQuery(api.barbershops.getBySlug, { slug })
 	const [bookingOpen, setBookingOpen] = useState(false)
@@ -60,7 +62,7 @@ function ShopProfilePage() {
 					<div className="w-20 h-20 rounded-full bg-[var(--gold)/8] flex items-center justify-center mx-auto mb-6">
 						<Scissors size={32} className="text-(--gold)/40" />
 					</div>
-					<h1 className="text-2xl font-bold text-(--text) mb-2">{t("shop.notFound")}</h1>
+					<h1 className="page-title mb-2">{t("shop.notFound")}</h1>
 					<Link
 						to="/barbershops/listing"
 						className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-lg bg-(--gold) text-white text-sm font-medium hover:bg-(--gold-dark) transition-colors"
@@ -120,18 +122,16 @@ function ShopProfilePage() {
 				</div>
 			</div>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div className="page-container">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					<div className="lg:col-span-2 space-y-10">
 						<div>
 							<div className="flex items-center gap-3 mb-4">
 								<div className="flex items-center gap-2">
 									<Star size={20} fill="currentColor" className="text-(--gold)" />
-									<span className="text-2xl font-bold text-(--text)">{shop.rating.toFixed(1)}</span>
+									<span className="page-title">{shop.rating.toFixed(1)}</span>
 								</div>
-								<span className="text-sm text-(--text-muted)">
-									{t("map.reviewsCount", { count: shop.reviewCount })}
-								</span>
+								<span className="muted-sm">{t("map.reviewsCount", { count: shop.reviewCount })}</span>
 							</div>
 							{shop.description && (
 								<p className="text-(--text-muted) leading-relaxed text-base">{shop.description}</p>
@@ -147,7 +147,7 @@ function ShopProfilePage() {
 									))}
 								</div>
 							) : services.length === 0 ? (
-								<p className="text-sm text-(--text-muted)">{t("shop.noServices")}</p>
+								<p className="muted-sm">{t("shop.noServices")}</p>
 							) : (
 								<div className="space-y-1">
 									{services.map((svc: Service) => (
@@ -156,15 +156,11 @@ function ShopProfilePage() {
 											className="flex items-center justify-between py-4 px-4 rounded-xl hover:bg-(--gold)/[0.04] transition-colors duration-200 group"
 										>
 											<div className="flex-1">
-												<div className="font-medium text-(--text) text-sm group-hover:text-(--gold) transition-colors">
-													{svc.name}
-												</div>
-												{svc.description && (
-													<div className="text-xs text-(--text-muted) mt-0.5">{svc.description}</div>
-												)}
+												<div className="strong-sm group-hover:text-(--gold) transition-colors">{svc.name}</div>
+												{svc.description && <div className="muted-xs mt-0.5">{svc.description}</div>}
 											</div>
 											<div className="flex items-center gap-4">
-												<span className="text-xs text-(--text-subtle)">
+												<span className="subtle-xs">
 													{svc.durationMinutes} {t("common.min")}
 												</span>
 												<span className="text-sm font-bold text-(--gold) min-w-15 text-right">
@@ -188,7 +184,7 @@ function ShopProfilePage() {
 									))}
 								</div>
 							) : barbers.length === 0 ? (
-								<p className="text-sm text-(--text-muted)">{t("shop.noBarbers")}</p>
+								<p className="muted-sm">{t("shop.noBarbers")}</p>
 							) : (
 								<div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
 									{barbers.map((b: Barber) => (
@@ -206,7 +202,7 @@ function ShopProfilePage() {
 											<div className="text-center">
 												<div className="text-sm font-semibold text-(--text)">{b.name}</div>
 												{b.specializations[0] && (
-													<div className="text-[11px] text-(--text-muted) mt-0.5">{b.specializations[0]}</div>
+													<div className="muted-tiny mt-0.5">{b.specializations[0]}</div>
 												)}
 											</div>
 										</div>
@@ -229,21 +225,19 @@ function ShopProfilePage() {
 									))}
 								</div>
 							) : reviews.length === 0 ? (
-								<p className="text-sm text-(--text-muted)">{t("shop.noReviews")}</p>
+								<p className="muted-sm">{t("shop.noReviews")}</p>
 							) : (
 								<div className="space-y-4">
 									{reviews.map((r: Review) => (
 										<div key={r._id} className="pb-6 border-b border-(--border) last:border-0 last:pb-0">
 											<div className="flex items-center gap-3 mb-2">
 												<StarRating rating={r.rating} size={13} />
-												<span className="text-xs text-(--text-subtle) tracking-wide">
-													{formatRelative(r.createdAt)}
-												</span>
+												<span className="subtle-xs tracking-wide">{f.formatRelative(r.createdAt)}</span>
 											</div>
-											<p className="text-sm text-(--text) leading-relaxed">{r.comment}</p>
+											<p className="main-sm leading-relaxed">{r.comment}</p>
 											{r.ownerReply && (
 												<div className="mt-3 pl-4 border-l-2 border-(--gold)/25">
-													<p className="text-xs text-(--text-muted) leading-relaxed">
+													<p className="muted-xs leading-relaxed">
 														<span className="text-(--gold) font-semibold">{t("shop.ownerReply")}</span>{" "}
 														{r.ownerReply}
 													</p>
@@ -279,7 +273,7 @@ function ShopProfilePage() {
 											const h = shop.workingHours?.[day]
 											return (
 												<div key={day} className="contents">
-													<span className="text-xs text-(--text-muted)">{capitalizeFirst(day)}</span>
+													<span className="muted-xs">{t(`days.${day}`)}</span>
 													<span
 														className={`text-xs text-right ${h?.closed ? "text-(--error)" : "text-(--text)"}`}
 													>
@@ -302,7 +296,7 @@ function ShopProfilePage() {
 									<input
 										readOnly
 										value={bookingUrl}
-										className="flex-1 min-w-0 bg-(--bg) border border-(--border) rounded-full px-3 py-2 text-[11px] text-(--text-muted) outline-none"
+										className="flex-1 min-w-0 bg-(--bg) border border-(--border) rounded-full px-3 py-2 muted-tiny outline-none"
 									/>
 									<button
 										type="button"
@@ -329,35 +323,24 @@ function ShopProfilePage() {
 
 							{shop.socialLinks && (
 								<div className="flex items-center gap-2 mt-4 px-2">
-									{shop.socialLinks.instagram && (
-										<a
-											href={shop.socialLinks.instagram}
-											target="_blank"
-											rel="noreferrer"
-											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
-										>
-											<Link2 size={15} />
-										</a>
-									)}
-									{shop.socialLinks.facebook && (
-										<a
-											href={shop.socialLinks.facebook}
-											target="_blank"
-											rel="noreferrer"
-											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
-										>
-											<Share2 size={15} />
-										</a>
-									)}
-									{shop.socialLinks.website && (
-										<a
-											href={shop.socialLinks.website}
-											target="_blank"
-											rel="noreferrer"
-											className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
-										>
-											<Globe size={15} />
-										</a>
+									{(
+										[
+											["instagram", shop.socialLinks.instagram, Link2],
+											["facebook", shop.socialLinks.facebook, Share2],
+											["website", shop.socialLinks.website, Globe],
+										] as const
+									).map(([label, url, Icon]) =>
+										url ? (
+											<a
+												key={label}
+												href={url}
+												target="_blank"
+												rel="noreferrer"
+												className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
+											>
+												<Icon size={15} />
+											</a>
+										) : null,
 									)}
 								</div>
 							)}
@@ -374,7 +357,7 @@ function ShopProfileSkeleton() {
 	return (
 		<main className="page-main">
 			<Skeleton className="h-[50vh] w-full" />
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div className="page-container">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					<div className="lg:col-span-2 space-y-4">
 						<Skeleton className="h-8 w-48 rounded-xl" />

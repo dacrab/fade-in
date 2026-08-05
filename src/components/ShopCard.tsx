@@ -1,20 +1,17 @@
 import { Link } from "@tanstack/react-router"
-import { useMutation, useQuery } from "convex/react"
+import { useMutation } from "convex/react"
 import { Check, Heart, MapPin, Scissors, Star } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import type { Barbershop } from "#/types"
 import { api } from "../../convex/_generated/api"
-import type { Id } from "../../convex/_generated/dataModel"
 
 export default function ShopCard({ shop }: { shop: Barbershop }) {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const userData = useQuery(api.users.getById, user ? { id: user.id } : "skip")
 	const toggleFavorite = useMutation(api.users.toggleFavorite)
-	const isFavorited =
-		userData?.favoriteShopIds?.some((id: Id<"barbershops">) => id === shop._id) ?? false
+	const isFavorited = user?.favoriteShopIds.includes(shop._id) ?? false
 
 	const handleToggleFav = (e: React.MouseEvent) => {
 		e.preventDefault()
@@ -59,10 +56,10 @@ export default function ShopCard({ shop }: { shop: Barbershop }) {
 						)}
 						<div className="flex items-center gap-0.5 ml-auto">
 							<Star size={12} fill="currentColor" className="text-(--gold)" />
-							<span className="text-sm font-medium text-(--text)">{shop.rating.toFixed(1)}</span>
+							<span className="strong-sm">{shop.rating.toFixed(1)}</span>
 						</div>
 					</div>
-					<div className="flex items-center gap-1 text-xs text-(--text-muted)">
+					<div className="flex items-center gap-1 muted-xs">
 						<MapPin size={11} className="flex-shrink-0" />
 						<span className="truncate">
 							{shop.address}, {shop.city}

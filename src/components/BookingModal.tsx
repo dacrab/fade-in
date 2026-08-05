@@ -3,22 +3,19 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "#/hooks/useAuth"
-import { formatDate, formatPrice } from "#/lib/format"
+import { useFormatters } from "#/hooks/useFormatters"
+import { nextDayIso } from "#/lib/format"
 import type { Barber, Barbershop, Service } from "#/types"
 import { api } from "../../convex/_generated/api"
 import type { Doc, Id } from "../../convex/_generated/dataModel"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/Dialog"
 import { showToast } from "./ui/Toast"
 
-type Step = 1 | 2 | 3 | 4 | 5
-
-function clampStep(n: number): Step {
-	if (n === 1 || n === 2 || n === 3 || n === 4 || n === 5) return n
-	return n < 1 ? 1 : 5
-}
+type Step = 1 | 2 | 3 | 4
 
 export default function BookingModal({ shop, onClose }: { shop: Barbershop; onClose: () => void }) {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const { user } = useAuth()
 	const [step, setStep] = useState<Step>(1)
 	const [selectedServices, setSelectedServices] = useState<Id<"services">[]>([])
@@ -54,11 +51,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 
 	const createCheckout = useAction(api.payments.createCheckoutSession)
 
-	const minDate = (() => {
-		const d = new Date()
-		d.setDate(d.getDate() + 1)
-		return d.toISOString().split("T")[0]
-	})()
+	const minDate = nextDayIso()
 
 	const toggleService = (id: Id<"services">) =>
 		setSelectedServices((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]))
@@ -97,7 +90,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 		}
 	}
 
-	const stepKeys = ["services", "barber", "date", "confirm", "done"] as const
+	const stepKeys = ["services", "barber", "date", "confirm"] as const
 	const stepLabels = stepKeys.map((k) => t(`booking.steps.${k}`))
 	const canNext =
 		(step === 1 && selectedServices.length > 0) ||
@@ -114,7 +107,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 			selectedServiceDocs.map((s: Doc<"services">) => s.name).join(", "),
 		],
 		[t("booking.summaryFields.barber"), selectedBarberDoc?.name ?? "—"],
-		[t("booking.summaryFields.date"), formatDate(selectedDate)],
+		[t("booking.summaryFields.date"), f.formatDate(selectedDate)],
 		[t("booking.summaryFields.time"), selectedSlot],
 		[t("booking.summaryFields.duration"), t("booking.duration", { minutes: totalDuration })],
 	]
@@ -130,7 +123,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 				<DialogHeader onClose={onClose}>
 					<DialogTitle>{t("booking.title", { name: shop.name })}</DialogTitle>
 					<DialogDescription>
-						{t("booking.step", { current: step, total: 5 })} — {stepLabels[step - 1]}
+						{t("booking.step", { current: step, total: 4 })} — {stepLabels[step - 1]}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -148,11 +141,11 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 				<div className="px-6 pb-2 max-h-[55vh] overflow-y-auto">
 					{step === 1 && (
 						<div className="space-y-3">
-							<p className="text-sm text-(--text-muted) mb-4">{t("booking.selectServices")}</p>
+							<p className="muted-sm mb-4">{t("booking.selectServices")}</p>
 							{!services ? (
-								<p className="text-sm text-(--text-subtle)">{t("common.loading")}</p>
+								<p className="subtle-sm">{t("common.loading")}</p>
 							) : services.length === 0 ? (
-								<p className="text-sm text-(--text-subtle)">{t("booking.noServices")}</p>
+								<p className="subtle-sm">{t("booking.noServices")}</p>
 							) : (
 								services.map((svc: Service) => {
 									const selected = selectedServices.includes(svc._id)
@@ -169,10 +162,10 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 												{selected && <Check size={12} className="text-(--bg-card)" />}
 											</div>
 											<div className="flex-1 min-w-0">
-												<div className="font-medium text-(--text) text-sm">{svc.name}</div>
-												<div className="text-xs text-(--text-subtle) mt-0.5">{svc.durationMinutes} min</div>
+												<div className="strong-sm">{svc.name}</div>
+												<div className="field-hint">{svc.durationMinutes} min</div>
 											</div>
-											<div className="font-semibold text-sm text-(--gold)">{formatPrice(svc.price)}</div>
+											<div className="font-semibold text-sm text-(--gold)">{f.formatPrice(svc.price)}</div>
 										</button>
 									)
 								})
@@ -182,11 +175,11 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 
 					{step === 2 && (
 						<div className="space-y-3">
-							<p className="text-sm text-(--text-muted) mb-4">{t("booking.chooseBarber")}</p>
+							<p className="muted-sm mb-4">{t("booking.chooseBarber")}</p>
 							{!barbers ? (
-								<p className="text-sm text-(--text-subtle)">{t("common.loading")}</p>
+								<p className="subtle-sm">{t("common.loading")}</p>
 							) : barbers.length === 0 ? (
-								<p className="text-sm text-(--text-subtle)">{t("booking.noBarbers")}</p>
+								<p className="subtle-sm">{t("booking.noBarbers")}</p>
 							) : (
 								barbers.map((b: Barber) => {
 									const selected = selectedBarber === b._id
@@ -209,11 +202,9 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 												)}
 											</div>
 											<div className="flex-1">
-												<div className="font-medium text-(--text) text-sm">{b.name}</div>
+												<div className="strong-sm">{b.name}</div>
 												{b.specializations.length > 0 && (
-													<div className="text-xs text-(--text-subtle) mt-0.5">
-														{b.specializations.join(", ")}
-													</div>
+													<div className="field-hint">{b.specializations.join(", ")}</div>
 												)}
 											</div>
 											{selected && (
@@ -231,13 +222,13 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 					{step === 3 && (
 						<div className="space-y-5">
 							<div>
-								<label className="block text-sm font-medium text-(--text) mb-2" htmlFor="booking-date">
+								<label className="block strong-sm mb-2" htmlFor="booking-date">
 									{t("booking.pickDate")}
 								</label>
 								<input
 									id="booking-date"
 									type="date"
-									className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-4 py-2.5 text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold)"
+									className="input"
 									min={minDate}
 									value={selectedDate}
 									onChange={(e) => pickDate(e.target.value)}
@@ -245,13 +236,11 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 							</div>
 							{selectedDate && (
 								<div>
-									<p className="block text-sm font-medium text-(--text) mb-3">
-										{t("booking.availableSlots")}
-									</p>
+									<p className="block strong-sm mb-3">{t("booking.availableSlots")}</p>
 									{slots === undefined ? (
-										<p className="text-sm text-(--text-subtle)">{t("booking.loadingSlots")}</p>
+										<p className="subtle-sm">{t("booking.loadingSlots")}</p>
 									) : slots.length === 0 ? (
-										<p className="text-sm text-(--text-subtle)">{t("booking.noSlots")}</p>
+										<p className="subtle-sm">{t("booking.noSlots")}</p>
 									) : (
 										<div className="grid grid-cols-4 gap-2">
 											{slots.map((slot: string) => (
@@ -269,12 +258,12 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 								</div>
 							)}
 							<div>
-								<label className="block text-sm font-medium text-(--text) mb-2" htmlFor="booking-notes">
+								<label className="block strong-sm mb-2" htmlFor="booking-notes">
 									{t("booking.notes")}
 								</label>
 								<textarea
 									id="booking-notes"
-									className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-4 py-2.5 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 focus:border-(--gold) resize-none"
+									className="input resize-none"
 									rows={3}
 									placeholder={t("booking.notesPlaceholder")}
 									value={notes}
@@ -297,63 +286,40 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 								<div className="my-3 h-px bg-(--bg-input)" />
 								<div className="flex justify-between font-bold">
 									<span className="text-(--text)">{t("booking.summaryFields.total")}</span>
-									<span className="text-lg text-(--gold)">{formatPrice(totalPrice)}</span>
+									<span className="text-lg text-(--gold)">{f.formatPrice(totalPrice)}</span>
 								</div>
 							</div>
-							{notes && <p className="text-sm text-(--text-muted)">{notes}</p>}
-						</div>
-					)}
-
-					{step === 5 && (
-						<div className="text-center py-10">
-							<div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-(--success)/10 border-2 border-(--success)/20">
-								<Check size={32} className="text-(--success)" />
-							</div>
-							<h3 className="text-xl font-bold text-(--text) mb-2">{t("booking.confirmed")}</h3>
-							<p className="text-(--text-muted) text-sm mb-8">
-								{t("booking.confirmedMessage", {
-									name: shop.name,
-									date: formatDate(selectedDate),
-									time: selectedSlot,
-								})}
-							</p>
-							<button
-								type="button"
-								onClick={onClose}
-								className="rounded-lg px-8 py-2.5 font-medium text-white text-sm transition-all duration-200 bg-(--gold) hover:bg-(--gold-dark) cursor-pointer"
-							>
-								{t("common.done")}
-							</button>
+							{notes && <p className="muted-sm">{notes}</p>}
 						</div>
 					)}
 				</div>
 
-				{step < 5 && (
-					<div className="flex gap-3 px-6 py-5 border-t border-(--border)">
-						{step > 1 && (
-							<button
-								type="button"
-								onClick={() => setStep(clampStep(step - 1))}
-								className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-(--text) hover:bg-(--bg-input) transition-all duration-200 flex items-center gap-1 cursor-pointer"
-							>
-								<ChevronLeft size={16} /> {t("common.back")}
-							</button>
-						)}
+				<div className="flex gap-3 px-6 py-5 border-t border-(--border)">
+					{step > 1 && (
 						<button
 							type="button"
-							onClick={() => (step === 4 ? void handleConfirm() : setStep(clampStep(step + 1)))}
-							disabled={!canNext || loading}
-							className="rounded-lg flex-1 py-2.5 text-sm font-medium text-white transition-all duration-200 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed bg-(--gold) hover:bg-(--gold-dark) cursor-pointer"
+							onClick={() => setStep((s) => (s > 1 ? ((s - 1) as Step) : s))}
+							className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-(--text) hover:bg-(--bg-input) transition-all duration-200 flex items-center gap-1 cursor-pointer"
 						>
-							{loading
-								? t("booking.confirming")
-								: step === 4
-									? t("booking.confirmBooking")
-									: t("common.next")}
-							{step < 4 && !loading && <ChevronRight size={16} />}
+							<ChevronLeft size={16} /> {t("common.back")}
 						</button>
-					</div>
-				)}
+					)}
+					<button
+						type="button"
+						onClick={() =>
+							step === 4 ? void handleConfirm() : setStep((s) => (s < 4 ? ((s + 1) as Step) : s))
+						}
+						disabled={!canNext || loading}
+						className="rounded-lg flex-1 py-2.5 text-sm font-medium text-white transition-all duration-200 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed bg-(--gold) hover:bg-(--gold-dark) cursor-pointer"
+					>
+						{loading
+							? t("booking.confirming")
+							: step === 4
+								? t("booking.confirmBooking")
+								: t("common.next")}
+						{step < 4 && !loading && <ChevronRight size={16} />}
+					</button>
+				</div>
 			</DialogContent>
 		</Dialog>
 	)

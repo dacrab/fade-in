@@ -91,9 +91,7 @@ function BusinessBarbers() {
 			<div className="max-w-3xl mx-auto px-6 py-8">
 				<div className="flex items-start justify-between mb-5">
 					<div>
-						<h1 className="text-lg font-medium text-(--text) tracking-tight">
-							{t("business.barbers.title")}
-						</h1>
+						<h1 className="section-title">{t("business.barbers.title")}</h1>
 					</div>
 					<button
 						type="button"
@@ -101,7 +99,7 @@ function BusinessBarbers() {
 							reset()
 							setShowForm(!showForm)
 						}}
-						className="btn btn-primary text-xs"
+						className="btn btn-primary btn-sm"
 					>
 						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
 						{showForm ? t("common.cancel") : t("business.barbers.addBarber")}
@@ -115,7 +113,7 @@ function BusinessBarbers() {
 						</h2>
 						<form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="barber-name">
+								<label className="field-label" htmlFor="barber-name">
 									{t("form.nameStar")}
 								</label>
 								<input
@@ -128,7 +126,7 @@ function BusinessBarbers() {
 								/>
 							</div>
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="barber-specs">
+								<label className="field-label" htmlFor="barber-specs">
 									{t("business.barbers.specializationsLabel")}
 								</label>
 								<input
@@ -140,12 +138,12 @@ function BusinessBarbers() {
 								/>
 							</div>
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="barber-bio">
+								<label className="field-label" htmlFor="barber-bio">
 									{t("form.descriptionLabel")}
 								</label>
 								<textarea
 									id="barber-bio"
-									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
+									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
 									rows={2}
 									placeholder={t("business.barbers.bioPlaceholder")}
 									value={form.bio}
@@ -153,14 +151,14 @@ function BusinessBarbers() {
 								/>
 							</div>
 							<div className="flex gap-3">
-								<button type="submit" className="btn btn-primary text-xs">
+								<button type="submit" className="btn btn-primary btn-sm">
 									<Check size={13} />
 									{editId ? t("common.save") : t("business.barbers.addBarber")}
 								</button>
 								<button
 									type="button"
 									onClick={reset}
-									className="px-4 py-2 rounded-full border border-(--border) text-xs text-(--text-muted) hover:text-(--text-muted) transition-colors"
+									className="px-4 py-2 rounded-full border border-(--border) muted-xs hover:text-(--text-muted) transition-colors"
 								>
 									{t("common.cancel")}
 								</button>
@@ -176,22 +174,20 @@ function BusinessBarbers() {
 						))}
 					</div>
 				) : barbers.length === 0 ? (
-					<p className="text-sm text-(--text-subtle) py-8 text-center">
-						{t("business.barbers.noBarbers")}
-					</p>
+					<p className="empty-text">{t("business.barbers.noBarbers")}</p>
 				) : (
-					<div className="divide-y divide-white/4">
+					<div className="divide-y divide-(--border)">
 						{barbers.map((b: Doc<"barbers">) => (
 							<div key={b._id} className="flex items-center gap-4 py-4 group">
 								<div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium text-(--gold) flex-shrink-0 bg-(--gold)/10">
 									{b.name.charAt(0)}
 								</div>
 								<div className="flex-1 min-w-0">
-									<div className="text-sm text-(--text)">{b.name}</div>
+									<div className="main-sm">{b.name}</div>
 									{b.specializations.length > 0 && (
-										<div className="text-xs text-(--text-subtle) mt-0.5">{b.specializations.join(", ")}</div>
+										<div className="field-hint">{b.specializations.join(", ")}</div>
 									)}
-									{b.bio && <div className="text-xs text-(--text-subtle) truncate mt-0.5">{b.bio}</div>}
+									{b.bio && <div className="subtle-xs truncate mt-0.5">{b.bio}</div>}
 								</div>
 								<div className="flex gap-1">
 									<button

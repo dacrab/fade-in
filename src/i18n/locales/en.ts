@@ -5,7 +5,8 @@ const en = {
 		cancel: "Cancel",
 		back: "Back",
 		next: "Next",
-		done: "Done",
+		noData: "No data",
+		page: "Page {{page}} of {{total}}",
 		search: "Search",
 		filter: "Filters",
 		reset: "Reset",
@@ -20,10 +21,29 @@ const en = {
 		active: "Active",
 		suspended: "Suspended",
 		anyRating: "Any",
-		at: "at",
 		min: "min",
+		switchLanguage: "Switch to {{lang}}",
 		addToFavorites: "Add to favorites",
 		removeFromFavorites: "Remove from favorites",
+	},
+
+	days: {
+		monday: "Monday",
+		tuesday: "Tuesday",
+		wednesday: "Wednesday",
+		thursday: "Thursday",
+		friday: "Friday",
+		saturday: "Saturday",
+		sunday: "Sunday",
+		short: {
+			monday: "Mo",
+			tuesday: "Tu",
+			wednesday: "We",
+			thursday: "Th",
+			friday: "Fr",
+			saturday: "Sa",
+			sunday: "Su",
+		},
 	},
 
 	nav: {
@@ -67,7 +87,6 @@ const en = {
 	},
 
 	home: {
-		badge: "The #1 barbershop booking platform",
 		heroTitle: "Look sharp,",
 		heroTitleHighlight: "book fast",
 		heroSubtitle:
@@ -112,6 +131,7 @@ const en = {
 		clearFilters: "Clear all filters",
 		mapView: "Map",
 		listView: "List",
+		ratingAbove: "{{rating}}+ stars",
 	},
 
 	shop: {
@@ -126,7 +146,6 @@ const en = {
 		noReviews: "No reviews yet.",
 		bookAppointment: "Book an appointment",
 		hours: "Hours",
-		followUs: "Follow us",
 		closed: "Closed",
 		ownerReply: "Owner reply:",
 		shareTitle: "Share this shop",
@@ -145,7 +164,6 @@ const en = {
 			barber: "Barber",
 			date: "Date & Time",
 			confirm: "Confirm",
-			done: "Done",
 		},
 		selectServices: "Select one or more services",
 		noServices: "No services available.",
@@ -170,10 +188,20 @@ const en = {
 		duration: "{{minutes}} min",
 		confirming: "Confirming…",
 		confirmBooking: "Confirm booking",
-		confirmed: "Booking confirmed!",
-		confirmedMessage: "Your appointment at {{name}} is confirmed for {{date}} at {{time}}.",
 		signInRequired: "Please sign in to book.",
 		failed: "Booking failed. Please try again.",
+		notFound: "Appointment not found",
+		notFoundMessage: "This appointment doesn't exist or has been removed.",
+		paid: "Paid",
+		unpaid: "Unpaid",
+		paymentSuccess: "Payment successful! Your appointment is confirmed.",
+		paymentCanceled: "Payment was canceled. Your appointment is not yet confirmed.",
+		reschedule: "Reschedule",
+		rescheduleTitle: "Reschedule appointment",
+		rescheduleConfirm: "Confirm reschedule",
+		rescheduled: "Appointment rescheduled!",
+		startTime: "Start time",
+		endTime: "End time",
 	},
 
 	forBusiness: {
@@ -225,9 +253,7 @@ const en = {
 		phonePlaceholder: "+30 6900 000000",
 		emailNote: "Email cannot be changed.",
 		leaveReview: "Leave a review",
-		reviewTitle: "Rate your experience",
 		reviewPlaceholder: "Tell others about your experience…",
-		reviewSubmitted: "Review submitted!",
 		rebook: "Rebook",
 	},
 
@@ -270,6 +296,10 @@ const en = {
 			confirm: "Confirm",
 			cancel: "Cancel",
 			complete: "Complete",
+			total: "{{count}} total",
+			pending: "{{count}} pending",
+			confirmed: "{{count}} confirmed",
+			done: "{{count}} done",
 		},
 		services: {
 			title: "Services",
@@ -330,6 +360,10 @@ const en = {
 		recentShops: "Recent shops",
 		userBreakdown: "User breakdown",
 		roles: {
+			customer: "Customer",
+			owner: "Shop owner",
+			barber: "Barber",
+			admin: "Admin",
 			customers: "Customers",
 			owners: "Shop owners",
 			barbers: "Barbers",
@@ -357,6 +391,17 @@ const en = {
 			colEmail: "Email",
 			colRole: "Role",
 		},
+		appointments: {
+			title: "Appointments",
+			noAppointments: "No appointments yet.",
+			colCustomer: "Customer",
+			colShop: "Shop",
+			colBarber: "Barber",
+			colDate: "Date & Time",
+			colStatus: "Status",
+			colPayment: "Payment",
+			colPrice: "Price",
+		},
 	},
 
 	footer: {
@@ -372,7 +417,6 @@ const en = {
 		noLocationsHint: "Shops need coordinates to appear on the map.",
 		shopsOnMap: "{{count}} shops on map",
 		bookNowArrow: "Book now",
-		switchTo: "Switch to {{lang}}",
 		reviewsCount: "{{count}} reviews",
 	},
 
@@ -381,14 +425,8 @@ const en = {
 		subtitle: "View your upcoming appointments.",
 		schedule: "Schedule",
 		earnings: "Earnings",
+		nextUp: "Next up",
 		noAppointments: "No appointments for this date.",
-	},
-
-	manage: {
-		noToken: "No manage link provided. Check your email for the full link.",
-		notFound: "Appointment not found",
-		notFoundMessage: "This appointment doesn't exist or has been removed.",
-		shop: "Barbershop",
 	},
 
 	resetPassword: {
@@ -412,6 +450,7 @@ const en = {
 		errorMessage: "An unexpected error occurred. Please try again.",
 		tryAgain: "Try again",
 		updateStatusFailed: "Failed to update status.",
+		rescheduleFailed: "Failed to reschedule appointment.",
 		fillAllFields: "Please fill in all fields.",
 		passwordLength: "Password must be at least 8 characters.",
 		passwordMismatch: "Passwords do not match.",
@@ -422,7 +461,6 @@ const en = {
 		replyAdded: "Reply added!",
 		reviewAdded: "Review submitted!",
 		reviewFailed: "Failed to submit review",
-		alreadyReviewed: "You've already reviewed this appointment",
 		replyFailed: "Failed to add reply.",
 		barberSaved: "Barber saved!",
 		barberFailed: "Failed to save barber.",

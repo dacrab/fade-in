@@ -7,9 +7,9 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { formatPrice } from "#/lib/format"
+import { formatPrice, todayIso } from "#/lib/format"
 import type { AppointmentStatus } from "#/types"
-import { STATUS_DOT } from "#/types"
+import { STATUS_DOT, WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/business/appointments")({ component: Busi
 function BusinessAppointments() {
 	const { t } = useTranslation()
 	const { user } = useBusinessAuth()
-	const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10))
+	const [selectedDate, setSelectedDate] = useState(todayIso())
 
 	const shop = useOwnerShop(user?.id)
 	const appointments = useQuery(
@@ -40,9 +40,7 @@ function BusinessAppointments() {
 
 	return (
 		<div className="px-8 py-8">
-			<h1 className="text-lg font-medium text-(--text) tracking-tight mb-5">
-				{t("business.appointments.title")}
-			</h1>
+			<h1 className="section-title mb-5">{t("business.appointments.title")}</h1>
 
 			<div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
 				<div>
@@ -51,7 +49,7 @@ function BusinessAppointments() {
 						<button
 							type="button"
 							onClick={() => setSelectedDate("")}
-							className="mt-3 text-xs text-(--text-muted) hover:text-(--gold) transition-colors w-full text-center"
+							className="mt-3 muted-xs hover:text-(--gold) transition-colors w-full text-center"
 						>
 							{t("business.appointments.clearFilter")}
 						</button>
@@ -60,14 +58,22 @@ function BusinessAppointments() {
 
 				<div>
 					{appointments && appointments.length > 0 && (
-						<div className="flex gap-4 mb-4 text-xs text-(--text-muted)">
-							<span>{appointments.length} total</span>
-							{pending.length > 0 && <span className="text-(--gold)">{pending.length} pending</span>}
+						<div className="flex gap-4 mb-4 muted-xs">
+							<span>{t("business.appointments.total", { count: appointments.length })}</span>
+							{pending.length > 0 && (
+								<span className="text-(--gold)">
+									{t("business.appointments.pending", { count: pending.length })}
+								</span>
+							)}
 							{confirmed.length > 0 && (
-								<span className="text-(--success)">{confirmed.length} confirmed</span>
+								<span className="text-(--success)">
+									{t("business.appointments.confirmed", { count: confirmed.length })}
+								</span>
 							)}
 							{completed.length > 0 && (
-								<span className="text-(--text-subtle)">{completed.length} done</span>
+								<span className="text-(--text-subtle)">
+									{t("business.appointments.done", { count: completed.length })}
+								</span>
 							)}
 						</div>
 					)}
@@ -81,7 +87,7 @@ function BusinessAppointments() {
 					) : appointments.length === 0 ? (
 						<div className="text-center py-12">
 							<Clock size={24} className="mx-auto mb-2 text-(--text-subtle)" />
-							<p className="text-sm text-(--text-muted)">{t("business.appointments.noAppointments")}</p>
+							<p className="muted-sm">{t("business.appointments.noAppointments")}</p>
 						</div>
 					) : (
 						<div className="divide-y divide-(--border)">
@@ -97,8 +103,8 @@ function BusinessAppointments() {
 										</div>
 										<span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[appt.status]}`} />
 										<div className="flex-1 min-w-0">
-											<div className="text-sm text-(--text) truncate">{appt.notes || "—"}</div>
-											<div className="text-xs text-(--text-subtle)">{formatPrice(appt.totalPrice)}</div>
+											<div className="main-sm truncate">{appt.notes || "—"}</div>
+											<div className="subtle-xs">{formatPrice(appt.totalPrice)}</div>
 										</div>
 										<div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
 											{appt.status === "pending" && (
@@ -142,6 +148,7 @@ function BusinessAppointments() {
 }
 
 function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: string) => void }) {
+	const { t } = useTranslation()
 	const [viewDate, setViewDate] = useState(() => {
 		const d = selected ? new Date(selected) : new Date()
 		return { year: d.getFullYear(), month: d.getMonth() }
@@ -151,7 +158,7 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 	const firstDay = new Date(viewDate.year, viewDate.month, 1).getDay()
 	const offset = firstDay === 0 ? 6 : firstDay - 1
 
-	const today = new Date().toISOString().slice(0, 10)
+	const today = todayIso()
 	const monthLabel = new Date(viewDate.year, viewDate.month).toLocaleDateString(undefined, {
 		month: "long",
 		year: "numeric",
@@ -180,7 +187,7 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 				>
 					<ChevronLeft size={16} />
 				</button>
-				<span className="text-sm font-medium text-(--text) capitalize">{monthLabel}</span>
+				<span className="strong-sm capitalize">{monthLabel}</span>
 				<button
 					type="button"
 					onClick={() => shift(1)}
@@ -191,9 +198,9 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 			</div>
 
 			<div className="grid grid-cols-7 mb-1">
-				{["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d) => (
-					<div key={d} className="text-[10px] text-(--text-subtle) text-center py-1 font-medium">
-						{d}
+				{WEEK_DAYS.map((day) => (
+					<div key={day} className="text-[10px] text-(--text-subtle) text-center py-1 font-medium">
+						{t(`days.short.${day}`)}
 					</div>
 				))}
 			</div>

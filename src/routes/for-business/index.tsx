@@ -38,20 +38,18 @@ function ForBusinessPage() {
 				</div>
 			</section>
 
-			<section className="px-4 py-8 border-t border-white/6">
+			<section className="px-4 py-8 border-t border-(--border)">
 				<div className="page-wrap max-w-4xl">
-					<p className="text-[11px] text-(--text-muted) font-medium mb-3">
-						{t("forBusiness.featuresTitle")}
-					</p>
+					<p className="muted-tiny font-medium mb-3">{t("forBusiness.featuresTitle")}</p>
 					<p className="text-(--text-muted) text-sm mb-6">{t("forBusiness.featuresSubtitle")}</p>
 
 					<div className="space-y-4">
 						{features.map(({ icon: Icon, key }, i) => (
 							<div
 								key={key}
-								className="flex gap-6 items-start group py-6 border-b border-white/4 last:border-0"
+								className="flex gap-6 items-start group py-6 border-b border-(--border) last:border-0"
 							>
-								<span className="text-4xl font-bold text-white/6 leading-none shrink-0 w-12">
+								<span className="text-4xl font-bold text-(--border) leading-none shrink-0 w-12">
 									{String(i + 1).padStart(2, "0")}
 								</span>
 								<div className="flex-1">
@@ -59,9 +57,7 @@ function ForBusinessPage() {
 										<Icon size={16} className="text-(--gold) opacity-70" />
 										{t(`forBusiness.features.${key}.title`)}
 									</h3>
-									<p className="text-sm text-(--text-muted) leading-relaxed">
-										{t(`forBusiness.features.${key}.desc`)}
-									</p>
+									<p className="muted-sm leading-relaxed">{t(`forBusiness.features.${key}.desc`)}</p>
 								</div>
 							</div>
 						))}

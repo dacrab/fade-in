@@ -5,7 +5,8 @@ const el = {
 		cancel: "Ακύρωση",
 		back: "Πίσω",
 		next: "Επόμενο",
-		done: "Τέλος",
+		noData: "Δεν υπάρχουν δεδομένα",
+		page: "Σελίδα {{page}} από {{total}}",
 		search: "Αναζήτηση",
 		filter: "Φίλτρα",
 		reset: "Επαναφορά",
@@ -20,10 +21,29 @@ const el = {
 		active: "Ενεργό",
 		suspended: "Ανασταλμένο",
 		anyRating: "Οποιαδήποτε",
-		at: "στις",
 		min: "λεπτά",
+		switchLanguage: "Αλλαγή σε {{lang}}",
 		addToFavorites: "Προσθήκη στα αγαπημένα",
 		removeFromFavorites: "Αφαίρεση από αγαπημένα",
+	},
+
+	days: {
+		monday: "Δευτέρα",
+		tuesday: "Τρίτη",
+		wednesday: "Τετάρτη",
+		thursday: "Πέμπτη",
+		friday: "Παρασκευή",
+		saturday: "Σάββατο",
+		sunday: "Κυριακή",
+		short: {
+			monday: "Δε",
+			tuesday: "Τρ",
+			wednesday: "Τε",
+			thursday: "Πε",
+			friday: "Πα",
+			saturday: "Σα",
+			sunday: "Κυ",
+		},
 	},
 
 	nav: {
@@ -67,7 +87,6 @@ const el = {
 	},
 
 	home: {
-		badge: "Η #1 πλατφόρμα κράτησης κουρείων",
 		heroTitle: "Εμφάνιση κορυφαία,",
 		heroTitleHighlight: "κράτηση γρήγορα",
 		heroSubtitle: "Ανακαλύψτε κορυφαία κουρεία κοντά σας και κλείστε ραντεβού σε δευτερόλεπτα.",
@@ -112,6 +131,7 @@ const el = {
 		clearFilters: "Καθαρισμός φίλτρων",
 		mapView: "Χάρτης",
 		listView: "Λίστα",
+		ratingAbove: "{{rating}}+ αστέρια",
 	},
 
 	shop: {
@@ -126,7 +146,6 @@ const el = {
 		noReviews: "Δεν υπάρχουν αξιολογήσεις ακόμα.",
 		bookAppointment: "Κλείστε ραντεβού",
 		hours: "Ωράριο",
-		followUs: "Ακολουθήστε μας",
 		closed: "Κλειστό",
 		ownerReply: "Απάντηση ιδιοκτήτη:",
 		shareTitle: "Μοιραστείτε αυτό το κατάστημα",
@@ -145,7 +164,6 @@ const el = {
 			barber: "Κουρέας",
 			date: "Ημερομηνία & Ώρα",
 			confirm: "Επιβεβαίωση",
-			done: "Τέλος",
 		},
 		selectServices: "Επιλέξτε μία ή περισσότερες υπηρεσίες",
 		noServices: "Δεν υπάρχουν διαθέσιμες υπηρεσίες.",
@@ -170,10 +188,20 @@ const el = {
 		duration: "{{minutes}} λεπτά",
 		confirming: "Επιβεβαίωση…",
 		confirmBooking: "Επιβεβαίωση κράτησης",
-		confirmed: "Η κράτηση επιβεβαιώθηκε!",
-		confirmedMessage: "Το ραντεβού σας στο {{name}} επιβεβαιώθηκε για {{date}} στις {{time}}.",
 		signInRequired: "Συνδεθείτε για να κάνετε κράτηση.",
 		failed: "Η κράτηση απέτυχε. Δοκιμάστε ξανά.",
+		notFound: "Το ραντεβού δεν βρέθηκε",
+		notFoundMessage: "Αυτό το ραντεβού δεν υπάρχει ή έχει αφαιρεθεί.",
+		paid: "Πληρωμένο",
+		unpaid: "Απλήρωτο",
+		paymentSuccess: "Η πληρωμή ολοκληρώθηκε! Το ραντεβού σας επιβεβαιώθηκε.",
+		paymentCanceled: "Η πληρωμή ακυρώθηκε. Το ραντεβού σας δεν έχει επιβεβαιωθεί ακόμα.",
+		reschedule: "Αλλαγή ώρας",
+		rescheduleTitle: "Αλλαγή ραντεβού",
+		rescheduleConfirm: "Επιβεβαίωση αλλαγής",
+		rescheduled: "Το ραντεβού άλλαξε!",
+		startTime: "Ώρα έναρξης",
+		endTime: "Ώρα λήξης",
 	},
 
 	forBusiness: {
@@ -225,9 +253,7 @@ const el = {
 		phonePlaceholder: "+30 6900 000000",
 		emailNote: "Το email δεν μπορεί να αλλαχθεί.",
 		leaveReview: "Γράψτε κριτική",
-		reviewTitle: "Αξιολογήστε την εμπειρία σας",
 		reviewPlaceholder: "Πείτε σε άλλους για την εμπειρία σας…",
-		reviewSubmitted: "Η κριτική υποβλήθηκε!",
 		rebook: "Επανακράτηση",
 	},
 
@@ -270,6 +296,10 @@ const el = {
 			confirm: "Επιβεβαίωση",
 			cancel: "Ακύρωση",
 			complete: "Ολοκλήρωση",
+			total: "{{count}} συνολικά",
+			pending: "{{count}} σε αναμονή",
+			confirmed: "{{count}} επιβεβαιωμένα",
+			done: "{{count}} ολοκληρωμένα",
 		},
 		services: {
 			title: "Υπηρεσίες",
@@ -330,6 +360,10 @@ const el = {
 		recentShops: "Πρόσφατα καταστήματα",
 		userBreakdown: "Κατανομή χρηστών",
 		roles: {
+			customer: "Πελάτης",
+			owner: "Ιδιοκτήτης",
+			barber: "Κουρέας",
+			admin: "Διαχειριστής",
 			customers: "Πελάτες",
 			owners: "Ιδιοκτήτες",
 			barbers: "Κουρείς",
@@ -357,6 +391,17 @@ const el = {
 			colEmail: "Email",
 			colRole: "Ρόλος",
 		},
+		appointments: {
+			title: "Ραντεβού",
+			noAppointments: "Δεν υπάρχουν ραντεβού ακόμα.",
+			colCustomer: "Πελάτης",
+			colShop: "Κατάστημα",
+			colBarber: "Κουρέας",
+			colDate: "Ημερομηνία & Ώρα",
+			colStatus: "Κατάσταση",
+			colPayment: "Πληρωμή",
+			colPrice: "Τιμή",
+		},
 	},
 
 	footer: {
@@ -372,7 +417,6 @@ const el = {
 		noLocationsHint: "Τα καταστήματα χρειάζονται συντεταγμένες για να εμφανιστούν.",
 		shopsOnMap: "{{count}} καταστήματα στον χάρτη",
 		bookNowArrow: "Κράτηση τώρα",
-		switchTo: "Αλλαγή σε {{lang}}",
 		reviewsCount: "{{count}} αξιολογήσεις",
 	},
 
@@ -381,14 +425,8 @@ const el = {
 		subtitle: "Δείτε τα επερχόμενα ραντεβού σας.",
 		schedule: "Πρόγραμμα",
 		earnings: "Κέρδη",
+		nextUp: "Επόμενο",
 		noAppointments: "Δεν υπάρχουν ραντεβού για αυτή την ημερομηνία.",
-	},
-
-	manage: {
-		noToken: "Δεν δόθηκε σύνδεσμος διαχείρισης. Ελέγξτε το email σας για τον πλήρη σύνδεσμο.",
-		notFound: "Το ραντεβού δεν βρέθηκε",
-		notFoundMessage: "Αυτό το ραντεβού δεν υπάρχει ή έχει αφαιρεθεί.",
-		shop: "Κουρείο",
 	},
 
 	resetPassword: {
@@ -412,6 +450,7 @@ const el = {
 		errorMessage: "Παρουσιάστηκε ένα απρόσμενο σφάλμα. Δοκιμάστε ξανά.",
 		tryAgain: "Δοκιμάστε ξανά",
 		updateStatusFailed: "Αποτυχία ενημέρωσης κατάστασης.",
+		rescheduleFailed: "Αποτυχία αλλαγής ραντεβού.",
 		fillAllFields: "Παρακαλώ συμπληρώστε όλα τα πεδία.",
 		passwordLength: "Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.",
 		passwordMismatch: "Οι κωδικοί δεν ταιριάζουν.",
@@ -422,7 +461,6 @@ const el = {
 		replyAdded: "Η απάντηση προστέθηκε!",
 		reviewAdded: "Η κριτική υποβλήθηκε!",
 		reviewFailed: "Αποτυχία υποβολής κριτικής",
-		alreadyReviewed: "Έχετε ήδη αξιολογήσει αυτό το ραντεβού",
 		replyFailed: "Αποτυχία προσθήκης απάντησης.",
 		barberSaved: "Ο κουρέας αποθηκεύτηκε!",
 		barberFailed: "Αποτυχία αποθήκευσης κουρέα.",

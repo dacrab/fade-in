@@ -7,10 +7,11 @@ import {
 	getSortedRowModel,
 	type SortingState,
 	useReactTable,
-	type VisibilityState,
 } from "@tanstack/react-table"
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp } from "lucide-react"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { SkeletonRows } from "./Skeleton"
 
 interface DataTableProps<TData> {
 	columns: ColumnDef<TData>[]
@@ -27,20 +28,19 @@ export function DataTable<TData extends { _id: string }>({
 	data,
 	loading,
 	loadingRows = 5,
-	emptyMessage = "No data",
+	emptyMessage,
 	searchable,
-	searchPlaceholder = "Search...",
+	searchPlaceholder,
 }: DataTableProps<TData>) {
+	const { t } = useTranslation()
 	const [sorting, setSorting] = useState<SortingState>([])
-	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [globalFilter, setGlobalFilter] = useState("")
 
 	const table = useReactTable({
 		data,
 		columns,
-		state: { sorting, columnVisibility, globalFilter },
+		state: { sorting, globalFilter },
 		onSortingChange: setSorting,
-		onColumnVisibilityChange: setColumnVisibility,
 		onGlobalFilterChange: setGlobalFilter,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -50,15 +50,9 @@ export function DataTable<TData extends { _id: string }>({
 	})
 
 	if (loading) {
-		const skeletonKeys = Array.from(
-			{ length: loadingRows },
-			(_, i) => `skeleton-row-${loadingRows}-${i}`,
-		)
 		return (
 			<div className="space-y-3">
-				{skeletonKeys.map((key) => (
-					<div key={key} className="h-12 w-full rounded-lg bg-(--bg-input) animate-pulse" />
-				))}
+				<SkeletonRows count={loadingRows} className="h-12" />
 			</div>
 		)
 	}
@@ -66,7 +60,7 @@ export function DataTable<TData extends { _id: string }>({
 	if (data.length === 0) {
 		return (
 			<div className="text-center py-12">
-				<p className="text-sm text-(--text-muted)">{emptyMessage}</p>
+				<p className="muted-sm">{emptyMessage ?? t("common.noData")}</p>
 			</div>
 		)
 	}
@@ -77,7 +71,7 @@ export function DataTable<TData extends { _id: string }>({
 				<div className="mb-4">
 					<input
 						className="input w-full max-w-xs text-sm"
-						placeholder={searchPlaceholder}
+						placeholder={searchPlaceholder ?? t("common.search")}
 						value={globalFilter}
 						onChange={(e) => setGlobalFilter(e.target.value)}
 					/>
@@ -92,7 +86,7 @@ export function DataTable<TData extends { _id: string }>({
 									<th
 										key={header.id}
 										className="px-4 py-3 text-left text-xs font-semibold text-(--text-muted) select-none"
-										style={{ width: header.getSize() === 150 ? undefined : header.getSize() }}
+										style={{ width: header.getSize() }}
 									>
 										{header.isPlaceholder ? null : (
 											<button
@@ -122,7 +116,7 @@ export function DataTable<TData extends { _id: string }>({
 								className="border-b border-(--border) last:border-0 hover:bg-(--bg-input)/20 transition-colors"
 							>
 								{row.getVisibleCells().map((cell) => (
-									<td key={cell.id} className="px-4 py-3 text-sm text-(--text)">
+									<td key={cell.id} className="px-4 py-3 main-sm">
 										{flexRender(cell.column.columnDef.cell, cell.getContext())}
 									</td>
 								))}
@@ -131,9 +125,12 @@ export function DataTable<TData extends { _id: string }>({
 					</tbody>
 				</table>
 			</div>
-			<div className="flex items-center justify-between mt-4 text-xs text-(--text-muted)">
+			<div className="flex items-center justify-between mt-4 muted-xs">
 				<span>
-					Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+					{t("common.page", {
+						page: table.getState().pagination.pageIndex + 1,
+						total: table.getPageCount(),
+					})}
 				</span>
 				<div className="flex items-center gap-2">
 					<button

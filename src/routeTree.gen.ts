@@ -34,7 +34,6 @@ import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminShopsRouteImport } from './routes/admin/shops'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin/appointments'
-import { Route as BookingIdManageRouteImport } from './routes/booking/$id.manage'
 
 const BusinessRoute = BusinessRouteImport.update({
   id: '/business',
@@ -161,11 +160,6 @@ const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
   path: '/admin/appointments',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BookingIdManageRoute = BookingIdManageRouteImport.update({
-  id: '/manage',
-  path: '/manage',
-  getParentRoute: () => BookingIdRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -177,7 +171,7 @@ export interface FileRoutesByFullPath {
   '/barber/overview': typeof BarberOverviewRoute
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
-  '/booking/$id': typeof BookingIdRouteWithChildren
+  '/booking/$id': typeof BookingIdRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
   '/business/barbers': typeof BusinessBarbersRoute
   '/business/overview': typeof BusinessOverviewRoute
@@ -193,7 +187,6 @@ export interface FileRoutesByFullPath {
   '/register/': typeof RegisterIndexRoute
   '/reset-password/': typeof ResetPasswordIndexRoute
   '/terms/': typeof TermsIndexRoute
-  '/booking/$id/manage': typeof BookingIdManageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -205,7 +198,7 @@ export interface FileRoutesByTo {
   '/barber/overview': typeof BarberOverviewRoute
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
-  '/booking/$id': typeof BookingIdRouteWithChildren
+  '/booking/$id': typeof BookingIdRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
   '/business/barbers': typeof BusinessBarbersRoute
   '/business/overview': typeof BusinessOverviewRoute
@@ -221,7 +214,6 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterIndexRoute
   '/reset-password': typeof ResetPasswordIndexRoute
   '/terms': typeof TermsIndexRoute
-  '/booking/$id/manage': typeof BookingIdManageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -234,7 +226,7 @@ export interface FileRoutesById {
   '/barber/overview': typeof BarberOverviewRoute
   '/barbershops/$slug': typeof BarbershopsSlugRoute
   '/barbershops/listing': typeof BarbershopsListingRoute
-  '/booking/$id': typeof BookingIdRouteWithChildren
+  '/booking/$id': typeof BookingIdRoute
   '/business/appointments': typeof BusinessAppointmentsRoute
   '/business/barbers': typeof BusinessBarbersRoute
   '/business/overview': typeof BusinessOverviewRoute
@@ -250,7 +242,6 @@ export interface FileRoutesById {
   '/register/': typeof RegisterIndexRoute
   '/reset-password/': typeof ResetPasswordIndexRoute
   '/terms/': typeof TermsIndexRoute
-  '/booking/$id/manage': typeof BookingIdManageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -280,7 +271,6 @@ export interface FileRouteTypes {
     | '/register/'
     | '/reset-password/'
     | '/terms/'
-    | '/booking/$id/manage'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -308,7 +298,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/terms'
-    | '/booking/$id/manage'
   id:
     | '__root__'
     | '/'
@@ -336,7 +325,6 @@ export interface FileRouteTypes {
     | '/register/'
     | '/reset-password/'
     | '/terms/'
-    | '/booking/$id/manage'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -349,7 +337,7 @@ export interface RootRouteChildren {
   BarberOverviewRoute: typeof BarberOverviewRoute
   BarbershopsSlugRoute: typeof BarbershopsSlugRoute
   BarbershopsListingRoute: typeof BarbershopsListingRoute
-  BookingIdRoute: typeof BookingIdRouteWithChildren
+  BookingIdRoute: typeof BookingIdRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardOverviewRoute: typeof DashboardOverviewRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
@@ -538,13 +526,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAppointmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/booking/$id/manage': {
-      id: '/booking/$id/manage'
-      path: '/manage'
-      fullPath: '/booking/$id/manage'
-      preLoaderRoute: typeof BookingIdManageRouteImport
-      parentRoute: typeof BookingIdRoute
-    }
   }
 }
 
@@ -570,18 +551,6 @@ const BusinessRouteWithChildren = BusinessRoute._addFileChildren(
   BusinessRouteChildren,
 )
 
-interface BookingIdRouteChildren {
-  BookingIdManageRoute: typeof BookingIdManageRoute
-}
-
-const BookingIdRouteChildren: BookingIdRouteChildren = {
-  BookingIdManageRoute: BookingIdManageRoute,
-}
-
-const BookingIdRouteWithChildren = BookingIdRoute._addFileChildren(
-  BookingIdRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BusinessRoute: BusinessRouteWithChildren,
@@ -592,7 +561,7 @@ const rootRouteChildren: RootRouteChildren = {
   BarberOverviewRoute: BarberOverviewRoute,
   BarbershopsSlugRoute: BarbershopsSlugRoute,
   BarbershopsListingRoute: BarbershopsListingRoute,
-  BookingIdRoute: BookingIdRouteWithChildren,
+  BookingIdRoute: BookingIdRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardOverviewRoute: DashboardOverviewRoute,
   DashboardProfileRoute: DashboardProfileRoute,

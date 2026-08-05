@@ -2,7 +2,6 @@ import { ConvexError, v } from "convex/values"
 import { api } from "./_generated/api"
 import type { Id } from "./_generated/dataModel"
 import { action } from "./_generated/server"
-import { computeServiceTotal } from "./lib/services"
 
 const POLAR_BASE = "https://api.polar.sh/v1"
 
@@ -43,13 +42,7 @@ export const createCheckoutSession = action({
 		const user = await ctx.runMutation(api.users.ensureCurrentUser, {})
 		if (!user) throw new ConvexError("Not authenticated")
 
-		const totalPrice = await computeServiceTotal(
-			(id: Id<"services">) => ctx.runQuery(api.services.getById, { id }),
-			args.serviceIds,
-			args.barbershopId,
-		)
-
-		const appointmentId = await ctx.runMutation(api.appointments.create, {
+		const { appointmentId, totalPrice } = await ctx.runMutation(api.appointments.create, {
 			barbershopId: args.barbershopId,
 			barberId: args.barberId,
 			serviceIds: args.serviceIds,

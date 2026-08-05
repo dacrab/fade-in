@@ -99,7 +99,7 @@ function BusinessServices() {
 			{
 				name: svc.name,
 				description: svc.description ?? "",
-				price: formatPrice(svc.price),
+				price: (svc.price / 100).toFixed(2),
 				durationMinutes: String(svc.durationMinutes),
 				category: svc.category,
 			},
@@ -120,9 +120,7 @@ function BusinessServices() {
 			<div className="max-w-3xl mx-auto px-6 py-8">
 				<div className="flex items-start justify-between mb-5">
 					<div>
-						<h1 className="text-lg font-medium text-(--text) tracking-tight">
-							{t("business.services.title")}
-						</h1>
+						<h1 className="section-title">{t("business.services.title")}</h1>
 					</div>
 					<button
 						type="button"
@@ -130,7 +128,7 @@ function BusinessServices() {
 							reset()
 							setShowForm(!showForm)
 						}}
-						className="btn btn-primary text-xs"
+						className="btn btn-primary btn-sm"
 					>
 						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
 						{showForm ? t("common.cancel") : t("business.services.addService")}
@@ -147,7 +145,7 @@ function BusinessServices() {
 							className="grid grid-cols-1 sm:grid-cols-2 gap-5"
 						>
 							<div className="sm:col-span-2">
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-name">
+								<label className="field-label" htmlFor="svc-name">
 									{t("form.nameStar")}
 								</label>
 								<input
@@ -160,7 +158,7 @@ function BusinessServices() {
 								/>
 							</div>
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-price">
+								<label className="field-label" htmlFor="svc-price">
 									{t("form.priceLabel")} *
 								</label>
 								<input
@@ -175,7 +173,7 @@ function BusinessServices() {
 								/>
 							</div>
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-duration">
+								<label className="field-label" htmlFor="svc-duration">
 									{t("form.durationLabel")} *
 								</label>
 								<input
@@ -190,12 +188,12 @@ function BusinessServices() {
 								/>
 							</div>
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-category">
+								<label className="field-label" htmlFor="svc-category">
 									{t("form.categoryLabel")}
 								</label>
 								<select
 									id="svc-category"
-									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 text-sm text-(--text) focus:outline-none focus:border-(--gold) transition-colors"
+									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm focus:outline-none focus:border-(--gold) transition-colors"
 									value={form.category}
 									onChange={set("category")}
 								>
@@ -207,7 +205,7 @@ function BusinessServices() {
 								</select>
 							</div>
 							<div className="sm:col-span-2">
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="svc-desc">
+								<label className="field-label" htmlFor="svc-desc">
 									{t("form.descriptionLabel")}
 								</label>
 								<input
@@ -218,14 +216,14 @@ function BusinessServices() {
 								/>
 							</div>
 							<div className="sm:col-span-2 flex gap-3">
-								<button type="submit" className="btn btn-primary text-xs">
+								<button type="submit" className="btn btn-primary btn-sm">
 									<Check size={13} />
 									{editId ? t("common.save") : t("business.services.addService")}
 								</button>
 								<button
 									type="button"
 									onClick={reset}
-									className="px-4 py-2 rounded-full border border-(--border) text-xs text-(--text-muted) hover:text-(--text-muted) transition-colors"
+									className="px-4 py-2 rounded-full border border-(--border) muted-xs hover:text-(--text-muted) transition-colors"
 								>
 									{t("common.cancel")}
 								</button>
@@ -237,16 +235,14 @@ function BusinessServices() {
 				{services === undefined ? (
 					<SkeletonRows count={4} className="h-14 rounded-lg" />
 				) : services.length === 0 ? (
-					<p className="text-sm text-(--text-subtle) py-8 text-center">
-						{t("business.services.noServices")}
-					</p>
+					<p className="empty-text">{t("business.services.noServices")}</p>
 				) : (
-					<div className="divide-y divide-white/4">
+					<div className="divide-y divide-(--border)">
 						{services.map((svc: Doc<"services">) => (
 							<div key={svc._id} className="flex items-center gap-4 py-4 group">
 								<div className="flex-1 min-w-0">
-									<div className="text-sm text-(--text)">{svc.name}</div>
-									<div className="text-xs text-(--text-subtle) mt-0.5">
+									<div className="main-sm">{svc.name}</div>
+									<div className="field-hint">
 										{svc.durationMinutes} min · {t(`business.services.categories.${svc.category}`)}
 									</div>
 								</div>

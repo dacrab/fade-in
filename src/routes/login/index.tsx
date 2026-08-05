@@ -51,12 +51,12 @@ function LoginPage() {
 				</Link>
 
 				<div className="bg-(--bg-card) rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-8">
-					<h1 className="text-2xl font-bold text-(--text) mb-1 text-center">{t("auth.loginTitle")}</h1>
-					<p className="text-sm text-(--text-muted) mb-6 text-center">{t("auth.loginSubtitle")}</p>
+					<h1 className="page-title mb-1 text-center">{t("auth.loginTitle")}</h1>
+					<p className="muted-sm mb-6 text-center">{t("auth.loginSubtitle")}</p>
 
 					<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
 						<div>
-							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="login-email">
+							<label className="block strong-sm mb-1.5" htmlFor="login-email">
 								{t("auth.emailLabel")}
 							</label>
 							<input
@@ -71,7 +71,7 @@ function LoginPage() {
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="login-password">
+							<label className="block strong-sm mb-1.5" htmlFor="login-password">
 								{t("auth.passwordLabel")}
 							</label>
 							<PasswordInput
@@ -92,7 +92,7 @@ function LoginPage() {
 						</button>
 					</form>
 
-					<p className="mt-6 text-center text-sm text-(--text-muted)">
+					<p className="mt-6 text-center muted-sm">
 						{t("auth.noAccount")}{" "}
 						<Link to="/register" className="text-(--gold) hover:underline font-medium">
 							{t("common.createAccount")}

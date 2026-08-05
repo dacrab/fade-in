@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next"
 import { DataTable } from "#/components/ui/DataTable"
 import { useAdminAuth } from "#/hooks/useAdminAuth"
 import { formatPrice } from "#/lib/format"
-import { STATUS_BADGE } from "#/types"
+import { isAppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
 type ListAllWithDetails = (typeof api.appointments)["listAllWithDetails"]
@@ -31,7 +31,7 @@ function AdminAppointments() {
 			cell: ({ row }) => (
 				<div className="flex items-center gap-2 min-w-0">
 					<User size={13} className="text-(--text-subtle) shrink-0" />
-					<span className="text-sm text-(--text) truncate">{row.original.customerName}</span>
+					<span className="main-sm truncate">{row.original.customerName}</span>
 				</div>
 			),
 		},
@@ -41,7 +41,7 @@ function AdminAppointments() {
 			cell: ({ row }) => (
 				<div className="flex items-center gap-2 min-w-0">
 					<Store size={13} className="text-(--text-subtle) shrink-0" />
-					<span className="text-sm text-(--text-muted) truncate">{row.original.shopName}</span>
+					<span className="muted-sm truncate">{row.original.shopName}</span>
 				</div>
 			),
 		},
@@ -51,7 +51,7 @@ function AdminAppointments() {
 			cell: ({ row }) => (
 				<div className="flex items-center gap-2 min-w-0">
 					<Scissors size={13} className="text-(--text-subtle) shrink-0" />
-					<span className="text-sm text-(--text-muted) truncate">{row.original.barberName}</span>
+					<span className="muted-sm truncate">{row.original.barberName}</span>
 				</div>
 			),
 		},
@@ -62,8 +62,8 @@ function AdminAppointments() {
 			cell: ({ row }) => (
 				<div className="flex items-center gap-2">
 					<Calendar size={13} className="text-(--text-subtle) shrink-0" />
-					<span className="text-sm text-(--text)">{row.original.date}</span>
-					<span className="text-xs text-(--text-subtle)">
+					<span className="main-sm">{row.original.date}</span>
+					<span className="subtle-xs">
 						{row.original.startTime} – {row.original.endTime}
 					</span>
 				</div>
@@ -75,14 +75,8 @@ function AdminAppointments() {
 			enableSorting: true,
 			cell: ({ row }) => {
 				const status = row.original.status
-				if (
-					status !== "pending" &&
-					status !== "confirmed" &&
-					status !== "completed" &&
-					status !== "cancelled"
-				)
-					return null
-				return <span className={`badge ${STATUS_BADGE[status]} w-fit`}>{status}</span>
+				if (!isAppointmentStatus(status)) return null
+				return <span className={`badge ${STATUS_BADGE[status]} w-fit`}>{t(`status.${status}`)}</span>
 			},
 		},
 		{
@@ -91,9 +85,11 @@ function AdminAppointments() {
 			cell: ({ row }) => {
 				const ps = row.original.paymentStatus
 				return ps ? (
-					<span className={`badge w-fit ${ps === "paid" ? "badge-green" : "badge-gold"}`}>{ps}</span>
+					<span className={`badge w-fit ${ps === "paid" ? "badge-green" : "badge-gold"}`}>
+						{ps === "paid" ? t("booking.paid") : t("booking.unpaid")}
+					</span>
 				) : (
-					<span className="text-xs text-(--text-subtle)">—</span>
+					<span className="subtle-xs">—</span>
 				)
 			},
 		},
@@ -104,9 +100,7 @@ function AdminAppointments() {
 			cell: ({ row }) => (
 				<div className="flex items-center gap-1">
 					<Euro size={13} className="text-(--text-subtle)" />
-					<span className="text-sm font-medium text-(--text)">
-						{formatPrice(row.original.totalPrice)}
-					</span>
+					<span className="strong-sm">{formatPrice(row.original.totalPrice)}</span>
 				</div>
 			),
 		},
@@ -115,7 +109,7 @@ function AdminAppointments() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-6xl">
-				<div className="flex items-center justify-between mb-6">
+				<div className="page-head">
 					<div className="page-header">
 						<Link to="/admin/overview" className="breadcrumb-back">
 							← {t("nav.admin")}

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { formatPrice } from "#/lib/format"
+import { formatPrice, todayIso } from "#/lib/format"
 import { PAGE_SIZE, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
@@ -18,7 +18,7 @@ function BusinessDashboard() {
 
 	const shop = useOwnerShop(user?.id)
 
-	const todayStr = new Date().toISOString().slice(0, 10)
+	const todayStr = todayIso()
 	const todayAppts = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: todayStr } : "skip",
@@ -45,7 +45,7 @@ function BusinessDashboard() {
 					<h1 className="text-xl font-medium text-(--text) tracking-tight">
 						{t("business.setupTitle")}
 					</h1>
-					<p className="text-sm text-(--text-muted) leading-relaxed">{t("business.setupHint")}</p>
+					<p className="muted-sm leading-relaxed">{t("business.setupHint")}</p>
 					<Link to="/business/profile" className="btn btn-primary">
 						<PlusCircle size={15} /> {t("business.createShop")}
 					</Link>
@@ -57,12 +57,8 @@ function BusinessDashboard() {
 	return (
 		<div className="px-8 py-8">
 			<div className="mb-5">
-				<h1 className="text-lg font-medium text-(--text) tracking-tight">
-					{t("business.overviewTitle")}
-				</h1>
-				<p className="text-sm text-(--text-muted) mt-1">
-					{t("dashboard.welcome", { name: user.name })}
-				</p>
+				<h1 className="section-title">{t("business.overviewTitle")}</h1>
+				<p className="muted-sm mt-1">{t("dashboard.welcome", { name: user.name })}</p>
 			</div>
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
@@ -88,7 +84,7 @@ function BusinessDashboard() {
 				).map(({ label, value }) => (
 					<div key={label} className="border-l-2 border-(--gold)/40 pl-4 py-3">
 						<div className="text-2xl font-semibold text-(--text) tracking-tight">{value}</div>
-						<div className="text-xs text-(--text-muted) mt-1">{label}</div>
+						<div className="muted-xs mt-1">{label}</div>
 					</div>
 				))}
 			</div>
@@ -110,22 +106,22 @@ function BusinessDashboard() {
 						))}
 					</div>
 				) : todayAppts.length === 0 ? (
-					<p className="text-sm text-(--text-subtle) py-4">{t("business.noToday")}</p>
+					<p className="subtle-sm py-4">{t("business.noToday")}</p>
 				) : (
-					<div className="divide-y divide-white/4">
+					<div className="divide-y divide-(--border)">
 						{todayAppts.map((appt: Doc<"appointments">) => (
 							<div key={appt._id} className="flex items-center gap-4 py-3">
 								<span className="font-mono text-sm font-medium text-(--gold) w-12">{appt.startTime}</span>
 								<div className="flex-1 min-w-0">
-									<div className="text-sm text-(--text-muted) truncate">
+									<div className="muted-sm truncate">
 										{appt.notes ?? t("business.defaultAppointmentNote")}
 									</div>
-									<div className="text-xs text-(--text-subtle)">
+									<div className="subtle-xs">
 										{appt.endTime} · {formatPrice(appt.totalPrice)}
 									</div>
 								</div>
 								<span className={`text-[10px] px-2 py-0.5 rounded-full ${STATUS_BADGE[appt.status]}`}>
-									{appt.status}
+									{t(`status.${appt.status}`)}
 								</span>
 							</div>
 						))}
@@ -138,15 +134,15 @@ function BusinessDashboard() {
 				{stats === undefined ? (
 					<Skeleton className="h-24 w-full" />
 				) : stats.totalCount === 0 ? (
-					<p className="text-sm text-(--text-subtle)">{t("business.revenue.noData")}</p>
+					<p className="subtle-sm">{t("business.revenue.noData")}</p>
 				) : (
 					<div className="space-y-4">
 						<div>
-							<div className="flex justify-between text-xs text-(--text-muted) mb-2">
+							<div className="flex justify-between muted-xs mb-2">
 								<span>{t("business.stats.completionRate")}</span>
 								<span className="font-medium text-(--text-muted)">{completionRate}%</span>
 							</div>
-							<div className="h-1.5 rounded-full bg-white/6 overflow-hidden">
+							<div className="h-1.5 rounded-full bg-(--bg-input) overflow-hidden">
 								<div
 									className="h-full rounded-full bg-(--gold) transition-all"
 									style={{ width: `${completionRate}%` }}
@@ -175,7 +171,7 @@ function BusinessDashboard() {
 							).map(({ label, count, color }) => (
 								<div key={label}>
 									<div className={`text-xl font-semibold ${color}`}>{count}</div>
-									<div className="text-xs text-(--text-subtle) mt-0.5">{label}</div>
+									<div className="field-hint">{label}</div>
 								</div>
 							))}
 						</div>
@@ -196,16 +192,16 @@ function BusinessDashboard() {
 				{reviews === undefined ? (
 					<Skeleton className="h-24 w-full" />
 				) : reviews.length === 0 ? (
-					<p className="text-sm text-(--text-subtle)">{t("business.noReviewsYet")}</p>
+					<p className="subtle-sm">{t("business.noReviewsYet")}</p>
 				) : (
 					<div className="space-y-3">
 						{reviews.slice(0, 3).map((r: Doc<"reviews">) => (
 							<div key={r._id} className="border-b border-(--border) pb-3 last:border-0 last:pb-0">
 								<div className="flex items-center gap-2 mb-1">
 									<span className="text-sm font-medium text-(--gold)">{r.rating.toFixed(1)}</span>
-									<span className="text-xs text-(--text-subtle)">/ 5</span>
+									<span className="subtle-xs">/ 5</span>
 								</div>
-								<p className="text-sm text-(--text-muted) line-clamp-2">{r.comment}</p>
+								<p className="muted-sm line-clamp-2">{r.comment}</p>
 							</div>
 						))}
 					</div>

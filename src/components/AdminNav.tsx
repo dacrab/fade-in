@@ -14,14 +14,14 @@ export default function AdminNav() {
 		<aside className="px-4 py-6 hidden md:block">
 			<div className="mb-6">
 				<h2 className="font-semibold text-(--text)">{t("admin.title")}</h2>
-				<p className="text-xs text-(--text-muted)">{t("admin.subtitle")}</p>
+				<p className="muted-xs">{t("admin.subtitle")}</p>
 			</div>
 			<nav className="space-y-0.5">
 				{NAV_LINKS.map(({ to, labelKey, icon: Icon }) => (
 					<Link
 						key={to}
 						to={to}
-						className="flex items-center gap-2.5 px-3 py-2 text-sm text-(--text-muted) rounded-lg border-l-2 border-transparent transition-colors hover:text-(--text) hover:bg-(--bg-input)"
+						className="flex items-center gap-2.5 px-3 py-2 muted-sm rounded-lg border-l-2 border-transparent transition-colors hover:text-(--text) hover:bg-(--bg-input)"
 						activeProps={{
 							className:
 								"flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg border-l-2 border-(--gold) text-(--text) bg-(--bg-input)",

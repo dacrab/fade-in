@@ -55,7 +55,7 @@ function BarbershopsPage() {
 
 	return (
 		<main className="page-main">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div className="page-container">
 				<div className="mb-10">
 					<h1 className="text-4xl sm:text-5xl font-bold text-(--text) tracking-tight">
 						{t("barbershops.title")}
@@ -72,7 +72,7 @@ function BarbershopsPage() {
 								<Search size={16} className="text-(--text-subtle)" />
 							</div>
 							<input
-								className="flex-1 bg-transparent border-none outline-none py-3 text-sm text-(--text) placeholder:text-(--text-subtle)"
+								className="flex-1 bg-transparent border-none outline-none py-3 main-sm placeholder:text-(--text-subtle)"
 								placeholder={t("barbershops.searchPlaceholder")}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
@@ -82,7 +82,7 @@ function BarbershopsPage() {
 								<MapPin size={14} className="text-(--text-subtle)" />
 							</div>
 							<input
-								className="w-32 sm:w-40 bg-transparent border-none outline-none py-3 pr-4 text-sm text-(--text) placeholder:text-(--text-subtle)"
+								className="w-32 sm:w-40 bg-transparent border-none outline-none py-3 pr-4 main-sm placeholder:text-(--text-subtle)"
 								placeholder={t("home.cityPlaceholder")}
 								value={city}
 								onChange={(e) => setCity(e.target.value)}
@@ -161,7 +161,7 @@ function BarbershopsPage() {
 								<button
 									type="button"
 									onClick={() => setMinRating(0)}
-									className="flex items-center gap-1 text-xs text-(--text-muted) hover:text-(--gold) transition-colors"
+									className="flex items-center gap-1 muted-xs hover:text-(--gold) transition-colors"
 								>
 									<X size={12} />
 									{t("common.reset")}
@@ -188,7 +188,7 @@ function BarbershopsPage() {
 							<Scissors size={32} className="text-(--gold)/40" />
 						</div>
 						<p className="text-xl font-semibold text-(--text) mb-2">{t("barbershops.noShops")}</p>
-						<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t("barbershops.noShopsHint")}</p>
+						<p className="muted-sm mb-6 max-w-sm">{t("barbershops.noShopsHint")}</p>
 						{(search || city || minRating > 0) && (
 							<button
 								type="button"

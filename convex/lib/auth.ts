@@ -26,3 +26,9 @@ export async function requireOwner(
 	if (!shop || shop.ownerId !== user._id) throw new ConvexError("Not authorized")
 	return user
 }
+
+export async function requireAdmin(ctx: MutationCtx | QueryCtx): Promise<Doc<"users">> {
+	const user = await requireUser(ctx)
+	if (user.role !== "admin") throw new ConvexError("Not authorized")
+	return user
+}

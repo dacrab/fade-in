@@ -71,7 +71,7 @@ function HomePage() {
 					</form>
 
 					{stats && (stats.shopCount > 0 || stats.customerCount > 0) && (
-						<div className="flex items-center gap-6 text-sm text-(--text-muted) mt-8">
+						<div className="flex items-center gap-6 muted-sm mt-8">
 							{stats.shopCount > 0 && (
 								<span>
 									<strong className="text-(--text)">{stats.shopCount}</strong> {t("home.stats.shops")}
@@ -94,7 +94,7 @@ function HomePage() {
 
 			<section className="px-4 py-8">
 				<div className="page-wrap">
-					<h2 className="text-2xl font-bold text-(--text) mb-5">{t("home.featured")}</h2>
+					<h2 className="page-title mb-5">{t("home.featured")}</h2>
 					{!featured ? (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 							{[0, 1, 2, 3, 4, 5].map((i) => (
@@ -121,7 +121,7 @@ function HomePage() {
 
 			<section className="px-4 py-8 border-t border-(--border)">
 				<div className="page-wrap">
-					<h2 className="text-2xl font-bold text-(--text) mb-2">{t("home.howTitle")}</h2>
+					<h2 className="page-title mb-2">{t("home.howTitle")}</h2>
 					<p className="text-(--text-muted) mb-6">{t("home.howSubtitle")}</p>
 
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
