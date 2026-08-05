@@ -1,10 +1,10 @@
 /**
  * Unit tests for the appointment slot-generation algorithm.
- * Tests the shared generateSlots function from src/lib/slots.ts,
- * which is also used directly by the Convex appointments query.
+ * Tests the shared generateSlots function from convex/lib/slots.ts,
+ * which is used directly by the Convex appointments query.
  */
 import { describe, expect, it } from "vitest"
-import { generateSlots } from "./slots"
+import { generateSlots } from "../../convex/lib/slots"
 
 describe("generateSlots — appointment slot algorithm", () => {
 	it("generates slots starting at 09:00", () => {
@@ -28,11 +28,11 @@ describe("generateSlots — appointment slot algorithm", () => {
 		expect(generateSlots(30, [])).toHaveLength(20)
 	})
 
-	it("generates 20 slots for 60-min duration", () => {
+	it("last slot for 60-min duration is 18:00 (ends at 19:00)", () => {
 		const slots = generateSlots(60, [])
-		expect(slots).toHaveLength(20)
+		expect(slots).toHaveLength(19)
 		expect(slots[0]).toBe("09:00")
-		expect(slots[slots.length - 1]).toBe("18:30")
+		expect(slots[slots.length - 1]).toBe("18:00")
 	})
 
 	it("generates no slots when duration exceeds the working day", () => {
@@ -103,7 +103,7 @@ describe("generateSlots — appointment slot algorithm", () => {
 	it("handles 90-minute duration correctly", () => {
 		const slots = generateSlots(90, [])
 		expect(slots[0]).toBe("09:00")
-		expect(slots[slots.length - 1]).toBe("18:00") // 18:00 + 90min = 19:30, exceeds 19:00
+		expect(slots[slots.length - 1]).toBe("17:30") // 17:30 + 90min = 19:00, the last slot that ends by closing
 	})
 
 	it("handles appointments that start before working hours", () => {

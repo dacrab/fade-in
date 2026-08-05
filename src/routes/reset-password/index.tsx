@@ -29,10 +29,8 @@ function ResetPasswordPage() {
 				showToast(result.error.message, "error")
 				return
 			}
-			if (signIn.status === "needs_new_password") {
-				setSent(true)
-				showToast(t("resetPassword.sentSuccess"), "success")
-			}
+			setSent(true)
+			showToast(t("resetPassword.sentSuccess"), "success")
 		} catch {
 			showToast(t("resetPassword.sentFailed"), "error")
 		} finally {
@@ -48,12 +46,12 @@ function ResetPasswordPage() {
 						<div className="auth-logo-icon text-(--gold)">
 							<Scissors size={20} className="text-black" />
 						</div>
-						<span className="text-2xl font-bold text-(--text)">
+						<span className="page-title">
 							Fade<span className="text-(--gold)">In</span>
 						</span>
 					</Link>
-					<h1 className="text-2xl font-bold text-(--text) mb-1">{t("resetPassword.title")}</h1>
-					<p className="text-sm text-(--text-muted)">{t("resetPassword.subtitle")}</p>
+					<h1 className="page-title mb-1">{t("resetPassword.title")}</h1>
+					<p className="muted-sm">{t("resetPassword.subtitle")}</p>
 				</div>
 
 				<div className="card p-6 sm:p-8">
@@ -91,7 +89,7 @@ function ResetPasswordPage() {
 						</form>
 					)}
 
-					<div className="mt-6 text-center text-sm text-(--text-muted)">
+					<div className="mt-6 text-center muted-sm">
 						{t("resetPassword.rememberPassword")}{" "}
 						<Link to="/login" className="text-(--gold) hover:underline no-underline font-semibold">
 							{t("common.signIn")}

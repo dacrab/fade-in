@@ -25,8 +25,8 @@ function BusinessLayout() {
 			<aside className="w-56 flex-shrink-0 hidden md:flex flex-col py-8 px-5 border-r border-(--border)">
 				{shop && (
 					<div className="mb-5">
-						<h2 className="text-sm font-medium text-(--text) truncate">{shop.name}</h2>
-						<p className="text-xs text-(--text-muted) mt-0.5">{shop.city}</p>
+						<h2 className="strong-sm truncate">{shop.name}</h2>
+						<p className="muted-xs mt-0.5">{shop.city}</p>
 						{shop.isVerified && (
 							<span className="inline-flex items-center gap-1 text-[10px] text-(--gold) mt-1.5">
 								<Check size={9} /> {t("common.verified")}
@@ -39,10 +39,10 @@ function BusinessLayout() {
 						<Link
 							key={to}
 							to={to}
-							className="flex items-center gap-2.5 px-3 py-2 text-sm text-(--text-muted) hover:text-(--text) transition-colors rounded-md"
+							className="flex items-center gap-2.5 px-3 py-2 muted-sm hover:text-(--text) transition-colors rounded-md"
 							activeProps={{
 								className:
-									"flex items-center gap-2.5 px-3 py-2 text-sm text-(--text) font-medium rounded-md relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-0.5 before:h-4 before:bg-(--gold) before:rounded-full",
+									"flex items-center gap-2.5 px-3 py-2 main-sm font-medium rounded-md relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-0.5 before:h-4 before:bg-(--gold) before:rounded-full",
 							}}
 						>
 							<Icon size={15} />

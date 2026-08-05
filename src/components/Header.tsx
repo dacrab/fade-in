@@ -103,9 +103,7 @@ export default function Header() {
 										<div className="w-8 h-8 rounded-full bg-(--gold) text-white flex items-center justify-center text-xs font-medium">
 											{(user.name ?? user.email)?.[0]?.toUpperCase() ?? "?"}
 										</div>
-										<span className="hidden sm:block text-sm text-(--text) font-medium">
-											{user.name ?? user.email}
-										</span>
+										<span className="hidden sm:block main-sm font-medium">{user.name ?? user.email}</span>
 									</button>
 								}
 								items={userMenuItems}
@@ -139,12 +137,7 @@ export default function Header() {
 				<div className="fixed top-(--header-height) left-0 right-0 z-[60] bg-(--bg) border-b border-(--border) shadow-sm md:hidden">
 					<div className="flex flex-col px-6 py-6 gap-4">
 						{NAV_ITEMS.map(({ to, key }) => (
-							<Link
-								key={to}
-								to={to}
-								className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
-								onClick={() => setMobileOpen(false)}
-							>
+							<Link key={to} to={to} className="nav-link" onClick={() => setMobileOpen(false)}>
 								{t(key)}
 							</Link>
 						))}
@@ -152,11 +145,7 @@ export default function Header() {
 							<>
 								<div className="w-full h-px bg-(--border)" />
 								{roleItem && (
-									<Link
-										to={roleItem.to}
-										className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
-										onClick={() => setMobileOpen(false)}
-									>
+									<Link to={roleItem.to} className="nav-link" onClick={() => setMobileOpen(false)}>
 										{t(roleItem.labelKey)}
 									</Link>
 								)}
@@ -174,11 +163,7 @@ export default function Header() {
 						) : (
 							<>
 								<div className="w-full h-px bg-(--border)" />
-								<Link
-									to="/login"
-									className="text-base font-medium text-(--text) hover:text-(--gold) transition-colors py-2"
-									onClick={() => setMobileOpen(false)}
-								>
+								<Link to="/login" className="nav-link" onClick={() => setMobileOpen(false)}>
 									{t("common.signIn")}
 								</Link>
 								<Link

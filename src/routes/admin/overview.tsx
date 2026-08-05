@@ -29,7 +29,7 @@ function AdminDashboard() {
 				<AdminNav />
 
 				<div className="page-main">
-					<h1 className="text-2xl font-bold text-(--text) mb-6">{t("admin.overviewTitle")}</h1>
+					<h1 className="page-title mb-6">{t("admin.overviewTitle")}</h1>
 
 					<div className="stat-grid stat-grid-4">
 						{[
@@ -40,8 +40,8 @@ function AdminDashboard() {
 						].map(({ label, value, icon: Icon }) => (
 							<div key={label} className="card p-4">
 								<Icon size={18} className="text-(--gold) mb-2" />
-								<div className="text-2xl font-bold text-(--text)">{value}</div>
-								<div className="text-xs text-(--text-muted)">{label}</div>
+								<div className="page-title">{value}</div>
+								<div className="muted-xs">{label}</div>
 							</div>
 						))}
 					</div>
@@ -64,8 +64,8 @@ function AdminDashboard() {
 											className="flex items-center gap-3 py-2 border-b border-(--border) last:border-0"
 										>
 											<div className="flex-1 min-w-0">
-												<div className="text-sm font-medium text-(--text) truncate">{shop.name}</div>
-												<div className="text-xs text-(--text-muted)">{shop.city}</div>
+												<div className="strong-sm truncate">{shop.name}</div>
+												<div className="muted-xs">{shop.city}</div>
 											</div>
 											<span className={`badge text-[10px] ${shop.isVerified ? "badge-green" : "badge-gold"}`}>
 												{shop.isVerified ? t("common.verified") : t("admin.shops.pending")}

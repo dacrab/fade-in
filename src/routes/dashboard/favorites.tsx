@@ -12,8 +12,7 @@ export const Route = createFileRoute("/dashboard/favorites")({ component: Favori
 function FavoritesPage() {
 	const { t } = useTranslation()
 	const { user } = useAuth()
-	const userData = useQuery(api.users.getById, user ? { id: user.id } : "skip")
-	const favoriteIds = userData?.favoriteShopIds ?? []
+	const favoriteIds = user?.favoriteShopIds ?? []
 
 	const shopsRaw = useQuery(
 		api.barbershops.listByIds,
@@ -27,18 +26,18 @@ function FavoritesPage() {
 			<div className="page-wrap max-w-3xl py-8">
 				<Link
 					to="/dashboard/overview"
-					className="inline-flex items-center gap-1.5 text-xs text-(--text-muted) hover:text-(--text) mb-4"
+					className="inline-flex items-center gap-1.5 muted-xs hover:text-(--text) mb-4"
 				>
 					<ArrowLeft size={12} /> {t("nav.dashboard")}
 				</Link>
-				<h1 className="text-2xl font-bold text-(--text) mb-6">{t("dashboard.favoritesTitle")}</h1>
+				<h1 className="page-title mb-6">{t("dashboard.favoritesTitle")}</h1>
 
 				{favoriteIds.length === 0 ? (
 					<div className="card p-8 text-center">
 						<Heart size={24} className="mx-auto mb-2 text-(--text-subtle)" />
-						<p className="text-sm text-(--text-muted) mb-1">{t("dashboard.noFavorites")}</p>
-						<p className="text-xs text-(--text-subtle) mb-4">{t("dashboard.noFavoritesHint")}</p>
-						<Link to="/barbershops/listing" className="btn btn-primary text-xs">
+						<p className="muted-sm mb-1">{t("dashboard.noFavorites")}</p>
+						<p className="subtle-xs mb-4">{t("dashboard.noFavoritesHint")}</p>
+						<Link to="/barbershops/listing" className="btn btn-primary btn-sm">
 							{t("nav.barbershops")}
 						</Link>
 					</div>

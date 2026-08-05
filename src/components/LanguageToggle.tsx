@@ -15,8 +15,8 @@ export default function LanguageToggle() {
 		<button
 			type="button"
 			onClick={() => setLanguage(next)}
-			className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:bg-white/10 text-(--text-muted)"
-			title={t("map.switchTo", { lang: label })}
+			className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:bg-(--bg-input) text-(--text-muted)"
+			title={t("common.switchLanguage", { lang: label })}
 		>
 			<span>{flag}</span>
 			<span className="hidden sm:inline">{label}</span>

@@ -58,7 +58,7 @@ function NotFound() {
 		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
 			<h1 className="text-6xl font-bold text-(--border)">404</h1>
 			<p className="text-lg font-semibold text-(--text)">{t("errors.notFoundTitle")}</p>
-			<p className="text-sm text-(--text-muted) max-w-sm">{t("errors.notFoundMessage")}</p>
+			<p className="muted-sm max-w-sm">{t("errors.notFoundMessage")}</p>
 			<Link to="/" className="btn btn-primary mt-4">
 				{t("errors.backHome")}
 			</Link>
@@ -73,7 +73,7 @@ function RouteError(_props: ErrorComponentProps) {
 	return (
 		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
 			<h1 className="text-xl font-bold text-(--text)">{t("errors.errorTitle")}</h1>
-			<p className="text-sm text-(--text-muted) max-w-sm">{t("errors.errorMessage")}</p>
+			<p className="muted-sm max-w-sm">{t("errors.errorMessage")}</p>
 			<button type="button" onClick={() => router.invalidate()} className="btn btn-primary mt-4">
 				{t("errors.tryAgain")}
 			</button>
@@ -82,8 +82,9 @@ function RouteError(_props: ErrorComponentProps) {
 }
 
 function RootDocument() {
+	const { i18n } = useTranslation()
 	return (
-		<html lang="en">
+		<html lang={i18n.language === "el" ? "el" : "en"}>
 			<head>
 				<HeadContent />
 			</head>

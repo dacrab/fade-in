@@ -106,7 +106,7 @@ function BusinessProfile() {
 		<div className="px-8 py-8">
 			<div className="max-w-2xl mx-auto px-6 py-8">
 				<div className="mb-5">
-					<h1 className="text-lg font-medium text-(--text) tracking-tight">
+					<h1 className="section-title">
 						{shop ? t("business.profile.editTitle") : t("business.profile.createTitle")}
 					</h1>
 				</div>
@@ -117,7 +117,7 @@ function BusinessProfile() {
 							{t("business.profile.basicInfo")}
 						</h2>
 						<div>
-							<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-name">
+							<label className="field-label" htmlFor="shop-name">
 								{t("form.nameStar")}
 							</label>
 							<input
@@ -134,7 +134,7 @@ function BusinessProfile() {
 							)}
 						</div>
 						<div>
-							<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-desc">
+							<label className="field-label" htmlFor="shop-desc">
 								{t("form.descriptionLabel")}
 							</label>
 							<textarea
@@ -148,7 +148,7 @@ function BusinessProfile() {
 						</div>
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-phone">
+								<label className="field-label" htmlFor="shop-phone">
 									{t("form.phoneLabel")}
 								</label>
 								<input
@@ -160,7 +160,7 @@ function BusinessProfile() {
 								/>
 							</div>
 							<div>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-city">
+								<label className="field-label" htmlFor="shop-city">
 									{t("form.cityStar")}
 								</label>
 								<input
@@ -173,7 +173,7 @@ function BusinessProfile() {
 							</div>
 						</div>
 						<div>
-							<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor="shop-address">
+							<label className="field-label" htmlFor="shop-address">
 								{t("form.addressStar")}
 							</label>
 							<input
@@ -192,7 +192,7 @@ function BusinessProfile() {
 						</h2>
 						{(["instagram", "facebook", "website"] as const).map((key) => (
 							<div key={key}>
-								<label className="block text-xs text-(--text-muted) mb-1.5" htmlFor={`social-${key}`}>
+								<label className="field-label" htmlFor={`social-${key}`}>
 									{t(`form.${key}Label`)}
 								</label>
 								<input

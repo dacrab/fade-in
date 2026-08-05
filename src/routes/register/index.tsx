@@ -102,10 +102,8 @@ function RegisterPage() {
 				</Link>
 
 				<div className="bg-(--bg-card) rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-8">
-					<h1 className="text-2xl font-bold text-(--text) mb-1 text-center">
-						{t("auth.registerTitle")}
-					</h1>
-					<p className="text-sm text-(--text-muted) mb-6 text-center">{t("auth.registerSubtitle")}</p>
+					<h1 className="page-title mb-1 text-center">{t("auth.registerTitle")}</h1>
+					<p className="muted-sm mb-6 text-center">{t("auth.registerSubtitle")}</p>
 
 					<div className="flex rounded-lg bg-(--bg) border border-(--border) p-1 mb-6">
 						{(["customer", "owner"] as const).map((r) => (
@@ -122,7 +120,7 @@ function RegisterPage() {
 
 					<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
 						<div>
-							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="reg-name">
+							<label className="block strong-sm mb-1.5" htmlFor="reg-name">
 								{t("auth.nameLabel")}
 							</label>
 							<input
@@ -136,7 +134,7 @@ function RegisterPage() {
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="reg-email">
+							<label className="block strong-sm mb-1.5" htmlFor="reg-email">
 								{t("auth.emailLabel")}
 							</label>
 							<input
@@ -151,7 +149,7 @@ function RegisterPage() {
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="reg-password">
+							<label className="block strong-sm mb-1.5" htmlFor="reg-password">
 								{t("auth.passwordLabel")}
 							</label>
 							<PasswordInput
@@ -179,7 +177,7 @@ function RegisterPage() {
 							)}
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-(--text) mb-1.5" htmlFor="reg-confirm">
+							<label className="block strong-sm mb-1.5" htmlFor="reg-confirm">
 								{t("auth.confirmPasswordLabel")}
 							</label>
 							<PasswordInput
@@ -220,7 +218,7 @@ function RegisterPage() {
 						</a>
 					</p>
 
-					<p className="mt-4 text-center text-sm text-(--text-muted)">
+					<p className="mt-4 text-center muted-sm">
 						{t("auth.haveAccount")}{" "}
 						<Link to="/login" className="text-(--gold) hover:underline no-underline font-medium">
 							{t("common.signIn")}

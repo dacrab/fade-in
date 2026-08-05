@@ -1,12 +1,13 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { Calendar, CheckCircle, Clock, Heart, RefreshCw, Star, User, XCircle } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton, SkeletonRows } from "#/components/ui/Skeleton"
+import { StatCard } from "#/components/ui/StatCard"
 import { withToast } from "#/components/ui/Toast"
-import { useAuth } from "#/hooks/useAuth"
-import { formatDateShort, formatPrice } from "#/lib/format"
+import { useFormatters } from "#/hooks/useFormatters"
+import { useRequireRole } from "#/hooks/useRequireRole"
 import type { Appointment, Barbershop } from "#/types"
 import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -16,12 +17,7 @@ export const Route = createFileRoute("/dashboard/overview")({ component: Custome
 
 function CustomerDashboard() {
 	const { t } = useTranslation()
-	const { user } = useAuth()
-	const navigate = useNavigate()
-
-	useEffect(() => {
-		if (user && user.role !== "customer" && user.role !== "admin") void navigate({ to: "/" })
-	}, [user, navigate])
+	const { user } = useRequireRole(["customer", "admin"])
 
 	const appointments = useQuery(
 		api.appointments.listByCustomer,
@@ -58,16 +54,16 @@ function CustomerDashboard() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl py-8">
-				<div className="flex items-center justify-between mb-6">
+				<div className="page-head">
 					<div>
-						<h1 className="text-2xl font-bold text-(--text)">{t("dashboard.title")}</h1>
-						<p className="text-sm text-(--text-muted)">{t("dashboard.welcome", { name: user.name })}</p>
+						<h1 className="page-title">{t("dashboard.title")}</h1>
+						<p className="muted-sm">{t("dashboard.welcome", { name: user.name })}</p>
 					</div>
 					<div className="flex gap-2">
-						<Link to="/dashboard/favorites" className="btn btn-secondary text-xs gap-1.5">
+						<Link to="/dashboard/favorites" className="btn btn-secondary btn-sm">
 							<Heart size={13} /> {t("dashboard.favorites")}
 						</Link>
-						<Link to="/dashboard/profile" className="btn btn-secondary text-xs gap-1.5">
+						<Link to="/dashboard/profile" className="btn btn-secondary btn-sm">
 							<User size={13} /> {t("dashboard.profile")}
 						</Link>
 					</div>
@@ -85,25 +81,19 @@ function CustomerDashboard() {
 								icon: XCircle,
 							},
 						] as const
-					).map(({ label, value, icon: Icon }) => (
-						<div key={label} className="card p-3 flex items-center gap-3">
-							<Icon size={16} className="text-(--gold) shrink-0" />
-							<div>
-								<div className="text-lg font-bold text-(--text) tabular-nums">{value}</div>
-								<div className="text-[11px] text-(--text-muted)">{label}</div>
-							</div>
-						</div>
+					).map(({ label, value, icon }) => (
+						<StatCard key={label} icon={icon} value={value} label={label} />
 					))}
 				</div>
 
 				<section className="card p-5 mb-4">
-					<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.upcomingTitle")}</h2>
+					<h2 className="card-title">{t("dashboard.upcomingTitle")}</h2>
 					{appointments === undefined ? (
 						<SkeletonRows count={3} className="h-12" />
 					) : upcoming.length === 0 ? (
 						<div className="text-center py-6">
-							<p className="text-sm text-(--text-muted) mb-3">{t("dashboard.noUpcoming")}</p>
-							<Link to="/barbershops/listing" className="btn btn-primary text-xs">
+							<p className="muted-sm mb-3">{t("dashboard.noUpcoming")}</p>
+							<Link to="/barbershops/listing" className="btn btn-primary btn-sm">
 								{t("common.bookNow")}
 							</Link>
 						</div>
@@ -123,16 +113,10 @@ function CustomerDashboard() {
 
 				{past.length > 0 && (
 					<section className="card p-5">
-						<h2 className="text-sm font-semibold text-(--text) mb-3">{t("dashboard.pastTitle")}</h2>
+						<h2 className="card-title">{t("dashboard.pastTitle")}</h2>
 						<div className="divide-y divide-(--border)">
 							{past.slice(0, 8).map((appt: Doc<"appointments">) => (
-								<AppointmentRow
-									key={appt._id}
-									appt={appt}
-									shop={shopMap.get(appt.barbershopId)}
-									showRebook={appt.status === "completed"}
-									showReview={appt.status === "completed"}
-								/>
+								<AppointmentRow key={appt._id} appt={appt} shop={shopMap.get(appt.barbershopId)} />
 							))}
 						</div>
 					</section>
@@ -146,16 +130,13 @@ function AppointmentRow({
 	appt,
 	shop,
 	showActions,
-	showRebook,
-	showReview,
 }: {
 	appt: Appointment
 	shop?: Barbershop
 	showActions?: boolean
-	showRebook?: boolean
-	showReview?: boolean
 }) {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const updateStatus = useMutation(api.appointments.updateStatus)
 	const hasReview = useQuery(api.reviews.hasReview, { appointmentId: appt._id })
 	const createReview = useMutation(api.reviews.create)
@@ -191,12 +172,10 @@ function AppointmentRow({
 				<span className="text-xs font-mono text-(--text-muted) w-11 shrink-0">{appt.startTime}</span>
 				<span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
 				<div className="flex-1 min-w-0">
-					<span className="text-sm text-(--text) block truncate">{shop?.name ?? "…"}</span>
-					<span className="text-xs text-(--text-subtle)">{formatDateShort(appt.date)}</span>
+					<span className="main-sm block truncate">{shop?.name ?? "…"}</span>
+					<span className="subtle-xs">{f.formatDateShort(appt.date)}</span>
 				</div>
-				<span className="text-sm font-medium text-(--text) tabular-nums">
-					{formatPrice(appt.totalPrice)}
-				</span>
+				<span className="strong-sm tabular-nums">{f.formatPrice(appt.totalPrice)}</span>
 				{showActions && (appt.status === "pending" || appt.status === "confirmed") && (
 					<button
 						type="button"
@@ -206,7 +185,7 @@ function AppointmentRow({
 						{t("common.cancel")}
 					</button>
 				)}
-				{showRebook && shop && (
+				{appt.status === "completed" && shop && (
 					<Link
 						to="/barbershops/$slug"
 						params={{ slug: shop.slug }}
@@ -215,7 +194,7 @@ function AppointmentRow({
 						<RefreshCw size={11} /> {t("dashboard.rebook")}
 					</Link>
 				)}
-				{showReview && showRebook && hasReview === false && (
+				{appt.status === "completed" && hasReview === false && (
 					<button
 						type="button"
 						onClick={() => setShowForm(!showForm)}
@@ -243,25 +222,21 @@ function AppointmentRow({
 						))}
 					</div>
 					<textarea
-						className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-3 py-2 text-sm text-(--text) placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 resize-none"
+						className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-3 py-2 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 resize-none"
 						rows={2}
 						placeholder={t("dashboard.reviewPlaceholder")}
 						value={comment}
 						onChange={(e) => setComment(e.target.value)}
 					/>
 					<div className="flex justify-end gap-2">
-						<button
-							type="button"
-							onClick={() => setShowForm(false)}
-							className="text-xs text-(--text-muted) px-3 py-1.5"
-						>
+						<button type="button" onClick={() => setShowForm(false)} className="muted-xs px-3 py-1.5">
 							{t("common.cancel")}
 						</button>
 						<button
 							type="button"
 							onClick={() => void handleSubmitReview()}
 							disabled={submitting || comment.trim().length === 0}
-							className="btn btn-primary text-xs"
+							className="btn btn-primary btn-sm"
 						>
 							{t("common.save")}
 						</button>

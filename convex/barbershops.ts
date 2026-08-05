@@ -1,7 +1,7 @@
 import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { getCurrentUser, requireUser } from "./lib/auth"
+import { getCurrentUser, requireAdmin, requireUser } from "./lib/auth"
 import { definedPatch, socialLinksValidator, workingHoursValidator } from "./validators"
 
 export const list = query({
@@ -92,6 +92,8 @@ export const getById = query({
 export const listByOwner = query({
 	args: { ownerId: v.id("users") },
 	handler: async (ctx, args) => {
+		const user = await getCurrentUser(ctx)
+		if (!user || user._id !== args.ownerId) return []
 		return ctx.db
 			.query("barbershops")
 			.withIndex("by_owner", (q) => q.eq("ownerId", args.ownerId))
@@ -117,15 +119,22 @@ export const create = mutation({
 		const user = await requireUser(ctx)
 		const userId = user._id
 
+		const slug = args.slug
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, "-")
+			.replace(/^-|-$/g, "")
+		if (!slug) throw new ConvexError("Invalid shop slug")
+
 		const existing = await ctx.db
 			.query("barbershops")
-			.withIndex("by_slug", (q) => q.eq("slug", args.slug))
+			.withIndex("by_slug", (q) => q.eq("slug", slug))
 			.first()
 		if (existing) throw new ConvexError("A shop with this URL already exists")
 
 		const { images, ...rest } = args
 		return ctx.db.insert("barbershops", {
 			...rest,
+			slug,
 			ownerId: userId,
 			images: images ?? [],
 			rating: 0,
@@ -166,8 +175,7 @@ export const update = mutation({
 export const verify = mutation({
 	args: { id: v.id("barbershops"), isVerified: v.boolean() },
 	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
-		if (user.role !== "admin") throw new ConvexError("Not authorized")
+		await requireAdmin(ctx)
 		return ctx.db.patch(args.id, { isVerified: args.isVerified })
 	},
 })
@@ -175,8 +183,7 @@ export const verify = mutation({
 export const suspend = mutation({
 	args: { id: v.id("barbershops"), isActive: v.boolean() },
 	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
-		if (user.role !== "admin") throw new ConvexError("Not authorized")
+		await requireAdmin(ctx)
 		return ctx.db.patch(args.id, { isActive: args.isActive })
 	},
 })
@@ -192,9 +199,7 @@ export const listByIds = query({
 export const listAll = query({
 	args: {},
 	handler: async (ctx) => {
-		const user = await getCurrentUser(ctx)
-		if (!user) return []
-		if (user.role !== "admin") return []
+		await requireAdmin(ctx)
 		return ctx.db.query("barbershops").collect()
 	},
 })

@@ -16,23 +16,15 @@ export default function Footer() {
 				</Link>
 
 				<nav className="flex items-center gap-5">
-					<Link
-						to="/terms"
-						className="text-xs text-(--text-muted) no-underline hover:text-(--gold) transition-colors"
-					>
+					<Link to="/terms" className="muted-xs no-underline hover:text-(--gold) transition-colors">
 						{t("footer.links.terms")}
 					</Link>
-					<Link
-						to="/privacy"
-						className="text-xs text-(--text-muted) no-underline hover:text-(--gold) transition-colors"
-					>
+					<Link to="/privacy" className="muted-xs no-underline hover:text-(--gold) transition-colors">
 						{t("footer.links.privacy")}
 					</Link>
 				</nav>
 
-				<p className="text-xs text-(--text-subtle) m-0">
-					{t("footer.rights", { year: new Date().getFullYear() })}
-				</p>
+				<p className="subtle-xs m-0">{t("footer.rights", { year: new Date().getFullYear() })}</p>
 			</div>
 		</footer>
 	)

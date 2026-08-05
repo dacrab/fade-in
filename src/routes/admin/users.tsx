@@ -2,18 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "#/components/ui/Skeleton"
+import { SkeletonRows } from "#/components/ui/Skeleton"
 import { useAdminAuth } from "#/hooks/useAdminAuth"
 import type { UserRole } from "#/types"
+import { parseUserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/admin/users")({ component: AdminUsers })
-
-function parseUserRole(role: string | null | undefined): UserRole {
-	if (role === "customer" || role === "owner" || role === "barber" || role === "admin") return role
-	return "customer"
-}
 
 const ROLE_BADGE: Record<UserRole, string> = {
 	customer: "badge-gray",
@@ -31,7 +27,7 @@ function AdminUsers() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="flex items-center justify-between mb-6">
+				<div className="page-head">
 					<div className="page-header">
 						<Link to="/admin/overview" className="breadcrumb-back">
 							← {t("nav.admin")}
@@ -42,11 +38,7 @@ function AdminUsers() {
 				</div>
 
 				{!allUsers ? (
-					<div className="space-y-3">
-						{[0, 1, 2, 3, 4, 5].map((i) => (
-							<Skeleton key={i} className="h-14 w-full rounded-xl" />
-						))}
-					</div>
+					<SkeletonRows count={6} className="h-14 rounded-xl" />
 				) : allUsers.length === 0 ? (
 					<div className="empty-state">
 						<Users size={36} className="mx-auto mb-3 opacity-30" />
@@ -68,11 +60,11 @@ function AdminUsers() {
 									<div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 bg-(--gold) text-black">
 										{u.name?.charAt(0).toUpperCase() ?? "?"}
 									</div>
-									<span className="text-sm text-(--text) truncate">{u.name}</span>
+									<span className="main-sm truncate">{u.name}</span>
 								</div>
-								<span className="text-sm text-(--text-muted) truncate">{u.email}</span>
+								<span className="muted-sm truncate">{u.email}</span>
 								<span className={`badge ${ROLE_BADGE[parseUserRole(u.role)]} w-fit`}>
-									{u.role ?? "customer"}
+									{t(`admin.roles.${parseUserRole(u.role)}`)}
 								</span>
 							</div>
 						))}

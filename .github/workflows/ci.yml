@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master, "renovate/**"]
+    branches: [master]
   pull_request:
 
 concurrency:
@@ -36,6 +36,7 @@ jobs:
       - uses: dopplerhq/cli-action@v4
 
       - name: Build
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork != true
         run: doppler run -- bun run build
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}

@@ -1,9 +1,9 @@
 import { ConvexError, v } from "convex/values"
-import { generateSlots } from "../src/lib/slots"
-import { mutation, query } from "./_generated/server"
-import { getCurrentUser, requireUser } from "./lib/auth"
+import { internalMutation, mutation, query } from "./_generated/server"
+import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
 import { sendEmail } from "./lib/email"
 import { computeServiceTotal } from "./lib/services"
+import { generateSlots } from "./lib/slots"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const TIME_RE = /^\d{2}:\d{2}$/
@@ -48,6 +48,7 @@ export const create = mutation({
 		if (!DATE_RE.test(args.date)) throw new ConvexError("Invalid date format")
 		if (!(TIME_RE.test(args.startTime) && TIME_RE.test(args.endTime)))
 			throw new ConvexError("Invalid time format")
+		if (args.startTime >= args.endTime) throw new ConvexError("Invalid time range")
 		if (args.serviceIds.length === 0) throw new ConvexError("At least one service required")
 
 		const totalPrice = await computeServiceTotal(
@@ -55,6 +56,13 @@ export const create = mutation({
 			args.serviceIds,
 			args.barbershopId,
 		)
+
+		const barber = await ctx.db.get(args.barberId)
+		if (!barber || barber.barbershopId !== args.barbershopId)
+			throw new ConvexError("Invalid barber for this shop")
+
+		const shop = await ctx.db.get(args.barbershopId)
+		if (!shop || shop.isActive !== true) throw new ConvexError("Shop is not available")
 
 		const existing = await ctx.db
 			.query("appointments")
@@ -102,7 +110,7 @@ export const create = mutation({
 			}
 		} catch {}
 
-		return appointmentId
+		return { appointmentId, totalPrice }
 	},
 })
 
@@ -159,8 +167,7 @@ export const listByShop = query({
 		date: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
-		const user = await getCurrentUser(ctx)
-		if (!user) return []
+		await requireOwner(ctx, args.barbershopId)
 
 		const date = args.date
 		if (date) {
@@ -181,8 +188,13 @@ export const listByShop = query({
 export const listByBarber = query({
 	args: { barberId: v.id("barbers"), date: v.optional(v.string()) },
 	handler: async (ctx, args) => {
-		const user = await getCurrentUser(ctx)
-		if (!user) return []
+		const user = await requireUser(ctx)
+		const barber = await ctx.db.get(args.barberId)
+		if (!barber) throw new ConvexError("Barber not found")
+		if (barber.userId !== user._id) {
+			const shop = await ctx.db.get(barber.barbershopId)
+			if (!shop || shop.ownerId !== user._id) throw new ConvexError("Not authorized")
+		}
 
 		const appts = await ctx.db
 			.query("appointments")
@@ -195,7 +207,7 @@ export const listByBarber = query({
 	},
 })
 
-export const confirmFromCheckout = mutation({
+export const confirmFromCheckout = internalMutation({
 	args: {
 		polarCheckoutId: v.string(),
 	},
@@ -216,7 +228,10 @@ export const setPolarCheckout = mutation({
 		polarCheckoutId: v.string(),
 	},
 	handler: async (ctx, args) => {
-		await requireUser(ctx)
+		const user = await requireUser(ctx)
+		const appt = await ctx.db.get(args.id)
+		if (!appt) throw new ConvexError("Not found")
+		if (appt.customerId !== user._id) throw new ConvexError("Not authorized")
 		await ctx.db.patch(args.id, {
 			polarCheckoutId: args.polarCheckoutId,
 			paymentStatus: "unpaid",
@@ -227,7 +242,23 @@ export const setPolarCheckout = mutation({
 export const getById = query({
 	args: { id: v.id("appointments") },
 	handler: async (ctx, args) => {
-		return ctx.db.get(args.id)
+		const user = await getCurrentUser(ctx)
+		if (!user) return null
+
+		const appt = await ctx.db.get(args.id)
+		if (!appt) return null
+
+		if (appt.customerId === user._id) return appt
+
+		const shop = await ctx.db.get(appt.barbershopId)
+		if (shop?.ownerId === user._id) return appt
+
+		if (user.role === "admin") return appt
+
+		const barber = await ctx.db.get(appt.barberId)
+		if (barber?.userId === user._id) return appt
+
+		return null
 	},
 })
 
@@ -242,11 +273,33 @@ export const reschedule = mutation({
 		const user = await requireUser(ctx)
 		const appt = await ctx.db.get(args.id)
 		if (!appt) throw new ConvexError("Not found")
-		if (appt.customerId !== user._id && user.role !== "admin" && user.role !== "owner")
-			throw new ConvexError("Not authorized")
+
+		const isCustomer = appt.customerId === user._id
+		if (!isCustomer && user.role !== "admin") {
+			const shop = await ctx.db.get(appt.barbershopId)
+			if (!shop || shop.ownerId !== user._id) throw new ConvexError("Not authorized")
+		}
+
 		if (!DATE_RE.test(args.date)) throw new ConvexError("Invalid date format")
 		if (!(TIME_RE.test(args.startTime) && TIME_RE.test(args.endTime)))
 			throw new ConvexError("Invalid time format")
+		if (args.startTime >= args.endTime) throw new ConvexError("Invalid time range")
+
+		const existing = await ctx.db
+			.query("appointments")
+			.withIndex("by_shop_date", (q) => q.eq("barbershopId", appt.barbershopId).eq("date", args.date))
+			.filter((q) =>
+				q.and(
+					q.eq(q.field("barberId"), appt.barberId),
+					q.neq(q.field("_id"), appt._id),
+					q.neq(q.field("status"), "cancelled"),
+				),
+			)
+			.collect()
+
+		const conflict = existing.some((a) => args.startTime < a.endTime && args.endTime > a.startTime)
+		if (conflict) throw new ConvexError("This time slot is no longer available.")
+
 		await ctx.db.patch(args.id, {
 			date: args.date,
 			startTime: args.startTime,
@@ -257,8 +310,7 @@ export const reschedule = mutation({
 
 export const listAllWithDetails = query({
 	handler: async (ctx) => {
-		const user = await requireUser(ctx)
-		if (user.role !== "admin") throw new ConvexError("Not authorized")
+		await requireAdmin(ctx)
 
 		const appts = await ctx.db.query("appointments").order("desc").collect()
 		const [barbershops, barbers, customers] = await Promise.all([
@@ -279,6 +331,8 @@ export const listAllWithDetails = query({
 export const getShopStats = query({
 	args: { barbershopId: v.id("barbershops") },
 	handler: async (ctx, args) => {
+		await requireOwner(ctx, args.barbershopId)
+
 		const allAppts = await ctx.db
 			.query("appointments")
 			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))

@@ -6,6 +6,11 @@ export function asId<T extends TableNames>(id: string): Id<T> {
 
 export type UserRole = "customer" | "owner" | "barber" | "admin"
 
+export function parseUserRole(role: string | null | undefined): UserRole {
+	if (role === "customer" || role === "owner" || role === "barber" || role === "admin") return role
+	return "customer"
+}
+
 export function isOwnerOrAdmin(user: { role?: UserRole } | null | undefined): boolean {
 	return user?.role === "owner" || user?.role === "admin"
 }
@@ -91,6 +96,10 @@ export interface Service {
 }
 
 export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled"
+
+export function isAppointmentStatus(s: string): s is AppointmentStatus {
+	return s === "pending" || s === "confirmed" || s === "completed" || s === "cancelled"
+}
 
 export interface Appointment {
 	_id: Id<"appointments">
