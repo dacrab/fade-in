@@ -40,9 +40,10 @@ You'll need [Bun](https://bun.sh) 1.3+ and a [Convex account](https://dashboard.
 
 ```bash
 bun install
-cp .env.example .env.local   # add your Convex URL
-bunx convex dev              # start backend
-bun dev                      # start app
+# Set up secrets (via Doppler — or copy .env.example to .env)
+doppler setup
+bunx convex dev   # start backend
+bun dev           # start app
 ```
 
 Open [localhost:3000](http://localhost:3000).

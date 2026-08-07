@@ -39,7 +39,6 @@ const enKeys = extractKeys(en as I18nRecord)
 const elKeys = extractKeys(el as I18nRecord)
 
 describe("i18n locale parity — English ↔ Greek", () => {
-	// Key existence
 	it.each([
 		["English", enKeys, elKeys],
 		["Greek", elKeys, enKeys],
@@ -51,7 +50,6 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		).toHaveLength(0)
 	})
 
-	// value completeness
 	it.each([
 		["English", en, enKeys],
 		["Greek", el, elKeys],
@@ -60,7 +58,6 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		expect(empty, `${label} keys with empty values: ${empty.join(", ")}`).toHaveLength(0)
 	})
 
-	// value types match
 	// Arrays are valid i18n values (e.g. feature lists), so we only flag
 	// non-string, non-array leaf values.
 	it("all leaf values are strings or arrays (no unexpected object leaves)", () => {
@@ -71,7 +68,6 @@ describe("i18n locale parity — English ↔ Greek", () => {
 		expect(badEl, `EL non-string/array values: ${badEl.join(", ")}`).toHaveLength(0)
 	})
 
-	// Arrays in i18n (e.g. feature lists) must have matching lengths in both locales
 	it("array values have the same length in both locales", () => {
 		const arrayKeys = enKeys.filter((k) => Array.isArray(getByPath(en as I18nRecord, k)))
 		const mismatched: string[] = []

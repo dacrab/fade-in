@@ -286,7 +286,6 @@ function ShopProfilePage() {
 								</div>
 							)}
 
-							{/* Share / QR - Subtle */}
 							<div className="rounded-2xl bg-(--bg-card) border border-[(--gold)/8] p-5">
 								<div className="flex items-center gap-2 mb-3">
 									<Share2 size={13} className="text-(--text-subtle)" />
