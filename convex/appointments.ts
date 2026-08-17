@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values"
-import { internalMutation, mutation, query } from "./_generated/server"
+import { internal } from "./_generated/api"
+import { internalAction, internalMutation, mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
 import { sendEmail } from "./lib/email"
 import { computeServiceTotal } from "./lib/services"
@@ -75,6 +76,9 @@ export const create = mutation({
 		const conflict = existing.some((a) => args.startTime < a.endTime && args.endTime > a.startTime)
 		if (conflict) throw new ConvexError("This time slot is no longer available.")
 
+		// The conflict check above plus this insert run in a single mutation, which
+		// Convex executes atomically and retries on write conflicts, so two
+		// concurrent bookings cannot both claim the same slot.
 		const appointmentId = await ctx.db.insert("appointments", {
 			customerId: userId,
 			barbershopId: args.barbershopId,
@@ -89,28 +93,63 @@ export const create = mutation({
 			createdAt: Date.now(),
 		})
 
-		try {
-			const [customer, shop, barber] = await Promise.all([
-				ctx.db.get(userId),
-				ctx.db.get(args.barbershopId),
-				ctx.db.get(args.barberId),
-			])
-			if (customer?.email) {
-				await sendEmail(
-					customer.email,
-					`Booking Confirmed — ${shop?.name ?? "Barbershop"}`,
-					`<p>Hi ${customer.name ?? "there"},</p>
-					<p>Your booking at <strong>${shop?.name ?? "Barbershop"}</strong> is confirmed!</p>
-					<p><strong>Barber:</strong> ${barber?.name ?? "—"}<br>
-					<strong>Date:</strong> ${args.date}<br>
-					<strong>Time:</strong> ${args.startTime} – ${args.endTime}<br>
-					<strong>Total:</strong> €${(totalPrice / 100).toFixed(2)}</p>
-					<p>See you there!<br>— The FadeIn Team</p>`,
-				)
-			}
-		} catch {}
+		const customer = await ctx.db.get(userId)
+		if (customer?.email) {
+			// Send the email in a scheduled action so the mutation stays atomic:
+			// network I/O never runs inside the transaction and a mutation retry
+			// cannot produce a duplicate email.
+			await ctx.scheduler.runAfter(0, internal.appointments.sendBookingConfirmationEmail, {
+				to: customer.email,
+				customerName: customer.name,
+				shopName: shop?.name,
+				barberName: barber?.name,
+				date: args.date,
+				startTime: args.startTime,
+				endTime: args.endTime,
+				totalPrice,
+			})
+		}
 
 		return { appointmentId, totalPrice }
+	},
+})
+
+export const sendBookingConfirmationEmail = internalAction({
+	args: {
+		to: v.string(),
+		customerName: v.optional(v.string()),
+		shopName: v.optional(v.string()),
+		barberName: v.optional(v.string()),
+		date: v.string(),
+		startTime: v.string(),
+		endTime: v.string(),
+		totalPrice: v.number(),
+	},
+	handler: async (_ctx, args) => {
+		try {
+			await sendEmail(
+				args.to,
+				`Booking Confirmed — ${args.shopName ?? "Barbershop"}`,
+				`<p>Hi ${args.customerName ?? "there"},</p>
+				<p>Your booking at <strong>${args.shopName ?? "Barbershop"}</strong> is confirmed!</p>
+				<p><strong>Barber:</strong> ${args.barberName ?? "—"}<br>
+				<strong>Date:</strong> ${args.date}<br>
+				<strong>Time:</strong> ${args.startTime} – ${args.endTime}<br>
+				<strong>Total:</strong> €${(args.totalPrice / 100).toFixed(2)}</p>
+				<p>See you there!<br>— The FadeIn Team</p>`,
+			)
+		} catch {
+			// Best-effort email: a delivery failure must not fail the booking.
+		}
+	},
+})
+
+export const removeUnpaidOrphan = internalMutation({
+	args: { id: v.id("appointments") },
+	handler: async (ctx, args) => {
+		const appt = await ctx.db.get(args.id)
+		if (appt?.status !== "pending" || appt.paymentStatus === "paid") return
+		await ctx.db.delete(args.id)
 	},
 })
 
@@ -133,6 +172,10 @@ export const updateStatus = mutation({
 
 		if (appt.customerId === userId) {
 			if (args.status !== "cancelled") throw new ConvexError("Customers can only cancel appointments")
+			// Note: cancelling frees the slot but does not void the Polar checkout
+			// session, and checkouts abandoned before payment stay "pending" until
+			// the user cancels. A cleanup job (or Polar checkout.expired webhook)
+			// would be needed to reclaim those slots automatically.
 			return ctx.db.patch(args.id, { status: args.status })
 		}
 
