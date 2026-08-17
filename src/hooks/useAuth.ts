@@ -2,7 +2,6 @@ import { useClerk, useUser } from "@clerk/tanstack-react-start"
 import { useQuery } from "convex/react"
 import { parseUserRole } from "#/types"
 import { api } from "../../convex/_generated/api"
-import type { Id } from "../../convex/_generated/dataModel"
 
 export function useAuth() {
 	const { signOut } = useClerk()
@@ -16,7 +15,7 @@ export function useAuth() {
 				email: viewer.email,
 				role: parseUserRole(viewer.role),
 				avatarUrl: viewer.avatarUrl,
-				favoriteShopIds: viewer.favoriteShopIds ?? ([] as Id<"barbershops">[]),
+				favoriteShopIds: viewer.favoriteShopIds ?? [],
 			}
 		: null
 

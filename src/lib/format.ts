@@ -21,15 +21,18 @@ export function formatRelative(timestamp: number, locale: DateLocale = "en"): st
 	return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: DATE_LOCALES[locale] })
 }
 
-export function todayIso(): string {
-	const d = new Date()
+function toIsoDate(d: Date): string {
 	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
+export function todayIso(): string {
+	return toIsoDate(new Date())
 }
 
 export function nextDayIso(): string {
 	const d = new Date()
 	d.setDate(d.getDate() + 1)
-	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+	return toIsoDate(d)
 }
 
 export function slugify(str: string): string {
