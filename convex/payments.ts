@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values"
-import { api } from "./_generated/api"
+import { api, internal } from "./_generated/api"
 import type { Id } from "./_generated/dataModel"
 import { action } from "./_generated/server"
 
@@ -52,22 +52,30 @@ export const createCheckoutSession = action({
 			notes: args.notes,
 		})
 
-		const checkout: { id: string; url: string } = await polarPost<{
-			id: string
-			url: string
-		}>("/checkouts/", {
-			amount: totalPrice,
-			currency: "eur",
-			customer_email: user.email,
-			metadata: { appointmentId },
-			success_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
-			cancel_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
-		})
+		let checkout: { id: string; url: string }
+		try {
+			checkout = await polarPost<{
+				id: string
+				url: string
+			}>("/checkouts/", {
+				amount: totalPrice,
+				currency: "eur",
+				customer_email: user.email,
+				metadata: { appointmentId },
+				success_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
+				cancel_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
+			})
 
-		await ctx.runMutation(api.appointments.setPolarCheckout, {
-			id: appointmentId,
-			polarCheckoutId: checkout.id,
-		})
+			await ctx.runMutation(api.appointments.setPolarCheckout, {
+				id: appointmentId,
+				polarCheckoutId: checkout.id,
+			})
+		} catch (err) {
+			// The slot was reserved but payment never started (or checkout was not
+			// persisted). Free the slot so it isn't permanently orphaned.
+			await ctx.runMutation(internal.appointments.removeUnpaidOrphan, { id: appointmentId })
+			throw err
+		}
 
 		return { url: checkout.url, appointmentId }
 	},

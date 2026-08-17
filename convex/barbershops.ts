@@ -125,6 +125,9 @@ export const create = mutation({
 			.replace(/^-|-$/g, "")
 		if (!slug) throw new ConvexError("Invalid shop slug")
 
+		// Check-then-insert runs inside a single mutation: Convex executes it
+		// atomically and retries on concurrent writes, so a duplicate slug cannot
+		// slip through. (Convex has no native unique constraints / onConflict.)
 		const existing = await ctx.db
 			.query("barbershops")
 			.withIndex("by_slug", (q) => q.eq("slug", slug))

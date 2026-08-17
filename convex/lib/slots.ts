@@ -3,16 +3,26 @@ interface ExistingAppt {
 	endTime: string
 }
 
-const START_HOUR = 9
-const END_HOUR = 19
-const INTERVAL_MINUTES = 30
-const CLOSING_MINUTES = END_HOUR * 60
+/**
+ * Slot-generation config. Tune these to change the shop's operating hours
+ * and slot resolution across all shops.
+ */
+export const SLOT_CONFIG = {
+	/** First slot can start at this hour (inclusive). */
+	START_HOUR: 9,
+	/** No slots start at or after this hour. */
+	END_HOUR: 19,
+	/** Granularity of slot start times, in minutes. */
+	INTERVAL_MINUTES: 30,
+} as const
+
+const CLOSING_MINUTES = SLOT_CONFIG.END_HOUR * 60
 
 export function generateSlots(durationMinutes: number, existing: ExistingAppt[]): string[] {
 	const slots: string[] = []
 
-	for (let h = START_HOUR; h < END_HOUR; h++) {
-		for (let m = 0; m < 60; m += INTERVAL_MINUTES) {
+	for (let h = SLOT_CONFIG.START_HOUR; h < SLOT_CONFIG.END_HOUR; h++) {
+		for (let m = 0; m < 60; m += SLOT_CONFIG.INTERVAL_MINUTES) {
 			const slotStart = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
 			const slotStartMinutes = h * 60 + m
 			const slotEndMinutes = slotStartMinutes + durationMinutes
