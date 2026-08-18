@@ -20,9 +20,10 @@ async function polarPost<T>(path: string, body: Record<string, unknown>): Promis
 		},
 		body: JSON.stringify(body),
 	})
-	const data = await res.json()
+	const data: unknown = await res.json()
 	if (!res.ok) {
-		const msg = data.detail?.[0]?.msg || data.error || "Polar API error"
+		const error = data as { detail?: { msg?: string }[]; error?: string }
+		const msg = error.detail?.[0]?.msg || error.error || "Polar API error"
 		throw new ConvexError(msg)
 	}
 	return data as T
