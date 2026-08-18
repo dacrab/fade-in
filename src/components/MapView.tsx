@@ -14,9 +14,12 @@ interface MapViewProps {
 function escapeHtml(str: string): string {
 	return str.replace(
 		/[&<>"']/g,
-		(ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] as string,
+		(ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] ?? ch,
 	)
 }
+
+const hasCoords = (s: Barbershop): s is Barbershop & { lat: number; lng: number } =>
+	s.lat !== undefined && s.lng !== undefined
 
 const DEFAULT_CENTER: [number, number] = [37.9838, 23.7275]
 const DEFAULT_ZOOM = 12
@@ -28,14 +31,7 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	const markersRef = useRef<L.Marker[]>([])
 	const [ready, setReady] = useState(false)
 
-	const shopsWithCoords = useMemo(
-		() =>
-			shops.filter((s) => s.lat !== undefined && s.lng !== undefined) as (Barbershop & {
-				lat: number
-				lng: number
-			})[],
-		[shops],
-	)
+	const shopsWithCoords = useMemo(() => shops.filter(hasCoords), [shops])
 
 	useEffect(() => {
 		if (!mapContainerRef.current || mapRef.current) return
