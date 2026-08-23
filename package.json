@@ -16,6 +16,7 @@
     "knip": "knip",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
+    "check": "biome check .",
     "validate": "bun run lint && bun run typecheck && bun run test && bun run build"
   },
   "dependencies": {
