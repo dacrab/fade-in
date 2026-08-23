@@ -3,8 +3,8 @@ import { useQuery } from "convex/react"
 import { PlusCircle, Scissors } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice, todayIso } from "#/lib/format"
 import { PAGE_SIZE, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -12,9 +12,10 @@ import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/overview")({ component: BusinessDashboard })
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function BusinessDashboard() {
 	const { t } = useTranslation()
-	const { user } = useBusinessAuth()
+	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 
 	const shop = useOwnerShop(user?.id)
 

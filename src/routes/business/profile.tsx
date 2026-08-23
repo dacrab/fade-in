@@ -3,11 +3,14 @@ import { useMutation } from "convex/react"
 import { PlusCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { showToast } from "#/components/ui/Toast"
-import { useBusinessAuth } from "#/hooks/useBusinessAuth"
+import { showToast, withToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { slugify } from "#/lib/format"
+import type { WeekDay, WorkingHoursForm } from "#/types"
+import { WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
+import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/profile")({ component: BusinessProfile })
 
@@ -31,9 +34,24 @@ const EMPTY: ShopForm = {
 	facebook: "",
 	website: "",
 }
+
+// Matches the slot-generation defaults so shops without explicit hours keep
+// booking availability unchanged.
+const DEFAULT_DAY = { open: "09:00", close: "19:00", closed: false }
+const DEFAULT_HOURS: WorkingHoursForm = Object.fromEntries(
+	WEEK_DAYS.map((d) => [d, { ...DEFAULT_DAY }]),
+) as WorkingHoursForm
+
+function hoursFromShop(wh: Doc<"barbershops">["workingHours"]): WorkingHoursForm {
+	if (!wh) return structuredClone(DEFAULT_HOURS)
+	return Object.fromEntries(
+		WEEK_DAYS.map((d) => [d, wh[d] ? { ...wh[d] } : { ...DEFAULT_DAY }]),
+	) as WorkingHoursForm
+}
+
 function BusinessProfile() {
 	const { t } = useTranslation()
-	const { user } = useBusinessAuth()
+	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 	const router = useRouter()
 
 	const [form, setForm] = useState(EMPTY)
@@ -42,6 +60,7 @@ function BusinessProfile() {
 			setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
 	const shop = useOwnerShop(user?.id)
+	const [hours, setHours] = useState<WorkingHoursForm>(structuredClone(DEFAULT_HOURS))
 	const [saving, setSaving] = useState(false)
 
 	useEffect(() => {
@@ -56,7 +75,19 @@ function BusinessProfile() {
 			facebook: shop.socialLinks?.facebook ?? "",
 			website: shop.socialLinks?.website ?? "",
 		})
+		setHours(hoursFromShop(shop.workingHours))
 	}, [shop])
+
+	const setDay = (day: WeekDay, key: "open" | "close") => (e: React.ChangeEvent<HTMLInputElement>) =>
+		setHours((prev) => ({ ...prev, [day]: { ...prev[day], [key]: e.target.value } }))
+
+	const toggleClosed = (day: WeekDay) =>
+		setHours((prev) => ({ ...prev, [day]: { ...prev[day], closed: !prev[day].closed } }))
+
+	const hoursValid = WEEK_DAYS.every((d) => {
+		const h = hours[d]
+		return h.closed || h.close > h.open
+	})
 
 	const createShop = useMutation(api.barbershops.create)
 	const updateShop = useMutation(api.barbershops.update)
@@ -64,41 +95,45 @@ function BusinessProfile() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		if (!user) return
+		if (!hoursValid) {
+			showToast(t("business.profile.hoursInvalid"), "error")
+			return
+		}
 		setSaving(true)
 		const socialLinks = {
 			instagram: form.instagram || undefined,
 			facebook: form.facebook || undefined,
 			website: form.website || undefined,
 		}
-		try {
-			if (shop) {
-				await updateShop({
-					id: shop._id,
-					name: form.name,
-					description: form.description || undefined,
-					phone: form.phone || undefined,
-					address: form.address,
-					city: form.city,
-					socialLinks,
-				})
-				showToast(t("errors.shopSaved"), "success")
-			} else {
-				await createShop({
-					name: form.name,
-					slug: slugify(form.name),
-					description: form.description || undefined,
-					phone: form.phone || undefined,
-					address: form.address,
-					city: form.city,
-					socialLinks,
-				})
-				showToast(t("errors.shopCreated"), "success")
-				void router.navigate({ to: "/business/overview" })
-			}
-		} catch {
-			showToast(t("errors.shopFailed"), "error")
-		} finally {
-			setSaving(false)
+		const result = await withToast(
+			() =>
+				shop
+					? updateShop({
+							id: shop._id,
+							name: form.name,
+							description: form.description || undefined,
+							phone: form.phone || undefined,
+							address: form.address,
+							city: form.city,
+							socialLinks,
+							workingHours: hours,
+						})
+					: createShop({
+							name: form.name,
+							slug: slugify(form.name),
+							description: form.description || undefined,
+							phone: form.phone || undefined,
+							address: form.address,
+							city: form.city,
+							socialLinks,
+							workingHours: hours,
+						}),
+			shop ? t("business.profile.saved") : t("business.profile.created"),
+			t("errors.shopFailed"),
+		)
+		setSaving(false)
+		if (result !== undefined && !shop) {
+			void router.navigate({ to: "/business/overview" })
 		}
 	}
 
@@ -184,6 +219,51 @@ function BusinessProfile() {
 								required
 							/>
 						</div>
+					</div>
+
+					<div className="space-y-3">
+						<h2 className="text-[11px] font-medium text-(--text-subtle)">
+							{t("business.profile.hoursTitle")}
+						</h2>
+						{WEEK_DAYS.map((day) => {
+							const h = hours[day]
+							return (
+								<div key={day} className="flex items-center gap-3">
+									<span className="w-24 text-sm text-(--text-muted)">{t(`days.${day}`)}</span>
+									<label className="flex items-center gap-1.5 text-xs muted-sm cursor-pointer select-none">
+										<input
+											type="checkbox"
+											checked={h.closed}
+											onChange={() => toggleClosed(day)}
+											className="accent-(--gold)"
+										/>
+										{t("business.profile.closed")}
+									</label>
+									<div className="ml-auto flex items-center gap-2">
+										<input
+											type="time"
+											className="input w-auto px-2 py-1.5 text-xs disabled:opacity-40"
+											value={h.open}
+											onChange={setDay(day, "open")}
+											disabled={h.closed}
+											aria-label={t("business.profile.opensAt", { day: t(`days.${day}`) })}
+										/>
+										<span className="muted-xs">–</span>
+										<input
+											type="time"
+											className="input w-auto px-2 py-1.5 text-xs disabled:opacity-40"
+											value={h.close}
+											onChange={setDay(day, "close")}
+											disabled={h.closed}
+											aria-label={t("business.profile.closesAt", { day: t(`days.${day}`) })}
+										/>
+									</div>
+								</div>
+							)
+						})}
+						{!hoursValid && (
+							<p className="text-xs text-(--error)">{t("business.profile.hoursInvalid")}</p>
+						)}
 					</div>
 
 					<div className="space-y-5">

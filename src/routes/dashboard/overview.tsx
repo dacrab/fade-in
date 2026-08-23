@@ -7,7 +7,7 @@ import { Skeleton, SkeletonRows } from "#/components/ui/Skeleton"
 import { StatCard } from "#/components/ui/StatCard"
 import { withToast } from "#/components/ui/Toast"
 import { useFormatters } from "#/hooks/useFormatters"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { CUSTOMER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import type { Appointment, Barbershop } from "#/types"
 import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -17,12 +17,9 @@ export const Route = createFileRoute("/dashboard/overview")({ component: Custome
 
 function CustomerDashboard() {
 	const { t } = useTranslation()
-	const { user } = useRequireRole(["customer", "admin"])
+	const { user } = useRequireRole(CUSTOMER_ADMIN_ROLES)
 
-	const appointments = useQuery(
-		api.appointments.listByCustomer,
-		user ? { customerId: user.id } : "skip",
-	)
+	const appointments = useQuery(api.appointments.listByCustomer, user ? {} : "skip")
 
 	// Batch fetch all unique shops referenced by appointments (fixes N+1)
 	const shopIds = useMemo(() => {
@@ -157,7 +154,7 @@ function AppointmentRow({
 		setSubmitting(true)
 		await withToast(
 			() => createReview({ appointmentId: appt._id, rating, comment: comment.trim() }),
-			t("errors.reviewAdded"),
+			t("dashboard.reviewAdded"),
 			t("errors.reviewFailed"),
 		)
 		setSubmitting(false)

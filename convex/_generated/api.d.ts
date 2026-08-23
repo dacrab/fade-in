@@ -14,7 +14,6 @@ import type * as barbershops from "../barbershops.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_email from "../lib/email.js";
-import type * as lib_services from "../lib/services.js";
 import type * as payments from "../payments.js";
 import type * as reviews from "../reviews.js";
 import type * as services from "../services.js";
@@ -34,7 +33,6 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/auth": typeof lib_auth;
   "lib/email": typeof lib_email;
-  "lib/services": typeof lib_services;
   payments: typeof payments;
   reviews: typeof reviews;
   services: typeof services;

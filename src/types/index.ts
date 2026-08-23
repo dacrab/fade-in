@@ -1,4 +1,4 @@
-import type { Id, TableNames } from "../../convex/_generated/dataModel"
+import type { Doc, Id, TableNames } from "../../convex/_generated/dataModel"
 
 export function asId<T extends TableNames>(id: string): Id<T> {
 	return id as Id<T>
@@ -17,12 +17,6 @@ export function isOwnerOrAdmin(user: { role?: UserRole } | null | undefined): bo
 
 export const PAGE_SIZE = 50
 
-export interface DayHours {
-	open: string
-	close: string
-	closed: boolean
-}
-
 export type WeekDay =
 	| "monday"
 	| "tuesday"
@@ -31,8 +25,6 @@ export type WeekDay =
 	| "friday"
 	| "saturday"
 	| "sunday"
-
-export type WorkingHours = Partial<Record<WeekDay, DayHours>>
 
 export const WEEK_DAYS: WeekDay[] = [
 	"monday",
@@ -44,79 +36,19 @@ export const WEEK_DAYS: WeekDay[] = [
 	"sunday",
 ]
 
-export interface SocialLinks {
-	instagram?: string
-	facebook?: string
-	website?: string
-}
+/** Editable form shape for one week of opening hours. */
+export type WorkingHoursForm = Record<WeekDay, { open: string; close: string; closed: boolean }>
 
-export interface Barbershop {
-	_id: Id<"barbershops">
-	_creationTime: number
-	name: string
-	slug: string
-	ownerId: Id<"users">
-	description?: string
-	phone?: string
-	address: string
-	city: string
-	lat?: number
-	lng?: number
-	images: string[]
-	rating: number
-	reviewCount: number
-	isVerified: boolean
-	isActive: boolean
-	workingHours?: WorkingHours
-	socialLinks?: SocialLinks
-}
+export type Barbershop = Doc<"barbershops">
+export type Barber = Doc<"barbers">
+export type Service = Doc<"services">
+export type Appointment = Doc<"appointments">
+export type Review = Doc<"reviews">
 
-export interface Barber {
-	_id: Id<"barbers">
-	_creationTime: number
-	barbershopId: Id<"barbershops">
-	name: string
-	bio?: string
-	specializations: string[]
-	avatarUrl?: string
-	workingHours?: WorkingHours
-	isActive: boolean
-}
-
-export interface Service {
-	_id: Id<"services">
-	_creationTime: number
-	barbershopId: Id<"barbershops">
-	name: string
-	description?: string
-	price: number
-	durationMinutes: number
-	category: string
-	isActive: boolean
-}
-
-export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled"
+export type AppointmentStatus = Appointment["status"]
 
 export function isAppointmentStatus(s: string): s is AppointmentStatus {
 	return s === "pending" || s === "confirmed" || s === "completed" || s === "cancelled"
-}
-
-export interface Appointment {
-	_id: Id<"appointments">
-	_creationTime: number
-	customerId: Id<"users">
-	barbershopId: Id<"barbershops">
-	barberId: Id<"barbers">
-	serviceIds: Id<"services">[]
-	date: string
-	startTime: string
-	endTime: string
-	totalPrice: number
-	status: AppointmentStatus
-	notes?: string
-	polarCheckoutId?: string
-	paymentStatus?: "unpaid" | "paid"
-	createdAt: number
 }
 
 export const STATUS_BADGE: Record<AppointmentStatus, string> = {
@@ -131,16 +63,4 @@ export const STATUS_DOT: Record<AppointmentStatus, string> = {
 	confirmed: "bg-green-500",
 	completed: "bg-green-500",
 	cancelled: "bg-red-400",
-}
-
-export interface Review {
-	_id: Id<"reviews">
-	_creationTime: number
-	customerId: Id<"users">
-	barbershopId: Id<"barbershops">
-	appointmentId: Id<"appointments">
-	rating: number // 1-5
-	comment: string
-	ownerReply?: string
-	createdAt: number
 }

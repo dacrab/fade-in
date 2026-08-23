@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 import { Skeleton, SkeletonRows } from "#/components/ui/Skeleton"
 import { StatCard } from "#/components/ui/StatCard"
 import { useFormatters } from "#/hooks/useFormatters"
-import { useRequireRole } from "#/hooks/useRequireRole"
+import { BARBER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { todayIso } from "#/lib/format"
 import type { Appointment } from "#/types"
 import { STATUS_DOT } from "#/types"
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/barber/overview")({ component: BarberDash
 function BarberDashboard() {
 	const { t } = useTranslation()
 	const f = useFormatters()
-	const { user } = useRequireRole(["barber", "admin"])
+	const { user } = useRequireRole(BARBER_ADMIN_ROLES)
 	const [selectedDate, setSelectedDate] = useState(todayIso())
 
 	const barber = useQuery(api.barbers.getByUserId, user ? { userId: user.id } : "skip")

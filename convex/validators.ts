@@ -1,4 +1,5 @@
-import { v } from "convex/values"
+import type { Infer } from "convex/values"
+import { ConvexError, v } from "convex/values"
 
 export function definedPatch<T extends Record<string, unknown>>(obj: T): Partial<T> {
 	return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined)) as Partial<T>
@@ -17,6 +18,24 @@ export const workingHoursValidator = v.optional(
 		sunday: v.optional(dayHours),
 	}),
 )
+
+const TIME_RE = /^\d{2}:\d{2}$/
+
+type WorkingHoursInput = Infer<typeof workingHoursValidator>
+
+/** Semantic check beyond the schema validator: open days need valid HH:mm with close > open. */
+export function assertValidWorkingHours(hours: WorkingHoursInput) {
+	if (!hours) return
+	for (const [day, h] of Object.entries(hours)) {
+		if (!h || h.closed) continue
+		if (!(TIME_RE.test(h.open) && TIME_RE.test(h.close))) {
+			throw new ConvexError(`Invalid opening hours for ${day}`)
+		}
+		if (h.close <= h.open) {
+			throw new ConvexError(`Closing time must be after opening time on ${day}`)
+		}
+	}
+}
 
 export const socialLinksValidator = v.optional(
 	v.object({

@@ -27,12 +27,15 @@ function extractKeys(obj: I18nRecord, prefix = ""): string[] {
 
 // Resolve a dot-path in a nested object
 function getByPath(obj: I18nRecord, path: string): unknown {
-	return path.split(".").reduce<unknown>((acc, part) => {
+	let acc: unknown = obj
+	for (const part of path.split(".")) {
 		if (acc !== null && typeof acc === "object") {
-			return (acc as I18nRecord)[part]
+			acc = (acc as I18nRecord)[part]
+		} else {
+			return undefined
 		}
-		return undefined
-	}, obj)
+	}
+	return acc
 }
 
 const enKeys = extractKeys(en as I18nRecord)

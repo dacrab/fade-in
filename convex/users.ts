@@ -5,10 +5,7 @@ import { definedPatch } from "./validators"
 
 export const getViewer = query({
 	args: {},
-	handler: async (ctx) => {
-		const user = await getCurrentUser(ctx)
-		return user ? ctx.db.get(user._id) : null
-	},
+	handler: async (ctx) => getCurrentUser(ctx),
 })
 
 export const updateProfile = mutation({
@@ -27,10 +24,24 @@ export const updateProfile = mutation({
 	},
 })
 
+export const claimOwnerIntent = mutation({
+	args: {},
+	handler: async (ctx) => {
+		const user = await requireUser(ctx)
+		// Only promote a plain customer; never downgrade admin/barber roles.
+		if (user.role !== "customer") return user.role
+		await ctx.db.patch(user._id, { role: "owner" })
+		return "owner"
+	},
+})
+
 export const toggleFavorite = mutation({
 	args: { barbershopId: v.id("barbershops") },
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
+
+		const shop = await ctx.db.get(args.barbershopId)
+		if (!shop?.isActive) throw new ConvexError("Shop is not available")
 
 		const favorites = user.favoriteShopIds ?? []
 		const exists = favorites.some((id) => id === args.barbershopId)

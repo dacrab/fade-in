@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/react"
+import { ConvexError } from "convex/values"
 import { AlertCircle, CheckCircle, Info } from "lucide-react"
 import { useSyncExternalStore } from "react"
 
@@ -21,6 +22,7 @@ function emit() {
 }
 
 export function showToast(message: string, type: ToastType = "info") {
+	if (toasts.some((t) => t.message === message && t.type === type)) return
 	const id = ++toastId
 	toasts = [...toasts, { id, type, message }]
 	emit()
@@ -28,6 +30,12 @@ export function showToast(message: string, type: ToastType = "info") {
 		toasts = toasts.filter((t) => t.id !== id)
 		emit()
 	}, TOAST_TTL)
+}
+
+function errorMessage(e: unknown, fallback: string): string {
+	// Convex errors carry a server-provided user-facing message (e.g. slot conflicts).
+	if (e instanceof ConvexError && typeof e.data === "string" && e.data.length > 0) return e.data
+	return fallback
 }
 
 export async function withToast<T>(
@@ -40,7 +48,7 @@ export async function withToast<T>(
 		showToast(success, "success")
 		return result
 	} catch (e) {
-		showToast(error, "error")
+		showToast(errorMessage(e, error), "error")
 		Sentry.captureException(e)
 	}
 }

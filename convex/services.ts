@@ -3,6 +3,14 @@ import { mutation, query } from "./_generated/server"
 import { requireUser } from "./lib/auth"
 import { definedPatch } from "./validators"
 
+const MAX_DURATION_MINUTES = 480
+
+function validatePriceDuration(price: number, durationMinutes: number) {
+	if (!(price > 0)) throw new ConvexError("Price must be greater than zero")
+	if (durationMinutes < 1 || durationMinutes > MAX_DURATION_MINUTES)
+		throw new ConvexError("Invalid duration")
+}
+
 export const getById = query({
 	args: { id: v.id("services") },
 	handler: async (ctx, args) => ctx.db.get(args.id),
@@ -31,6 +39,7 @@ export const create = mutation({
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
 		const userId = user._id
+		validatePriceDuration(args.price, args.durationMinutes)
 
 		const shop = await ctx.db.get(args.barbershopId)
 		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
@@ -55,6 +64,8 @@ export const update = mutation({
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
 		const userId = user._id
+		if (args.price !== undefined && args.durationMinutes !== undefined)
+			validatePriceDuration(args.price, args.durationMinutes)
 
 		const service = await ctx.db.get(args.id)
 		if (!service) throw new ConvexError("Not found")

@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.5.10/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -22,6 +22,15 @@
 		"lineWidth": 100,
 		"lineEnding": "lf"
 	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"trailingCommas": "all",
+			"semicolons": "asNeeded",
+			"arrowParentheses": "always",
+			"bracketSameLine": false
+		}
+	},
 	"assist": {
 		"actions": {
 			"source": {
@@ -33,47 +42,78 @@
 		"enabled": true,
 		"rules": {
 			"preset": "recommended",
-			"correctness": {
-				"noUnusedVariables": "error",
-				"noUnusedImports": "error",
-				"useExhaustiveDependencies": "warn"
-			},
-			"suspicious": {
-				"noExplicitAny": "error",
-				"noConsole": "error",
-				"noConfusingVoidType": "error",
-				"noMisleadingInstantiator": "error"
-			},
-			"style": {
-				"useTemplate": "error",
-				"useSingleVarDeclarator": "error",
-				"noParameterAssign": "error",
-				"useShorthandAssign": "error",
-				"useDefaultParameterLast": "error",
-				"noUselessElse": "error",
-				"useImportType": "error"
+			"a11y": {
+				"noSvgWithoutTitle": "off",
+				"useButtonType": "warn"
 			},
 			"complexity": {
+				"noExcessiveCognitiveComplexity": {
+					"level": "warn",
+					"options": { "maxAllowedComplexity": 15 }
+				},
 				"noForEach": "off",
-				"useSimplifiedLogicExpression": "warn",
-				"noExcessiveCognitiveComplexity": "off"
+				"noUselessUndefined": "warn",
+				"useLiteralKeys": "off",
+				"useSimplifiedLogicExpression": "warn"
+			},
+			"correctness": {
+				"noUnusedFunctionParameters": "warn",
+				"noUnusedImports": "error",
+				"noUnusedVariables": "error",
+				"useExhaustiveDependencies": "warn",
+				"useHookAtTopLevel": "error"
 			},
 			"performance": {
 				"noAccumulatingSpread": "warn",
 				"noDelete": "warn"
 			},
-			"a11y": {
-				"noSvgWithoutTitle": "off"
+			"security": {
+				"noDangerouslySetInnerHtml": "warn"
+			},
+			"suspicious": {
+				"noArrayIndexKey": "warn",
+				"noCommentText": "off",
+				"noConsole": "warn",
+				"noDebugger": "error",
+				"noConfusingVoidType": "error",
+				"noDoubleEquals": "error",
+				"noExplicitAny": "error",
+				"noImplicitAnyLet": "warn",
+				"noMisleadingInstantiator": "error",
+				"noRedeclare": "error",
+				"noSelfCompare": "error",
+				"noVar": "error"
+			},
+			"style": {
+				"noNonNullAssertion": "warn",
+				"noParameterAssign": "error",
+				"noUselessElse": "error",
+				"noUnusedTemplateLiteral": "error",
+				"useCollapsedElseIf": "warn",
+				"useConsistentArrayType": { "level": "error", "options": { "syntax": "shorthand" } },
+				"useConsistentBuiltinInstantiation": "error",
+				"useConst": "error",
+				"useDefaultParameterLast": "error",
+				"useImportType": "error",
+				"useSelfClosingElements": "warn",
+				"useShorthandAssign": "error",
+				"useSingleVarDeclarator": "error",
+				"useTemplate": "error",
+				"useThrowOnlyError": "error"
 			}
 		}
 	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double",
-			"trailingCommas": "all",
-			"semicolons": "asNeeded",
-			"arrowParentheses": "always",
-			"bracketSameLine": false
+	"overrides": [
+		{
+			"includes": ["**/*.{test,spec}.{ts,tsx}"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noConsole": "off",
+						"noExplicitAny": "warn"
+					}
+				}
+			}
 		}
-	}
+	]
 }

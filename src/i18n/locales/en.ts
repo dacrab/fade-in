@@ -1,6 +1,7 @@
 const en = {
 	common: {
 		loading: "Loading…",
+		loadMore: "Load more",
 		save: "Save changes",
 		cancel: "Cancel",
 		back: "Back",
@@ -78,6 +79,8 @@ const en = {
 		creatingAccount: "Creating account…",
 		confirmPasswordLabel: "Confirm password",
 		confirmPasswordPlaceholder: "Re-enter your password",
+		welcomeBack: "Welcome back!",
+		accountCreated: "Account created! Welcome to FadeIn.",
 		strength: {
 			weak: "Weak",
 			fair: "Fair",
@@ -255,6 +258,8 @@ const en = {
 		leaveReview: "Leave a review",
 		reviewPlaceholder: "Tell others about your experience…",
 		rebook: "Rebook",
+		reviewAdded: "Review submitted!",
+		profileSaved: "Profile saved!",
 	},
 
 	business: {
@@ -308,6 +313,8 @@ const en = {
 			newService: "NEW SERVICE",
 			namePlaceholder: "e.g. Classic Haircut",
 			noServices: "No services yet.",
+			saved: "Service saved!",
+			removed: "Service removed.",
 			categories: {
 				haircut: "Haircut",
 				beard: "Beard",
@@ -325,6 +332,8 @@ const en = {
 			specializationsPlaceholder: "Fades, Beards, Classic cuts",
 			bioPlaceholder: "Short bio…",
 			noBarbers: "No barbers yet.",
+			saved: "Barber saved!",
+			removed: "Barber removed.",
 		},
 		reviews: {
 			title: "Reviews",
@@ -333,6 +342,7 @@ const en = {
 			replyPlaceholder: "Write a reply…",
 			replyButton: "Reply",
 			replyAction: "Reply to this review",
+			replyAdded: "Reply added!",
 		},
 		profile: {
 			editTitle: "Edit Shop Profile",
@@ -344,6 +354,13 @@ const en = {
 			phonePlaceholder: "+30 210 0000000",
 			addressPlaceholder: "Tsimiski 10, Thessaloniki",
 			urlPreview: "URL: /barbershops/{{slug}}",
+			saved: "Shop saved!",
+			created: "Shop created! Welcome to FadeIn.",
+			hoursTitle: "OPENING HOURS",
+			closed: "Closed",
+			opensAt: "Opening time — {{day}}",
+			closesAt: "Closing time — {{day}}",
+			hoursInvalid: "Closing time must be after opening time on every open day.",
 		},
 	},
 
@@ -456,23 +473,12 @@ const en = {
 		passwordMismatch: "Passwords do not match.",
 		registrationFailed: "Registration failed. Please try again.",
 		loginFailed: "Sign-in failed. Check your credentials.",
-		profileSaved: "Profile saved!",
 		profileFailed: "Failed to save profile",
-		replyAdded: "Reply added!",
-		reviewAdded: "Review submitted!",
 		reviewFailed: "Failed to submit review",
 		replyFailed: "Failed to add reply.",
-		barberSaved: "Barber saved!",
 		barberFailed: "Failed to save barber.",
-		barberRemoved: "Barber removed.",
-		serviceSaved: "Service saved!",
-		serviceRemoved: "Service removed.",
 		serviceFailed: "Failed to save service.",
-		shopSaved: "Shop saved!",
-		shopCreated: "Shop created! Welcome to FadeIn.",
 		shopFailed: "Failed to save.",
-		welcomeBack: "Welcome back!",
-		accountCreated: "Account created! Welcome to FadeIn.",
 	},
 
 	form: {

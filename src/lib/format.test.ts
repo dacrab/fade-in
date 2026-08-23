@@ -21,11 +21,12 @@ describe("formatPrice", () => {
 		expect(formatPrice(cents)).toBe(expected)
 	})
 
-	it.each([
-		0, 1, 50, 200, 99999, 123456,
-	])("formats %i cents with a euro sign and exactly two decimals", (cents) => {
-		expect(formatPrice(cents)).toMatch(/^€\d+\.\d{2}$/)
-	})
+	it.each([0, 1, 50, 200, 99999, 123456])(
+		"formats %i cents with a euro sign and exactly two decimals",
+		(cents) => {
+			expect(formatPrice(cents)).toMatch(/^€\d+\.\d{2}$/)
+		},
+	)
 })
 
 describe("formatDateShort", () => {

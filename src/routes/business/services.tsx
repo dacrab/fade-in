@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
+import { Check, Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { SkeletonRows } from "#/components/ui/Skeleton"
-import { showToast } from "#/components/ui/Toast"
-import { useBusinessAuth } from "#/hooks/useBusinessAuth"
+import { CrudListPage } from "#/components/ui/CrudListPage"
+import { withToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice } from "#/lib/format"
 import type { Service } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Doc, Id } from "../../../convex/_generated/dataModel"
+import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/services")({ component: BusinessServices })
 
@@ -33,7 +33,7 @@ const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other
 
 function BusinessServices() {
 	const { t } = useTranslation()
-	const { user } = useBusinessAuth()
+	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 
 	const [form, setForm] = useState(EMPTY_FORM)
 	const [showForm, setShowForm] = useState(false)
@@ -67,31 +67,22 @@ function BusinessServices() {
 		if (!shop) return
 		const price = Math.round(parseFloat(form.price) * 100)
 		const durationMinutes = parseInt(form.durationMinutes, 10)
-		try {
-			if (editId) {
-				await updateService({
-					id: editId,
-					name: form.name,
-					description: form.description || undefined,
-					price,
-					durationMinutes,
-					category: form.category,
-				})
-			} else {
-				await createService({
-					barbershopId: shop._id,
-					name: form.name,
-					description: form.description || undefined,
-					price,
-					durationMinutes,
-					category: form.category,
-				})
-			}
-			showToast(t("errors.serviceSaved"), "success")
-			reset()
-		} catch {
-			showToast(t("errors.serviceFailed"), "error")
+		const payload = {
+			name: form.name,
+			description: form.description || undefined,
+			price,
+			durationMinutes,
+			category: form.category,
 		}
+		const result = await withToast(
+			() =>
+				editId
+					? updateService({ id: editId, ...payload })
+					: createService({ barbershopId: shop._id, ...payload }),
+			t("business.services.saved"),
+			t("errors.serviceFailed"),
+		)
+		if (result !== undefined) reset()
 	}
 
 	const handleEdit = (svc: Service) =>
@@ -106,168 +97,138 @@ function BusinessServices() {
 			svc._id,
 		)
 
-	const handleDelete = async (id: Id<"services">) => {
-		try {
-			await removeService({ id })
-			showToast(t("errors.serviceRemoved"), "info")
-		} catch {
-			showToast(t("errors.serviceFailed"), "error")
-		}
-	}
+	const handleDelete = async (id: Id<"services">) =>
+		withToast(() => removeService({ id }), t("business.services.removed"), t("errors.serviceFailed"))
 
 	return (
-		<div className="px-8 py-8">
-			<div className="max-w-3xl mx-auto px-6 py-8">
-				<div className="flex items-start justify-between mb-5">
+		<CrudListPage
+			title={t("business.services.title")}
+			addLabel={t("business.services.addService")}
+			showForm={showForm}
+			onToggleForm={() => {
+				reset()
+				setShowForm(!showForm)
+			}}
+			formTitle={editId ? t("business.services.editService") : t("business.services.newService")}
+			form={
+				<form onSubmit={(e) => void handleSubmit(e)} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+					<div className="sm:col-span-2">
+						<label className="field-label" htmlFor="svc-name">
+							{t("form.nameStar")}
+						</label>
+						<input
+							className="input w-full text-sm"
+							id="svc-name"
+							placeholder={t("business.services.namePlaceholder")}
+							value={form.name}
+							onChange={set("name")}
+							required
+						/>
+					</div>
 					<div>
-						<h1 className="section-title">{t("business.services.title")}</h1>
+						<label className="field-label" htmlFor="svc-price">
+							{t("form.priceLabel")} *
+						</label>
+						<input
+							className="input w-full text-sm"
+							type="number"
+							step="0.01"
+							min="0.01"
+							placeholder="15.00"
+							value={form.price}
+							onChange={set("price")}
+							required
+						/>
 					</div>
-					<button
-						type="button"
-						onClick={() => {
-							reset()
-							setShowForm(!showForm)
-						}}
-						className="btn btn-primary btn-sm"
-					>
-						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
-						{showForm ? t("common.cancel") : t("business.services.addService")}
-					</button>
-				</div>
-
-				{showForm && (
-					<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5 animate-in fade-in slide-in-from-top-2 duration-200">
-						<h2 className="text-[11px] font-medium text-(--text-subtle) mb-5">
-							{editId ? t("business.services.editService") : t("business.services.newService")}
-						</h2>
-						<form
-							onSubmit={(e) => void handleSubmit(e)}
-							className="grid grid-cols-1 sm:grid-cols-2 gap-5"
+					<div>
+						<label className="field-label" htmlFor="svc-duration">
+							{t("form.durationLabel")} *
+						</label>
+						<input
+							className="input w-full text-sm"
+							type="number"
+							min="5"
+							step="5"
+							placeholder="30"
+							value={form.durationMinutes}
+							onChange={set("durationMinutes")}
+							required
+						/>
+					</div>
+					<div>
+						<label className="field-label" htmlFor="svc-category">
+							{t("form.categoryLabel")}
+						</label>
+						<select
+							id="svc-category"
+							className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm focus:outline-none focus:border-(--gold) transition-colors"
+							value={form.category}
+							onChange={set("category")}
 						>
-							<div className="sm:col-span-2">
-								<label className="field-label" htmlFor="svc-name">
-									{t("form.nameStar")}
-								</label>
-								<input
-									className="input w-full text-sm"
-									id="svc-name"
-									placeholder={t("business.services.namePlaceholder")}
-									value={form.name}
-									onChange={set("name")}
-									required
-								/>
-							</div>
-							<div>
-								<label className="field-label" htmlFor="svc-price">
-									{t("form.priceLabel")} *
-								</label>
-								<input
-									className="input w-full text-sm"
-									type="number"
-									step="0.01"
-									min="0"
-									placeholder="15.00"
-									value={form.price}
-									onChange={set("price")}
-									required
-								/>
-							</div>
-							<div>
-								<label className="field-label" htmlFor="svc-duration">
-									{t("form.durationLabel")} *
-								</label>
-								<input
-									className="input w-full text-sm"
-									type="number"
-									min="5"
-									step="5"
-									placeholder="30"
-									value={form.durationMinutes}
-									onChange={set("durationMinutes")}
-									required
-								/>
-							</div>
-							<div>
-								<label className="field-label" htmlFor="svc-category">
-									{t("form.categoryLabel")}
-								</label>
-								<select
-									id="svc-category"
-									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm focus:outline-none focus:border-(--gold) transition-colors"
-									value={form.category}
-									onChange={set("category")}
-								>
-									{CATEGORIES.map((c) => (
-										<option key={c} value={c}>
-											{t(`business.services.categories.${c}`)}
-										</option>
-									))}
-								</select>
-							</div>
-							<div className="sm:col-span-2">
-								<label className="field-label" htmlFor="svc-desc">
-									{t("form.descriptionLabel")}
-								</label>
-								<input
-									className="input w-full text-sm"
-									placeholder={t("form.optional")}
-									value={form.description}
-									onChange={set("description")}
-								/>
-							</div>
-							<div className="sm:col-span-2 flex gap-3">
-								<button type="submit" className="btn btn-primary btn-sm">
-									<Check size={13} />
-									{editId ? t("common.save") : t("business.services.addService")}
-								</button>
-								<button
-									type="button"
-									onClick={reset}
-									className="px-4 py-2 rounded-full border border-(--border) muted-xs hover:text-(--text-muted) transition-colors"
-								>
-									{t("common.cancel")}
-								</button>
-							</div>
-						</form>
+							{CATEGORIES.map((c) => (
+								<option key={c} value={c}>
+									{t(`business.services.categories.${c}`)}
+								</option>
+							))}
+						</select>
 					</div>
-				)}
-
-				{services === undefined ? (
-					<SkeletonRows count={4} className="h-14 rounded-lg" />
-				) : services.length === 0 ? (
-					<p className="empty-text">{t("business.services.noServices")}</p>
-				) : (
-					<div className="divide-y divide-(--border)">
-						{services.map((svc: Doc<"services">) => (
-							<div key={svc._id} className="flex items-center gap-4 py-4 group">
-								<div className="flex-1 min-w-0">
-									<div className="main-sm">{svc.name}</div>
-									<div className="field-hint">
-										{svc.durationMinutes} min · {t(`business.services.categories.${svc.category}`)}
-									</div>
-								</div>
-								<div className="text-sm font-medium text-(--gold)">{formatPrice(svc.price)}</div>
-								<div className="flex gap-1">
-									<button
-										type="button"
-										onClick={() => handleEdit(svc)}
-										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--text-muted) transition-all"
-									>
-										<Pencil size={13} />
-									</button>
-									<button
-										type="button"
-										onClick={() => void handleDelete(svc._id)}
-										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--error) transition-all"
-									>
-										<Trash2 size={13} />
-									</button>
-								</div>
-							</div>
-						))}
+					<div className="sm:col-span-2">
+						<label className="field-label" htmlFor="svc-desc">
+							{t("form.descriptionLabel")}
+						</label>
+						<input
+							className="input w-full text-sm"
+							placeholder={t("form.optional")}
+							value={form.description}
+							onChange={set("description")}
+						/>
 					</div>
-				)}
-			</div>
-		</div>
+					<div className="sm:col-span-2 flex gap-3">
+						<button type="submit" className="btn btn-primary btn-sm">
+							<Check size={13} />
+							{editId ? t("common.save") : t("business.services.addService")}
+						</button>
+						<button
+							type="button"
+							onClick={reset}
+							className="px-4 py-2 rounded-full border border-(--border) muted-xs hover:text-(--text-muted) transition-colors"
+						>
+							{t("common.cancel")}
+						</button>
+					</div>
+				</form>
+			}
+			loading={services === undefined}
+			empty={services?.length === 0}
+			emptyText={t("business.services.noServices")}
+		>
+			{services?.map((svc) => (
+				<div key={svc._id} className="flex items-center gap-4 py-4 group">
+					<div className="flex-1 min-w-0">
+						<div className="main-sm">{svc.name}</div>
+						<div className="field-hint">
+							{svc.durationMinutes} min · {t(`business.services.categories.${svc.category}`)}
+						</div>
+					</div>
+					<div className="text-sm font-medium text-(--gold)">{formatPrice(svc.price)}</div>
+					<div className="flex gap-1">
+						<button
+							type="button"
+							onClick={() => handleEdit(svc)}
+							className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--text-muted) transition-all"
+						>
+							<Pencil size={13} />
+						</button>
+						<button
+							type="button"
+							onClick={() => void handleDelete(svc._id)}
+							className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--error) transition-all"
+						>
+							<Trash2 size={13} />
+						</button>
+					</div>
+				</div>
+			))}
+		</CrudListPage>
 	)
 }

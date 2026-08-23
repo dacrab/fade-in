@@ -1,6 +1,7 @@
 const el = {
 	common: {
 		loading: "Φόρτωση…",
+		loadMore: "Φόρτωσε περισσότερα",
 		save: "Αποθήκευση αλλαγών",
 		cancel: "Ακύρωση",
 		back: "Πίσω",
@@ -78,6 +79,8 @@ const el = {
 		creatingAccount: "Δημιουργία…",
 		confirmPasswordLabel: "Επιβεβαίωση κωδικού",
 		confirmPasswordPlaceholder: "Εισάγετε ξανά τον κωδικό",
+		welcomeBack: "Καλωσήρθατε πίσω!",
+		accountCreated: "Ο λογαριασμός δημιουργήθηκε! Καλωσήρθατε στο FadeIn.",
 		strength: {
 			weak: "Αδύναμος",
 			fair: "Μέτριος",
@@ -255,6 +258,8 @@ const el = {
 		leaveReview: "Γράψτε κριτική",
 		reviewPlaceholder: "Πείτε σε άλλους για την εμπειρία σας…",
 		rebook: "Επανακράτηση",
+		reviewAdded: "Η κριτική υποβλήθηκε!",
+		profileSaved: "Το προφίλ αποθηκεύτηκε!",
 	},
 
 	business: {
@@ -308,6 +313,8 @@ const el = {
 			newService: "ΝΕΑ ΥΠΗΡΕΣΙΑ",
 			namePlaceholder: "π.χ. Κλασικό κούρεμα",
 			noServices: "Δεν υπάρχουν υπηρεσίες ακόμα.",
+			saved: "Η υπηρεσία αποθηκεύτηκε!",
+			removed: "Η υπηρεσία αφαιρέθηκε.",
 			categories: {
 				haircut: "Κούρεμα",
 				beard: "Γένια",
@@ -325,6 +332,8 @@ const el = {
 			specializationsPlaceholder: "Fades, Γένια, Κλασικά",
 			bioPlaceholder: "Σύντομη βιογραφία…",
 			noBarbers: "Δεν υπάρχουν κουρείς ακόμα.",
+			saved: "Ο κουρέας αποθηκεύτηκε!",
+			removed: "Ο κουρέας αφαιρέθηκε.",
 		},
 		reviews: {
 			title: "Αξιολογήσεις",
@@ -333,6 +342,7 @@ const el = {
 			replyPlaceholder: "Γράψτε απάντηση…",
 			replyButton: "Απάντηση",
 			replyAction: "Απάντηση σε αυτή την αξιολόγηση",
+			replyAdded: "Η απάντηση προστέθηκε!",
 		},
 		profile: {
 			editTitle: "Επεξεργασία Προφίλ Καταστήματος",
@@ -344,6 +354,13 @@ const el = {
 			phonePlaceholder: "+30 210 0000000",
 			addressPlaceholder: "Τσιμισκή 10, Θεσσαλονίκη",
 			urlPreview: "URL: /barbershops/{{slug}}",
+			saved: "Το κατάστημα αποθηκεύτηκε!",
+			created: "Το κατάστημα δημιουργήθηκε! Καλωσήρθατε στο FadeIn.",
+			hoursTitle: "ΩΡΑΡΙΟ ΛΕΙΤΟΥΡΓΙΑΣ",
+			closed: "Κλειστά",
+			opensAt: "Ώρα έναρξης — {{day}}",
+			closesAt: "Ώρα λήξης — {{day}}",
+			hoursInvalid: "Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης για κάθε ανοιχτή μέρα.",
 		},
 	},
 
@@ -456,23 +473,12 @@ const el = {
 		passwordMismatch: "Οι κωδικοί δεν ταιριάζουν.",
 		registrationFailed: "Η εγγραφή απέτυχε. Δοκιμάστε ξανά.",
 		loginFailed: "Η σύνδεση απέτυχε. Ελέγξτε τα στοιχεία σας.",
-		profileSaved: "Το προφίλ αποθηκεύτηκε!",
 		profileFailed: "Αποτυχία αποθήκευσης προφίλ",
-		replyAdded: "Η απάντηση προστέθηκε!",
-		reviewAdded: "Η κριτική υποβλήθηκε!",
 		reviewFailed: "Αποτυχία υποβολής κριτικής",
 		replyFailed: "Αποτυχία προσθήκης απάντησης.",
-		barberSaved: "Ο κουρέας αποθηκεύτηκε!",
 		barberFailed: "Αποτυχία αποθήκευσης κουρέα.",
-		barberRemoved: "Ο κουρέας αφαιρέθηκε.",
-		serviceSaved: "Η υπηρεσία αποθηκεύτηκε!",
-		serviceRemoved: "Η υπηρεσία αφαιρέθηκε.",
 		serviceFailed: "Αποτυχία αποθήκευσης υπηρεσίας.",
-		shopSaved: "Το κατάστημα αποθηκεύτηκε!",
-		shopCreated: "Το κατάστημα δημιουργήθηκε! Καλωσήρθατε στο FadeIn.",
 		shopFailed: "Αποτυχία αποθήκευσης.",
-		welcomeBack: "Καλωσήρθατε πίσω!",
-		accountCreated: "Ο λογαριασμός δημιουργήθηκε! Καλωσήρθατε στο FadeIn.",
 	},
 
 	form: {
