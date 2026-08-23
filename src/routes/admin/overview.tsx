@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Building2, ShieldCheck, Star, Users } from "lucide-react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import AdminNav from "#/components/AdminNav"
 import { Skeleton } from "#/components/ui/Skeleton"
-import { useAdminAuth } from "#/hooks/useAdminAuth"
+import { ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
+import type { UserRole } from "#/types"
+import { parseUserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
 
@@ -12,16 +15,20 @@ export const Route = createFileRoute("/admin/overview")({ component: AdminDashbo
 
 function AdminDashboard() {
 	const { t } = useTranslation()
-	const { user } = useAdminAuth()
+	const { user } = useRequireRole(ADMIN_ROLES)
 
 	const allShops = useQuery(api.barbershops.listAll)
 	const allUsers = useQuery(api.users.listAll)
 
+	const roleCounts = useMemo(() => {
+		const counts: Record<UserRole, number> = { customer: 0, owner: 0, barber: 0, admin: 0 }
+		for (const u of allUsers ?? []) counts[parseUserRole(u.role)]++
+		return counts
+	}, [allUsers])
+
 	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
 
 	const verified = allShops?.filter((s: Doc<"barbershops">) => s.isVerified).length ?? 0
-	const owners = allUsers?.filter((u: Doc<"users">) => u.role === "owner").length ?? 0
-	const customers = allUsers?.filter((u: Doc<"users">) => u.role === "customer").length ?? 0
 
 	return (
 		<main>
@@ -36,7 +43,7 @@ function AdminDashboard() {
 							{ label: t("admin.stats.totalShops"), value: allShops?.length ?? "—", icon: Building2 },
 							{ label: t("admin.stats.verifiedShops"), value: verified, icon: ShieldCheck },
 							{ label: t("admin.stats.totalUsers"), value: allUsers?.length ?? "—", icon: Users },
-							{ label: t("admin.stats.owners"), value: owners, icon: Star },
+							{ label: t("admin.stats.owners"), value: roleCounts.owner, icon: Star },
 						].map(({ label, value, icon: Icon }) => (
 							<div key={label} className="card p-4">
 								<Icon size={18} className="text-(--gold) mb-2" />
@@ -87,16 +94,16 @@ function AdminDashboard() {
 								<div className="space-y-3">
 									{(
 										[
-											{ role: t("admin.roles.customers"), count: customers, color: "var(--gold)" },
-											{ role: t("admin.roles.owners"), count: owners, color: "var(--success)" },
+											{ role: t("admin.roles.customers"), count: roleCounts.customer, color: "var(--gold)" },
+											{ role: t("admin.roles.owners"), count: roleCounts.owner, color: "var(--success)" },
 											{
 												role: t("admin.roles.barbers"),
-												count: allUsers.filter((u: Doc<"users">) => u.role === "barber").length,
+												count: roleCounts.barber,
 												color: "var(--info)",
 											},
 											{
 												role: t("admin.roles.admins"),
-												count: allUsers.filter((u: Doc<"users">) => u.role === "admin").length,
+												count: roleCounts.admin,
 												color: "var(--error)",
 											},
 										] as const

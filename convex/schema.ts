@@ -16,7 +16,8 @@ export default defineSchema({
 		emailVerified: v.optional(v.boolean()),
 	})
 		.index("by_email", ["email"])
-		.index("by_clerkId", ["clerkId"]),
+		.index("by_clerkId", ["clerkId"])
+		.index("by_role", ["role"]),
 
 	barbershops: defineTable({
 		name: v.string(),
@@ -39,7 +40,11 @@ export default defineSchema({
 		.index("by_slug", ["slug"])
 		.index("by_owner", ["ownerId"])
 		.index("by_city", ["city"])
-		.index("by_active", ["isActive"]),
+		.index("by_active", ["isActive"])
+		.searchIndex("search_name", {
+			searchField: "name",
+			filterFields: ["city", "isActive"],
+		}),
 
 	barbers: defineTable({
 		barbershopId: v.id("barbershops"),
@@ -98,5 +103,7 @@ export default defineSchema({
 		comment: v.string(),
 		ownerReply: v.optional(v.string()),
 		createdAt: v.number(),
-	}).index("by_shop", ["barbershopId"]),
+	})
+		.index("by_shop", ["barbershopId"])
+		.index("by_appointment", ["appointmentId"]),
 })

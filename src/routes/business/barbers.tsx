@@ -1,15 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Check, Pencil, PlusCircle, Trash2, X } from "lucide-react"
+import { Check, Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Skeleton } from "#/components/ui/Skeleton"
-import { showToast } from "#/components/ui/Toast"
-import { useBusinessAuth } from "#/hooks/useBusinessAuth"
+import { CrudListPage } from "#/components/ui/CrudListPage"
+import { withToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import type { Barber } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Doc, Id } from "../../../convex/_generated/dataModel"
+import type { Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/business/barbers")({ component: BusinessBarbers })
 
@@ -22,7 +22,7 @@ const EMPTY: BarberForm = { name: "", bio: "", specializations: "" }
 
 function BusinessBarbers() {
 	const { t } = useTranslation()
-	const { user } = useBusinessAuth()
+	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 
 	const [form, setForm] = useState<BarberForm>(EMPTY)
 	const [showForm, setShowForm] = useState(false)
@@ -48,27 +48,20 @@ function BusinessBarbers() {
 			.split(",")
 			.map((s) => s.trim())
 			.filter(Boolean)
-		try {
-			if (editId) {
-				await updateBarber({
-					id: editId,
-					name: form.name,
-					bio: form.bio || undefined,
-					specializations: specs,
-				})
-			} else {
-				await createBarber({
-					barbershopId: shop._id,
-					name: form.name,
-					bio: form.bio || undefined,
-					specializations: specs,
-				})
-			}
-			showToast(t("errors.barberSaved"), "success")
-			reset()
-		} catch {
-			showToast(t("errors.barberFailed"), "error")
+		const payload = {
+			name: form.name,
+			bio: form.bio || undefined,
+			specializations: specs,
 		}
+		const result = await withToast(
+			() =>
+				editId
+					? updateBarber({ id: editId, ...payload })
+					: createBarber({ barbershopId: shop._id, ...payload }),
+			t("business.barbers.saved"),
+			t("errors.barberFailed"),
+		)
+		if (result !== undefined) reset()
 	}
 
 	const handleEdit = (b: Barber) => {
@@ -77,139 +70,108 @@ function BusinessBarbers() {
 		setShowForm(true)
 	}
 
-	const handleDelete = async (id: Id<"barbers">) => {
-		try {
-			await removeBarber({ id })
-			showToast(t("errors.barberRemoved"), "info")
-		} catch {
-			showToast(t("errors.barberFailed"), "error")
-		}
-	}
+	const handleDelete = async (id: Id<"barbers">) =>
+		withToast(() => removeBarber({ id }), t("business.barbers.removed"), t("errors.barberFailed"))
 
 	return (
-		<div className="px-8 py-8">
-			<div className="max-w-3xl mx-auto px-6 py-8">
-				<div className="flex items-start justify-between mb-5">
+		<CrudListPage
+			title={t("business.barbers.title")}
+			addLabel={t("business.barbers.addBarber")}
+			showForm={showForm}
+			onToggleForm={() => {
+				reset()
+				setShowForm(!showForm)
+			}}
+			formTitle={editId ? t("common.edit") : t("business.barbers.addBarber")}
+			form={
+				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
 					<div>
-						<h1 className="section-title">{t("business.barbers.title")}</h1>
+						<label className="field-label" htmlFor="barber-name">
+							{t("form.nameStar")}
+						</label>
+						<input
+							id="barber-name"
+							className="input w-full text-sm"
+							placeholder={t("business.barbers.namePlaceholder")}
+							value={form.name}
+							onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+							required
+						/>
 					</div>
-					<button
-						type="button"
-						onClick={() => {
-							reset()
-							setShowForm(!showForm)
-						}}
-						className="btn btn-primary btn-sm"
-					>
-						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
-						{showForm ? t("common.cancel") : t("business.barbers.addBarber")}
-					</button>
+					<div>
+						<label className="field-label" htmlFor="barber-specs">
+							{t("business.barbers.specializationsLabel")}
+						</label>
+						<input
+							id="barber-specs"
+							className="input w-full text-sm"
+							placeholder={t("business.barbers.specializationsPlaceholder")}
+							value={form.specializations}
+							onChange={(e) => setForm((f) => ({ ...f, specializations: e.target.value }))}
+						/>
+					</div>
+					<div>
+						<label className="field-label" htmlFor="barber-bio">
+							{t("form.descriptionLabel")}
+						</label>
+						<textarea
+							id="barber-bio"
+							className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
+							rows={2}
+							placeholder={t("business.barbers.bioPlaceholder")}
+							value={form.bio}
+							onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
+						/>
+					</div>
+					<div className="flex gap-3">
+						<button type="submit" className="btn btn-primary btn-sm">
+							<Check size={13} />
+							{editId ? t("common.save") : t("business.barbers.addBarber")}
+						</button>
+						<button
+							type="button"
+							onClick={reset}
+							className="px-4 py-2 rounded-full border border-(--border) muted-xs hover:text-(--text-muted) transition-colors"
+						>
+							{t("common.cancel")}
+						</button>
+					</div>
+				</form>
+			}
+			loading={barbers === undefined}
+			empty={barbers?.length === 0}
+			emptyText={t("business.barbers.noBarbers")}
+		>
+			{barbers?.map((b) => (
+				<div key={b._id} className="flex items-center gap-4 py-4 group">
+					<div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium text-(--gold) flex-shrink-0 bg-(--gold)/10">
+						{b.name.charAt(0)}
+					</div>
+					<div className="flex-1 min-w-0">
+						<div className="main-sm">{b.name}</div>
+						{b.specializations.length > 0 && (
+							<div className="field-hint">{b.specializations.join(", ")}</div>
+						)}
+						{b.bio && <div className="subtle-xs truncate mt-0.5">{b.bio}</div>}
+					</div>
+					<div className="flex gap-1">
+						<button
+							type="button"
+							onClick={() => handleEdit(b)}
+							className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--text-muted) transition-all"
+						>
+							<Pencil size={13} />
+						</button>
+						<button
+							type="button"
+							onClick={() => void handleDelete(b._id)}
+							className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--error) transition-all"
+						>
+							<Trash2 size={13} />
+						</button>
+					</div>
 				</div>
-
-				{showForm && (
-					<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5 animate-in fade-in slide-in-from-top-2 duration-200">
-						<h2 className="text-[11px] font-medium text-(--text-subtle) mb-5">
-							{editId ? t("common.edit") : t("business.barbers.addBarber")}
-						</h2>
-						<form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
-							<div>
-								<label className="field-label" htmlFor="barber-name">
-									{t("form.nameStar")}
-								</label>
-								<input
-									id="barber-name"
-									className="input w-full text-sm"
-									placeholder={t("business.barbers.namePlaceholder")}
-									value={form.name}
-									onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-									required
-								/>
-							</div>
-							<div>
-								<label className="field-label" htmlFor="barber-specs">
-									{t("business.barbers.specializationsLabel")}
-								</label>
-								<input
-									id="barber-specs"
-									className="input w-full text-sm"
-									placeholder={t("business.barbers.specializationsPlaceholder")}
-									value={form.specializations}
-									onChange={(e) => setForm((f) => ({ ...f, specializations: e.target.value }))}
-								/>
-							</div>
-							<div>
-								<label className="field-label" htmlFor="barber-bio">
-									{t("form.descriptionLabel")}
-								</label>
-								<textarea
-									id="barber-bio"
-									className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
-									rows={2}
-									placeholder={t("business.barbers.bioPlaceholder")}
-									value={form.bio}
-									onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
-								/>
-							</div>
-							<div className="flex gap-3">
-								<button type="submit" className="btn btn-primary btn-sm">
-									<Check size={13} />
-									{editId ? t("common.save") : t("business.barbers.addBarber")}
-								</button>
-								<button
-									type="button"
-									onClick={reset}
-									className="px-4 py-2 rounded-full border border-(--border) muted-xs hover:text-(--text-muted) transition-colors"
-								>
-									{t("common.cancel")}
-								</button>
-							</div>
-						</form>
-					</div>
-				)}
-
-				{!barbers ? (
-					<div className="space-y-3">
-						{[0, 1, 2].map((i) => (
-							<Skeleton key={i} className="h-14 w-full rounded-lg" />
-						))}
-					</div>
-				) : barbers.length === 0 ? (
-					<p className="empty-text">{t("business.barbers.noBarbers")}</p>
-				) : (
-					<div className="divide-y divide-(--border)">
-						{barbers.map((b: Doc<"barbers">) => (
-							<div key={b._id} className="flex items-center gap-4 py-4 group">
-								<div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium text-(--gold) flex-shrink-0 bg-(--gold)/10">
-									{b.name.charAt(0)}
-								</div>
-								<div className="flex-1 min-w-0">
-									<div className="main-sm">{b.name}</div>
-									{b.specializations.length > 0 && (
-										<div className="field-hint">{b.specializations.join(", ")}</div>
-									)}
-									{b.bio && <div className="subtle-xs truncate mt-0.5">{b.bio}</div>}
-								</div>
-								<div className="flex gap-1">
-									<button
-										type="button"
-										onClick={() => handleEdit(b)}
-										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--text-muted) transition-all"
-									>
-										<Pencil size={13} />
-									</button>
-									<button
-										type="button"
-										onClick={() => void handleDelete(b._id)}
-										className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--error) transition-all"
-									>
-										<Trash2 size={13} />
-									</button>
-								</div>
-							</div>
-						))}
-					</div>
-				)}
-			</div>
-		</div>
+			))}
+		</CrudListPage>
 	)
 }

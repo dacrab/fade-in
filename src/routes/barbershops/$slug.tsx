@@ -16,7 +16,7 @@ import {
 	Star,
 } from "lucide-react"
 import { QRCodeSVG } from "qrcode.react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import BookingModal from "#/components/BookingModal"
 import { Skeleton } from "#/components/ui/Skeleton"
@@ -30,6 +30,7 @@ import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProfilePage })
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function ShopProfilePage() {
 	const { t } = useTranslation()
 	const f = useFormatters()
@@ -37,8 +38,12 @@ function ShopProfilePage() {
 	const shop = useQuery(api.barbershops.getBySlug, { slug })
 	const [bookingOpen, setBookingOpen] = useState(false)
 	const [showQr, setShowQr] = useState(false)
-	const bookingUrl =
-		typeof window !== "undefined" ? `${window.location.origin}/barbershops/${slug}` : ""
+	const [bookingUrl, setBookingUrl] = useState("")
+
+	useEffect(() => {
+		// Computed after mount: window.location is unavailable during SSR.
+		setBookingUrl(`${window.location.origin}/barbershops/${slug}`)
+	}, [slug])
 
 	const handleCopyLink = () =>
 		withToast(

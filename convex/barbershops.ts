@@ -2,7 +2,13 @@ import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireUser } from "./lib/auth"
-import { definedPatch, socialLinksValidator, workingHoursValidator } from "./validators"
+import { slugify } from "./lib/slug"
+import {
+	assertValidWorkingHours,
+	definedPatch,
+	socialLinksValidator,
+	workingHoursValidator,
+} from "./validators"
 
 export const list = query({
 	args: {
@@ -16,6 +22,22 @@ export const list = query({
 		const city = args.city
 		const minRating = args.minRating
 		const isVerified = args.isVerified
+
+		if (args.search) {
+			const term = args.search
+			let searchQuery = ctx.db.query("barbershops").withSearchIndex("search_name", (q) => {
+				let filtered = q.search("name", term)
+				if (city) filtered = filtered.eq("city", city)
+				return filtered.eq("isActive", true)
+			})
+			if (minRating !== undefined) {
+				searchQuery = searchQuery.filter((q) => q.gte(q.field("rating"), minRating))
+			}
+			if (isVerified !== undefined) {
+				searchQuery = searchQuery.filter((q) => q.eq(q.field("isVerified"), isVerified))
+			}
+			return searchQuery.paginate(args.paginationOpts)
+		}
 
 		const getBaseQuery = () => {
 			if (city) {
@@ -34,26 +56,6 @@ export const list = query({
 		}
 		if (isVerified !== undefined) {
 			baseQuery = baseQuery.filter((q) => q.eq(q.field("isVerified"), isVerified))
-		}
-
-		if (args.search) {
-			const term = args.search.toLowerCase()
-			const all = await baseQuery.collect()
-			const filtered = all.filter(
-				(s) =>
-					s.name.toLowerCase().includes(term) ||
-					s.city.toLowerCase().includes(term) ||
-					s.address.toLowerCase().includes(term),
-			)
-			const numItems = args.paginationOpts.numItems
-			const startIdx = args.paginationOpts.cursor ? Number(args.paginationOpts.cursor) || 0 : 0
-			const page = filtered.slice(startIdx, startIdx + numItems)
-			const nextIdx = startIdx + numItems
-			return {
-				page,
-				isDone: nextIdx >= filtered.length,
-				continueCursor: nextIdx >= filtered.length ? null : String(nextIdx),
-			}
 		}
 
 		return baseQuery.paginate(args.paginationOpts)
@@ -90,13 +92,14 @@ export const getById = query({
 })
 
 export const listByOwner = query({
-	args: { ownerId: v.id("users") },
+	args: { ownerId: v.optional(v.id("users")) },
 	handler: async (ctx, args) => {
 		const user = await getCurrentUser(ctx)
-		if (!user || user._id !== args.ownerId) return []
+		if (!user) return []
+		if (args.ownerId !== undefined && args.ownerId !== user._id) return []
 		return ctx.db
 			.query("barbershops")
-			.withIndex("by_owner", (q) => q.eq("ownerId", args.ownerId))
+			.withIndex("by_owner", (q) => q.eq("ownerId", user._id))
 			.collect()
 	},
 })
@@ -118,11 +121,9 @@ export const create = mutation({
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
 		const userId = user._id
+		assertValidWorkingHours(args.workingHours)
 
-		const slug = args.slug
-			.toLowerCase()
-			.replace(/[^a-z0-9]+/g, "-")
-			.replace(/^-|-$/g, "")
+		const slug = slugify(args.slug)
 		if (!slug) throw new ConvexError("Invalid shop slug")
 
 		// Check-then-insert runs inside a single mutation: Convex executes it
@@ -135,7 +136,7 @@ export const create = mutation({
 		if (existing) throw new ConvexError("A shop with this URL already exists")
 
 		const { images, ...rest } = args
-		return ctx.db.insert("barbershops", {
+		const shopId = await ctx.db.insert("barbershops", {
 			...rest,
 			slug,
 			ownerId: userId,
@@ -145,6 +146,10 @@ export const create = mutation({
 			isVerified: false,
 			isActive: true,
 		})
+		if (user.role === "customer") {
+			await ctx.db.patch(userId, { role: "owner" })
+		}
+		return shopId
 	},
 })
 
@@ -166,6 +171,8 @@ export const update = mutation({
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
 		const userId = user._id
+
+		assertValidWorkingHours(args.workingHours)
 
 		const shop = await ctx.db.get(args.id)
 		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
@@ -195,7 +202,7 @@ export const listByIds = query({
 	args: { ids: v.array(v.id("barbershops")) },
 	handler: async (ctx, args) => {
 		const shops = await Promise.all(args.ids.map((id) => ctx.db.get(id)))
-		return shops.filter(Boolean)
+		return shops.filter((s) => s?.isActive === true)
 	},
 })
 
@@ -222,7 +229,7 @@ export const getStats = query({
 
 		const customers = await ctx.db
 			.query("users")
-			.filter((q) => q.eq(q.field("role"), "customer"))
+			.withIndex("by_role", (q) => q.eq("role", "customer"))
 			.collect()
 
 		return {

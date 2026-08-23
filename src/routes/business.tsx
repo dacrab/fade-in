@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router"
 import { BarChart3, Calendar, Check, MessageSquare, Scissors, Settings, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 
 export const Route = createFileRoute("/business")({ component: BusinessLayout })
 
@@ -17,7 +17,7 @@ const NAV_LINK_DEFS = [
 
 function BusinessLayout() {
 	const { t } = useTranslation()
-	const { user } = useBusinessAuth()
+	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 	const shop = useOwnerShop(user?.id)
 
 	return (

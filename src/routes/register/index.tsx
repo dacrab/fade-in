@@ -1,5 +1,6 @@
 import { useSignUp } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { useMutation } from "convex/react"
 import { Scissors } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -7,6 +8,7 @@ import { z } from "zod"
 import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
 import type { UserRole } from "#/types"
+import { api } from "../../../convex/_generated/api"
 
 const searchSchema = z.object({
 	role: z.enum(["customer", "owner"]).optional(),
@@ -48,9 +50,11 @@ function RegisterPage() {
 	const [loading, setLoading] = useState(false)
 	const { signUp } = useSignUp()
 	const router = useRouter()
+	const claimOwnerIntent = useMutation(api.users.claimOwnerIntent)
 
 	const strength = getStrength(password)
 
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: sequential validation steps
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		if (!(name && email && password)) {
@@ -79,7 +83,17 @@ function RegisterPage() {
 			}
 			if (signUp.status === "complete") {
 				await signUp.finalize()
-				showToast(t("errors.accountCreated"), "success")
+				if (role === "owner") {
+					// The Convex user record is created with role "customer"; promote
+					// it so /business routes authorize immediately.
+					try {
+						await claimOwnerIntent()
+					} catch {
+						showToast(t("errors.registrationFailed"), "error")
+						return
+					}
+				}
+				showToast(t("auth.accountCreated"), "success")
 				void router.navigate({ to: role === "owner" ? "/business/overview" : "/dashboard/overview" })
 			}
 		} catch {

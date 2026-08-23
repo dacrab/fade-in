@@ -43,6 +43,7 @@ interface RescheduleValues {
 
 const EMPTY_RESCHEDULE: RescheduleValues = { date: "", startTime: "", endTime: "" }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function BookingPage() {
 	const { t } = useTranslation()
 	const f = useFormatters()
@@ -71,7 +72,7 @@ function BookingPage() {
 
 	const handleReschedule = async () => {
 		setRescheduling(true)
-		await withToast(
+		const result = await withToast(
 			() =>
 				reschedule({
 					id: asId<"appointments">(id),
@@ -83,8 +84,11 @@ function BookingPage() {
 			t("errors.rescheduleFailed"),
 		)
 		setRescheduling(false)
-		setShowReschedule(false)
-		setRescheduleValues(EMPTY_RESCHEDULE)
+		// Only clear the form on success so users can retry after a conflict.
+		if (result !== undefined) {
+			setShowReschedule(false)
+			setRescheduleValues(EMPTY_RESCHEDULE)
+		}
 	}
 
 	const setRescheduleField = (field: keyof RescheduleValues) => (value: string) =>

@@ -36,9 +36,12 @@ export const create = mutation({
 
 		const existing = await ctx.db
 			.query("reviews")
-			.filter((q) => q.eq(q.field("appointmentId"), args.appointmentId))
-			.collect()
-		if (existing.length > 0) throw new ConvexError("Already reviewed this appointment")
+			.withIndex("by_appointment", (q) => q.eq("appointmentId", args.appointmentId))
+			.unique()
+		if (existing) throw new ConvexError("Already reviewed this appointment")
+
+		const shop = await ctx.db.get(appt.barbershopId)
+		if (!shop) throw new ConvexError("Shop not found")
 
 		const reviewId = await ctx.db.insert("reviews", {
 			customerId: userId,
@@ -49,15 +52,15 @@ export const create = mutation({
 			createdAt: Date.now(),
 		})
 
-		const allReviews = await ctx.db
-			.query("reviews")
-			.withIndex("by_shop", (q) => q.eq("barbershopId", appt.barbershopId))
-			.collect()
-		const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
+		// Incremental average: the shop stores the exact (unrounded) mean and
+		// clients round to one decimal for display.
+		const prevCount = shop.reviewCount
+		const nextCount = prevCount + 1
+		const nextRating = (shop.rating * prevCount + args.rating) / nextCount
 
 		await ctx.db.patch(appt.barbershopId, {
-			rating: Math.round(avgRating * 10) / 10,
-			reviewCount: allReviews.length,
+			rating: nextRating,
+			reviewCount: nextCount,
 		})
 
 		return reviewId
@@ -73,9 +76,9 @@ export const hasReview = query({
 
 		const existing = await ctx.db
 			.query("reviews")
-			.filter((q) => q.eq(q.field("appointmentId"), args.appointmentId))
-			.collect()
-		return existing.length > 0
+			.withIndex("by_appointment", (q) => q.eq("appointmentId", args.appointmentId))
+			.unique()
+		return existing !== null
 	},
 })
 

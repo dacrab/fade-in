@@ -13,6 +13,7 @@ import { showToast } from "./ui/Toast"
 
 type Step = 1 | 2 | 3 | 4
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 export default function BookingModal({ shop, onClose }: { shop: Barbershop; onClose: () => void }) {
 	const { t } = useTranslation()
 	const f = useFormatters()

@@ -1,15 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useQuery } from "convex/react"
+import { usePaginatedQuery } from "convex/react"
 import { Filter, List, Map as MapIcon, MapPin, Scissors, Search, X } from "lucide-react"
-import { useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
-import MapView from "#/components/MapView"
 import ShopCard from "#/components/ShopCard"
-import { ShopCardSkeleton } from "#/components/ui/Skeleton"
+import { ShopCardSkeleton, Skeleton } from "#/components/ui/Skeleton"
 import { PAGE_SIZE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
+
+const SEARCH_DEBOUNCE_MS = 300
+
+const MapView = lazy(() => import("#/components/MapView"))
 
 const searchSchema = z.object({
 	q: z.string().optional(),
@@ -22,6 +25,7 @@ export const Route = createFileRoute("/barbershops/listing")({
 	component: BarbershopsPage,
 })
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function BarbershopsPage() {
 	const { t } = useTranslation()
 	const { q, city: cityParam, minRating: minRatingParam } = Route.useSearch()
@@ -31,17 +35,27 @@ function BarbershopsPage() {
 	const [minRating, setMinRating] = useState(minRatingParam ?? 0)
 	const [view, setView] = useState<"list" | "map">("list")
 	const [showFilters, setShowFilters] = useState(false)
+	const [debouncedSearch, setDebouncedSearch] = useState(search)
 
-	const shopsResult = useQuery(api.barbershops.list, {
-		city: city || undefined,
-		search: search || undefined,
-		minRating: minRating > 0 ? minRating : undefined,
-		paginationOpts: { cursor: null, numItems: PAGE_SIZE },
-	})
-	const shops = shopsResult?.page
+	useEffect(() => {
+		const timer = setTimeout(() => setDebouncedSearch(search), SEARCH_DEBOUNCE_MS)
+		return () => clearTimeout(timer)
+	}, [search])
+
+	const { results, isLoading, status, loadMore } = usePaginatedQuery(
+		api.barbershops.list,
+		{
+			city: city || undefined,
+			search: debouncedSearch || undefined,
+			minRating: minRating > 0 ? minRating : undefined,
+		},
+		{ initialNumItems: PAGE_SIZE },
+	)
+	const shops = results
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault()
+		setDebouncedSearch(search)
 		void navigate({
 			to: "/barbershops/listing",
 			search: (prev: z.infer<typeof searchSchema>) => ({
@@ -61,7 +75,7 @@ function BarbershopsPage() {
 						{t("barbershops.title")}
 					</h1>
 					<p className="text-(--text-muted) text-sm mt-2 tracking-wide">
-						{shops === undefined ? t("common.loading") : t("barbershops.found", { count: shops.length })}
+						{isLoading ? t("common.loading") : t("barbershops.found", { count: shops.length })}
 					</p>
 				</div>
 
@@ -172,11 +186,13 @@ function BarbershopsPage() {
 				)}
 
 				{view === "map" ? (
-					<MapView
-						shops={shops ?? []}
-						onShopClick={(slug) => void navigate({ to: "/barbershops/$slug", params: { slug } })}
-					/>
-				) : shops === undefined ? (
+					<Suspense fallback={<Skeleton className="h-125 w-full rounded-2xl" />}>
+						<MapView
+							shops={shops}
+							onShopClick={(slug) => void navigate({ to: "/barbershops/$slug", params: { slug } })}
+						/>
+					</Suspense>
+				) : isLoading ? (
 					<div className="shop-grid">
 						{[0, 1, 2, 3, 4, 5].map((i) => (
 							<ShopCardSkeleton key={i} />
@@ -204,11 +220,24 @@ function BarbershopsPage() {
 						)}
 					</div>
 				) : (
-					<div className="shop-grid">
-						{shops.map((shop: Doc<"barbershops">) => (
-							<ShopCard key={shop._id} shop={shop} />
-						))}
-					</div>
+					<>
+						<div className="shop-grid">
+							{shops.map((shop: Doc<"barbershops">) => (
+								<ShopCard key={shop._id} shop={shop} />
+							))}
+						</div>
+						{status === "CanLoadMore" && (
+							<div className="flex justify-center mt-8">
+								<button
+									type="button"
+									onClick={() => loadMore(PAGE_SIZE)}
+									className="px-6 py-2.5 rounded-full text-sm font-medium bg-(--bg-card) border border-(--border) text-(--text-muted) hover:border-(--gold)/40 hover:text-(--text) transition-all duration-300 cursor-pointer"
+								>
+									{t("common.loadMore")}
+								</button>
+							</div>
+						)}
+					</>
 				)}
 			</div>
 		</main>

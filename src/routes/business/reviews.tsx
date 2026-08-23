@@ -5,9 +5,9 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SkeletonRows } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
-import { useBusinessAuth } from "#/hooks/useBusinessAuth"
 import { useFormatters } from "#/hooks/useFormatters"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
+import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { PAGE_SIZE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
@@ -15,7 +15,7 @@ import type { Doc, Id } from "../../../convex/_generated/dataModel"
 export const Route = createFileRoute("/business/reviews")({ component: BusinessReviews })
 
 function BusinessReviews() {
-	const { user } = useBusinessAuth()
+	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 	const { t } = useTranslation()
 	const f = useFormatters()
 
@@ -33,7 +33,7 @@ function BusinessReviews() {
 		if (!replyText.trim()) return
 		await withToast(
 			() => addReply({ id, ownerReply: replyText }),
-			t("errors.replyAdded"),
+			t("business.reviews.replyAdded"),
 			t("errors.replyFailed"),
 		)
 		setReplyId(null)

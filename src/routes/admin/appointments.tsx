@@ -5,7 +5,7 @@ import type { FunctionReference } from "convex/server"
 import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { DataTable } from "#/components/ui/DataTable"
-import { useAdminAuth } from "#/hooks/useAdminAuth"
+import { ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice } from "#/lib/format"
 import { isAppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin/appointments")({ component: AdminAp
 
 function AdminAppointments() {
 	const { t } = useTranslation()
-	useAdminAuth()
+	useRequireRole(ADMIN_ROLES)
 
 	const data = useQuery(api.appointments.listAllWithDetails)
 

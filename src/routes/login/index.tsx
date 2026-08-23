@@ -28,7 +28,7 @@ function LoginPage() {
 			}
 			if (signIn.status === "complete") {
 				await signIn.finalize()
-				showToast(t("errors.welcomeBack"), "success")
+				showToast(t("auth.welcomeBack"), "success")
 				void router.navigate({ to: "/dashboard/overview" })
 			}
 		} catch {

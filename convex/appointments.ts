@@ -3,11 +3,13 @@ import { internal } from "./_generated/api"
 import { internalAction, internalMutation, mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
 import { sendEmail } from "./lib/email"
-import { computeServiceTotal } from "./lib/services"
-import { generateSlots } from "./lib/slots"
+import { generateSlots, SLOT_CONFIG, timeToMinutes, weekdayOf } from "./lib/slots"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const TIME_RE = /^\d{2}:\d{2}$/
+const STALE_PENDING_MS = 24 * 60 * 60 * 1000
+
+const MAX_DURATION_MINUTES = 480
 
 export const getAvailableSlots = query({
 	args: {
@@ -18,8 +20,18 @@ export const getAvailableSlots = query({
 	},
 	handler: async (ctx, args) => {
 		if (!DATE_RE.test(args.date)) throw new ConvexError("Invalid date format")
-		if (args.durationMinutes < 1 || args.durationMinutes > 480)
+		if (args.durationMinutes < 1 || args.durationMinutes > MAX_DURATION_MINUTES)
 			throw new ConvexError("Invalid duration")
+
+		const shop = await ctx.db.get(args.barbershopId)
+		if (shop?.isActive !== true) throw new ConvexError("Shop is not available")
+
+		const hours = shop.workingHours?.[weekdayOf(args.date)]
+		if (hours?.closed) return []
+		const window = {
+			startMinute: hours ? timeToMinutes(hours.open) : undefined,
+			endMinute: hours ? timeToMinutes(hours.close) : undefined,
+		}
 
 		const existing = await ctx.db
 			.query("appointments")
@@ -29,7 +41,13 @@ export const getAvailableSlots = query({
 			)
 			.collect()
 
-		return generateSlots(args.durationMinutes, existing)
+		return generateSlots(
+			args.durationMinutes,
+			existing,
+			window.startMinute !== undefined && window.endMinute !== undefined
+				? { startMinute: window.startMinute, endMinute: window.endMinute }
+				: undefined,
+		)
 	},
 })
 
@@ -52,18 +70,31 @@ export const create = mutation({
 		if (args.startTime >= args.endTime) throw new ConvexError("Invalid time range")
 		if (args.serviceIds.length === 0) throw new ConvexError("At least one service required")
 
-		const totalPrice = await computeServiceTotal(
-			(id) => ctx.db.get(id),
-			args.serviceIds,
-			args.barbershopId,
-		)
+		const services = await Promise.all(args.serviceIds.map((id) => ctx.db.get(id)))
+		const totalPrice = services.reduce((sum, s) => {
+			if (!s?.isActive) throw new ConvexError("Invalid service")
+			if (s.barbershopId !== args.barbershopId) throw new ConvexError("Service not from this shop")
+			return sum + s.price
+		}, 0)
 
 		const barber = await ctx.db.get(args.barberId)
 		if (!barber || barber.barbershopId !== args.barbershopId)
 			throw new ConvexError("Invalid barber for this shop")
 
 		const shop = await ctx.db.get(args.barbershopId)
-		if (!shop || shop.isActive !== true) throw new ConvexError("Shop is not available")
+		if (shop?.isActive !== true) throw new ConvexError("Shop is not available")
+
+		const hours = shop.workingHours?.[weekdayOf(args.date)]
+		if (hours?.closed) throw new ConvexError("Shop is closed on this date")
+		const openMinute = hours ? timeToMinutes(hours.open) : SLOT_CONFIG.START_HOUR * 60
+		const closeMinute = hours ? timeToMinutes(hours.close) : SLOT_CONFIG.END_HOUR * 60
+		const start = timeToMinutes(args.startTime)
+		if (
+			start < openMinute ||
+			timeToMinutes(args.endTime) > closeMinute ||
+			(start - openMinute) % SLOT_CONFIG.INTERVAL_MINUTES !== 0
+		)
+			throw new ConvexError("Time is outside of operating hours")
 
 		const existing = await ctx.db
 			.query("appointments")
@@ -101,8 +132,8 @@ export const create = mutation({
 			await ctx.scheduler.runAfter(0, internal.appointments.sendBookingConfirmationEmail, {
 				to: customer.email,
 				customerName: customer.name,
-				shopName: shop?.name,
-				barberName: barber?.name,
+				shopName: shop.name,
+				barberName: barber.name,
 				date: args.date,
 				startTime: args.startTime,
 				endTime: args.endTime,
@@ -153,6 +184,35 @@ export const removeUnpaidOrphan = internalMutation({
 	},
 })
 
+export const sweepStalePending = internalMutation({
+	args: {},
+	handler: async (ctx) => {
+		const cutoff = Date.now() - STALE_PENDING_MS
+		const stale = await ctx.db
+			.query("appointments")
+			.filter((q) => q.eq(q.field("status"), "pending"))
+			.collect()
+		for (const appt of stale) {
+			if (appt.createdAt < cutoff && appt.paymentStatus !== "paid") {
+				await ctx.db.delete(appt._id)
+			}
+		}
+	},
+})
+
+export const removeUnpaidOrphanById = internalMutation({
+	args: { polarCheckoutId: v.string() },
+	handler: async (ctx, args) => {
+		const appt = await ctx.db
+			.query("appointments")
+			.withIndex("by_polar_checkout", (q) => q.eq("polarCheckoutId", args.polarCheckoutId))
+			.unique()
+		if (!appt) return
+		if (appt.status !== "pending" || appt.paymentStatus === "paid") return
+		await ctx.db.delete(appt._id)
+	},
+})
+
 export const updateStatus = mutation({
 	args: {
 		id: v.id("appointments"),
@@ -191,14 +251,15 @@ export const updateStatus = mutation({
 })
 
 export const listByCustomer = query({
-	args: { customerId: v.id("users") },
+	args: { customerId: v.optional(v.id("users")) },
 	handler: async (ctx, args) => {
 		const user = await getCurrentUser(ctx)
-		if (!user || user._id !== args.customerId) return []
+		if (!user) return []
+		if (args.customerId !== undefined && args.customerId !== user._id) return []
 
 		return ctx.db
 			.query("appointments")
-			.withIndex("by_customer", (q) => q.eq("customerId", args.customerId))
+			.withIndex("by_customer", (q) => q.eq("customerId", user._id))
 			.order("desc")
 			.collect()
 	},
@@ -382,7 +443,10 @@ export const getShopStats = query({
 			.collect()
 
 		const completed = allAppts.filter((a) => a.status === "completed")
-		const thisMonth = new Date().toISOString().slice(0, 7)
+		// Appointment dates are local-time "YYYY-MM-DD" strings; take the month
+		// from local date parts rather than a UTC timestamp.
+		const now = new Date()
+		const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
 
 		return {
 			totalRevenue: completed.reduce((sum, a) => sum + a.totalPrice, 0),

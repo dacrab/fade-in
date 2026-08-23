@@ -4,7 +4,7 @@ import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucid
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
-import { useAdminAuth } from "#/hooks/useAdminAuth"
+import { ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import type { Barbershop } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -68,7 +68,7 @@ function ShopRow({ shop, onVerify, onSuspend }: ShopRowProps) {
 
 function AdminShops() {
 	const { t } = useTranslation()
-	useAdminAuth()
+	useRequireRole(ADMIN_ROLES)
 
 	const allShops = useQuery(api.barbershops.listAll)
 	const verify = useMutation(api.barbershops.verify)

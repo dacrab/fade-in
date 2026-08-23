@@ -71,6 +71,7 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 
 	useEffect(() => {
 		if (!ready) return
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: marker/popup construction is inherently verbose
 		void leafletPromise.then((L) => {
 			if (!mapRef.current) return
 
