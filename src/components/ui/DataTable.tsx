@@ -1,20 +1,39 @@
 import {
 	type ColumnDef,
+	columnFilteringFeature,
+	columnSizingFeature,
+	columnVisibilityFeature,
+	createFilteredRowModel,
+	createPaginatedRowModel,
+	createSortedRowModel,
 	flexRender,
-	getCoreRowModel,
-	getFilteredRowModel,
-	getPaginationRowModel,
-	getSortedRowModel,
+	globalFilteringFeature,
+	type RowData,
+	rowPaginationFeature,
+	rowSortingFeature,
 	type SortingState,
-	useReactTable,
+	tableFeatures,
+	useTable,
 } from "@tanstack/react-table"
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SkeletonRows } from "./Skeleton"
 
-interface DataTableProps<TData> {
-	columns: ColumnDef<TData>[]
+export const features = tableFeatures({
+	columnFilteringFeature,
+	globalFilteringFeature,
+	rowSortingFeature,
+	rowPaginationFeature,
+	columnSizingFeature,
+	columnVisibilityFeature,
+	filteredRowModel: createFilteredRowModel(),
+	sortedRowModel: createSortedRowModel(),
+	paginatedRowModel: createPaginatedRowModel(),
+})
+
+interface DataTableProps<TData extends RowData & { _id: string }> {
+	columns: ColumnDef<typeof features, TData>[]
 	data: TData[]
 	loading?: boolean
 	loadingRows?: number
@@ -23,7 +42,7 @@ interface DataTableProps<TData> {
 	searchPlaceholder?: string
 }
 
-export function DataTable<TData extends { _id: string }>({
+export function DataTable<TData extends RowData & { _id: string }>({
 	columns,
 	data,
 	loading,
@@ -36,17 +55,14 @@ export function DataTable<TData extends { _id: string }>({
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [globalFilter, setGlobalFilter] = useState("")
 
-	const table = useReactTable({
+	const table = useTable({
 		data,
 		columns,
+		features,
 		state: { sorting, globalFilter },
 		onSortingChange: setSorting,
 		onGlobalFilterChange: setGlobalFilter,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		initialState: { pagination: { pageSize: 15 } },
+		initialState: { pagination: { pageIndex: 0, pageSize: 15 } },
 	})
 
 	if (loading) {
@@ -128,7 +144,7 @@ export function DataTable<TData extends { _id: string }>({
 			<div className="flex items-center justify-between mt-4 muted-xs">
 				<span>
 					{t("common.page", {
-						page: table.getState().pagination.pageIndex + 1,
+						page: table.state.pagination.pageIndex + 1,
 						total: table.getPageCount(),
 					})}
 				</span>
