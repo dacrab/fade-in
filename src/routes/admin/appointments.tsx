@@ -4,7 +4,7 @@ import { useQuery } from "convex/react"
 import type { FunctionReference } from "convex/server"
 import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { DataTable } from "#/components/ui/DataTable"
+import { DataTable, type features } from "#/components/ui/DataTable"
 import { ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice } from "#/lib/format"
 import { isAppointmentStatus, STATUS_BADGE } from "#/types"
@@ -24,7 +24,7 @@ function AdminAppointments() {
 
 	const data = useQuery(api.appointments.listAllWithDetails)
 
-	const columns: ColumnDef<AppointmentRow>[] = [
+	const columns: ColumnDef<typeof features, AppointmentRow>[] = [
 		{
 			header: t("admin.appointments.colCustomer"),
 			accessorFn: (row) => row.customerName,
