@@ -25,15 +25,12 @@ Built with [TanStack Start](https://tanstack.com/start) (React 19 SSR), [Convex]
 - Shop profile editor including weekly opening hours (per-day closed toggle + open/close times)
 - Services & barbers CRUD, appointment management, owner replies to reviews
 
-## Architecture Notes
+## How it works
 
-- **Slot generation respects shop hours**: availability comes from each shop's saved `workingHours` (falling back to global defaults); closed days return no slots. The booking mutation re-validates server-side that requested times fall inside operating hours on the 30-minute grid.
-- **Payments**: creating a checkout reserves the slot atomically (pending appointment). The Polar webhook confirms bookings on `checkout.created`/`checkout.updated` with status `succeeded`, and frees the slot on `checkout.expired`. An hourly cron sweeps pending-unpaid appointments older than 24 h.
+- **Booking slots** follow each shop's saved opening hours (closed days return no slots), and requested times are re-validated server-side.
+- **Payments**: booking a paid service reserves the slot until checkout. Confirmed payments turn the appointment active; abandoned checkouts release the slot automatically.
 - **Validation is server-side**: service prices must be positive and durations within 1–480 minutes; opening hours require `close > open` on open days.
-- **Dates are local-time `YYYY-MM-DD` strings**, parsed without UTC shifting; month stats derive from local date parts.
-- **Reviews**: unique per appointment (indexed check), shop rating/count updated incrementally.
-- **Search**: shops use a Convex `searchIndex` (name tokens, city/isActive filters) paginated natively — no offset cursors.
-- **Types**: frontend models are aliases of Convex `Doc<"…">` types — no hand-maintained duplicates.
+- **Dates are local-time `YYYY-MM-DD` strings**, parsed without UTC shifting.
 
 ## Getting Started
 
@@ -47,7 +44,7 @@ bunx convex dev   # start backend (pushes schema + search/cron config)
 bun dev           # start app
 ```
 
-Open [localhost:3000](http://localhost:3000).
+Open [localhost:5173](http://localhost:5173).
 
 ## Scripts
 

@@ -21,7 +21,11 @@ export interface DayWindow {
 	endMinute: number
 }
 
-const DEFAULT_WINDOW: DayWindow = {
+/**
+ * Default operating window derived from SLOT_CONFIG — used both by slot
+ * generation and by server-side bounds checks so they can't diverge.
+ */
+export const DEFAULT_WINDOW: DayWindow = {
 	startMinute: SLOT_CONFIG.START_HOUR * 60,
 	endMinute: SLOT_CONFIG.END_HOUR * 60,
 }

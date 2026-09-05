@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Check, Pencil, Trash2 } from "lucide-react"
+import { Check } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { CrudListPage } from "#/components/ui/CrudListPage"
+import { RowActions } from "#/components/ui/RowActions"
 import { withToast } from "#/components/ui/Toast"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
@@ -211,22 +212,7 @@ function BusinessServices() {
 						</div>
 					</div>
 					<div className="text-sm font-medium text-(--gold)">{formatPrice(svc.price)}</div>
-					<div className="flex gap-1">
-						<button
-							type="button"
-							onClick={() => handleEdit(svc)}
-							className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--text-muted) transition-all"
-						>
-							<Pencil size={13} />
-						</button>
-						<button
-							type="button"
-							onClick={() => void handleDelete(svc._id)}
-							className="p-1.5 rounded-md text-(--text-subtle) opacity-0 group-hover:opacity-100 hover:text-(--error) transition-all"
-						>
-							<Trash2 size={13} />
-						</button>
-					</div>
+					<RowActions onEdit={() => handleEdit(svc)} onDelete={() => void handleDelete(svc._id)} />
 				</div>
 			))}
 		</CrudListPage>

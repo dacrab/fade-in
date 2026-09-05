@@ -5,7 +5,10 @@ import { definedPatch, workingHoursValidator } from "./validators"
 
 export const getById = query({
 	args: { id: v.id("barbers") },
-	handler: async (ctx, args) => ctx.db.get(args.id),
+	handler: async (ctx, args) => {
+		await requireUser(ctx)
+		return ctx.db.get(args.id)
+	},
 })
 
 export const listByShop = query({
