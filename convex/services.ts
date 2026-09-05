@@ -13,7 +13,10 @@ function validatePriceDuration(price: number, durationMinutes: number) {
 
 export const getById = query({
 	args: { id: v.id("services") },
-	handler: async (ctx, args) => ctx.db.get(args.id),
+	handler: async (ctx, args) => {
+		await requireUser(ctx)
+		return ctx.db.get(args.id)
+	},
 })
 
 export const listByShop = query({

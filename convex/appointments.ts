@@ -3,7 +3,7 @@ import { internal } from "./_generated/api"
 import { internalAction, internalMutation, mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
 import { sendEmail } from "./lib/email"
-import { generateSlots, SLOT_CONFIG, timeToMinutes, weekdayOf } from "./lib/slots"
+import { DEFAULT_WINDOW, generateSlots, SLOT_CONFIG, timeToMinutes, weekdayOf } from "./lib/slots"
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const TIME_RE = /^\d{2}:\d{2}$/
@@ -86,8 +86,8 @@ export const create = mutation({
 
 		const hours = shop.workingHours?.[weekdayOf(args.date)]
 		if (hours?.closed) throw new ConvexError("Shop is closed on this date")
-		const openMinute = hours ? timeToMinutes(hours.open) : SLOT_CONFIG.START_HOUR * 60
-		const closeMinute = hours ? timeToMinutes(hours.close) : SLOT_CONFIG.END_HOUR * 60
+		const openMinute = hours ? timeToMinutes(hours.open) : DEFAULT_WINDOW.startMinute
+		const closeMinute = hours ? timeToMinutes(hours.close) : DEFAULT_WINDOW.endMinute
 		const start = timeToMinutes(args.startTime)
 		if (
 			start < openMinute ||

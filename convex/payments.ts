@@ -63,8 +63,8 @@ export const createCheckoutSession = action({
 				currency: "eur",
 				customer_email: user.email,
 				metadata: { appointmentId },
-				success_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
-				cancel_url: `${process.env.VITE_CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
+				success_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
+				cancel_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
 			})
 
 			await ctx.runMutation(api.appointments.setPolarCheckout, {

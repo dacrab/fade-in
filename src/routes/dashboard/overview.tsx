@@ -38,15 +38,25 @@ function CustomerDashboard() {
 
 	if (!user) return <DashSkeleton />
 
-	const upcoming =
-		appointments?.filter(
-			(a: Doc<"appointments">) => a.status === "pending" || a.status === "confirmed",
-		) ?? []
-	const completed = appointments?.filter((a: Doc<"appointments">) => a.status === "completed") ?? []
-	const past =
-		appointments?.filter(
-			(a: Doc<"appointments">) => a.status === "completed" || a.status === "cancelled",
-		) ?? []
+	// Single pass over the appointments list (status-based buckets).
+	const { upcoming, completed, cancelled, past } = (appointments ?? []).reduce(
+		(
+			acc: {
+				upcoming: Doc<"appointments">[]
+				completed: Doc<"appointments">[]
+				cancelled: Doc<"appointments">[]
+				past: Doc<"appointments">[]
+			},
+			appt: Doc<"appointments">,
+		) => {
+			if (appt.status === "pending" || appt.status === "confirmed") acc.upcoming.push(appt)
+			if (appt.status === "completed") acc.completed.push(appt)
+			if (appt.status === "cancelled") acc.cancelled.push(appt)
+			if (appt.status === "completed" || appt.status === "cancelled") acc.past.push(appt)
+			return acc
+		},
+		{ upcoming: [], completed: [], cancelled: [], past: [] },
+	)
 
 	return (
 		<main className="page-main">
@@ -74,7 +84,7 @@ function CustomerDashboard() {
 							{ label: t("dashboard.stats.completed"), value: completed.length, icon: CheckCircle },
 							{
 								label: t("dashboard.stats.cancelled"),
-								value: past.length - completed.length,
+								value: cancelled.length,
 								icon: XCircle,
 							},
 						] as const
