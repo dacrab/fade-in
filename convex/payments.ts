@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values"
+import { z } from "zod"
 import { api, internal } from "./_generated/api"
 import type { Id } from "./_generated/dataModel"
 import { action } from "./_generated/server"
@@ -11,7 +12,17 @@ function polarToken(): string {
 	return token
 }
 
-async function polarPost<T>(path: string, body: Record<string, unknown>): Promise<T> {
+/**
+ * POST to the Polar API and validate the response body against `schema`.
+ * Polar's API is an external contract: parse instead of casting so a payload
+ * change fails loudly here instead of mistyping downstream (e.g. `url` reading
+ * as `string` while being `undefined`).
+ */
+async function polarPost<S extends z.ZodType>(
+	path: string,
+	body: Record<string, unknown>,
+	schema: S,
+): Promise<z.infer<S>> {
 	const res = await fetch(`${POLAR_BASE}${path}`, {
 		method: "POST",
 		headers: {
@@ -26,8 +37,10 @@ async function polarPost<T>(path: string, body: Record<string, unknown>): Promis
 		const msg = error.detail?.[0]?.msg || error.error || "Polar API error"
 		throw new ConvexError(msg)
 	}
-	return data as T
+	return schema.parse(data)
 }
+
+const polarCheckoutSchema = z.object({ id: z.string().min(1), url: z.string().url() })
 
 export const createCheckoutSession = action({
 	args: {
@@ -53,19 +66,20 @@ export const createCheckoutSession = action({
 			notes: args.notes,
 		})
 
-		let checkout: { id: string; url: string }
+		let checkout: z.infer<typeof polarCheckoutSchema>
 		try {
-			checkout = await polarPost<{
-				id: string
-				url: string
-			}>("/checkouts/", {
-				amount: totalPrice,
-				currency: "eur",
-				customer_email: user.email,
-				metadata: { appointmentId },
-				success_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
-				cancel_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
-			})
+			checkout = await polarPost(
+				"/checkouts/",
+				{
+					amount: totalPrice,
+					currency: "eur",
+					customer_email: user.email,
+					metadata: { appointmentId },
+					success_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=success`,
+					cancel_url: `${process.env.CONVEX_SITE_URL}/booking/${appointmentId}?payment=canceled`,
+				},
+				polarCheckoutSchema,
+			)
 
 			await ctx.runMutation(api.appointments.setPolarCheckout, {
 				id: appointmentId,

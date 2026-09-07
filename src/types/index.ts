@@ -1,7 +1,16 @@
 import type { Doc, Id, TableNames } from "../../convex/_generated/dataModel"
 
-export function asId<T extends TableNames>(id: string): Id<T> {
-	return id as Id<T>
+/** Convex document IDs: base32-encoded, URL-safe, 22 (legacy) or 32 (current) chars. */
+const ID_RE = /^[a-z0-9]{22,32}$/
+
+/**
+ * Validate an untrusted string (e.g. a route param) as a Convex document ID.
+ * Returns null instead of mistyping garbage as `Id<T>`; the server-side
+ * `v.id()` validator remains the authoritative check.
+ */
+export function parseId<T extends TableNames>(id: string): Id<T> | null {
+	// Single justified cast: the regex above has verified the ID shape.
+	return ID_RE.test(id) ? (id as Id<T>) : null
 }
 
 export type UserRole = "customer" | "owner" | "barber" | "admin"
