@@ -22,7 +22,7 @@ import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
 import { useFormatters } from "#/hooks/useFormatters"
 import { nextDayIso } from "#/lib/format"
-import { asId, isOwnerOrAdmin, STATUS_BADGE } from "#/types"
+import { isOwnerOrAdmin, parseId, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
 
@@ -48,10 +48,13 @@ function BookingPage() {
 	const { t } = useTranslation()
 	const f = useFormatters()
 	const { id } = Route.useParams()
+	const parsedId = parseId<"appointments">(id)
 	const { user } = useAuth()
 	const { payment } = useSearch({ from: "/booking/$id" })
 
-	const appointment = useQuery(api.appointments.getById, { id: asId<"appointments">(id) })
+	// Invalid IDs (e.g. /booking/garbage) skip the query and render not-found
+	// instead of leaving the Convex client erroring forever behind a spinner.
+	const appointment = useQuery(api.appointments.getById, parsedId ? { id: parsedId } : "skip")
 	const shop = useQuery(
 		api.barbershops.getById,
 		appointment ? { id: appointment.barbershopId } : "skip",
@@ -71,11 +74,12 @@ function BookingPage() {
 	const minDate = nextDayIso()
 
 	const handleReschedule = async () => {
+		if (!parsedId) return
 		setRescheduling(true)
 		const result = await withToast(
 			() =>
 				reschedule({
-					id: asId<"appointments">(id),
+					id: parsedId,
 					date: rescheduleValues.date,
 					startTime: rescheduleValues.startTime,
 					endTime: rescheduleValues.endTime,
@@ -94,14 +98,16 @@ function BookingPage() {
 	const setRescheduleField = (field: keyof RescheduleValues) => (value: string) =>
 		setRescheduleValues((prev) => ({ ...prev, [field]: value }))
 
-	const handleCancel = () =>
+	const handleCancel = () => {
+		if (!parsedId) return
 		void withToast(
-			() => updateStatus({ id: asId<"appointments">(id), status: "cancelled" }),
+			() => updateStatus({ id: parsedId, status: "cancelled" }),
 			t("status.cancelled"),
 			t("errors.updateStatusFailed"),
 		)
+	}
 
-	const isLoading = appointment === undefined
+	const isLoading = parsedId !== null && appointment === undefined
 	const appt = appointment ?? null
 
 	const selectedServices =

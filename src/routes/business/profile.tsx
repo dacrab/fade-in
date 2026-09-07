@@ -38,16 +38,24 @@ const EMPTY: ShopForm = {
 // Matches the slot-generation defaults so shops without explicit hours keep
 // booking availability unchanged.
 const DEFAULT_DAY = { open: "09:00", close: "19:00", closed: false }
-const DEFAULT_HOURS: WorkingHoursForm = Object.fromEntries(
-	WEEK_DAYS.map((d) => [d, { ...DEFAULT_DAY }]),
-) as WorkingHoursForm
 
-function hoursFromShop(wh: Doc<"barbershops">["workingHours"]): WorkingHoursForm {
-	if (!wh) return structuredClone(DEFAULT_HOURS)
-	return Object.fromEntries(
-		WEEK_DAYS.map((d) => [d, wh[d] ? { ...wh[d] } : { ...DEFAULT_DAY }]),
-	) as WorkingHoursForm
+// Build the week explicitly (no Object.fromEntries + cast) so the compiler
+// checks that every day key is present. Days missing from legacy DB rows
+// fall back to DEFAULT_DAY.
+function hoursFor(wh: Doc<"barbershops">["workingHours"]): WorkingHoursForm {
+	const day = (d: WeekDay) => wh?.[d] ?? DEFAULT_DAY
+	return {
+		monday: { ...day("monday") },
+		tuesday: { ...day("tuesday") },
+		wednesday: { ...day("wednesday") },
+		thursday: { ...day("thursday") },
+		friday: { ...day("friday") },
+		saturday: { ...day("saturday") },
+		sunday: { ...day("sunday") },
+	}
 }
+
+const DEFAULT_HOURS: WorkingHoursForm = hoursFor(undefined)
 
 function BusinessProfile() {
 	const { t } = useTranslation()
@@ -75,7 +83,7 @@ function BusinessProfile() {
 			facebook: shop.socialLinks?.facebook ?? "",
 			website: shop.socialLinks?.website ?? "",
 		})
-		setHours(hoursFromShop(shop.workingHours))
+		setHours(hoursFor(shop.workingHours))
 	}, [shop])
 
 	const setDay = (day: WeekDay, key: "open" | "close") => (e: React.ChangeEvent<HTMLInputElement>) =>

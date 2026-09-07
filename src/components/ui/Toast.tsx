@@ -78,7 +78,7 @@ export function ToastContainer() {
 					<div
 						key={toast.id}
 						className="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-(--bg-card) shadow-md border border-(--border) animate-in slide-in-from-top-2"
-						style={{ borderLeft: `3px solid ${borderColor}`, color: borderColor } as React.CSSProperties}
+						style={{ borderLeft: `3px solid ${borderColor}`, color: borderColor }}
 					>
 						<Icon size={15} className="flex-shrink-0" />
 						<span className="text-[13px] text-(--text) font-medium">{toast.message}</span>
