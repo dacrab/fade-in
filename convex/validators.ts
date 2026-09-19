@@ -2,7 +2,9 @@ import type { Infer } from "convex/values"
 import { ConvexError, v } from "convex/values"
 
 export function definedPatch<T extends Record<string, unknown>>(obj: T): Partial<T> {
-	return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined)) as Partial<T>
+	return Object.fromEntries(
+		Object.entries(obj).filter(([, value]) => value !== undefined),
+	) as Partial<T>
 }
 
 const dayHours = v.object({ open: v.string(), close: v.string(), closed: v.boolean() })
