@@ -1,14 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { Check } from "lucide-react"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { CrudListPage } from "#/components/ui/CrudListPage"
+import { FormActions } from "#/components/ui/FormActions"
 import { RowActions } from "#/components/ui/RowActions"
-import { withToast } from "#/components/ui/Toast"
+import { useCrudForm } from "#/hooks/useCrudForm"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
-import type { Barber } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -25,10 +23,6 @@ function BusinessBarbers() {
 	const { t } = useTranslation()
 	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 
-	const [form, setForm] = useState<BarberForm>(EMPTY)
-	const [showForm, setShowForm] = useState(false)
-	const [editId, setEditId] = useState<Id<"barbers"> | null>(null)
-
 	const shop = useOwnerShop(user?.id)
 	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip")
 
@@ -36,56 +30,39 @@ function BusinessBarbers() {
 	const updateBarber = useMutation(api.barbers.update)
 	const removeBarber = useMutation(api.barbers.remove)
 
-	const reset = () => {
-		setForm(EMPTY)
-		setEditId(null)
-		setShowForm(false)
-	}
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		if (!shop) return
-		const specs = form.specializations
-			.split(",")
-			.map((s) => s.trim())
-			.filter(Boolean)
-		const payload = {
-			name: form.name,
-			bio: form.bio || undefined,
-			specializations: specs,
-		}
-		const result = await withToast(
-			() =>
-				editId
-					? updateBarber({ id: editId, ...payload })
-					: createBarber({ barbershopId: shop._id, ...payload }),
-			t("business.barbers.saved"),
-			t("errors.barberFailed"),
-		)
-		if (result !== undefined) reset()
-	}
-
-	const handleEdit = (b: Barber) => {
-		setForm({ name: b.name, bio: b.bio ?? "", specializations: b.specializations.join(", ") })
-		setEditId(b._id)
-		setShowForm(true)
-	}
-
-	const handleDelete = async (id: Id<"barbers">) =>
-		withToast(() => removeBarber({ id }), t("business.barbers.removed"), t("errors.barberFailed"))
+	const crud = useCrudForm<BarberForm, Id<"barbers">>({
+		empty: EMPTY,
+		save: (form, editId) => {
+			if (!shop) return null
+			const payload = {
+				name: form.name,
+				bio: form.bio || undefined,
+				specializations: form.specializations
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean),
+			}
+			return editId
+				? updateBarber({ id: editId, ...payload })
+				: createBarber({ barbershopId: shop._id, ...payload })
+		},
+		remove: (id) => removeBarber({ id }),
+		messages: {
+			saved: t("business.barbers.saved"),
+			removed: t("business.barbers.removed"),
+			failed: t("errors.barberFailed"),
+		},
+	})
 
 	return (
 		<CrudListPage
 			title={t("business.barbers.title")}
 			addLabel={t("business.barbers.addBarber")}
-			showForm={showForm}
-			onToggleForm={() => {
-				reset()
-				setShowForm(!showForm)
-			}}
-			formTitle={editId ? t("common.edit") : t("business.barbers.addBarber")}
+			showForm={crud.showForm}
+			onToggleForm={crud.toggleForm}
+			formTitle={crud.editId ? t("common.edit") : t("business.barbers.addBarber")}
 			form={
-				<form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
+				<form onSubmit={(e) => void crud.submit(e)} className="space-y-5">
 					<div>
 						<label className="field-label" htmlFor="barber-name">
 							{t("form.nameStar")}
@@ -94,8 +71,8 @@ function BusinessBarbers() {
 							id="barber-name"
 							className="input w-full text-sm"
 							placeholder={t("business.barbers.namePlaceholder")}
-							value={form.name}
-							onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+							value={crud.form.name}
+							onChange={(e) => crud.setForm((f) => ({ ...f, name: e.target.value }))}
 							required
 						/>
 					</div>
@@ -107,8 +84,8 @@ function BusinessBarbers() {
 							id="barber-specs"
 							className="input w-full text-sm"
 							placeholder={t("business.barbers.specializationsPlaceholder")}
-							value={form.specializations}
-							onChange={(e) => setForm((f) => ({ ...f, specializations: e.target.value }))}
+							value={crud.form.specializations}
+							onChange={(e) => crud.setForm((f) => ({ ...f, specializations: e.target.value }))}
 						/>
 					</div>
 					<div>
@@ -120,23 +97,14 @@ function BusinessBarbers() {
 							className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
 							rows={2}
 							placeholder={t("business.barbers.bioPlaceholder")}
-							value={form.bio}
-							onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
+							value={crud.form.bio}
+							onChange={(e) => crud.setForm((f) => ({ ...f, bio: e.target.value }))}
 						/>
 					</div>
-					<div className="flex gap-3">
-						<button type="submit" className="btn btn-primary btn-sm">
-							<Check size={13} />
-							{editId ? t("common.save") : t("business.barbers.addBarber")}
-						</button>
-						<button
-							type="button"
-							onClick={reset}
-							className="px-4 py-2 rounded-full border border-(--border) muted-xs hover:text-(--text-muted) transition-colors"
-						>
-							{t("common.cancel")}
-						</button>
-					</div>
+					<FormActions
+						submitLabel={crud.editId ? t("common.save") : t("business.barbers.addBarber")}
+						onCancel={crud.reset}
+					/>
 				</form>
 			}
 			loading={barbers === undefined}
@@ -155,7 +123,16 @@ function BusinessBarbers() {
 						)}
 						{b.bio && <div className="subtle-xs truncate mt-0.5">{b.bio}</div>}
 					</div>
-					<RowActions onEdit={() => handleEdit(b)} onDelete={() => void handleDelete(b._id)} />
+					<RowActions
+						onEdit={() =>
+							crud.edit(b._id, {
+								name: b.name,
+								bio: b.bio ?? "",
+								specializations: b.specializations.join(", "),
+							})
+						}
+						onDelete={() => void crud.removeRecord(b._id)}
+					/>
 				</div>
 			))}
 		</CrudListPage>

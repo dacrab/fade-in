@@ -81,6 +81,11 @@ function RouteError(_props: ErrorComponentProps) {
 	)
 }
 
+function SentryErrorFallback() {
+	const { t } = useTranslation()
+	return <div>{t("errors.errorTitle")}</div>
+}
+
 function RootDocument() {
 	const { i18n } = useTranslation()
 	return (
@@ -92,7 +97,7 @@ function RootDocument() {
 				<ConvexProvider>
 					<Header />
 					<div className="flex-1">
-						<Sentry.ErrorBoundary fallback={<div>Something went wrong</div>}>
+						<Sentry.ErrorBoundary fallback={<SentryErrorFallback />}>
 							<Outlet />
 						</Sentry.ErrorBoundary>
 					</div>

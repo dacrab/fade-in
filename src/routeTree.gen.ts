@@ -9,145 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as BusinessRouteImport } from './routes/business'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TermsIndexRouteImport } from './routes/terms/index'
-import { Route as ResetPasswordIndexRouteImport } from './routes/reset-password/index'
-import { Route as RegisterIndexRouteImport } from './routes/register/index'
-import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
-import { Route as LoginIndexRouteImport } from './routes/login/index'
-import { Route as ForBusinessIndexRouteImport } from './routes/for-business/index'
-import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
-import { Route as DashboardOverviewRouteImport } from './routes/dashboard/overview'
-import { Route as DashboardFavoritesRouteImport } from './routes/dashboard/favorites'
-import { Route as BusinessServicesRouteImport } from './routes/business/services'
-import { Route as BusinessReviewsRouteImport } from './routes/business/reviews'
-import { Route as BusinessProfileRouteImport } from './routes/business/profile'
-import { Route as BusinessOverviewRouteImport } from './routes/business/overview'
-import { Route as BusinessBarbersRouteImport } from './routes/business/barbers'
-import { Route as BusinessAppointmentsRouteImport } from './routes/business/appointments'
-import { Route as BookingIdRouteImport } from './routes/booking/$id'
-import { Route as BarbershopsListingRouteImport } from './routes/barbershops/listing'
-import { Route as BarbershopsSlugRouteImport } from './routes/barbershops/$slug'
-import { Route as BarberOverviewRouteImport } from './routes/barber/overview'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
-import { Route as AdminShopsRouteImport } from './routes/admin/shops'
-import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
+import { Route as BusinessRouteImport } from './routes/business'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin/appointments'
+import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
+import { Route as AdminShopsRouteImport } from './routes/admin/shops'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as BarberOverviewRouteImport } from './routes/barber/overview'
+import { Route as BarbershopsSlugRouteImport } from './routes/barbershops/$slug'
+import { Route as BarbershopsListingRouteImport } from './routes/barbershops/listing'
+import { Route as BookingIdRouteImport } from './routes/booking/$id'
+import { Route as BusinessAppointmentsRouteImport } from './routes/business/appointments'
+import { Route as BusinessBarbersRouteImport } from './routes/business/barbers'
+import { Route as BusinessOverviewRouteImport } from './routes/business/overview'
+import { Route as BusinessProfileRouteImport } from './routes/business/profile'
+import { Route as BusinessReviewsRouteImport } from './routes/business/reviews'
+import { Route as BusinessServicesRouteImport } from './routes/business/services'
+import { Route as DashboardFavoritesRouteImport } from './routes/dashboard/favorites'
+import { Route as DashboardOverviewRouteImport } from './routes/dashboard/overview'
+import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
+import { Route as ForBusinessIndexRouteImport } from './routes/for-business/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
+import { Route as RegisterIndexRouteImport } from './routes/register/index'
+import { Route as ResetPasswordIndexRouteImport } from './routes/reset-password/index'
+import { Route as TermsIndexRouteImport } from './routes/terms/index'
 
-const BusinessRoute = BusinessRouteImport.update({
-  id: '/business',
-  path: '/business',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TermsIndexRoute = TermsIndexRouteImport.update({
-  id: '/terms/',
-  path: '/terms/',
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResetPasswordIndexRoute = ResetPasswordIndexRouteImport.update({
-  id: '/reset-password/',
-  path: '/reset-password/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegisterIndexRoute = RegisterIndexRouteImport.update({
-  id: '/register/',
-  path: '/register/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyIndexRoute = PrivacyIndexRouteImport.update({
-  id: '/privacy/',
-  path: '/privacy/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForBusinessIndexRoute = ForBusinessIndexRouteImport.update({
-  id: '/for-business/',
-  path: '/for-business/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardProfileRoute = DashboardProfileRouteImport.update({
-  id: '/dashboard/profile',
-  path: '/dashboard/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardOverviewRoute = DashboardOverviewRouteImport.update({
-  id: '/dashboard/overview',
-  path: '/dashboard/overview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
-  id: '/dashboard/favorites',
-  path: '/dashboard/favorites',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BusinessServicesRoute = BusinessServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => BusinessRoute,
-} as any)
-const BusinessReviewsRoute = BusinessReviewsRouteImport.update({
-  id: '/reviews',
-  path: '/reviews',
-  getParentRoute: () => BusinessRoute,
-} as any)
-const BusinessProfileRoute = BusinessProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => BusinessRoute,
-} as any)
-const BusinessOverviewRoute = BusinessOverviewRouteImport.update({
-  id: '/overview',
-  path: '/overview',
-  getParentRoute: () => BusinessRoute,
-} as any)
-const BusinessBarbersRoute = BusinessBarbersRouteImport.update({
-  id: '/barbers',
-  path: '/barbers',
-  getParentRoute: () => BusinessRoute,
-} as any)
-const BusinessAppointmentsRoute = BusinessAppointmentsRouteImport.update({
-  id: '/appointments',
-  path: '/appointments',
-  getParentRoute: () => BusinessRoute,
-} as any)
-const BookingIdRoute = BookingIdRouteImport.update({
-  id: '/booking/$id',
-  path: '/booking/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BarbershopsListingRoute = BarbershopsListingRouteImport.update({
-  id: '/barbershops/listing',
-  path: '/barbershops/listing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BarbershopsSlugRoute = BarbershopsSlugRouteImport.update({
-  id: '/barbershops/$slug',
-  path: '/barbershops/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BarberOverviewRoute = BarberOverviewRouteImport.update({
-  id: '/barber/overview',
-  path: '/barber/overview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminShopsRoute = AdminShopsRouteImport.update({
-  id: '/admin/shops',
-  path: '/admin/shops',
+const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
+  id: '/admin/appointments',
+  path: '/admin/appointments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminOverviewRoute = AdminOverviewRouteImport.update({
@@ -155,9 +55,109 @@ const AdminOverviewRoute = AdminOverviewRouteImport.update({
   path: '/admin/overview',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
-  id: '/admin/appointments',
-  path: '/admin/appointments',
+const AdminShopsRoute = AdminShopsRouteImport.update({
+  id: '/admin/shops',
+  path: '/admin/shops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BarberOverviewRoute = BarberOverviewRouteImport.update({
+  id: '/barber/overview',
+  path: '/barber/overview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BarbershopsSlugRoute = BarbershopsSlugRouteImport.update({
+  id: '/barbershops/$slug',
+  path: '/barbershops/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BarbershopsListingRoute = BarbershopsListingRouteImport.update({
+  id: '/barbershops/listing',
+  path: '/barbershops/listing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingIdRoute = BookingIdRouteImport.update({
+  id: '/booking/$id',
+  path: '/booking/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessAppointmentsRoute = BusinessAppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
+  getParentRoute: () => BusinessRoute,
+} as any)
+const BusinessBarbersRoute = BusinessBarbersRouteImport.update({
+  id: '/barbers',
+  path: '/barbers',
+  getParentRoute: () => BusinessRoute,
+} as any)
+const BusinessOverviewRoute = BusinessOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => BusinessRoute,
+} as any)
+const BusinessProfileRoute = BusinessProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => BusinessRoute,
+} as any)
+const BusinessReviewsRoute = BusinessReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => BusinessRoute,
+} as any)
+const BusinessServicesRoute = BusinessServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => BusinessRoute,
+} as any)
+const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
+  id: '/dashboard/favorites',
+  path: '/dashboard/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardOverviewRoute = DashboardOverviewRouteImport.update({
+  id: '/dashboard/overview',
+  path: '/dashboard/overview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/dashboard/profile',
+  path: '/dashboard/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForBusinessIndexRoute = ForBusinessIndexRouteImport.update({
+  id: '/for-business/',
+  path: '/for-business/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyIndexRoute = PrivacyIndexRouteImport.update({
+  id: '/privacy/',
+  path: '/privacy/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterIndexRoute = RegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordIndexRoute = ResetPasswordIndexRouteImport.update({
+  id: '/reset-password/',
+  path: '/reset-password/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsIndexRoute = TermsIndexRouteImport.update({
+  id: '/terms/',
+  path: '/terms/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -351,13 +351,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/business': {
-      id: '/business'
-      path: '/business'
-      fullPath: '/business'
-      preLoaderRoute: typeof BusinessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -365,151 +358,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/terms/': {
-      id: '/terms/'
-      path: '/terms'
-      fullPath: '/terms/'
-      preLoaderRoute: typeof TermsIndexRouteImport
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reset-password/': {
-      id: '/reset-password/'
-      path: '/reset-password'
-      fullPath: '/reset-password/'
-      preLoaderRoute: typeof ResetPasswordIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register/': {
-      id: '/register/'
-      path: '/register'
-      fullPath: '/register/'
-      preLoaderRoute: typeof RegisterIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy/': {
-      id: '/privacy/'
-      path: '/privacy'
-      fullPath: '/privacy/'
-      preLoaderRoute: typeof PrivacyIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login/'
-      preLoaderRoute: typeof LoginIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-business/': {
-      id: '/for-business/'
-      path: '/for-business'
-      fullPath: '/for-business/'
-      preLoaderRoute: typeof ForBusinessIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/profile': {
-      id: '/dashboard/profile'
-      path: '/dashboard/profile'
-      fullPath: '/dashboard/profile'
-      preLoaderRoute: typeof DashboardProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/overview': {
-      id: '/dashboard/overview'
-      path: '/dashboard/overview'
-      fullPath: '/dashboard/overview'
-      preLoaderRoute: typeof DashboardOverviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/favorites': {
-      id: '/dashboard/favorites'
-      path: '/dashboard/favorites'
-      fullPath: '/dashboard/favorites'
-      preLoaderRoute: typeof DashboardFavoritesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/business/services': {
-      id: '/business/services'
-      path: '/services'
-      fullPath: '/business/services'
-      preLoaderRoute: typeof BusinessServicesRouteImport
-      parentRoute: typeof BusinessRoute
-    }
-    '/business/reviews': {
-      id: '/business/reviews'
-      path: '/reviews'
-      fullPath: '/business/reviews'
-      preLoaderRoute: typeof BusinessReviewsRouteImport
-      parentRoute: typeof BusinessRoute
-    }
-    '/business/profile': {
-      id: '/business/profile'
-      path: '/profile'
-      fullPath: '/business/profile'
-      preLoaderRoute: typeof BusinessProfileRouteImport
-      parentRoute: typeof BusinessRoute
-    }
-    '/business/overview': {
-      id: '/business/overview'
-      path: '/overview'
-      fullPath: '/business/overview'
-      preLoaderRoute: typeof BusinessOverviewRouteImport
-      parentRoute: typeof BusinessRoute
-    }
-    '/business/barbers': {
-      id: '/business/barbers'
-      path: '/barbers'
-      fullPath: '/business/barbers'
-      preLoaderRoute: typeof BusinessBarbersRouteImport
-      parentRoute: typeof BusinessRoute
-    }
-    '/business/appointments': {
-      id: '/business/appointments'
-      path: '/appointments'
-      fullPath: '/business/appointments'
-      preLoaderRoute: typeof BusinessAppointmentsRouteImport
-      parentRoute: typeof BusinessRoute
-    }
-    '/booking/$id': {
-      id: '/booking/$id'
-      path: '/booking/$id'
-      fullPath: '/booking/$id'
-      preLoaderRoute: typeof BookingIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/barbershops/listing': {
-      id: '/barbershops/listing'
-      path: '/barbershops/listing'
-      fullPath: '/barbershops/listing'
-      preLoaderRoute: typeof BarbershopsListingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/barbershops/$slug': {
-      id: '/barbershops/$slug'
-      path: '/barbershops/$slug'
-      fullPath: '/barbershops/$slug'
-      preLoaderRoute: typeof BarbershopsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/barber/overview': {
-      id: '/barber/overview'
-      path: '/barber/overview'
-      fullPath: '/barber/overview'
-      preLoaderRoute: typeof BarberOverviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/admin/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/shops': {
-      id: '/admin/shops'
-      path: '/admin/shops'
-      fullPath: '/admin/shops'
-      preLoaderRoute: typeof AdminShopsRouteImport
+    '/admin/appointments': {
+      id: '/admin/appointments'
+      path: '/admin/appointments'
+      fullPath: '/admin/appointments'
+      preLoaderRoute: typeof AdminAppointmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/overview': {
@@ -519,11 +379,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOverviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/appointments': {
-      id: '/admin/appointments'
-      path: '/admin/appointments'
-      fullPath: '/admin/appointments'
-      preLoaderRoute: typeof AdminAppointmentsRouteImport
+    '/admin/shops': {
+      id: '/admin/shops'
+      path: '/admin/shops'
+      fullPath: '/admin/shops'
+      preLoaderRoute: typeof AdminShopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/barber/overview': {
+      id: '/barber/overview'
+      path: '/barber/overview'
+      fullPath: '/barber/overview'
+      preLoaderRoute: typeof BarberOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/barbershops/$slug': {
+      id: '/barbershops/$slug'
+      path: '/barbershops/$slug'
+      fullPath: '/barbershops/$slug'
+      preLoaderRoute: typeof BarbershopsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/barbershops/listing': {
+      id: '/barbershops/listing'
+      path: '/barbershops/listing'
+      fullPath: '/barbershops/listing'
+      preLoaderRoute: typeof BarbershopsListingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking/$id': {
+      id: '/booking/$id'
+      path: '/booking/$id'
+      fullPath: '/booking/$id'
+      preLoaderRoute: typeof BookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business/appointments': {
+      id: '/business/appointments'
+      path: '/appointments'
+      fullPath: '/business/appointments'
+      preLoaderRoute: typeof BusinessAppointmentsRouteImport
+      parentRoute: typeof BusinessRoute
+    }
+    '/business/barbers': {
+      id: '/business/barbers'
+      path: '/barbers'
+      fullPath: '/business/barbers'
+      preLoaderRoute: typeof BusinessBarbersRouteImport
+      parentRoute: typeof BusinessRoute
+    }
+    '/business/overview': {
+      id: '/business/overview'
+      path: '/overview'
+      fullPath: '/business/overview'
+      preLoaderRoute: typeof BusinessOverviewRouteImport
+      parentRoute: typeof BusinessRoute
+    }
+    '/business/profile': {
+      id: '/business/profile'
+      path: '/profile'
+      fullPath: '/business/profile'
+      preLoaderRoute: typeof BusinessProfileRouteImport
+      parentRoute: typeof BusinessRoute
+    }
+    '/business/reviews': {
+      id: '/business/reviews'
+      path: '/reviews'
+      fullPath: '/business/reviews'
+      preLoaderRoute: typeof BusinessReviewsRouteImport
+      parentRoute: typeof BusinessRoute
+    }
+    '/business/services': {
+      id: '/business/services'
+      path: '/services'
+      fullPath: '/business/services'
+      preLoaderRoute: typeof BusinessServicesRouteImport
+      parentRoute: typeof BusinessRoute
+    }
+    '/dashboard/favorites': {
+      id: '/dashboard/favorites'
+      path: '/dashboard/favorites'
+      fullPath: '/dashboard/favorites'
+      preLoaderRoute: typeof DashboardFavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/overview': {
+      id: '/dashboard/overview'
+      path: '/dashboard/overview'
+      fullPath: '/dashboard/overview'
+      preLoaderRoute: typeof DashboardOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/profile': {
+      id: '/dashboard/profile'
+      path: '/dashboard/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-business/': {
+      id: '/for-business/'
+      path: '/for-business'
+      fullPath: '/for-business/'
+      preLoaderRoute: typeof ForBusinessIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy/': {
+      id: '/privacy/'
+      path: '/privacy'
+      fullPath: '/privacy/'
+      preLoaderRoute: typeof PrivacyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register/': {
+      id: '/register/'
+      path: '/register'
+      fullPath: '/register/'
+      preLoaderRoute: typeof RegisterIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password/': {
+      id: '/reset-password/'
+      path: '/reset-password'
+      fullPath: '/reset-password/'
+      preLoaderRoute: typeof ResetPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms/': {
+      id: '/terms/'
+      path: '/terms'
+      fullPath: '/terms/'
+      preLoaderRoute: typeof TermsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

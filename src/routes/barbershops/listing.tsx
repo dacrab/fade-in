@@ -212,6 +212,17 @@ function BarbershopsPage() {
 									setSearch("")
 									setCity("")
 									setMinRating(0)
+									// Keep the URL in sync with the reset filters so a reload
+									// or share does not silently restore them.
+									void navigate({
+										to: "/barbershops/listing",
+										search: (prev: z.infer<typeof searchSchema>) => ({
+											...prev,
+											q: undefined,
+											city: undefined,
+											minRating: undefined,
+										}),
+									})
 								}}
 								className="px-6 py-2.5 rounded-full text-sm font-medium bg-(--bg-card) border border-(--gold)/20 text-(--text) hover:border-(--gold)/40 transition-all duration-300"
 							>

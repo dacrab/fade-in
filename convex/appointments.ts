@@ -1,6 +1,13 @@
 import { ConvexError, v } from "convex/values"
 import { internal } from "./_generated/api"
-import { internalAction, internalMutation, mutation, query } from "./_generated/server"
+import type { Id } from "./_generated/dataModel"
+import {
+	internalAction,
+	internalMutation,
+	type MutationCtx,
+	mutation,
+	query,
+} from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
 import { sendEmail } from "./lib/email"
 import { DEFAULT_WINDOW, generateSlots, SLOT_CONFIG, timeToMinutes, weekdayOf } from "./lib/slots"
@@ -10,6 +17,40 @@ const TIME_RE = /^\d{2}:\d{2}$/
 const STALE_PENDING_MS = 24 * 60 * 60 * 1000
 
 const MAX_DURATION_MINUTES = 480
+
+/**
+ * Validates a requested slot and returns the shop. Shared by every mutation that
+ * writes a date/time onto an appointment so none of them can skip the checks.
+ */
+async function assertBookableSlot(
+	ctx: MutationCtx,
+	barbershopId: Id<"barbershops">,
+	date: string,
+	startTime: string,
+	endTime: string,
+) {
+	if (!DATE_RE.test(date)) throw new ConvexError("Invalid date format")
+	if (!(TIME_RE.test(startTime) && TIME_RE.test(endTime)))
+		throw new ConvexError("Invalid time format")
+	if (startTime >= endTime) throw new ConvexError("Invalid time range")
+
+	const shop = await ctx.db.get(barbershopId)
+	if (shop?.isActive !== true) throw new ConvexError("Shop is not available")
+
+	const hours = shop.workingHours?.[weekdayOf(date)]
+	if (hours?.closed) throw new ConvexError("Shop is closed on this date")
+	const openMinute = hours ? timeToMinutes(hours.open) : DEFAULT_WINDOW.startMinute
+	const closeMinute = hours ? timeToMinutes(hours.close) : DEFAULT_WINDOW.endMinute
+	const start = timeToMinutes(startTime)
+	if (
+		start < openMinute ||
+		timeToMinutes(endTime) > closeMinute ||
+		(start - openMinute) % SLOT_CONFIG.INTERVAL_MINUTES !== 0
+	)
+		throw new ConvexError("Time is outside of operating hours")
+
+	return shop
+}
 
 export const getAvailableSlots = query({
 	args: {
@@ -64,10 +105,13 @@ export const create = mutation({
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
 		const userId = user._id
-		if (!DATE_RE.test(args.date)) throw new ConvexError("Invalid date format")
-		if (!(TIME_RE.test(args.startTime) && TIME_RE.test(args.endTime)))
-			throw new ConvexError("Invalid time format")
-		if (args.startTime >= args.endTime) throw new ConvexError("Invalid time range")
+		const shop = await assertBookableSlot(
+			ctx,
+			args.barbershopId,
+			args.date,
+			args.startTime,
+			args.endTime,
+		)
 		if (args.serviceIds.length === 0) throw new ConvexError("At least one service required")
 
 		const services = await Promise.all(args.serviceIds.map((id) => ctx.db.get(id)))
@@ -80,21 +124,6 @@ export const create = mutation({
 		const barber = await ctx.db.get(args.barberId)
 		if (!barber || barber.barbershopId !== args.barbershopId)
 			throw new ConvexError("Invalid barber for this shop")
-
-		const shop = await ctx.db.get(args.barbershopId)
-		if (shop?.isActive !== true) throw new ConvexError("Shop is not available")
-
-		const hours = shop.workingHours?.[weekdayOf(args.date)]
-		if (hours?.closed) throw new ConvexError("Shop is closed on this date")
-		const openMinute = hours ? timeToMinutes(hours.open) : DEFAULT_WINDOW.startMinute
-		const closeMinute = hours ? timeToMinutes(hours.close) : DEFAULT_WINDOW.endMinute
-		const start = timeToMinutes(args.startTime)
-		if (
-			start < openMinute ||
-			timeToMinutes(args.endTime) > closeMinute ||
-			(start - openMinute) % SLOT_CONFIG.INTERVAL_MINUTES !== 0
-		)
-			throw new ConvexError("Time is outside of operating hours")
 
 		const existing = await ctx.db
 			.query("appointments")
@@ -320,7 +349,15 @@ export const confirmFromCheckout = internalMutation({
 			.query("appointments")
 			.withIndex("by_polar_checkout", (q) => q.eq("polarCheckoutId", args.polarCheckoutId))
 			.unique()
-		if (!appt) throw new ConvexError("Appointment not found for session")
+		// A checkout whose appointment is gone (swept as stale, or created
+		// outside this app) must still be acknowledged: Polar retries any
+		// non-2xx response, so throwing here would retry forever. Log it instead,
+		// so a paid checkout with no appointment stays visible for manual refund.
+		if (!appt) {
+			// biome-ignore lint/suspicious/noConsole: paid checkout with no appointment needs a durable record
+			console.error(`Polar checkout ${args.polarCheckoutId} succeeded but has no appointment`)
+			return
+		}
 		if (appt.status !== "pending") return // already confirmed
 		await ctx.db.patch(appt._id, { status: "confirmed", paymentStatus: "paid" })
 	},
@@ -384,10 +421,7 @@ export const reschedule = mutation({
 			if (!shop || shop.ownerId !== user._id) throw new ConvexError("Not authorized")
 		}
 
-		if (!DATE_RE.test(args.date)) throw new ConvexError("Invalid date format")
-		if (!(TIME_RE.test(args.startTime) && TIME_RE.test(args.endTime)))
-			throw new ConvexError("Invalid time format")
-		if (args.startTime >= args.endTime) throw new ConvexError("Invalid time range")
+		await assertBookableSlot(ctx, appt.barbershopId, args.date, args.startTime, args.endTime)
 
 		const existing = await ctx.db
 			.query("appointments")
