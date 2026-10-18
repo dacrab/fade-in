@@ -3,9 +3,8 @@ import { useQuery } from "convex/react"
 import { useEffect } from "react"
 import type { UserRole } from "#/types"
 import { api } from "../../convex/_generated/api"
-import { useAuth } from "./useAuth"
+import { useAuth, type Viewer } from "./useAuth"
 
-/** Stable role constants keep the effect dependencies identity-safe. */
 export const ADMIN_ROLES: readonly UserRole[] = ["admin"]
 export const OWNER_ADMIN_ROLES: readonly UserRole[] = ["owner", "admin"]
 export const CUSTOMER_ADMIN_ROLES: readonly UserRole[] = ["customer", "admin"]
@@ -14,7 +13,7 @@ export const BARBER_ADMIN_ROLES: readonly UserRole[] = ["barber", "admin"]
 export function useRequireRole(
 	roles: readonly UserRole[],
 	allowShopOwnership = false,
-): { user: ReturnType<typeof useAuth>["user"]; loading: boolean } {
+): { user: Viewer | null; loading: boolean } {
 	const { user, loading: authLoading } = useAuth()
 	const navigate = useNavigate()
 	const shops = useQuery(api.barbershops.listByOwner, allowShopOwnership && user ? {} : "skip")

@@ -73,6 +73,8 @@ export default function ShopCard({ shop }: { shop: Barbershop }) {
 					onClick={handleToggleFav}
 					className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-colors z-10 cursor-pointer"
 					title={t(isFavorited ? "common.removeFromFavorites" : "common.addToFavorites")}
+					aria-label={t(isFavorited ? "common.removeFromFavorites" : "common.addToFavorites")}
+					aria-pressed={isFavorited}
 				>
 					<Heart
 						size={14}

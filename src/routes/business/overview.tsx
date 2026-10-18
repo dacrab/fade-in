@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { PlusCircle, Scissors } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { DashSkeleton } from "#/components/ui/DashSkeleton"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
@@ -17,7 +18,7 @@ function BusinessDashboard() {
 	const { t } = useTranslation()
 	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 
-	const shop = useOwnerShop(user?.id)
+	const { shop, isLoading } = useOwnerShop(Boolean(user))
 
 	const todayStr = todayIso()
 	const todayAppts = useQuery(
@@ -34,7 +35,12 @@ function BusinessDashboard() {
 	const completionRate =
 		stats && stats.totalCount > 0 ? Math.round((stats.completedCount / stats.totalCount) * 100) : 0
 
-	if (!user) return <DashSkeleton />
+	if (!user || isLoading)
+		return (
+			<div className="px-8 py-8 flex items-center justify-center flex-1">
+				<DashSkeleton className="w-full max-w-4xl px-8" />
+			</div>
+		)
 
 	if (!shop) {
 		return (
@@ -110,22 +116,26 @@ function BusinessDashboard() {
 					<p className="subtle-sm py-4">{t("business.noToday")}</p>
 				) : (
 					<div className="divide-y divide-(--border)">
-						{todayAppts.map((appt: Doc<"appointments">) => (
-							<div key={appt._id} className="flex items-center gap-4 py-3">
-								<span className="font-mono text-sm font-medium text-(--gold) w-12">{appt.startTime}</span>
-								<div className="flex-1 min-w-0">
-									<div className="muted-sm truncate">
-										{appt.notes ?? t("business.defaultAppointmentNote")}
+						{todayAppts
+							.toSorted((a: Doc<"appointments">, b: Doc<"appointments">) =>
+								a.startTime.localeCompare(b.startTime),
+							)
+							.map((appt: Doc<"appointments">) => (
+								<div key={appt._id} className="flex items-center gap-4 py-3">
+									<span className="font-mono text-sm font-medium text-(--gold) w-12">{appt.startTime}</span>
+									<div className="flex-1 min-w-0">
+										<div className="muted-sm truncate">
+											{appt.notes ?? t("business.defaultAppointmentNote")}
+										</div>
+										<div className="subtle-xs">
+											{appt.endTime} · {formatPrice(appt.totalPrice)}
+										</div>
 									</div>
-									<div className="subtle-xs">
-										{appt.endTime} · {formatPrice(appt.totalPrice)}
-									</div>
+									<span className={`text-[10px] px-2 py-0.5 rounded-full ${STATUS_BADGE[appt.status]}`}>
+										{t(`status.${appt.status}`)}
+									</span>
 								</div>
-								<span className={`text-[10px] px-2 py-0.5 rounded-full ${STATUS_BADGE[appt.status]}`}>
-									{t(`status.${appt.status}`)}
-								</span>
-							</div>
-						))}
+							))}
 					</div>
 				)}
 			</div>
@@ -207,22 +217,6 @@ function BusinessDashboard() {
 						))}
 					</div>
 				)}
-			</div>
-		</div>
-	)
-}
-
-function DashSkeleton() {
-	return (
-		<div className="px-8 py-8 flex items-center justify-center flex-1">
-			<div className="w-full max-w-4xl px-8 space-y-4">
-				<Skeleton className="h-8 w-48" />
-				<div className="grid grid-cols-4 gap-4">
-					{[0, 1, 2, 3].map((i) => (
-						<Skeleton key={i} className="h-16 rounded-lg" />
-					))}
-				</div>
-				<Skeleton className="h-48 rounded-xl" />
 			</div>
 		</div>
 	)

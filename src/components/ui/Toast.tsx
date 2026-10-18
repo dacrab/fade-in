@@ -17,6 +17,23 @@ let toasts: Toast[] = []
 let toastId = 0
 const listeners = new Set<() => void>()
 
+const EMPTY_TOASTS: Toast[] = []
+
+function subscribe(listener: () => void) {
+	listeners.add(listener)
+	return () => {
+		listeners.delete(listener)
+	}
+}
+
+function getSnapshot() {
+	return toasts
+}
+
+function getServerSnapshot() {
+	return EMPTY_TOASTS
+}
+
 function emit() {
 	for (const listener of listeners) listener()
 }
@@ -38,18 +55,21 @@ function errorMessage(e: unknown, fallback: string): string {
 	return fallback
 }
 
+export type ToastResult<T> = { ok: true; value: T } | { ok: false }
+
 export async function withToast<T>(
 	fn: () => Promise<T>,
 	success: string,
 	error: string,
-): Promise<T | undefined> {
+): Promise<ToastResult<T>> {
 	try {
-		const result = await fn()
+		const value = await fn()
 		showToast(success, "success")
-		return result
+		return { ok: true, value }
 	} catch (e) {
 		showToast(errorMessage(e, error), "error")
 		Sentry.captureException(e)
+		return { ok: false }
 	}
 }
 
@@ -60,18 +80,10 @@ const TOAST_CONFIG = {
 } as const
 
 export function ToastContainer() {
-	const current = useSyncExternalStore(
-		(cb) => {
-			listeners.add(cb)
-			return () => {
-				listeners.delete(cb)
-			}
-		},
-		() => toasts,
-	)
+	const current = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
 	return (
-		<div className="toast-container">
+		<div className="toast-container" aria-live="polite" aria-atomic="false">
 			{current.map((toast) => {
 				const { icon: Icon, borderColor } = TOAST_CONFIG[toast.type]
 				return (

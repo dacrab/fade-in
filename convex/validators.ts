@@ -9,6 +9,9 @@ export function definedPatch<T extends Record<string, unknown>>(obj: T): Partial
 
 const dayHours = v.object({ open: v.string(), close: v.string(), closed: v.boolean() })
 
+export const TIME_RE = /^\d{2}:\d{2}$/
+export const MAX_DURATION_MINUTES = 480
+
 export const workingHoursValidator = v.optional(
 	v.object({
 		monday: v.optional(dayHours),
@@ -20,8 +23,6 @@ export const workingHoursValidator = v.optional(
 		sunday: v.optional(dayHours),
 	}),
 )
-
-const TIME_RE = /^\d{2}:\d{2}$/
 
 type WorkingHoursInput = Infer<typeof workingHoursValidator>
 

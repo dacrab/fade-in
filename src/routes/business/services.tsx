@@ -34,7 +34,7 @@ function BusinessServices() {
 	const { t } = useTranslation()
 	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 
-	const shop = useOwnerShop(user?.id)
+	const { shop } = useOwnerShop(Boolean(user))
 	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")
 
 	const createService = useMutation(api.services.create)
@@ -152,6 +152,7 @@ function BusinessServices() {
 						submitLabel={crud.editId ? t("common.save") : t("business.services.addService")}
 						onCancel={crud.reset}
 						className="sm:col-span-2 flex gap-3"
+						saving={crud.saving}
 					/>
 				</form>
 			}
@@ -164,7 +165,7 @@ function BusinessServices() {
 					<div className="flex-1 min-w-0">
 						<div className="main-sm">{svc.name}</div>
 						<div className="field-hint">
-							{svc.durationMinutes} min · {t(`business.services.categories.${svc.category}`)}
+							{svc.durationMinutes} {t("common.min")} · {t(`business.services.categories.${svc.category}`)}
 						</div>
 					</div>
 					<div className="text-sm font-medium text-(--gold)">{formatPrice(svc.price)}</div>

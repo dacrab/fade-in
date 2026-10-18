@@ -1,9 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
+import type { ColumnDef } from "@tanstack/react-table"
 import { useQuery } from "convex/react"
-import { Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { SkeletonRows } from "#/components/ui/Skeleton"
-import { ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
+import { DataTable, type features } from "#/components/ui/DataTable"
 import type { UserRole } from "#/types"
 import { parseUserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -20,56 +19,51 @@ const ROLE_BADGE: Record<UserRole, string> = {
 
 function AdminUsers() {
 	const { t } = useTranslation()
-	useRequireRole(ADMIN_ROLES)
 
 	const allUsers = useQuery(api.users.listAll)
+
+	const columns: ColumnDef<typeof features, Doc<"users">>[] = [
+		{
+			header: t("admin.users.colName"),
+			accessorFn: (row) => row.name ?? "",
+			enableSorting: true,
+			cell: ({ row }) => (
+				<div className="flex items-center gap-2 min-w-0">
+					<div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 bg-(--gold) text-black">
+						{row.original.name?.charAt(0).toUpperCase() ?? "?"}
+					</div>
+					<span className="main-sm truncate">{row.original.name}</span>
+				</div>
+			),
+		},
+		{
+			header: t("admin.users.colEmail"),
+			accessorKey: "email",
+			cell: ({ row }) => <span className="muted-sm truncate">{row.original.email}</span>,
+		},
+		{
+			header: t("admin.users.colRole"),
+			accessorFn: (row) => parseUserRole(row.role),
+			enableSorting: true,
+			cell: ({ row }) => {
+				const role = parseUserRole(row.original.role)
+				return <span className={`badge ${ROLE_BADGE[role]} w-fit`}>{t(`admin.roles.${role}`)}</span>
+			},
+		},
+	]
 
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-4xl">
-				<div className="page-head">
-					<div className="page-header">
-						<Link to="/admin/overview" className="breadcrumb-back">
-							← {t("nav.admin")}
-						</Link>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("admin.users.title")}</h1>
-					</div>
-				</div>
-
-				{!allUsers ? (
-					<SkeletonRows count={6} className="h-14 rounded-xl" />
-				) : allUsers.length === 0 ? (
-					<div className="empty-state">
-						<Users size={36} className="mx-auto mb-3 opacity-30" />
-						<p className="text-sm">{t("admin.users.noUsers")}</p>
-					</div>
-				) : (
-					<div className="card overflow-hidden">
-						<div className="grid grid-cols-3 gap-4 px-4 py-2 border-b border-(--border) text-xs font-semibold text-(--text-muted)">
-							<span>{t("admin.users.colName")}</span>
-							<span>{t("admin.users.colEmail")}</span>
-							<span>{t("admin.users.colRole")}</span>
-						</div>
-						{allUsers.map((u: Doc<"users">, i: number) => (
-							<div
-								key={u._id}
-								className={`grid grid-cols-3 gap-4 px-4 py-3 items-center ${i < allUsers.length - 1 ? "border-b border-(--border)" : ""}`}
-							>
-								<div className="flex items-center gap-2 min-w-0">
-									<div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 bg-(--gold) text-black">
-										{u.name?.charAt(0).toUpperCase() ?? "?"}
-									</div>
-									<span className="main-sm truncate">{u.name}</span>
-								</div>
-								<span className="muted-sm truncate">{u.email}</span>
-								<span className={`badge ${ROLE_BADGE[parseUserRole(u.role)]} w-fit`}>
-									{t(`admin.roles.${parseUserRole(u.role)}`)}
-								</span>
-							</div>
-						))}
-					</div>
-				)}
+				<h1 className="page-title mb-6">{t("admin.users.title")}</h1>
+				<DataTable
+					columns={columns}
+					data={allUsers ?? []}
+					loading={!allUsers}
+					searchable
+					searchPlaceholder={t("admin.users.colName")}
+					emptyMessage={t("admin.users.noUsers")}
+				/>
 			</div>
 		</main>
 	)

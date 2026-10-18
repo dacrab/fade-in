@@ -1,5 +1,5 @@
-import { useAction, useQuery } from "convex/react"
-import { Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { useAction, useMutation, useQuery } from "convex/react"
+import { Check, ChevronLeft, ChevronRight, Users } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "#/hooks/useAuth"
@@ -13,6 +13,23 @@ import { showToast } from "./ui/Toast"
 
 type Step = 1 | 2 | 3 | 4
 
+type BookingPayload = {
+	barbershopId: Id<"barbershops">
+	barberId: Id<"barbers">
+	serviceIds: Id<"services">[]
+	date: string
+	startTime: string
+	endTime: string
+	notes?: string
+}
+
+/** End time (HH:mm) for a slot lasting `durationMinutes`. */
+function slotEndTime(startTime: string, durationMinutes: number): string {
+	const [h, m] = startTime.split(":").map(Number)
+	const end = (h ?? 0) * 60 + (m ?? 0) + durationMinutes
+	return `${String(Math.floor(end / 60)).padStart(2, "0")}:${String(end % 60).padStart(2, "0")}`
+}
+
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 export default function BookingModal({ shop, onClose }: { shop: Barbershop; onClose: () => void }) {
 	const { t } = useTranslation()
@@ -25,6 +42,9 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 	const [selectedSlot, setSelectedSlot] = useState("")
 	const [notes, setNotes] = useState("")
 	const [loading, setLoading] = useState(false)
+	const [anyBarber, setAnyBarber] = useState(false)
+	const [resolvedBarberId, setResolvedBarberId] = useState<Id<"barbers"> | null>(null)
+	const [paymentMethod, setPaymentMethod] = useState<"onsite" | "online">("onsite")
 
 	const services = useQuery(api.services.listByShop, { barbershopId: shop._id })
 	const barbers = useQuery(api.barbers.listByShop, { barbershopId: shop._id })
@@ -40,7 +60,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 
 	const slots = useQuery(
 		api.appointments.getAvailableSlots,
-		selectedBarber && selectedDate
+		selectedBarber && selectedDate && !anyBarber
 			? {
 					barbershopId: shop._id,
 					barberId: selectedBarber,
@@ -50,7 +70,19 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 			: "skip",
 	)
 
+	const shopSlots = useQuery(
+		api.appointments.getAvailableSlotsForShop,
+		anyBarber && selectedDate
+			? {
+					barbershopId: shop._id,
+					date: selectedDate,
+					durationMinutes: totalDuration,
+				}
+			: "skip",
+	)
+
 	const createCheckout = useAction(api.payments.createCheckoutSession)
+	const createAppointment = useMutation(api.appointments.create)
 
 	const minDate = nextDayIso()
 
@@ -60,6 +92,19 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 	const pickDate = (date: string) => {
 		setSelectedDate(date)
 		setSelectedSlot("")
+		setResolvedBarberId(null)
+	}
+
+	/** Persist the booking via the chosen payment path, returning which path ran. */
+	const submitBooking = async (booking: BookingPayload): Promise<"online" | "onsite" | "failed"> => {
+		if (paymentMethod === "online") {
+			const result = await createCheckout(booking)
+			if (!result.url) return "failed"
+			window.location.href = result.url
+			return "online"
+		}
+		await createAppointment(booking)
+		return "onsite"
 	}
 
 	const handleConfirm = async () => {
@@ -67,23 +112,24 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 			showToast(t("booking.signInRequired"), "error")
 			return
 		}
-		if (!(selectedBarber && selectedDate && selectedSlot)) return
+		const barberId = anyBarber ? resolvedBarberId : selectedBarber
+		if (!(barberId && selectedDate && selectedSlot)) return
 		setLoading(true)
 		try {
-			const [startH, startM] = selectedSlot.split(":").map(Number)
-			const endMinutes = (startH ?? 0) * 60 + (startM ?? 0) + totalDuration
-			const endTime = `${String(Math.floor(endMinutes / 60)).padStart(2, "0")}:${String(endMinutes % 60).padStart(2, "0")}`
-			const result = await createCheckout({
+			const outcome = await submitBooking({
 				barbershopId: shop._id,
-				barberId: selectedBarber,
+				barberId,
 				serviceIds: selectedServices,
 				date: selectedDate,
 				startTime: selectedSlot,
-				endTime,
+				endTime: slotEndTime(selectedSlot, totalDuration),
 				notes: notes || undefined,
 			})
-			if (result.url) window.location.href = result.url
-			else showToast(t("booking.failed"), "error")
+			if (outcome === "failed") showToast(t("booking.failed"), "error")
+			if (outcome === "onsite") {
+				showToast(t("booking.booked"), "success")
+				onClose()
+			}
 		} catch {
 			showToast(t("booking.failed"), "error")
 		} finally {
@@ -95,8 +141,11 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 	const stepLabels = stepKeys.map((k) => t(`booking.steps.${k}`))
 	const canNext =
 		(step === 1 && selectedServices.length > 0) ||
-		(step === 2 && selectedBarber !== null) ||
-		(step === 3 && selectedDate !== "" && selectedSlot !== "") ||
+		(step === 2 && (selectedBarber !== null || anyBarber)) ||
+		(step === 3 &&
+			selectedDate !== "" &&
+			selectedSlot !== "" &&
+			(anyBarber ? resolvedBarberId !== null : selectedBarber !== null)) ||
 		step === 4
 
 	const selectedBarberDoc = barbers?.find((b: Doc<"barbers">) => b._id === selectedBarber)
@@ -107,7 +156,13 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 			t("booking.summaryFields.services"),
 			selectedServiceDocs.map((s: Doc<"services">) => s.name).join(", "),
 		],
-		[t("booking.summaryFields.barber"), selectedBarberDoc?.name ?? "—"],
+		[
+			t("booking.summaryFields.barber"),
+			anyBarber
+				? (barbers?.find((b: Doc<"barbers">) => b._id === resolvedBarberId)?.name ??
+					t("booking.anyBarber"))
+				: (selectedBarberDoc?.name ?? "—"),
+		],
 		[t("booking.summaryFields.date"), f.formatDate(selectedDate)],
 		[t("booking.summaryFields.time"), selectedSlot],
 		[t("booking.summaryFields.duration"), t("booking.duration", { minutes: totalDuration })],
@@ -164,7 +219,9 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											</div>
 											<div className="flex-1 min-w-0">
 												<div className="strong-sm">{svc.name}</div>
-												<div className="field-hint">{svc.durationMinutes} min</div>
+												<div className="field-hint">
+													{t("booking.duration", { minutes: svc.durationMinutes })}
+												</div>
 											</div>
 											<div className="font-semibold text-sm text-(--gold)">{f.formatPrice(svc.price)}</div>
 										</button>
@@ -182,40 +239,69 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 							) : barbers.length === 0 ? (
 								<p className="subtle-sm">{t("booking.noBarbers")}</p>
 							) : (
-								barbers.map((b: Barber) => {
-									const selected = selectedBarber === b._id
-									return (
-										<button
-											key={b._id}
-											type="button"
-											onClick={() => setSelectedBarber(b._id)}
-											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
-										>
-											<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
-												{b.avatarUrl ? (
-													<img
-														src={b.avatarUrl}
-														alt={b.name}
-														className="w-full h-full object-cover rounded-full"
-													/>
-												) : (
-													<span className="text-sm font-semibold">{b.name.charAt(0)}</span>
-												)}
+								<>
+									<button
+										type="button"
+										onClick={() => {
+											setAnyBarber(true)
+											setSelectedBarber(null)
+											setSelectedSlot("")
+											setResolvedBarberId(null)
+										}}
+										className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${anyBarber ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
+									>
+										<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
+											<Users size={18} />
+										</div>
+										<div className="flex-1">
+											<div className="strong-sm">{t("booking.anyBarber")}</div>
+										</div>
+										{anyBarber && (
+											<div className="w-6 h-6 rounded-full flex items-center justify-center bg-(--gold)">
+												<Check size={14} className="text-(--bg-card)" />
 											</div>
-											<div className="flex-1">
-												<div className="strong-sm">{b.name}</div>
-												{b.specializations.length > 0 && (
-													<div className="field-hint">{b.specializations.join(", ")}</div>
-												)}
-											</div>
-											{selected && (
-												<div className="w-6 h-6 rounded-full flex items-center justify-center bg-(--gold)">
-													<Check size={14} className="text-(--bg-card)" />
+										)}
+									</button>
+									{barbers.map((b: Barber) => {
+										const selected = !anyBarber && selectedBarber === b._id
+										return (
+											<button
+												key={b._id}
+												type="button"
+												onClick={() => {
+													setAnyBarber(false)
+													setSelectedBarber(b._id)
+													setSelectedSlot("")
+													setResolvedBarberId(b._id)
+												}}
+												className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
+											>
+												<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
+													{b.avatarUrl ? (
+														<img
+															src={b.avatarUrl}
+															alt={b.name}
+															className="w-full h-full object-cover rounded-full"
+														/>
+													) : (
+														<span className="text-sm font-semibold">{b.name.charAt(0)}</span>
+													)}
 												</div>
-											)}
-										</button>
-									)
-								})
+												<div className="flex-1">
+													<div className="strong-sm">{b.name}</div>
+													{b.specializations.length > 0 && (
+														<div className="field-hint">{b.specializations.join(", ")}</div>
+													)}
+												</div>
+												{selected && (
+													<div className="w-6 h-6 rounded-full flex items-center justify-center bg-(--gold)">
+														<Check size={14} className="text-(--bg-card)" />
+													</div>
+												)}
+											</button>
+										)
+									})}
+								</>
 							)}
 						</div>
 					)}
@@ -238,7 +324,29 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 							{selectedDate && (
 								<div>
 									<p className="block strong-sm mb-3">{t("booking.availableSlots")}</p>
-									{slots === undefined ? (
+									{anyBarber ? (
+										shopSlots === undefined ? (
+											<p className="subtle-sm">{t("booking.loadingSlots")}</p>
+										) : shopSlots.length === 0 ? (
+											<p className="subtle-sm">{t("booking.noSlots")}</p>
+										) : (
+											<div className="grid grid-cols-4 gap-2">
+												{shopSlots.map((entry: { startTime: string; barberId: Id<"barbers"> }) => (
+													<button
+														key={entry.startTime}
+														type="button"
+														onClick={() => {
+															setSelectedSlot(entry.startTime)
+															setResolvedBarberId(entry.barberId)
+														}}
+														className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${selectedSlot === entry.startTime ? "bg-(--gold) border-(--gold) text-white" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--gold)/40"}`}
+													>
+														{entry.startTime}
+													</button>
+												))}
+											</div>
+										)
+									) : slots === undefined ? (
 										<p className="subtle-sm">{t("booking.loadingSlots")}</p>
 									) : slots.length === 0 ? (
 										<p className="subtle-sm">{t("booking.noSlots")}</p>
@@ -291,6 +399,25 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 								</div>
 							</div>
 							{notes && <p className="muted-sm">{notes}</p>}
+							<div>
+								<p className="block strong-sm mb-2">{t("booking.paymentMethod")}</p>
+								<div className="grid grid-cols-2 gap-2">
+									<button
+										type="button"
+										onClick={() => setPaymentMethod("onsite")}
+										className={`py-2.5 px-3 text-sm rounded-lg font-medium transition-all duration-200 border cursor-pointer ${paymentMethod === "onsite" ? "bg-(--gold)/5 border-(--gold)/40 text-(--text)" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--border-hover)"}`}
+									>
+										{t("booking.payAtShop")}
+									</button>
+									<button
+										type="button"
+										onClick={() => setPaymentMethod("online")}
+										className={`py-2.5 px-3 text-sm rounded-lg font-medium transition-all duration-200 border cursor-pointer ${paymentMethod === "online" ? "bg-(--gold)/5 border-(--gold)/40 text-(--text)" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--border-hover)"}`}
+									>
+										{t("booking.payOnline")}
+									</button>
+								</div>
+							</div>
 						</div>
 					)}
 				</div>

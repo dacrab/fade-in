@@ -1,24 +1,40 @@
-import { format, formatDistanceToNow, type Locale, parseISO } from "date-fns"
+import { format, formatDistanceToNow, isValid, type Locale, parseISO } from "date-fns"
 import { el, enUS } from "date-fns/locale"
 
 export type DateLocale = "en" | "el"
 
 const DATE_LOCALES: Record<DateLocale, Locale> = { en: enUS, el }
+const INTL_LOCALES: Record<DateLocale, string> = { en: "en-IE", el: "el-GR" }
 
-export function formatPrice(cents: number): string {
-	return `€${(cents / 100).toFixed(2)}`
+const PRICE_FORMATTERS: Record<DateLocale, Intl.NumberFormat> = {
+	en: new Intl.NumberFormat(INTL_LOCALES.en, { style: "currency", currency: "EUR" }),
+	el: new Intl.NumberFormat(INTL_LOCALES.el, { style: "currency", currency: "EUR" }),
+}
+
+export function formatPrice(cents: number, locale: DateLocale = "en"): string {
+	if (!Number.isFinite(cents)) return "—"
+	return PRICE_FORMATTERS[locale].format(cents / 100)
+}
+
+function parseDate(dateStr: string): Date | null {
+	const parsed = parseISO(dateStr)
+	return isValid(parsed) ? parsed : null
 }
 
 export function formatDate(dateStr: string, locale: DateLocale = "en"): string {
-	return format(parseISO(dateStr), "EEEE, d MMMM yyyy", { locale: DATE_LOCALES[locale] })
+	const parsed = parseDate(dateStr)
+	return parsed ? format(parsed, "EEEE, d MMMM yyyy", { locale: DATE_LOCALES[locale] }) : "—"
 }
 
 export function formatDateShort(dateStr: string, locale: DateLocale = "en"): string {
-	return format(parseISO(dateStr), "d MMM yyyy", { locale: DATE_LOCALES[locale] })
+	const parsed = parseDate(dateStr)
+	return parsed ? format(parsed, "d MMM yyyy", { locale: DATE_LOCALES[locale] }) : "—"
 }
 
 export function formatRelative(timestamp: number, locale: DateLocale = "en"): string {
-	return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: DATE_LOCALES[locale] })
+	const date = new Date(timestamp)
+	if (!isValid(date)) return "—"
+	return formatDistanceToNow(date, { addSuffix: true, locale: DATE_LOCALES[locale] })
 }
 
 function toIsoDate(d: Date): string {
@@ -34,5 +50,3 @@ export function nextDayIso(): string {
 	d.setDate(d.getDate() + 1)
 	return toIsoDate(d)
 }
-
-export { slugify } from "./slugify"

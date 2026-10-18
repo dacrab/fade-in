@@ -20,7 +20,7 @@ export function SkeletonRows({ count, className }: { count: number; className?: 
 export function ShopCardSkeleton() {
 	return (
 		<div className="bg-(--bg-card) rounded-2xl border border-(--border) shadow-sm overflow-hidden">
-			<div className={cn(SKELETON, "h-48 w-full")} />
+			<div className={cn(SKELETON, "h-44 w-full")} />
 			<div className="p-5 space-y-3">
 				<div className={cn(SKELETON, "h-5 w-3/4")} />
 				<div className={cn(SKELETON, "h-4 w-1/2")} />

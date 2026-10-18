@@ -1,7 +1,7 @@
 import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { requireUser } from "./lib/auth"
+import { requireOwner, requireUser } from "./lib/auth"
 
 export const listByShop = query({
 	args: {
@@ -31,7 +31,8 @@ export const create = mutation({
 		if (!appt) throw new ConvexError("Appointment not found")
 		if (appt.customerId !== userId) throw new ConvexError("Not your appointment")
 		if (appt.status !== "completed") throw new ConvexError("Can only review completed appointments")
-		if (args.rating < 1 || args.rating > 5) throw new ConvexError("Rating must be 1-5")
+		if (!Number.isInteger(args.rating) || args.rating < 1 || args.rating > 5)
+			throw new ConvexError("Rating must be an integer from 1 to 5")
 		if (args.comment.trim().length === 0) throw new ConvexError("Comment cannot be empty")
 
 		const existing = await ctx.db
@@ -72,6 +73,8 @@ export const hasReview = query({
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
 		const appt = await ctx.db.get(args.appointmentId)
+		// Fail closed: a missing or foreign appointment reports "already reviewed"
+		// so the UI never offers to review someone else's booking.
 		if (!appt || appt.customerId !== user._id) return true
 
 		const existing = await ctx.db
@@ -88,16 +91,12 @@ export const addOwnerReply = mutation({
 		ownerReply: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
-		const userId = user._id
-
 		if (args.ownerReply.trim().length === 0) throw new ConvexError("Reply cannot be empty")
 
 		const review = await ctx.db.get(args.id)
 		if (!review) throw new ConvexError("Not found")
 
-		const shop = await ctx.db.get(review.barbershopId)
-		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+		await requireOwner(ctx, review.barbershopId)
 
 		return ctx.db.patch(args.id, { ownerReply: args.ownerReply.trim() })
 	},

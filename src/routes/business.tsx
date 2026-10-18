@@ -18,7 +18,7 @@ const NAV_LINK_DEFS = [
 function BusinessLayout() {
 	const { t } = useTranslation()
 	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
-	const shop = useOwnerShop(user?.id)
+	const { shop } = useOwnerShop(Boolean(user))
 
 	return (
 		<div className="flex flex-1">

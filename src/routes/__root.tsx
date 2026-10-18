@@ -27,7 +27,7 @@ export const Route = createRootRoute({
 				content:
 					"Discover and book top barbershops near you. FadeIn is the modern platform for premium grooming experiences.",
 			},
-			{ name: "theme-color", content: "var(--gold)" },
+			{ name: "theme-color", content: "#C84B31" },
 			{ name: "mobile-web-app-capable", content: "yes" },
 			{ name: "apple-mobile-web-app-capable", content: "yes" },
 			{ name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -44,7 +44,7 @@ export const Route = createRootRoute({
 			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
 			{ rel: "stylesheet", href: appCss },
 			{ rel: "manifest", href: "/manifest.json" },
-			{ rel: "apple-touch-icon", href: "/favicon.svg" },
+			{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
 		],
 	}),
 	component: RootDocument,
@@ -81,13 +81,8 @@ function RouteError(_props: ErrorComponentProps) {
 	)
 }
 
-function SentryErrorFallback() {
-	const { t } = useTranslation()
-	return <div>{t("errors.errorTitle")}</div>
-}
-
 function RootDocument() {
-	const { i18n } = useTranslation()
+	const { i18n, t } = useTranslation()
 	return (
 		<html lang={i18n.language === "el" ? "el" : "en"}>
 			<head>
@@ -97,7 +92,7 @@ function RootDocument() {
 				<ConvexProvider>
 					<Header />
 					<div className="flex-1">
-						<Sentry.ErrorBoundary fallback={<SentryErrorFallback />}>
+						<Sentry.ErrorBoundary fallback={<p className="p-8 text-center">{t("errors.errorTitle")}</p>}>
 							<Outlet />
 						</Sentry.ErrorBoundary>
 					</div>
@@ -105,12 +100,6 @@ function RootDocument() {
 					<ToastContainer />
 				</ConvexProvider>
 				<Scripts />
-				<script
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: SW registration inline script
-					dangerouslySetInnerHTML={{
-						__html: `if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js')); }`,
-					}}
-				/>
 			</body>
 		</html>
 	)

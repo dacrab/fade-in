@@ -64,7 +64,7 @@ function ShopProfilePage() {
 		return (
 			<main className="flex-1 flex items-center justify-center px-4">
 				<div className="text-center">
-					<div className="w-20 h-20 rounded-full bg-[var(--gold)/8] flex items-center justify-center mx-auto mb-6">
+					<div className="w-20 h-20 rounded-full bg-(--gold)/8 flex items-center justify-center mx-auto mb-6">
 						<Scissors size={32} className="text-(--gold)/40" />
 					</div>
 					<h1 className="page-title mb-2">{t("shop.notFound")}</h1>
@@ -195,9 +195,9 @@ function ShopProfilePage() {
 									{barbers.map((b: Barber) => (
 										<div
 											key={b._id}
-											className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-(--bg-card) border border-[(--gold)/10] min-w-30 flex-shrink-0 hover:border-(--gold)/30 transition-all duration-300"
+											className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-(--bg-card) border border-(--gold)/10 min-w-30 flex-shrink-0 hover:border-(--gold)/30 transition-all duration-300"
 										>
-											<div className="w-14 h-14 rounded-full overflow-hidden bg-[var(--gold)/8] flex items-center justify-center ring-2 ring-[(--gold)/15]">
+											<div className="w-14 h-14 rounded-full overflow-hidden bg-(--gold)/8 flex items-center justify-center ring-2 ring-(--gold)/15">
 												{b.avatarUrl ? (
 													<img src={b.avatarUrl} alt={b.name} className="w-full h-full object-cover" />
 												) : (
@@ -262,14 +262,14 @@ function ShopProfilePage() {
 								<button
 									type="button"
 									onClick={() => setBookingOpen(true)}
-									className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-(--gold) text-white font-medium text-sm hover:bg-(--gold-dark) transition-all duration-300 shadow-[0_4px_16px_var(--gold)/25] hover:shadow-[0_6px_24px_var(--gold)/35]"
+									className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-(--gold) text-white font-medium text-sm hover:bg-(--gold-dark) transition-all duration-300 shadow-[0_4px_16px_--alpha(var(--gold)/25%)] hover:shadow-[0_6px_24px_--alpha(var(--gold)/35%)]"
 								>
 									<Calendar size={16} /> {t("common.bookNow")}
 								</button>
 							</div>
 
 							{shop.workingHours && (
-								<div className="rounded-2xl bg-(--bg-card) border border-[(--gold)/8] p-6 mb-5">
+								<div className="rounded-2xl bg-(--bg-card) border border-(--gold)/8 p-6 mb-5">
 									<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2 text-sm">
 										<Clock size={14} className="text-(--gold)" /> {t("shop.hours")}
 									</h3>
@@ -291,7 +291,7 @@ function ShopProfilePage() {
 								</div>
 							)}
 
-							<div className="rounded-2xl bg-(--bg-card) border border-[(--gold)/8] p-5">
+							<div className="rounded-2xl bg-(--bg-card) border border-(--gold)/8 p-5">
 								<div className="flex items-center gap-2 mb-3">
 									<Share2 size={13} className="text-(--text-subtle)" />
 									<span className="text-xs font-medium text-(--text-muted)">{t("shop.shareTitle")}</span>
@@ -305,7 +305,7 @@ function ShopProfilePage() {
 									<button
 										type="button"
 										onClick={() => void handleCopyLink()}
-										className="flex-shrink-0 w-8 h-8 rounded-full bg-[(--gold)/8] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:bg-[(--gold)/15] transition-all"
+										className="flex-shrink-0 w-8 h-8 rounded-full bg-(--gold)/8 flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:bg-(--gold)/15 transition-all"
 										title={t("shop.copyLink")}
 									>
 										<Copy size={13} />
@@ -340,7 +340,7 @@ function ShopProfilePage() {
 												href={url}
 												target="_blank"
 												rel="noreferrer"
-												className="w-9 h-9 rounded-full bg-(--bg-card) border border-[(--gold)/10] flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
+												className="w-9 h-9 rounded-full bg-(--bg-card) border border-(--gold)/10 flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
 											>
 												<Icon size={15} />
 											</a>

@@ -217,19 +217,19 @@ function RegisterPage() {
 
 					<p className="mt-5 text-xs text-center text-(--text-subtle)">
 						{t("auth.agreeTerms")}{" "}
-						<a
-							href="/terms"
+						<Link
+							to="/terms"
 							className="text-(--gold)/70 hover:text-(--gold) hover:underline no-underline"
 						>
 							{t("auth.terms")}
-						</a>
+						</Link>
 						{t("form.andSeparator")}
-						<a
-							href="/privacy"
+						<Link
+							to="/privacy"
 							className="text-(--gold)/70 hover:text-(--gold) hover:underline no-underline"
 						>
 							{t("auth.privacy")}
-						</a>
+						</Link>
 					</p>
 
 					<p className="mt-4 text-center muted-sm">

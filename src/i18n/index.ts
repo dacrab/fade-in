@@ -12,8 +12,8 @@ export type Language = keyof typeof LANGUAGES
 
 const STORAGE_KEY = "fadein_lang"
 
-function isLanguage(val: string | null): val is Language {
-	return val !== null && Object.keys(LANGUAGES).includes(val)
+export function isLanguage(val: string | null | undefined): val is Language {
+	return val != null && Object.hasOwn(LANGUAGES, val)
 }
 
 function getInitialLanguage(): Language {
@@ -22,7 +22,9 @@ function getInitialLanguage(): Language {
 		if (isLanguage(stored)) return stored
 		const browser = navigator.language.split("-")[0]
 		if (isLanguage(browser)) return browser
-	} catch {}
+	} catch {
+		// No storage/locale access (e.g. SSR) — fall through to English.
+	}
 	return "en"
 }
 
@@ -42,7 +44,7 @@ export function setLanguage(lang: Language): void {
 	void i18n.changeLanguage(lang)
 	try {
 		localStorage.setItem(STORAGE_KEY, lang)
-	} catch {}
+	} catch {
+		// Storage may be unavailable (private mode); language still applies in-memory.
+	}
 }
-
-export default i18n

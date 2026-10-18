@@ -1,6 +1,7 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog"
 import { X } from "lucide-react"
 import type { ReactNode } from "react"
+import { useTranslation } from "react-i18next"
 import { cn } from "#/lib/cn"
 
 export const Dialog = BaseDialog.Root
@@ -34,11 +35,13 @@ export function DialogHeader({
 	children?: ReactNode
 	onClose?: () => void
 }) {
+	const { t } = useTranslation()
 	return (
 		<div className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
 			<div className="space-y-1 flex-1">{children}</div>
 			{onClose && (
 				<BaseDialog.Close
+					aria-label={t("common.close")}
 					className="rounded-lg p-1.5 text-(--text-subtle) hover:text-(--text-muted) hover:bg-(--bg-input) transition-colors border-0 bg-transparent cursor-pointer"
 					onClick={onClose}
 				>

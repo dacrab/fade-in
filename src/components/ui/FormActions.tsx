@@ -6,14 +6,25 @@ interface FormActionsProps {
 	submitLabel: string
 	onCancel: () => void
 	className?: string
+	/** Disables the submit button while a save is in flight. */
+	saving?: boolean
 }
 
 /** Submit + cancel footer shared by the business CRUD forms. */
-export function FormActions({ submitLabel, onCancel, className = "flex gap-3" }: FormActionsProps) {
+export function FormActions({
+	submitLabel,
+	onCancel,
+	className = "flex gap-3",
+	saving = false,
+}: FormActionsProps) {
 	const { t } = useTranslation()
 	return (
 		<div className={className}>
-			<button type="submit" className="btn btn-primary btn-sm">
+			<button
+				type="submit"
+				disabled={saving}
+				className="btn btn-primary btn-sm disabled:opacity-60 disabled:cursor-not-allowed"
+			>
 				<Check size={13} />
 				{submitLabel}
 			</button>

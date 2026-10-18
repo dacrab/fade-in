@@ -34,7 +34,7 @@ Built with [TanStack Start](https://tanstack.com/start) (React 19 SSR), [Convex]
 
 ## Getting Started
 
-You'll need [Bun](https://bun.sh) 1.3+ and a [Convex account](https://dashboard.convex.dev).
+You'll need [Bun](https://bun.sh) 1.4.2+ and a [Convex account](https://dashboard.convex.dev).
 
 ```bash
 bun install
@@ -54,9 +54,31 @@ bun run build        # production build
 bun run lint         # biome check (lint + format)
 bun run lint:fix     # biome check --write
 bun run typecheck    # tsc --noEmit
+bun run knip         # find unused files, deps, and exports
 bun run test         # vitest suite (slots, formatting, i18n parity)
-bun run validate     # lint + typecheck + test + build
+bun run validate     # lint + typecheck + knip + test + build
 ```
+
+## Deployment
+
+Frontend deploys on [Vercel](https://vercel.com); the backend deploys to a Convex production deployment. Secrets live in Doppler (`fade-in` project, `prd_app` config).
+
+**Convex production environment.** Set these on the production deployment (`bunx convex env set NAME 'value' --prod`, or the dashboard):
+
+| Variable | Purpose |
+| --- | --- |
+| `CLERK_JWT_ISSUER_DOMAIN` | Clerk JWT issuer; auth fails to load without it |
+| `PUBLIC_SITE_URL` | Public app URL, used for payment redirects |
+| `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET` | Polar checkout + webhook signature |
+| `RESEND_API_KEY`, `RESEND_FROM` | Transactional email (optional — skipped when unset) |
+
+**Deploy the backend:**
+
+```bash
+doppler run --config prd_app -- bunx convex deploy
+```
+
+**Vercel** builds with `doppler run -- bun run build`; set `VITE_CONVEX_URL` to the production deployment. Register the Polar webhook at `<convex-site-url>/polar-webhook` with the same `POLAR_WEBHOOK_SECRET`.
 
 ## License
 

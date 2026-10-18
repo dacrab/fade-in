@@ -16,14 +16,15 @@ interface BarberForm {
 	name: string
 	bio: string
 	specializations: string
+	accountEmail: string
 }
-const EMPTY: BarberForm = { name: "", bio: "", specializations: "" }
+const EMPTY: BarberForm = { name: "", bio: "", specializations: "", accountEmail: "" }
 
 function BusinessBarbers() {
 	const { t } = useTranslation()
 	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 
-	const shop = useOwnerShop(user?.id)
+	const { shop } = useOwnerShop(Boolean(user))
 	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip")
 
 	const createBarber = useMutation(api.barbers.create)
@@ -41,6 +42,7 @@ function BusinessBarbers() {
 					.split(",")
 					.map((s) => s.trim())
 					.filter(Boolean),
+				accountEmail: form.accountEmail.trim() || undefined,
 			}
 			return editId
 				? updateBarber({ id: editId, ...payload })
@@ -89,6 +91,20 @@ function BusinessBarbers() {
 						/>
 					</div>
 					<div>
+						<label className="field-label" htmlFor="barber-account-email">
+							{t("business.barbers.accountEmailLabel")}
+						</label>
+						<input
+							id="barber-account-email"
+							type="email"
+							className="input w-full text-sm"
+							placeholder={t("business.barbers.accountEmailPlaceholder")}
+							value={crud.form.accountEmail}
+							onChange={(e) => crud.setForm((f) => ({ ...f, accountEmail: e.target.value }))}
+						/>
+						<p className="field-hint">{t("business.barbers.accountEmailHint")}</p>
+					</div>
+					<div>
 						<label className="field-label" htmlFor="barber-bio">
 							{t("form.descriptionLabel")}
 						</label>
@@ -104,6 +120,7 @@ function BusinessBarbers() {
 					<FormActions
 						submitLabel={crud.editId ? t("common.save") : t("business.barbers.addBarber")}
 						onCancel={crud.reset}
+						saving={crud.saving}
 					/>
 				</form>
 			}
@@ -117,7 +134,14 @@ function BusinessBarbers() {
 						{b.name.charAt(0)}
 					</div>
 					<div className="flex-1 min-w-0">
-						<div className="main-sm">{b.name}</div>
+						<div className="main-sm flex items-center gap-2">
+							{b.name}
+							{b.userId && (
+								<span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-(--gold)/10 text-(--gold)">
+									{t("business.barbers.linked")}
+								</span>
+							)}
+						</div>
 						{b.specializations.length > 0 && (
 							<div className="field-hint">{b.specializations.join(", ")}</div>
 						)}
@@ -129,6 +153,7 @@ function BusinessBarbers() {
 								name: b.name,
 								bio: b.bio ?? "",
 								specializations: b.specializations.join(", "),
+								accountEmail: "",
 							})
 						}
 						onDelete={() => void crud.removeRecord(b._id)}

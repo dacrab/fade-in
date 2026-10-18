@@ -1,17 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Calendar, DollarSign, Scissors } from "lucide-react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton, SkeletonRows } from "#/components/ui/Skeleton"
 import { StatCard } from "#/components/ui/StatCard"
 import { useFormatters } from "#/hooks/useFormatters"
 import { BARBER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { todayIso } from "#/lib/format"
-import type { Appointment } from "#/types"
+import type { Appointment, Barbershop } from "#/types"
 import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
-import type { Doc } from "../../../convex/_generated/dataModel"
+import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/barber/overview")({ component: BarberDashboard })
 
@@ -26,6 +26,21 @@ function BarberDashboard() {
 		api.appointments.listByBarber,
 		barber ? { barberId: barber._id } : "skip",
 	)
+
+	// Batch-fetch the shops referenced by appointments (avoids a query per row).
+	const shopIds = useMemo(() => {
+		if (!appointments) return [] as Id<"barbershops">[]
+		return Array.from(new Set<Id<"barbershops">>(appointments.map((a) => a.barbershopId)))
+	}, [appointments])
+	const shopsRaw = useQuery(
+		api.barbershops.listByIds,
+		shopIds.length > 0 ? { ids: shopIds } : "skip",
+	)
+	const shopMap = useMemo(() => {
+		const map = new Map<string, Barbershop>()
+		if (shopsRaw) for (const s of shopsRaw) map.set(s._id, s)
+		return map
+	}, [shopsRaw])
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-xl" />
 
@@ -52,6 +67,7 @@ function BarberDashboard() {
 					<input
 						type="date"
 						className="input w-auto"
+						aria-label={t("barber.schedule")}
 						value={selectedDate}
 						onChange={(e) => setSelectedDate(e.target.value)}
 					/>
@@ -94,7 +110,7 @@ function BarberDashboard() {
 									a.startTime.localeCompare(b.startTime),
 								)
 								.map((appt: Doc<"appointments">) => (
-									<AppointmentRow key={appt._id} appt={appt} />
+									<AppointmentRow key={appt._id} appt={appt} shop={shopMap.get(appt.barbershopId)} />
 								))}
 						</div>
 					)}
@@ -104,10 +120,9 @@ function BarberDashboard() {
 	)
 }
 
-function AppointmentRow({ appt }: { appt: Appointment }) {
+function AppointmentRow({ appt, shop }: { appt: Appointment; shop?: Barbershop }) {
 	const { t } = useTranslation()
 	const f = useFormatters()
-	const shop = useQuery(api.barbershops.getById, { id: appt.barbershopId })
 
 	const statusColor = STATUS_DOT[appt.status]
 

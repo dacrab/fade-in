@@ -3,7 +3,8 @@ import { useMutation, useQuery } from "convex/react"
 import { Calendar, CheckCircle, Clock, Heart, RefreshCw, Star, User, XCircle } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Skeleton, SkeletonRows } from "#/components/ui/Skeleton"
+import { DashSkeleton } from "#/components/ui/DashSkeleton"
+import { SkeletonRows } from "#/components/ui/Skeleton"
 import { StatCard } from "#/components/ui/StatCard"
 import { withToast } from "#/components/ui/Toast"
 import { useFormatters } from "#/hooks/useFormatters"
@@ -32,11 +33,16 @@ function CustomerDashboard() {
 	)
 	const shopMap = useMemo(() => {
 		const map = new Map<string, Barbershop>()
-		if (shopsRaw) for (const s of shopsRaw) if (s) map.set(s._id, s)
+		if (shopsRaw) for (const s of shopsRaw) map.set(s._id, s)
 		return map
 	}, [shopsRaw])
 
-	if (!user) return <DashSkeleton />
+	if (!user)
+		return (
+			<main className="page-main">
+				<DashSkeleton className="page-wrap max-w-3xl py-8" />
+			</main>
+		)
 
 	// Single pass over the appointments list (status-based buckets).
 	const { upcoming, completed, cancelled, past } = (appointments ?? []).reduce(
@@ -162,13 +168,17 @@ function AppointmentRow({
 	const handleSubmitReview = async () => {
 		if (comment.trim().length === 0) return
 		setSubmitting(true)
-		await withToast(
+		const { ok } = await withToast(
 			() => createReview({ appointmentId: appt._id, rating, comment: comment.trim() }),
 			t("dashboard.reviewAdded"),
 			t("errors.reviewFailed"),
 		)
 		setSubmitting(false)
-		setShowForm(false)
+		if (ok) {
+			setShowForm(false)
+			setComment("")
+			setRating(5)
+		}
 	}
 
 	const statusColor = STATUS_DOT[appt.status]
@@ -187,7 +197,7 @@ function AppointmentRow({
 					<button
 						type="button"
 						onClick={() => void handleCancel()}
-						className="text-xs text-(--error) opacity-0 group-hover:opacity-100 transition-opacity"
+						className="text-xs text-(--error) opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity"
 					>
 						{t("common.cancel")}
 					</button>
@@ -196,7 +206,7 @@ function AppointmentRow({
 					<Link
 						to="/barbershops/$slug"
 						params={{ slug: shop.slug }}
-						className="text-xs text-(--gold) hover:underline opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+						className="text-xs text-(--gold) hover:underline opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity flex items-center gap-1"
 					>
 						<RefreshCw size={11} /> {t("dashboard.rebook")}
 					</Link>
@@ -205,7 +215,7 @@ function AppointmentRow({
 					<button
 						type="button"
 						onClick={() => setShowForm(!showForm)}
-						className="text-xs text-(--gold) hover:underline opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+						className="text-xs text-(--gold) hover:underline opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity flex items-center gap-1"
 					>
 						<Star size={11} /> {t("dashboard.leaveReview")}
 					</button>
@@ -220,6 +230,8 @@ function AppointmentRow({
 								type="button"
 								onClick={() => setRating(star)}
 								className="p-0.5 cursor-pointer"
+								aria-label={`${star} / 5`}
+								aria-pressed={star <= rating}
 							>
 								<Star
 									size={16}
@@ -232,6 +244,7 @@ function AppointmentRow({
 						className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-3 py-2 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 resize-none"
 						rows={2}
 						placeholder={t("dashboard.reviewPlaceholder")}
+						aria-label={t("dashboard.reviewPlaceholder")}
 						value={comment}
 						onChange={(e) => setComment(e.target.value)}
 					/>
@@ -251,19 +264,5 @@ function AppointmentRow({
 				</div>
 			)}
 		</div>
-	)
-}
-
-function DashSkeleton() {
-	return (
-		<main className="page-main">
-			<div className="page-wrap max-w-3xl py-8 space-y-4">
-				<Skeleton className="h-8 w-48" />
-				<div className="grid grid-cols-4 gap-3">
-					<SkeletonRows count={4} className="h-16 rounded-xl" />
-				</div>
-				<Skeleton className="h-48 rounded-xl" />
-			</div>
-		</main>
 	)
 }

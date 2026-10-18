@@ -19,7 +19,7 @@ function BusinessReviews() {
 	const { t } = useTranslation()
 	const f = useFormatters()
 
-	const shop = useOwnerShop(user?.id)
+	const { shop } = useOwnerShop(Boolean(user))
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
 		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: PAGE_SIZE } } : "skip",
@@ -67,7 +67,7 @@ function BusinessReviews() {
 										<span className="text-sm font-medium text-(--gold)">{r.rating.toFixed(1)}</span>
 										<span className="subtle-xs">/ 5</span>
 									</div>
-									<span className="text-[11px] text-white/25">{f.formatRelative(r.createdAt)}</span>
+									<span className="text-[11px] text-(--text-subtle)">{f.formatRelative(r.createdAt)}</span>
 								</div>
 								<p className="muted-sm leading-relaxed">{r.comment}</p>
 								{r.ownerReply ? (
@@ -80,6 +80,7 @@ function BusinessReviews() {
 										<input
 											className="flex-1 bg-(--bg-card) border border-(--border) rounded-lg px-3 py-2 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
 											placeholder={t("business.reviews.replyPlaceholder")}
+											aria-label={t("business.reviews.replyPlaceholder")}
 											value={replyText}
 											onChange={(e) => setReplyText(e.target.value)}
 											onKeyDown={(e) => {
