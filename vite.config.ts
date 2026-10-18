@@ -24,6 +24,7 @@ export default defineConfig({
 						project: process.env.SENTRY_PROJECT,
 						authToken: process.env.SENTRY_AUTH_TOKEN,
 						telemetry: false,
+						sourcemaps: { filesToDeleteAfterUpload: ["./dist/**/*.map"] },
 					}),
 				]),
 	],
@@ -34,9 +35,8 @@ export default defineConfig({
 		sourcemap: true,
 	},
 	test: {
-		environment: "jsdom",
+		environment: "node",
 		globals: true,
-		setupFiles: ["./src/test/setup.ts"],
 		include: ["src/**/*.{test,spec}.{ts,tsx}"],
 	},
 })

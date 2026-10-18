@@ -13,7 +13,6 @@ interface CrudListPageProps {
 	loading: boolean
 	empty: boolean
 	emptyText: string
-	loadingRows?: number
 	children: ReactNode
 }
 
@@ -27,7 +26,6 @@ export function CrudListPage({
 	loading,
 	empty,
 	emptyText,
-	loadingRows = 4,
 	children,
 }: CrudListPageProps) {
 	const { t } = useTranslation()
@@ -36,9 +34,7 @@ export function CrudListPage({
 		<div className="px-8 py-8">
 			<div className="max-w-3xl mx-auto px-6 py-8">
 				<div className="flex items-start justify-between mb-5">
-					<div>
-						<h1 className="section-title">{title}</h1>
-					</div>
+					<h1 className="section-title">{title}</h1>
 					<button type="button" onClick={onToggleForm} className="btn btn-primary btn-sm">
 						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
 						{showForm ? t("common.cancel") : addLabel}
@@ -53,7 +49,7 @@ export function CrudListPage({
 				)}
 
 				{loading ? (
-					<SkeletonRows count={loadingRows} className="h-14 rounded-lg" />
+					<SkeletonRows count={4} className="h-14 rounded-lg" />
 				) : empty ? (
 					<p className="empty-text">{emptyText}</p>
 				) : (

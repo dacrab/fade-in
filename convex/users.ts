@@ -13,7 +13,6 @@ export const updateProfile = mutation({
 		id: v.id("users"),
 		name: v.optional(v.string()),
 		phone: v.optional(v.string()),
-		avatarUrl: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
@@ -72,7 +71,9 @@ export const ensureCurrentUser = mutation({
 			role: "customer",
 			avatarUrl: identity.pictureUrl ?? undefined,
 		})
-		return ctx.db.get(newId)
+		const created = await ctx.db.get(newId)
+		if (!created) throw new ConvexError("Failed to create user")
+		return created
 	},
 })
 

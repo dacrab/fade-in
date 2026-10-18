@@ -64,6 +64,7 @@ function ProfilePage() {
 								{t("auth.nameLabel")}
 							</label>
 							<input
+								id="profile-name"
 								className="input"
 								value={form.name}
 								onChange={set("name")}
@@ -75,6 +76,7 @@ function ProfilePage() {
 								{t("form.phoneLabel")}
 							</label>
 							<input
+								id="profile-phone"
 								className="input"
 								value={form.phone}
 								onChange={set("phone")}
@@ -86,7 +88,12 @@ function ProfilePage() {
 							<label className="form-label" htmlFor="profile-email">
 								{t("auth.emailLabel")}
 							</label>
-							<input className="input opacity-50 cursor-not-allowed" value={viewer?.email} disabled />
+							<input
+								id="profile-email"
+								className="input opacity-50 cursor-not-allowed"
+								value={viewer?.email}
+								disabled
+							/>
 							<p className="subtle-xs mt-1">{t("dashboard.emailNote")}</p>
 						</div>
 						<button type="submit" disabled={saving || !viewer} className="btn btn-primary gap-2">

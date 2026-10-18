@@ -1,8 +1,8 @@
 import { Resend } from "resend"
 
-export const DEFAULT_FROM = "FadeIn <noreply@fadein.app>"
+const DEFAULT_FROM = "FadeIn <noreply@fadein.app>"
 
-export function getResend(): Resend | null {
+function getResend(): Resend | null {
 	const key = process.env.RESEND_API_KEY
 	return key ? new Resend(key) : null
 }

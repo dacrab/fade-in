@@ -94,10 +94,10 @@ export default function Header() {
 					<div className="flex items-center gap-3">
 						{user ? (
 							<Menu
-								align="end"
 								trigger={
 									<button
 										type="button"
+										aria-label={user.name ?? user.email}
 										className="flex items-center gap-2 py-1.5 px-1 rounded-full hover:opacity-80 transition-opacity duration-200 cursor-pointer"
 									>
 										<div className="w-8 h-8 rounded-full bg-(--gold) text-white flex items-center justify-center text-xs font-medium">
@@ -124,6 +124,8 @@ export default function Header() {
 						<LanguageToggle />
 						<button
 							type="button"
+							aria-label={t("common.openMenu")}
+							aria-expanded={mobileOpen}
 							className="md:hidden p-2 text-(--text) hover:text-(--gold) transition-colors"
 							onClick={() => setMobileOpen((o) => !o)}
 						>
@@ -155,7 +157,7 @@ export default function Header() {
 										handleLogout()
 										setMobileOpen(false)
 									}}
-									className="text-base font-medium text-(--error) hover:text-(--error) transition-colors py-2 text-left"
+									className="text-base font-medium text-(--error) transition-colors py-2 text-left"
 								>
 									{t("common.signOut")}
 								</button>

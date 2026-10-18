@@ -1,7 +1,7 @@
 import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
-import { getCurrentUser, requireAdmin, requireUser } from "./lib/auth"
+import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
 import { slugify } from "./lib/slug"
 import {
 	assertValidWorkingHours,
@@ -15,13 +15,11 @@ export const list = query({
 		city: v.optional(v.string()),
 		search: v.optional(v.string()),
 		minRating: v.optional(v.number()),
-		isVerified: v.optional(v.boolean()),
 		paginationOpts: paginationOptsValidator,
 	},
 	handler: async (ctx, args) => {
 		const city = args.city
 		const minRating = args.minRating
-		const isVerified = args.isVerified
 
 		if (args.search) {
 			const term = args.search
@@ -32,9 +30,6 @@ export const list = query({
 			})
 			if (minRating !== undefined) {
 				searchQuery = searchQuery.filter((q) => q.gte(q.field("rating"), minRating))
-			}
-			if (isVerified !== undefined) {
-				searchQuery = searchQuery.filter((q) => q.eq(q.field("isVerified"), isVerified))
 			}
 			return searchQuery.paginate(args.paginationOpts)
 		}
@@ -54,9 +49,6 @@ export const list = query({
 		if (minRating !== undefined) {
 			baseQuery = baseQuery.filter((q) => q.gte(q.field("rating"), minRating))
 		}
-		if (isVerified !== undefined) {
-			baseQuery = baseQuery.filter((q) => q.eq(q.field("isVerified"), isVerified))
-		}
 
 		return baseQuery.paginate(args.paginationOpts)
 	},
@@ -65,7 +57,7 @@ export const list = query({
 export const getFeatured = query({
 	args: { limit: v.optional(v.number()) },
 	handler: async (ctx, args) => {
-		const limit = args.limit ?? 6
+		const limit = Math.min(Math.max(Math.floor(args.limit ?? 6), 1), 50)
 		const shops = await ctx.db
 			.query("barbershops")
 			.withIndex("by_active", (q) => q.eq("isActive", true))
@@ -92,11 +84,10 @@ export const getById = query({
 })
 
 export const listByOwner = query({
-	args: { ownerId: v.optional(v.id("users")) },
-	handler: async (ctx, args) => {
+	args: {},
+	handler: async (ctx) => {
 		const user = await getCurrentUser(ctx)
 		if (!user) return []
-		if (args.ownerId !== undefined && args.ownerId !== user._id) return []
 		return ctx.db
 			.query("barbershops")
 			.withIndex("by_owner", (q) => q.eq("ownerId", user._id))
@@ -166,19 +157,50 @@ export const update = mutation({
 		images: v.optional(v.array(v.string())),
 		workingHours: workingHoursValidator,
 		socialLinks: socialLinksValidator,
-		isActive: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		const user = await requireUser(ctx)
-		const userId = user._id
-
 		assertValidWorkingHours(args.workingHours)
 
-		const shop = await ctx.db.get(args.id)
-		if (!shop || shop.ownerId !== userId) throw new ConvexError("Not authorized")
+		// Suspension is admin-only (`suspend`), so owners cannot flip `isActive`.
+		await requireOwner(ctx, args.id)
 
 		const { id, ...fields } = args
 		return ctx.db.patch(id, definedPatch(fields))
+	},
+})
+
+export const generateUploadUrl = mutation({
+	args: {},
+	handler: async (ctx) => {
+		await requireUser(ctx)
+		return ctx.storage.generateUploadUrl()
+	},
+})
+
+export const addImage = mutation({
+	args: { id: v.id("barbershops"), storageId: v.id("_storage") },
+	handler: async (ctx, args) => {
+		await requireOwner(ctx, args.id)
+
+		const url = await ctx.storage.getUrl(args.storageId)
+		if (!url) throw new ConvexError("Upload not found")
+
+		const shop = await ctx.db.get(args.id)
+		if (!shop) throw new ConvexError("Not found")
+
+		await ctx.db.patch(args.id, { images: [...shop.images, url] })
+	},
+})
+
+export const removeImage = mutation({
+	args: { id: v.id("barbershops"), url: v.string() },
+	handler: async (ctx, args) => {
+		await requireOwner(ctx, args.id)
+
+		const shop = await ctx.db.get(args.id)
+		if (!shop) throw new ConvexError("Not found")
+
+		await ctx.db.patch(args.id, { images: shop.images.filter((u) => u !== args.url) })
 	},
 })
 
@@ -202,7 +224,7 @@ export const listByIds = query({
 	args: { ids: v.array(v.id("barbershops")) },
 	handler: async (ctx, args) => {
 		const shops = await Promise.all(args.ids.map((id) => ctx.db.get(id)))
-		return shops.filter((s) => s?.isActive === true)
+		return shops.flatMap((s) => (s?.isActive ? [s] : []))
 	},
 })
 

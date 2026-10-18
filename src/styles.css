@@ -209,28 +209,6 @@ body {
 
 .page-main { padding: 2rem 1rem; }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-.page-header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--text);
-  margin: 0;
-}
-.breadcrumb-sep { color: var(--text-subtle); }
-.breadcrumb-back {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-.breadcrumb-back:hover { color: var(--text); }
-
 /* ─── Shop Grid & Cards ─────────────────────────────────────────────────── */
 
 .shop-grid {

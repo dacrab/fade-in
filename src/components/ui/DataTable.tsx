@@ -88,6 +88,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 					<input
 						className="input w-full max-w-xs text-sm"
 						placeholder={searchPlaceholder ?? t("common.search")}
+						aria-label={searchPlaceholder ?? t("common.search")}
 						value={globalFilter}
 						onChange={(e) => setGlobalFilter(e.target.value)}
 					/>
@@ -153,6 +154,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 						type="button"
 						onClick={() => table.previousPage()}
 						disabled={!table.getCanPreviousPage()}
+						aria-label={t("common.previousPage")}
 						className="p-1.5 rounded-md hover:bg-(--bg-input) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
 						<ChevronLeft size={14} />
@@ -161,6 +163,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 						type="button"
 						onClick={() => table.nextPage()}
 						disabled={!table.getCanNextPage()}
+						aria-label={t("common.nextPage")}
 						className="p-1.5 rounded-md hover:bg-(--bg-input) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
 						<ChevronRight size={14} />

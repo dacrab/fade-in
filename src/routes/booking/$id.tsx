@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useSearch } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import {
 	AlertCircle,
@@ -35,6 +35,13 @@ export const Route = createFileRoute("/booking/$id")({
 	component: BookingPage,
 })
 
+const STATUS_ICON = {
+	pending: Clock,
+	confirmed: CheckCircle,
+	completed: CheckCircle,
+	cancelled: XCircle,
+} as const
+
 interface RescheduleValues {
 	date: string
 	startTime: string
@@ -50,7 +57,7 @@ function BookingPage() {
 	const { id } = Route.useParams()
 	const parsedId = parseId<"appointments">(id)
 	const { user } = useAuth()
-	const { payment } = useSearch({ from: "/booking/$id" })
+	const { payment } = Route.useSearch()
 
 	// Invalid IDs (e.g. /booking/garbage) skip the query and render not-found
 	// instead of leaving the Convex client erroring forever behind a spinner.
@@ -89,7 +96,7 @@ function BookingPage() {
 		)
 		setRescheduling(false)
 		// Only clear the form on success so users can retry after a conflict.
-		if (result !== undefined) {
+		if (result.ok) {
 			setShowReschedule(false)
 			setRescheduleValues(EMPTY_RESCHEDULE)
 		}
@@ -112,6 +119,12 @@ function BookingPage() {
 
 	const selectedServices =
 		appt && services ? services.filter((s: Doc<"services">) => appt.serviceIds.includes(s._id)) : []
+
+	const StatusIcon = appt ? STATUS_ICON[appt.status] : Clock
+
+	const isCustomer = appt?.customerId === user?.id
+	const isShopOwner = isOwnerOrAdmin(user) && shop?.ownerId === user?.id
+	const canReschedule = isCustomer || isShopOwner
 
 	return (
 		<main className="page-main">
@@ -170,10 +183,7 @@ function BookingPage() {
 									<span
 										className={`badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${STATUS_BADGE[appt.status]}`}
 									>
-										{appt.status === "confirmed" && <CheckCircle size={11} />}
-										{appt.status === "completed" && <CheckCircle size={11} />}
-										{appt.status === "cancelled" && <XCircle size={11} />}
-										{appt.status === "pending" && <Clock size={11} />}
+										<StatusIcon size={11} />
 										{t(`status.${appt.status}`)}
 									</span>
 									{appt.paymentStatus && (
@@ -261,26 +271,7 @@ function BookingPage() {
 
 							{(appt.status === "pending" || appt.status === "confirmed") && (
 								<div className="px-6 py-4 border-t border-(--border) bg-(--bg-input)/30 flex items-center gap-3">
-									{appt.customerId === user?.id && (
-										<>
-											<button
-												type="button"
-												onClick={() => setShowReschedule(!showReschedule)}
-												className="btn btn-secondary btn-sm"
-											>
-												<RefreshCw size={13} />
-												{t("booking.reschedule")}
-											</button>
-											<button
-												type="button"
-												onClick={() => void handleCancel()}
-												className="px-4 py-2 rounded-full border border-(--error)/20 text-xs text-(--error) hover:bg-(--error)/5 transition-colors"
-											>
-												{t("business.appointments.cancel")}
-											</button>
-										</>
-									)}
-									{isOwnerOrAdmin(user) && shop?.ownerId === user?.id && (
+									{canReschedule && (
 										<button
 											type="button"
 											onClick={() => setShowReschedule(!showReschedule)}
@@ -288,6 +279,15 @@ function BookingPage() {
 										>
 											<RefreshCw size={13} />
 											{t("booking.reschedule")}
+										</button>
+									)}
+									{isCustomer && (
+										<button
+											type="button"
+											onClick={() => void handleCancel()}
+											className="px-4 py-2 rounded-full border border-(--error)/20 text-xs text-(--error) hover:bg-(--error)/5 transition-colors"
+										>
+											{t("business.appointments.cancel")}
 										</button>
 									)}
 								</div>
@@ -300,7 +300,6 @@ function BookingPage() {
 								<form
 									onSubmit={(e) => {
 										e.preventDefault()
-										e.stopPropagation()
 										void handleReschedule()
 									}}
 									className="space-y-4"

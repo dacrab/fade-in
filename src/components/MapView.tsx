@@ -114,12 +114,12 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	}, [ready, shopsWithCoords, onShopClick, t])
 
 	return (
-		<div className="relative rounded-2xl overflow-hidden border border-white/6 h-125">
+		<div className="relative rounded-2xl overflow-hidden border border-(--border) h-125">
 			<div ref={mapContainerRef} className="w-full h-full" />
 			{shopsWithCoords.length === 0 && (
 				<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
 					<MapPin size={28} className="mb-2 text-(--text-subtle) opacity-40" />
-					<p className="text-sm font-medium text-white/70">{t("map.noLocations")}</p>
+					<p className="text-sm font-medium text-(--text-muted)">{t("map.noLocations")}</p>
 					<p className="text-xs mt-1 text-(--text-subtle)">{t("map.noLocationsHint")}</p>
 				</div>
 			)}

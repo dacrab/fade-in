@@ -1,11 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useQuery } from "convex/react"
 import type { FunctionReference } from "convex/server"
 import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { DataTable, type features } from "#/components/ui/DataTable"
-import { ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice } from "#/lib/format"
 import { isAppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -20,7 +19,6 @@ export const Route = createFileRoute("/admin/appointments")({ component: AdminAp
 
 function AdminAppointments() {
 	const { t } = useTranslation()
-	useRequireRole(ADMIN_ROLES)
 
 	const data = useQuery(api.appointments.listAllWithDetails)
 
@@ -109,15 +107,7 @@ function AdminAppointments() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-6xl">
-				<div className="page-head">
-					<div className="page-header">
-						<Link to="/admin/overview" className="breadcrumb-back">
-							← {t("nav.admin")}
-						</Link>
-						<span className="breadcrumb-sep">/</span>
-						<h1>{t("admin.appointments.title")}</h1>
-					</div>
-				</div>
+				<h1 className="page-title mb-6">{t("admin.appointments.title")}</h1>
 
 				{!data ? (
 					<DataTable columns={columns} data={[]} loading loadingRows={6} />

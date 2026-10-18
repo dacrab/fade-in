@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BusinessRouteImport } from './routes/business'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin/appointments'
 import { Route as AdminOverviewRouteImport } from './routes/admin/overview'
 import { Route as AdminShopsRouteImport } from './routes/admin/shops'
@@ -19,6 +21,7 @@ import { Route as BarberOverviewRouteImport } from './routes/barber/overview'
 import { Route as BarbershopsSlugRouteImport } from './routes/barbershops/$slug'
 import { Route as BarbershopsListingRouteImport } from './routes/barbershops/listing'
 import { Route as BookingIdRouteImport } from './routes/booking/$id'
+import { Route as BusinessIndexRouteImport } from './routes/business/index'
 import { Route as BusinessAppointmentsRouteImport } from './routes/business/appointments'
 import { Route as BusinessBarbersRouteImport } from './routes/business/barbers'
 import { Route as BusinessOverviewRouteImport } from './routes/business/overview'
@@ -40,30 +43,40 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BusinessRoute = BusinessRouteImport.update({
   id: '/business',
   path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
-  id: '/admin/appointments',
-  path: '/admin/appointments',
-  getParentRoute: () => rootRouteImport,
+  id: '/appointments',
+  path: '/appointments',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminOverviewRoute = AdminOverviewRouteImport.update({
-  id: '/admin/overview',
-  path: '/admin/overview',
-  getParentRoute: () => rootRouteImport,
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminShopsRoute = AdminShopsRouteImport.update({
-  id: '/admin/shops',
-  path: '/admin/shops',
-  getParentRoute: () => rootRouteImport,
+  id: '/shops',
+  path: '/shops',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
 } as any)
 const BarberOverviewRoute = BarberOverviewRouteImport.update({
   id: '/barber/overview',
@@ -84,6 +97,11 @@ const BookingIdRoute = BookingIdRouteImport.update({
   id: '/booking/$id',
   path: '/booking/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessIndexRoute = BusinessIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BusinessRoute,
 } as any)
 const BusinessAppointmentsRoute = BusinessAppointmentsRouteImport.update({
   id: '/appointments',
@@ -163,6 +181,7 @@ const TermsIndexRoute = TermsIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/business': typeof BusinessRouteWithChildren
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/overview': typeof AdminOverviewRoute
@@ -181,6 +200,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/admin/': typeof AdminIndexRoute
+  '/business/': typeof BusinessIndexRoute
   '/for-business/': typeof ForBusinessIndexRoute
   '/login/': typeof LoginIndexRoute
   '/privacy/': typeof PrivacyIndexRoute
@@ -190,7 +211,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/business': typeof BusinessRouteWithChildren
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/shops': typeof AdminShopsRoute
@@ -208,6 +228,8 @@ export interface FileRoutesByTo {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/admin': typeof AdminIndexRoute
+  '/business': typeof BusinessIndexRoute
   '/for-business': typeof ForBusinessIndexRoute
   '/login': typeof LoginIndexRoute
   '/privacy': typeof PrivacyIndexRoute
@@ -218,6 +240,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/business': typeof BusinessRouteWithChildren
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/overview': typeof AdminOverviewRoute
@@ -236,6 +259,8 @@ export interface FileRoutesById {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/admin/': typeof AdminIndexRoute
+  '/business/': typeof BusinessIndexRoute
   '/for-business/': typeof ForBusinessIndexRoute
   '/login/': typeof LoginIndexRoute
   '/privacy/': typeof PrivacyIndexRoute
@@ -247,6 +272,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/business'
     | '/admin/appointments'
     | '/admin/overview'
@@ -265,6 +291,8 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/overview'
     | '/dashboard/profile'
+    | '/admin/'
+    | '/business/'
     | '/for-business/'
     | '/login/'
     | '/privacy/'
@@ -274,7 +302,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/business'
     | '/admin/appointments'
     | '/admin/overview'
     | '/admin/shops'
@@ -292,6 +319,8 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/overview'
     | '/dashboard/profile'
+    | '/admin'
+    | '/business'
     | '/for-business'
     | '/login'
     | '/privacy'
@@ -301,6 +330,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/business'
     | '/admin/appointments'
     | '/admin/overview'
@@ -319,6 +349,8 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/overview'
     | '/dashboard/profile'
+    | '/admin/'
+    | '/business/'
     | '/for-business/'
     | '/login/'
     | '/privacy/'
@@ -329,11 +361,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BusinessRoute: typeof BusinessRouteWithChildren
-  AdminAppointmentsRoute: typeof AdminAppointmentsRoute
-  AdminOverviewRoute: typeof AdminOverviewRoute
-  AdminShopsRoute: typeof AdminShopsRoute
-  AdminUsersRoute: typeof AdminUsersRoute
   BarberOverviewRoute: typeof BarberOverviewRoute
   BarbershopsSlugRoute: typeof BarbershopsSlugRoute
   BarbershopsListingRoute: typeof BarbershopsListingRoute
@@ -358,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/business': {
       id: '/business'
       path: '/business'
@@ -365,33 +401,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/appointments': {
       id: '/admin/appointments'
-      path: '/admin/appointments'
+      path: '/appointments'
       fullPath: '/admin/appointments'
       preLoaderRoute: typeof AdminAppointmentsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/overview': {
       id: '/admin/overview'
-      path: '/admin/overview'
+      path: '/overview'
       fullPath: '/admin/overview'
       preLoaderRoute: typeof AdminOverviewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/shops': {
       id: '/admin/shops'
-      path: '/admin/shops'
+      path: '/shops'
       fullPath: '/admin/shops'
       preLoaderRoute: typeof AdminShopsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/users': {
       id: '/admin/users'
-      path: '/admin/users'
+      path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/barber/overview': {
       id: '/barber/overview'
@@ -420,6 +463,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/booking/$id'
       preLoaderRoute: typeof BookingIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/business/': {
+      id: '/business/'
+      path: '/'
+      fullPath: '/business/'
+      preLoaderRoute: typeof BusinessIndexRouteImport
+      parentRoute: typeof BusinessRoute
     }
     '/business/appointments': {
       id: '/business/appointments'
@@ -529,6 +579,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminAppointmentsRoute: typeof AdminAppointmentsRoute
+  AdminOverviewRoute: typeof AdminOverviewRoute
+  AdminShopsRoute: typeof AdminShopsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAppointmentsRoute: AdminAppointmentsRoute,
+  AdminOverviewRoute: AdminOverviewRoute,
+  AdminShopsRoute: AdminShopsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface BusinessRouteChildren {
   BusinessAppointmentsRoute: typeof BusinessAppointmentsRoute
   BusinessBarbersRoute: typeof BusinessBarbersRoute
@@ -536,6 +604,7 @@ interface BusinessRouteChildren {
   BusinessProfileRoute: typeof BusinessProfileRoute
   BusinessReviewsRoute: typeof BusinessReviewsRoute
   BusinessServicesRoute: typeof BusinessServicesRoute
+  BusinessIndexRoute: typeof BusinessIndexRoute
 }
 
 const BusinessRouteChildren: BusinessRouteChildren = {
@@ -545,6 +614,7 @@ const BusinessRouteChildren: BusinessRouteChildren = {
   BusinessProfileRoute: BusinessProfileRoute,
   BusinessReviewsRoute: BusinessReviewsRoute,
   BusinessServicesRoute: BusinessServicesRoute,
+  BusinessIndexRoute: BusinessIndexRoute,
 }
 
 const BusinessRouteWithChildren = BusinessRoute._addFileChildren(
@@ -553,11 +623,8 @@ const BusinessRouteWithChildren = BusinessRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   BusinessRoute: BusinessRouteWithChildren,
-  AdminAppointmentsRoute: AdminAppointmentsRoute,
-  AdminOverviewRoute: AdminOverviewRoute,
-  AdminShopsRoute: AdminShopsRoute,
-  AdminUsersRoute: AdminUsersRoute,
   BarberOverviewRoute: BarberOverviewRoute,
   BarbershopsSlugRoute: BarbershopsSlugRoute,
   BarbershopsListingRoute: BarbershopsListingRoute,

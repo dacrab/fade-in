@@ -1,23 +1,7 @@
 {
 	"$schema": "https://unpkg.com/knip@6/schema.json",
-	"entry": [
-		"src/routes/**/*.{ts,tsx}",
-		"src/sentry.client.ts",
-		"src/sentry.server.ts",
-		"src/integrations/convex/provider.tsx",
-		"src/i18n/index.ts",
-		"convex/**/*.ts"
-	],
-	"project": [
-		"src/**/*.{ts,tsx}",
-		"src/**/*.css",
-		"convex/**/*.ts"
-	],
-	"ignoreDependencies": [
-		"@tanstack/router-plugin"
-	],
+	"entry": ["src/routes/**/*.{ts,tsx}", "convex/**/*.ts"],
+	"project": ["src/**/*.{ts,tsx}", "src/**/*.css", "convex/**/*.ts"],
 	"ignoreExportsUsedInFile": true,
-	"ignoreBinaries": [
-		"doppler"
-	]
+	"ignoreBinaries": ["doppler"]
 }

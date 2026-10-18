@@ -15,8 +15,8 @@ export default defineSchema({
 		favoriteShopIds: v.optional(v.array(v.id("barbershops"))),
 		emailVerified: v.optional(v.boolean()),
 	})
-		.index("by_email", ["email"])
 		.index("by_clerkId", ["clerkId"])
+		.index("by_email", ["email"])
 		.index("by_role", ["role"]),
 
 	barbershops: defineTable({
@@ -93,6 +93,7 @@ export default defineSchema({
 		.index("by_shop", ["barbershopId"])
 		.index("by_shop_date", ["barbershopId", "date"])
 		.index("by_barber", ["barberId"])
+		.index("by_status", ["status"])
 		.index("by_polar_checkout", ["polarCheckoutId"]),
 
 	reviews: defineTable({

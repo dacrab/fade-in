@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
+import { slugify } from "../../convex/lib/slug"
 import {
 	formatDate,
 	formatDateShort,
 	formatPrice,
 	formatRelative,
 	nextDayIso,
-	slugify,
 	todayIso,
 } from "./format"
 
@@ -16,7 +16,7 @@ describe("formatPrice", () => {
 		[100, "€1.00"],
 		[1500, "€15.00"],
 		[99999, "€999.99"],
-		[123456, "€1234.56"],
+		[123456, "€1,234.56"],
 	])("formats %i cents as %s", (cents, expected) => {
 		expect(formatPrice(cents)).toBe(expected)
 	})
@@ -24,9 +24,14 @@ describe("formatPrice", () => {
 	it.each([0, 1, 50, 200, 99999, 123456])(
 		"formats %i cents with a euro sign and exactly two decimals",
 		(cents) => {
-			expect(formatPrice(cents)).toMatch(/^€\d+\.\d{2}$/)
+			expect(formatPrice(cents)).toMatch(/^€\d{1,3}(,\d{3})*\.\d{2}$/)
 		},
 	)
+
+	it("falls back to a dash for non-finite values", () => {
+		expect(formatPrice(Number.NaN)).toBe("—")
+		expect(formatPrice(Number.POSITIVE_INFINITY)).toBe("—")
+	})
 })
 
 describe("formatDateShort", () => {
@@ -54,6 +59,11 @@ describe("formatDate", () => {
 		["2026-12-31", "Thursday, 31 December 2026"],
 	])("formats %s as %s", (input, expected) => {
 		expect(formatDate(input)).toBe(expected)
+	})
+
+	it("falls back to a dash for malformed input", () => {
+		expect(formatDate("not-a-date")).toBe("—")
+		expect(formatDateShort("2026-13-40")).toBe("—")
 	})
 })
 
@@ -107,5 +117,13 @@ describe("slugify", () => {
 
 	it("handles a single word with no special chars", () => {
 		expect(slugify("Athens")).toBe("athens")
+	})
+
+	it("preserves non-ASCII letters, accent-stripped (Greek shop names)", () => {
+		expect(slugify("Κουρείο Νίκου")).toBe("κουρειο-νικου")
+	})
+
+	it("strips combining diacritics from latin text", () => {
+		expect(slugify("Café Déjà")).toBe("cafe-deja")
 	})
 })

@@ -45,7 +45,7 @@ const DAY_NAMES = [
 	"sunday",
 ] as const
 
-export type DayName = (typeof DAY_NAMES)[number]
+type DayName = (typeof DAY_NAMES)[number]
 
 /** Weekday name ("monday".."sunday") for a YYYY-MM-DD date, parsed as local time. */
 export function weekdayOf(dateStr: string): DayName {
@@ -55,6 +55,11 @@ export function weekdayOf(dateStr: string): DayName {
 
 function toTime(minutes: number): string {
 	return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`
+}
+
+/** Whether two `HH:mm`-based appointment windows overlap (half-open intervals). */
+export function overlaps(startTime: string, endTime: string, other: ExistingAppt): boolean {
+	return startTime < other.endTime && endTime > other.startTime
 }
 
 export function generateSlots(
@@ -71,7 +76,7 @@ export function generateSlots(
 	) {
 		const end = start + durationMinutes
 		if (end > window.endMinute) break
-		const hasConflict = existing.some((a) => toTime(start) < a.endTime && toTime(end) > a.startTime)
+		const hasConflict = existing.some((a) => overlaps(toTime(start), toTime(end), a))
 		if (!hasConflict) slots.push(toTime(start))
 	}
 

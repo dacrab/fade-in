@@ -20,7 +20,7 @@ function BusinessAppointments() {
 	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 	const [selectedDate, setSelectedDate] = useState(todayIso())
 
-	const shop = useOwnerShop(user?.id)
+	const { shop } = useOwnerShop(Boolean(user))
 	const appointments = useQuery(
 		api.appointments.listByShop,
 		shop ? { barbershopId: shop._id, date: selectedDate || undefined } : "skip",
@@ -106,7 +106,7 @@ function BusinessAppointments() {
 											<div className="main-sm truncate">{appt.notes || "—"}</div>
 											<div className="subtle-xs">{formatPrice(appt.totalPrice)}</div>
 										</div>
-										<div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+										<div className="flex items-center gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
 											{appt.status === "pending" && (
 												<>
 													<button
@@ -114,6 +114,7 @@ function BusinessAppointments() {
 														onClick={() => void handleStatus(appt._id, "confirmed")}
 														className="p-1.5 rounded-md bg-(--success)/10 text-(--success) hover:bg-(--success)/20 transition-colors"
 														title={t("business.appointments.confirm")}
+														aria-label={t("business.appointments.confirm")}
 													>
 														<Check size={13} />
 													</button>
@@ -122,6 +123,7 @@ function BusinessAppointments() {
 														onClick={() => void handleStatus(appt._id, "cancelled")}
 														className="p-1.5 rounded-md bg-(--error)/10 text-(--error) hover:bg-(--error)/20 transition-colors"
 														title={t("business.appointments.cancel")}
+														aria-label={t("business.appointments.cancel")}
 													>
 														<X size={13} />
 													</button>

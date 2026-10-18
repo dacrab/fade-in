@@ -3,9 +3,9 @@ import { useQuery } from "convex/react"
 import { ArrowLeft, Heart } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"
+import { ShopCardSkeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
 import { api } from "../../../convex/_generated/api"
-import type { Doc } from "../../../convex/_generated/dataModel"
 
 export const Route = createFileRoute("/dashboard/favorites")({ component: FavoritesPage })
 
@@ -18,8 +18,7 @@ function FavoritesPage() {
 		api.barbershops.listByIds,
 		favoriteIds.length > 0 ? { ids: favoriteIds } : "skip",
 	)
-	const shops =
-		shopsRaw?.filter((s: Doc<"barbershops"> | null): s is Doc<"barbershops"> => s != null) ?? []
+	const shops = shopsRaw ?? []
 
 	return (
 		<main className="page-main">
@@ -41,9 +40,15 @@ function FavoritesPage() {
 							{t("nav.barbershops")}
 						</Link>
 					</div>
+				) : shopsRaw === undefined ? (
+					<div className="shop-grid">
+						{[0, 1, 2].map((i) => (
+							<ShopCardSkeleton key={i} />
+						))}
+					</div>
 				) : (
 					<div className="shop-grid">
-						{shops.map((shop: Doc<"barbershops">) => (
+						{shops.map((shop) => (
 							<ShopCard key={shop._id} shop={shop} />
 						))}
 					</div>
