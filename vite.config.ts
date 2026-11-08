@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite"
 import { devtools } from "@tanstack/devtools-vite"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
 import viteReact from "@vitejs/plugin-react"
+import { nitro } from "nitro/vite"
 import { defineConfig } from "vitest/config"
 
 const isTest = process.env.NODE_ENV === "test" || Boolean(process.env.VITEST)
@@ -13,7 +14,7 @@ export default defineConfig({
 	},
 	plugins: [
 		// Skip SSR and devtools plugins in test environment
-		...(isTest ? [] : [devtools(), tanstackStart()]),
+		...(isTest ? [] : [devtools(), tanstackStart(), nitro()]),
 		tailwindcss(),
 		viteReact(),
 		...(isTest
