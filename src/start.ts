@@ -7,5 +7,11 @@ import { createCsrfMiddleware, createStart } from "@tanstack/react-start"
  * alongside Clerk's auth middleware.
  */
 export const startInstance = createStart(() => ({
-	requestMiddleware: [createCsrfMiddleware(), clerkMiddleware()],
+	requestMiddleware: [
+		// Only server function calls need CSRF checks. Applying this to page
+		// requests rejects normal navigations, which arrive as `Sec-Fetch-Site:
+		// none` or `cross-site`.
+		createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === "serverFn" }),
+		clerkMiddleware(),
+	],
 }))
