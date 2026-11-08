@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { ArrowLeft, Save } from "lucide-react"
+import type { ChangeEvent, FormEvent } from "react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { withToast } from "#/components/ui/Toast"
@@ -13,7 +14,7 @@ function ProfilePage() {
 	const { t } = useTranslation()
 	const viewer = useQuery(api.users.getViewer)
 	const [form, setForm] = useState({ name: "", phone: "" })
-	const set = (key: "name" | "phone") => (e: React.ChangeEvent<HTMLInputElement>) =>
+	const set = (key: "name" | "phone") => (e: ChangeEvent<HTMLInputElement>) =>
 		setForm((prev) => ({ ...prev, [key]: e.target.value }))
 	const [saving, setSaving] = useState(false)
 	const updateProfile = useMutation(api.users.updateProfile)
@@ -23,12 +24,12 @@ function ProfilePage() {
 		setForm({ name: viewer.name ?? viewer.email, phone: viewer.phone ?? "" })
 	}, [viewer])
 
-	const handleSave = async (e: React.FormEvent) => {
+	const handleSave = async (e: FormEvent) => {
 		e.preventDefault()
 		if (!viewer) return
 		setSaving(true)
 		await withToast(
-			() => updateProfile({ id: viewer._id, name: form.name, phone: form.phone || undefined }),
+			() => updateProfile({ name: form.name, phone: form.phone || undefined }),
 			t("dashboard.profileSaved"),
 			t("errors.profileFailed"),
 		)

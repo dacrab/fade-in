@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
+import type { ChangeEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { CrudListPage } from "#/components/ui/CrudListPage"
 import { FormActions } from "#/components/ui/FormActions"
@@ -64,9 +65,8 @@ function BusinessServices() {
 		},
 	})
 
-	const set =
-		(key: keyof ServiceForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-			crud.setForm((prev) => ({ ...prev, [key]: e.target.value }))
+	const set = (key: keyof ServiceForm) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+		crud.setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
 	return (
 		<CrudListPage

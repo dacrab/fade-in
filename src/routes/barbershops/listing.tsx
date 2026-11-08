@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { usePaginatedQuery } from "convex/react"
 import { Filter, List, Map as MapIcon, MapPin, Scissors, Search, X } from "lucide-react"
+import type { FormEvent } from "react"
 import { lazy, Suspense, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -61,7 +62,7 @@ function BarbershopsPage() {
 	)
 	const shops = results
 
-	const handleSearch = (e: React.FormEvent) => {
+	const handleSearch = (e: FormEvent) => {
 		e.preventDefault()
 		setDebouncedSearch(search)
 		void navigate({

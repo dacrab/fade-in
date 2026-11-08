@@ -1,13 +1,6 @@
 import * as Sentry from "@sentry/react"
 import type { ErrorComponentProps } from "@tanstack/react-router"
-import {
-	createRootRoute,
-	HeadContent,
-	Link,
-	Outlet,
-	Scripts,
-	useRouter,
-} from "@tanstack/react-router"
+import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import Footer from "#/components/Footer"
 import Header from "#/components/Header"
@@ -66,15 +59,14 @@ function NotFound() {
 	)
 }
 
-function RouteError(_props: ErrorComponentProps) {
+function RouteError({ reset }: ErrorComponentProps) {
 	const { t } = useTranslation()
-	const router = useRouter()
 
 	return (
 		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
 			<h1 className="text-xl font-bold text-(--text)">{t("errors.errorTitle")}</h1>
 			<p className="muted-sm max-w-sm">{t("errors.errorMessage")}</p>
-			<button type="button" onClick={() => router.invalidate()} className="btn btn-primary mt-4">
+			<button type="button" onClick={reset} className="btn btn-primary mt-4">
 				{t("errors.tryAgain")}
 			</button>
 		</main>

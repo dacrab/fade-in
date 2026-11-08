@@ -1,7 +1,7 @@
 import { ClerkProvider, useAuth as useClerkAuth, useUser } from "@clerk/tanstack-react-start"
 import { ConvexReactClient, useMutation } from "convex/react"
 import { ConvexProviderWithClerk } from "convex/react-clerk"
-import { useEffect } from "react"
+import { type ReactNode, useEffect } from "react"
 import { api } from "../../../convex/_generated/api"
 
 const convexClient = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
@@ -17,7 +17,7 @@ function SessionSync() {
 	return null
 }
 
-export default function AppConvexProvider({ children }: { children: React.ReactNode }) {
+export default function AppConvexProvider({ children }: { children: ReactNode }) {
 	return (
 		<ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
 			<ConvexProviderWithClerk client={convexClient} useAuth={useClerkAuth}>

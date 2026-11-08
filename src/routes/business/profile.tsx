@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
 import { PlusCircle, Save, X } from "lucide-react"
+import type { ChangeEvent, FormEvent } from "react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { DashSkeleton } from "#/components/ui/DashSkeleton"
@@ -11,6 +12,7 @@ import type { WeekDay, WorkingHoursForm } from "#/types"
 import { WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc, Id } from "../../../convex/_generated/dataModel"
+import { SLOT_CONFIG } from "../../../convex/lib/slots"
 import { slugify } from "../../../convex/lib/slug"
 
 export const Route = createFileRoute("/business/profile")({ component: BusinessProfile })
@@ -42,7 +44,12 @@ const EMPTY: ShopForm = {
 
 // Matches the slot-generation defaults so shops without explicit hours keep
 // booking availability unchanged.
-const DEFAULT_DAY = { open: "09:00", close: "19:00", closed: false }
+const two = (n: number) => String(n).padStart(2, "0")
+const DEFAULT_DAY = {
+	open: `${two(SLOT_CONFIG.START_HOUR)}:00`,
+	close: `${two(SLOT_CONFIG.END_HOUR)}:00`,
+	closed: false,
+}
 
 // Build the week explicitly (no Object.fromEntries + cast) so the compiler
 // checks that every day key is present. Days missing from legacy DB rows
@@ -75,9 +82,8 @@ function BusinessProfile() {
 	const router = useRouter()
 
 	const [form, setForm] = useState(EMPTY)
-	const set =
-		(key: keyof ShopForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-			setForm((prev) => ({ ...prev, [key]: e.target.value }))
+	const set = (key: keyof ShopForm) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+		setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
 	const { shop, isLoading } = useOwnerShop(Boolean(user))
 	const [hours, setHours] = useState<WorkingHoursForm>(() => hoursFor(undefined))
@@ -100,7 +106,7 @@ function BusinessProfile() {
 		setHours(hoursFor(shop.workingHours))
 	}, [shop])
 
-	const setDay = (day: WeekDay, key: "open" | "close") => (e: React.ChangeEvent<HTMLInputElement>) =>
+	const setDay = (day: WeekDay, key: "open" | "close") => (e: ChangeEvent<HTMLInputElement>) =>
 		setHours((prev) => ({ ...prev, [day]: { ...prev[day], [key]: e.target.value } }))
 
 	const toggleClosed = (day: WeekDay) =>
@@ -118,7 +124,7 @@ function BusinessProfile() {
 	const removeImage = useMutation(api.barbershops.removeImage)
 	const [uploading, setUploading] = useState(false)
 
-	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0]
 		e.target.value = "" // allow re-selecting the same file
 		if (!(file && shop)) return
@@ -140,7 +146,7 @@ function BusinessProfile() {
 		}
 	}
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault()
 		if (!user) return
 		if (!hoursValid) {

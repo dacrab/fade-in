@@ -1,7 +1,7 @@
 import type { Doc, Id, TableNames } from "../../convex/_generated/dataModel"
 
 /** Convex document IDs: base32-encoded, URL-safe, 22 (legacy) or 32 (current) chars. */
-const ID_RE = /^[a-z0-9]{22,32}$/
+const ID_RE = /^(?:[a-z0-9]{22}|[a-z0-9]{32})$/
 
 /**
  * Validate an untrusted string (e.g. a route param) as a Convex document ID.

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
 import { Check, Heart, MapPin, Scissors, Star } from "lucide-react"
+import type { MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
@@ -13,7 +14,7 @@ export default function ShopCard({ shop }: { shop: Barbershop }) {
 	const toggleFavorite = useMutation(api.users.toggleFavorite)
 	const isFavorited = user?.favoriteShopIds.includes(shop._id) ?? false
 
-	const handleToggleFav = (e: React.MouseEvent) => {
+	const handleToggleFav = (e: MouseEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
 		void withToast(

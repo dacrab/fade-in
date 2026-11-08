@@ -1,6 +1,7 @@
 import { useSignIn } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { Scissors } from "lucide-react"
+import type { FormEvent } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import PasswordInput from "#/components/ui/PasswordInput"
@@ -16,7 +17,7 @@ function LoginPage() {
 	const { signIn } = useSignIn()
 	const router = useRouter()
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault()
 		if (!signIn) return
 		setLoading(true)

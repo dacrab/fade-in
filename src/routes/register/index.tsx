@@ -2,6 +2,7 @@ import { useSignUp } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
 import { Scissors } from "lucide-react"
+import type { FormEvent } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -55,7 +56,7 @@ function RegisterPage() {
 	const strength = getStrength(password)
 
 	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: sequential validation steps
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault()
 		if (!(name && email && password)) {
 			showToast(t("errors.fillAllFields"), "error")

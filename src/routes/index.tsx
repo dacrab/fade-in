@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { ChevronRight, MapPin, Scissors, Search } from "lucide-react"
+import type { FormEvent } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import ShopCard from "#/components/ShopCard"
@@ -18,7 +19,7 @@ function HomePage() {
 	const featured = useQuery(api.barbershops.getFeatured, { limit: 6 })
 	const stats = useQuery(api.barbershops.getStats, {})
 
-	const handleSearch = (e: React.FormEvent) => {
+	const handleSearch = (e: FormEvent) => {
 		e.preventDefault()
 		void navigate({
 			to: "/barbershops/listing",

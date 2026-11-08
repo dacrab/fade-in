@@ -10,16 +10,12 @@ export const getViewer = query({
 
 export const updateProfile = mutation({
 	args: {
-		id: v.id("users"),
 		name: v.optional(v.string()),
 		phone: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
-		if (user._id !== args.id) throw new ConvexError("Not authorized")
-
-		const { id, ...fields } = args
-		return ctx.db.patch(id, definedPatch(fields))
+		return ctx.db.patch(user._id, definedPatch(args))
 	},
 })
 

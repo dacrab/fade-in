@@ -40,14 +40,6 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 
 		void leafletPromise.then((L) => {
 			if (cancelled || !mapContainerRef.current) return
-			const iconProto = L.Icon.Default.prototype
-			// Disable auto-detected icon path (broken under bundlers); use CDN marker URLs instead
-			Object.assign(iconProto, { _getIconUrl: undefined })
-			L.Icon.Default.mergeOptions({
-				iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-				iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-				shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-			})
 			const map = L.map(mapContainerRef.current, {
 				center: DEFAULT_CENTER,
 				zoom: DEFAULT_ZOOM,

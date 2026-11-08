@@ -7,11 +7,13 @@ import { createCsrfMiddleware, createMiddleware, createStart } from "@tanstack/r
  * path-based proxy for this domain, so ClerkJS assets and API calls must be
  * forwarded to Clerk from our own origin.
  */
+const PROXY_PATH = "/__clerk"
+
 const clerkProxy = createMiddleware().server(({ request, next }) => {
-	if (!matchProxyPath(request, { proxyPath: "/__clerk" })) return next()
+	if (!matchProxyPath(request, { proxyPath: PROXY_PATH })) return next()
 
 	return clerkFrontendApiProxy(request, {
-		proxyPath: "/__clerk",
+		proxyPath: PROXY_PATH,
 		publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
 		secretKey: process.env.CLERK_SECRET_KEY,
 	})

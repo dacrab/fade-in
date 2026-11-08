@@ -8,13 +8,15 @@ import { defineConfig } from "vitest/config"
 
 const isTest = process.env.NODE_ENV === "test" || Boolean(process.env.VITEST)
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
 	resolve: {
 		tsconfigPaths: true,
 	},
 	plugins: [
-		// Skip SSR and devtools plugins in test environment
-		...(isTest ? [] : [devtools(), tanstackStart(), nitro()]),
+		// Skip SSR and devtools plugins in test environment. The devtools UI is
+		// only useful while serving, so leave it out of production builds.
+		...(isTest ? [] : [tanstackStart(), nitro()]),
+		...(isTest || command !== "serve" ? [] : [devtools()]),
 		tailwindcss(),
 		viteReact(),
 		...(isTest
@@ -40,4 +42,4 @@ export default defineConfig({
 		globals: true,
 		include: ["src/**/*.{test,spec}.{ts,tsx}"],
 	},
-})
+}))

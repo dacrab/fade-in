@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useQuery } from "convex/react"
-import type { FunctionReference } from "convex/server"
+import type { FunctionReturnType } from "convex/server"
 import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { DataTable, type features } from "#/components/ui/DataTable"
@@ -9,11 +9,7 @@ import { formatPrice } from "#/lib/format"
 import { isAppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
-type ListAllWithDetails = (typeof api.appointments)["listAllWithDetails"]
-type AppointmentRow = Extract<
-	ListAllWithDetails,
-	FunctionReference<"query", "public">
->["_returnType"][number]
+type AppointmentRow = FunctionReturnType<typeof api.appointments.listAllWithDetails>[number]
 
 export const Route = createFileRoute("/admin/appointments")({ component: AdminAppointments })
 
