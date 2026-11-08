@@ -95,6 +95,7 @@ export default defineSchema({
 		.index("by_shop_date", ["barbershopId", "date"])
 		.index("by_barber", ["barberId"])
 		.index("by_status", ["status"])
+		.index("by_status_createdAt", ["status", "createdAt"])
 		.index("by_polar_checkout", ["polarCheckoutId"]),
 
 	reviews: defineTable({

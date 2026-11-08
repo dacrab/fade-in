@@ -1,138 +1,21 @@
 import { ConvexError, v } from "convex/values"
 import { internal } from "./_generated/api"
-import type { Doc, Id } from "./_generated/dataModel"
-import {
-	internalAction,
-	internalMutation,
-	type MutationCtx,
-	mutation,
-	query,
-} from "./_generated/server"
+import type { Doc } from "./_generated/dataModel"
+import { internalMutation, type MutationCtx, mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
-import { sendEmail } from "./lib/email"
 import { MAX_LIST_ROWS } from "./lib/limits"
 import {
-	DEFAULT_WINDOW,
-	generateSlots,
-	overlaps,
-	SLOT_CONFIG,
-	timeToMinutes,
-	weekdayOf,
-} from "./lib/slots"
-import { MAX_DURATION_MINUTES, TIME_RE } from "./validators"
+	assertBookableSlot,
+	assertDurationMatches,
+	DATE_RE,
+	dayWindow,
+	findConflicts,
+	slotOptionsByBarber,
+} from "./lib/scheduling"
+import { generateSlots, weekdayOf } from "./lib/slots"
+import { MAX_DURATION_MINUTES } from "./validators"
 
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const STALE_PENDING_MS = 24 * 60 * 60 * 1000
-
-type AppointmentFields = {
-	barbershopId: Id<"barbershops">
-	barberId: Id<"barbers">
-	date: string
-	startTime: string
-	endTime: string
-}
-
-/**
- * Appointments on the same barber/day that overlap the requested window,
- * excluding `excludeId` (used when rescheduling an existing appointment).
- */
-async function findConflicts(
-	ctx: MutationCtx,
-	args: AppointmentFields & { excludeId?: Id<"appointments"> },
-) {
-	const existing = await ctx.db
-		.query("appointments")
-		.withIndex("by_shop_date", (q) => q.eq("barbershopId", args.barbershopId).eq("date", args.date))
-		.filter((q) => {
-			const conditions = [
-				q.eq(q.field("barberId"), args.barberId),
-				q.neq(q.field("status"), "cancelled"),
-			]
-			if (args.excludeId !== undefined) conditions.push(q.neq(q.field("_id"), args.excludeId))
-			return q.and(...conditions)
-		})
-		.collect()
-
-	return existing.some((a) => overlaps(args.startTime, args.endTime, a))
-}
-
-/**
- * Effective hours for a barber on a given weekday. The shop's hours are the
- * outer bound: a closed shop closes the day, while a barber's own hours narrow
- * (or close) their day. Falls back to the shop's window, then to the default
- * window when neither defines one.
- */
-function dayWindow(
-	shopHours: Doc<"barbershops">["workingHours"],
-	barberHours: Doc<"barbers">["workingHours"],
-	weekday: ReturnType<typeof weekdayOf>,
-): { closed: boolean; window?: { startMinute: number; endMinute: number } } {
-	const shopDay = shopHours?.[weekday]
-	if (shopDay?.closed) return { closed: true }
-
-	const barberDay = barberHours?.[weekday]
-	if (barberDay) {
-		if (barberDay.closed) return { closed: true }
-		return {
-			closed: false,
-			window: {
-				startMinute: timeToMinutes(barberDay.open),
-				endMinute: timeToMinutes(barberDay.close),
-			},
-		}
-	}
-
-	if (shopDay) {
-		return {
-			closed: false,
-			window: { startMinute: timeToMinutes(shopDay.open), endMinute: timeToMinutes(shopDay.close) },
-		}
-	}
-
-	return { closed: false }
-}
-
-/**
- * Validates a requested slot against the shop and barber hours, returning the
- * shop and barber. Shared by every mutation that writes a date/time onto an
- * appointment so none of them can skip the checks.
- */
-async function assertBookableSlot(
-	ctx: MutationCtx,
-	barbershopId: Id<"barbershops">,
-	barberId: Id<"barbers">,
-	date: string,
-	startTime: string,
-	endTime: string,
-) {
-	if (!DATE_RE.test(date)) throw new ConvexError("Invalid date format")
-	if (!(TIME_RE.test(startTime) && TIME_RE.test(endTime)))
-		throw new ConvexError("Invalid time format")
-	if (startTime >= endTime) throw new ConvexError("Invalid time range")
-
-	const shop = await ctx.db.get(barbershopId)
-	if (shop?.isActive !== true) throw new ConvexError("Shop is not available")
-
-	const barber = await ctx.db.get(barberId)
-	if (!barber || barber.barbershopId !== barbershopId)
-		throw new ConvexError("Invalid barber for this shop")
-	if (barber.isActive !== true) throw new ConvexError("Barber is not available")
-
-	const { closed, window } = dayWindow(shop.workingHours, barber.workingHours, weekdayOf(date))
-	if (closed) throw new ConvexError("Barber is not available on this date")
-
-	const openMinute = window?.startMinute ?? DEFAULT_WINDOW.startMinute
-	const closeMinute = window?.endMinute ?? DEFAULT_WINDOW.endMinute
-	const start = timeToMinutes(startTime)
-	if (
-		start < openMinute ||
-		timeToMinutes(endTime) > closeMinute ||
-		(start - openMinute) % SLOT_CONFIG.INTERVAL_MINUTES !== 0
-	)
-		throw new ConvexError("Time is outside of operating hours")
-
-	return { shop, barber }
-}
 
 export const getAvailableSlots = query({
 	args: {
@@ -169,38 +52,6 @@ export const getAvailableSlots = query({
 		return generateSlots(args.durationMinutes, existing, window)
 	},
 })
-
-/**
- * Slots offered across every active barber on a date, mapped to the first barber
- * who can take each start time (backs the "any barber" booking option).
- */
-function slotOptionsByBarber(
-	appointments: Doc<"appointments">[],
-	barbers: Doc<"barbers">[],
-	shopHours: Doc<"barbershops">["workingHours"],
-	weekday: ReturnType<typeof weekdayOf>,
-	durationMinutes: number,
-): { startTime: string; barberId: Id<"barbers"> }[] {
-	const byBarber = new Map<string, Doc<"appointments">[]>()
-	for (const appt of appointments) {
-		const list = byBarber.get(appt.barberId)
-		if (list) list.push(appt)
-		else byBarber.set(appt.barberId, [appt])
-	}
-
-	const earliest = new Map<string, Id<"barbers">>()
-	for (const barber of barbers) {
-		const { closed, window } = dayWindow(shopHours, barber.workingHours, weekday)
-		if (closed) continue
-		for (const startTime of generateSlots(durationMinutes, byBarber.get(barber._id) ?? [], window)) {
-			if (!earliest.has(startTime)) earliest.set(startTime, barber._id)
-		}
-	}
-
-	return [...earliest.entries()]
-		.map(([startTime, barberId]) => ({ startTime, barberId }))
-		.sort((a, b) => a.startTime.localeCompare(b.startTime))
-}
 
 export const getAvailableSlotsForShop = query({
 	args: {
@@ -271,10 +122,7 @@ export const create = mutation({
 			if (s.barbershopId !== args.barbershopId) throw new ConvexError("Service not from this shop")
 			return sum + s.price
 		}, 0)
-		const expectedDuration = services.reduce((sum, s) => sum + (s?.durationMinutes ?? 0), 0)
-		const requestedDuration = timeToMinutes(args.endTime) - timeToMinutes(args.startTime)
-		if (requestedDuration !== expectedDuration)
-			throw new ConvexError("The selected time does not match the service duration")
+		assertDurationMatches(services, args.startTime, args.endTime)
 
 		const conflict = await findConflicts(ctx, {
 			barbershopId: args.barbershopId,
@@ -306,7 +154,7 @@ export const create = mutation({
 		// mutation stays atomic and a retry cannot produce a duplicate email.
 		const owner = await ctx.db.get(shop.ownerId)
 		if (owner?.email) {
-			await ctx.scheduler.runAfter(0, internal.appointments.sendNewBookingNotification, {
+			await ctx.scheduler.runAfter(0, internal.appointmentEmails.sendNewBookingNotification, {
 				to: owner.email,
 				customerName: user.name,
 				shopName: shop.name,
@@ -319,66 +167,6 @@ export const create = mutation({
 		}
 
 		return { appointmentId, totalPrice }
-	},
-})
-
-export const sendBookingConfirmationEmail = internalAction({
-	args: {
-		to: v.string(),
-		customerName: v.optional(v.string()),
-		shopName: v.optional(v.string()),
-		barberName: v.optional(v.string()),
-		date: v.string(),
-		startTime: v.string(),
-		endTime: v.string(),
-		totalPrice: v.number(),
-	},
-	handler: async (_ctx, args) => {
-		try {
-			await sendEmail(
-				args.to,
-				`Booking Confirmed — ${args.shopName ?? "Barbershop"}`,
-				`<p>Hi ${args.customerName ?? "there"},</p>
-				<p>Your booking at <strong>${args.shopName ?? "Barbershop"}</strong> is confirmed!</p>
-				<p><strong>Barber:</strong> ${args.barberName ?? "—"}<br>
-				<strong>Date:</strong> ${args.date}<br>
-				<strong>Time:</strong> ${args.startTime} – ${args.endTime}<br>
-				<strong>Total:</strong> €${(args.totalPrice / 100).toFixed(2)}</p>
-				<p>See you there!<br>— The FadeIn Team</p>`,
-			)
-		} catch {
-			// Best-effort email: a delivery failure must not fail the booking.
-		}
-	},
-})
-
-export const sendNewBookingNotification = internalAction({
-	args: {
-		to: v.string(),
-		customerName: v.optional(v.string()),
-		shopName: v.optional(v.string()),
-		barberName: v.optional(v.string()),
-		date: v.string(),
-		startTime: v.string(),
-		endTime: v.string(),
-		totalPrice: v.number(),
-	},
-	handler: async (_ctx, args) => {
-		try {
-			await sendEmail(
-				args.to,
-				`New booking request — ${args.shopName ?? "Barbershop"}`,
-				`<p>You have a new booking request at <strong>${args.shopName ?? "Barbershop"}</strong>.</p>
-				<p><strong>Customer:</strong> ${args.customerName ?? "—"}<br>
-				<strong>Barber:</strong> ${args.barberName ?? "—"}<br>
-				<strong>Date:</strong> ${args.date}<br>
-				<strong>Time:</strong> ${args.startTime} – ${args.endTime}<br>
-				<strong>Total:</strong> €${(args.totalPrice / 100).toFixed(2)}</p>
-				<p>— The FadeIn Team</p>`,
-			)
-		} catch {
-			// Best-effort email: a delivery failure must not affect the booking.
-		}
 	},
 })
 
@@ -406,10 +194,10 @@ export const sweepStalePending = internalMutation({
 		const cutoff = Date.now() - STALE_PENDING_MS
 		const stale = await ctx.db
 			.query("appointments")
-			.withIndex("by_status", (q) => q.eq("status", "pending"))
+			.withIndex("by_status_createdAt", (q) => q.eq("status", "pending").lt("createdAt", cutoff))
 			.collect()
 		for (const appt of stale) {
-			if (appt.createdAt < cutoff && appt.polarCheckoutId && appt.paymentStatus !== "paid") {
+			if (appt.polarCheckoutId && appt.paymentStatus !== "paid") {
 				await ctx.db.delete(appt._id)
 			}
 		}
@@ -551,7 +339,7 @@ export const confirmFromCheckout = internalMutation({
 		if (customer?.email) {
 			// Scheduled so the mutation stays atomic: network I/O never runs inside
 			// the transaction and a retry cannot produce a duplicate email.
-			await ctx.scheduler.runAfter(0, internal.appointments.sendBookingConfirmationEmail, {
+			await ctx.scheduler.runAfter(0, internal.appointmentEmails.sendBookingConfirmationEmail, {
 				to: customer.email,
 				customerName: customer.name,
 				shopName: shop?.name,
@@ -629,9 +417,7 @@ export const reschedule = mutation({
 		// Keep the booked duration consistent with the appointment's services, as
 		// `create` enforces — otherwise a reschedule could shrink or stretch a slot.
 		const services = await Promise.all(appt.serviceIds.map((id) => ctx.db.get(id)))
-		const expectedDuration = services.reduce((sum, s) => sum + (s?.durationMinutes ?? 0), 0)
-		if (timeToMinutes(args.endTime) - timeToMinutes(args.startTime) !== expectedDuration)
-			throw new ConvexError("The selected time does not match the service duration")
+		assertDurationMatches(services, args.startTime, args.endTime)
 
 		await assertBookableSlot(
 			ctx,

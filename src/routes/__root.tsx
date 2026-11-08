@@ -1,15 +1,17 @@
 import * as Sentry from "@sentry/react"
 import type { ErrorComponentProps } from "@tanstack/react-router"
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router"
-import { useTranslation } from "react-i18next"
+import { useMemo } from "react"
+import { I18nextProvider, useTranslation } from "react-i18next"
 import Footer from "#/components/Footer"
 import Header from "#/components/Header"
 import { ToastContainer } from "#/components/ui/Toast"
+import { createI18n, isLanguage, resolveLanguage } from "#/i18n"
 import ConvexProvider from "#/integrations/convex/provider"
-import "../i18n"
 import appCss from "../styles.css?url"
 
 export const Route = createRootRoute({
+	loader: () => ({ language: resolveLanguage() }),
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -68,9 +70,22 @@ function RouteError({ reset }: ErrorComponentProps) {
 }
 
 function RootDocument() {
-	const { i18n, t } = useTranslation()
+	const { language } = Route.useLoaderData()
+	const i18n = useMemo(() => createI18n(language), [language])
+
 	return (
-		<html lang={i18n.language === "el" ? "el" : "en"}>
+		<I18nextProvider i18n={i18n}>
+			<RootHtml />
+		</I18nextProvider>
+	)
+}
+
+function RootHtml() {
+	const { i18n, t } = useTranslation()
+	const language = isLanguage(i18n.language) ? i18n.language : "en"
+
+	return (
+		<html lang={language}>
 			<head>
 				<HeadContent />
 			</head>

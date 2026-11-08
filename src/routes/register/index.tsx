@@ -51,7 +51,7 @@ function RegisterPage() {
 	const [loading, setLoading] = useState(false)
 	const { signUp } = useSignUp()
 	const router = useRouter()
-	const claimOwnerIntent = useMutation(api.users.claimOwnerIntent)
+	const ensureCurrentUser = useMutation(api.users.ensureCurrentUser)
 
 	const strength = getStrength(password)
 
@@ -88,7 +88,7 @@ function RegisterPage() {
 					// The Convex user record is created with role "customer"; promote
 					// it so /business routes authorize immediately.
 					try {
-						await claimOwnerIntent()
+						await ensureCurrentUser({ role: "owner" })
 					} catch {
 						showToast(t("errors.registrationFailed"), "error")
 						return

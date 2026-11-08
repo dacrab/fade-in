@@ -11,7 +11,7 @@ function SessionSync() {
 	const ensureCurrentUser = useMutation(api.users.ensureCurrentUser)
 
 	useEffect(() => {
-		if (isLoaded && user) void ensureCurrentUser()
+		if (isLoaded && user) void ensureCurrentUser({})
 	}, [isLoaded, user, ensureCurrentUser])
 
 	return null

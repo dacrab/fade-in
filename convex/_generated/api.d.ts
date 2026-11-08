@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as appointmentEmails from "../appointmentEmails.js";
 import type * as appointments from "../appointments.js";
 import type * as barbers from "../barbers.js";
 import type * as barbershops from "../barbershops.js";
@@ -16,6 +17,7 @@ import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_email from "../lib/email.js";
 import type * as lib_limits from "../lib/limits.js";
+import type * as lib_scheduling from "../lib/scheduling.js";
 import type * as lib_slots from "../lib/slots.js";
 import type * as lib_slug from "../lib/slug.js";
 import type * as payments from "../payments.js";
@@ -31,6 +33,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  appointmentEmails: typeof appointmentEmails;
   appointments: typeof appointments;
   barbers: typeof barbers;
   barbershops: typeof barbershops;
@@ -39,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   "lib/auth": typeof lib_auth;
   "lib/email": typeof lib_email;
   "lib/limits": typeof lib_limits;
+  "lib/scheduling": typeof lib_scheduling;
   "lib/slots": typeof lib_slots;
   "lib/slug": typeof lib_slug;
   payments: typeof payments;
