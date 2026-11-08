@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { preloadedQueryResult, preloadQuery } from "convex/nextjs"
 import { type Preloaded, usePreloadedQuery } from "convex/react"
 import {
@@ -32,7 +32,9 @@ export const Route = createFileRoute("/barbershops/$slug")({
 		const url = import.meta.env.VITE_CONVEX_URL
 		const shop = await preloadQuery(api.barbershops.getBySlug, { slug: params.slug }, { url })
 		const shopValue = preloadedQueryResult(shop)
-		if (!shopValue) return { found: false as const, shop }
+		// Throwing lets the router render `notFoundComponent` and, on the
+		// server, respond with a real 404 instead of a 200 error page.
+		if (!shopValue) throw notFound()
 
 		// Preload the rest of the page so SSR contains real content (services,
 		// barbers and reviews) instead of skeletons, and crawlers see the shop.
@@ -49,7 +51,7 @@ export const Route = createFileRoute("/barbershops/$slug")({
 			),
 		])
 
-		return { found: true as const, shop, services, barbers, reviews }
+		return { shop, services, barbers, reviews }
 	},
 	head: ({ loaderData }) => {
 		const shop = loaderData ? preloadedQueryResult(loaderData.shop) : null
@@ -68,6 +70,7 @@ export const Route = createFileRoute("/barbershops/$slug")({
 		}
 	},
 	pendingComponent: ShopProfileSkeleton,
+	notFoundComponent: ShopNotFound,
 	component: ShopProfilePage,
 })
 
@@ -92,7 +95,7 @@ const DAY_INDEX: Record<number, WeekDay> = {
 function ShopProfilePage() {
 	const data = Route.useLoaderData()
 	const shop = usePreloadedQuery(data.shop)
-	if (!(shop && data.found)) return <ShopNotFound />
+	if (!shop) return <ShopNotFound />
 	return (
 		<ShopProfileContent
 			shop={shop}
