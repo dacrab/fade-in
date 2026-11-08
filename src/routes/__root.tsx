@@ -33,6 +33,7 @@ export const Route = createRootRoute({
 					"https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..700&family=Fraunces:opsz,wght@9..144,400..700&display=swap",
 			},
 			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+			{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
 			{ rel: "stylesheet", href: appCss },
 		],
 	}),

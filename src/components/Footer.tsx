@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router"
-import { ArrowUpRight, Scissors } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import BrandMark from "./BrandMark"
 
 export default function Footer() {
 	const { t } = useTranslation()
@@ -11,11 +12,9 @@ export default function Footer() {
 				<div className="grid gap-10 md:grid-cols-12">
 					<div className="md:col-span-6">
 						<Link to="/" className="inline-flex items-center gap-2.5 no-underline">
-							<span className="flex h-8 w-8 items-center justify-center rounded-(--radius) bg-(--gold) text-[#fffaf5]">
-								<Scissors size={15} strokeWidth={1.7} />
-							</span>
+							<BrandMark size={32} />
 							<span className="font-serif text-[1.3rem] font-medium leading-none tracking-[-0.03em] text-(--text)">
-								Fade<span className="text-(--gold)">In</span>
+								Fade<span className="italic text-(--gold)">In</span>
 							</span>
 						</Link>
 						<p className="mt-4 max-w-xs font-serif text-[1.35rem] leading-[1.3] tracking-[-0.02em] text-(--text-muted)">

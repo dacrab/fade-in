@@ -12,6 +12,7 @@ import {
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "#/hooks/useAuth"
+import BrandMark from "./BrandMark"
 import LanguageToggle from "./LanguageToggle"
 import { Menu } from "./ui/Menu"
 
@@ -73,11 +74,12 @@ export default function Header() {
 			<header className="sticky top-0 z-50 border-b border-(--border) bg-(--header-bg) backdrop-blur-md">
 				<nav className="page-wrap px-5 md:px-8 flex items-center justify-between h-18">
 					<Link to="/" className="flex items-center gap-2.5 no-underline flex-shrink-0 group">
-						<span className="flex h-9 w-9 items-center justify-center rounded-(--radius) bg-(--gold) text-[#fffaf5] shadow-[0_1px_2px_rgba(143,50,32,0.2)] transition-transform duration-300 group-hover:-rotate-6">
-							<Scissors size={17} strokeWidth={1.7} />
-						</span>
+						<BrandMark
+							size={36}
+							className="shadow-[0_1px_2px_rgba(143,50,32,0.2)] transition-transform duration-300 group-hover:-rotate-6"
+						/>
 						<span className="font-serif text-[1.35rem] font-medium leading-none tracking-[-0.03em] text-(--text)">
-							Fade<span className="text-(--gold)">In</span>
+							Fade<span className="italic text-(--gold)">In</span>
 						</span>
 					</Link>
 
