@@ -15,6 +15,7 @@ import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_email from "../lib/email.js";
+import type * as lib_limits from "../lib/limits.js";
 import type * as lib_slots from "../lib/slots.js";
 import type * as lib_slug from "../lib/slug.js";
 import type * as payments from "../payments.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/auth": typeof lib_auth;
   "lib/email": typeof lib_email;
+  "lib/limits": typeof lib_limits;
   "lib/slots": typeof lib_slots;
   "lib/slug": typeof lib_slug;
   payments: typeof payments;
