@@ -2,7 +2,7 @@ import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
-import { MAX_LIST_ROWS } from "./lib/limits"
+import { currentMonthKey } from "./lib/shopStats"
 import { slugify } from "./lib/slug"
 import {
 	assertValidWorkingHours,
@@ -37,21 +37,30 @@ export const list = query({
 
 		const getBaseQuery = () => {
 			if (city) {
+				if (minRating !== undefined) {
+					return ctx.db
+						.query("barbershops")
+						.withIndex("by_city_active_rating", (q) =>
+							q.eq("city", city).eq("isActive", true).gte("rating", minRating),
+						)
+						.order("desc")
+				}
 				return ctx.db
 					.query("barbershops")
-					.withIndex("by_city", (q) => q.eq("city", city))
-					.filter((q) => q.eq(q.field("isActive"), true))
+					.withIndex("by_city_active", (q) => q.eq("city", city).eq("isActive", true))
+			}
+			if (minRating !== undefined) {
+				return ctx.db
+					.query("barbershops")
+					.withIndex("by_active_rating", (q) => q.eq("isActive", true).gte("rating", minRating))
+					.order("desc")
 			}
 			return ctx.db.query("barbershops").withIndex("by_active", (q) => q.eq("isActive", true))
 		}
 
-		let baseQuery = getBaseQuery()
-
-		if (minRating !== undefined) {
-			baseQuery = baseQuery.filter((q) => q.gte(q.field("rating"), minRating))
-		}
-
-		return baseQuery.paginate(args.paginationOpts)
+		// Rating is now part of the index range for the non-search paths, so no
+		// post-index filter is needed. The search index still filters separately.
+		return getBaseQuery().paginate(args.paginationOpts)
 	},
 })
 
@@ -139,6 +148,17 @@ export const create = mutation({
 		if (user.role === "customer") {
 			await ctx.db.patch(userId, { role: "owner" })
 		}
+		await ctx.db.insert("shopStats", {
+			barbershopId: shopId,
+			totalRevenue: 0,
+			monthRevenue: 0,
+			completedCount: 0,
+			totalCount: 0,
+			pendingCount: 0,
+			cancelledCount: 0,
+			monthKey: currentMonthKey(),
+			backfilledAt: Date.now(),
+		})
 		return shopId
 	},
 })
@@ -228,9 +248,9 @@ export const listByIds = query({
 })
 
 export const listAll = query({
-	args: {},
-	handler: async (ctx) => {
+	args: { paginationOpts: paginationOptsValidator },
+	handler: async (ctx, args) => {
 		await requireAdmin(ctx)
-		return ctx.db.query("barbershops").take(MAX_LIST_ROWS)
+		return ctx.db.query("barbershops").paginate(args.paginationOpts)
 	},
 })

@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { internal } from "./_generated/api"
 import type { Doc } from "./_generated/dataModel"
@@ -12,6 +13,13 @@ import {
 	findConflicts,
 	slotOptionsByBarber,
 } from "./lib/scheduling"
+import {
+	applyAppointmentStatsChange,
+	computeMonthRevenue,
+	computeShopStats,
+	currentMonthKey,
+	getStatsRow,
+} from "./lib/shopStats"
 import { generateSlots, weekdayOf } from "./lib/slots"
 import { MAX_DURATION_MINUTES } from "./validators"
 
@@ -150,6 +158,13 @@ export const create = mutation({
 			createdAt: Date.now(),
 		})
 
+		await applyAppointmentStatsChange(ctx, {
+			barbershopId: args.barbershopId,
+			date: args.date,
+			totalPrice,
+			to: "pending",
+		})
+
 		// Notify the shop owner so they can review the request. Scheduled so the
 		// mutation stays atomic and a retry cannot produce a duplicate email.
 		const owner = await ctx.db.get(shop.ownerId)
@@ -173,6 +188,12 @@ export const create = mutation({
 /** Delete an appointment only if it is still pending and unpaid. */
 async function deleteIfUnpaidPending(ctx: MutationCtx, appt: Doc<"appointments"> | null) {
 	if (appt?.status !== "pending" || appt.paymentStatus === "paid") return
+	await applyAppointmentStatsChange(ctx, {
+		barbershopId: appt.barbershopId,
+		date: appt.date,
+		totalPrice: appt.totalPrice,
+		from: appt.status,
+	})
 	await ctx.db.delete(appt._id)
 }
 
@@ -238,6 +259,13 @@ export const updateStatus = mutation({
 			// session, and checkouts abandoned before payment stay "pending" until
 			// the user cancels. A cleanup job (or Polar checkout.expired webhook)
 			// would be needed to reclaim those slots automatically.
+			await applyAppointmentStatsChange(ctx, {
+				barbershopId: appt.barbershopId,
+				date: appt.date,
+				totalPrice: appt.totalPrice,
+				from: appt.status,
+				to: args.status,
+			})
 			return ctx.db.patch(args.id, { status: args.status })
 		}
 
@@ -245,6 +273,13 @@ export const updateStatus = mutation({
 		if (!shop) throw new ConvexError("Shop not found")
 
 		if (shop.ownerId === userId || user.role === "admin") {
+			await applyAppointmentStatsChange(ctx, {
+				barbershopId: appt.barbershopId,
+				date: appt.date,
+				totalPrice: appt.totalPrice,
+				from: appt.status,
+				to: args.status,
+			})
 			return ctx.db.patch(args.id, { status: args.status })
 		}
 
@@ -258,11 +293,23 @@ export const listByCustomer = query({
 		const user = await getCurrentUser(ctx)
 		if (!user) return []
 
-		return ctx.db
-			.query("appointments")
-			.withIndex("by_customer", (q) => q.eq("customerId", user._id))
-			.order("desc")
-			.take(MAX_LIST_ROWS)
+		// Fetch the appointment list and the customer's reviews together, then
+		// join in memory. The previous shape exposed a `hasReview` query per row,
+		// which created one subscription per appointment card on the dashboard.
+		const [appointments, reviews] = await Promise.all([
+			ctx.db
+				.query("appointments")
+				.withIndex("by_customer", (q) => q.eq("customerId", user._id))
+				.order("desc")
+				.take(MAX_LIST_ROWS),
+			ctx.db
+				.query("reviews")
+				.withIndex("by_customer", (q) => q.eq("customerId", user._id))
+				.take(MAX_LIST_ROWS),
+		])
+		const reviewed = new Set(reviews.map((r) => r.appointmentId))
+
+		return appointments.map((appt) => ({ ...appt, hasReview: reviewed.has(appt._id) }))
 	},
 })
 
@@ -291,7 +338,7 @@ export const listByShop = query({
 })
 
 export const listByBarber = query({
-	args: { barberId: v.id("barbers") },
+	args: { barberId: v.id("barbers"), date: v.optional(v.string()) },
 	handler: async (ctx, args) => {
 		const user = await requireUser(ctx)
 		const barber = await ctx.db.get(args.barberId)
@@ -299,6 +346,18 @@ export const listByBarber = query({
 		// The barber themself or the owning shop's owner may view the schedule.
 		if (barber.userId !== user._id) {
 			await requireOwner(ctx, barber.barbershopId)
+		}
+
+		// Filter in the index, not in JS: taking the newest 500 rows and then
+		// filtering by date silently drops the selected day once a barber has
+		// more than 500 lifetime appointments.
+		if (args.date) {
+			const date = args.date
+			return ctx.db
+				.query("appointments")
+				.withIndex("by_barber_date", (q) => q.eq("barberId", args.barberId).eq("date", date))
+				.order("desc")
+				.take(MAX_LIST_ROWS)
 		}
 
 		return ctx.db
@@ -447,10 +506,12 @@ export const reschedule = mutation({
 })
 
 export const listAllWithDetails = query({
-	handler: async (ctx) => {
+	args: { paginationOpts: paginationOptsValidator },
+	handler: async (ctx, args) => {
 		await requireAdmin(ctx)
 
-		const appts = await ctx.db.query("appointments").order("desc").take(MAX_LIST_ROWS)
+		const page = await ctx.db.query("appointments").order("desc").paginate(args.paginationOpts)
+		const appts = page.page
 
 		// Resolve each referenced entity once instead of once per appointment.
 		const shopIds = [...new Set(appts.map((a) => a.barbershopId))]
@@ -465,12 +526,15 @@ export const listAllWithDetails = query({
 		const barberNames = new Map(barbers.map((b) => [b?._id, b?.name]))
 		const customerNames = new Map(customers.map((c) => [c?._id, c?.name]))
 
-		return appts.map((a) => ({
-			...a,
-			shopName: shopNames.get(a.barbershopId) ?? "—",
-			barberName: barberNames.get(a.barberId) ?? "—",
-			customerName: customerNames.get(a.customerId) ?? "—",
-		}))
+		return {
+			...page,
+			page: appts.map((a) => ({
+				...a,
+				shopName: shopNames.get(a.barbershopId) ?? "—",
+				barberName: barberNames.get(a.barberId) ?? "—",
+				customerName: customerNames.get(a.customerId) ?? "—",
+			})),
+		}
 	},
 })
 
@@ -479,26 +543,24 @@ export const getShopStats = query({
 	handler: async (ctx, args) => {
 		await requireOwner(ctx, args.barbershopId)
 
-		const allAppts = await ctx.db
-			.query("appointments")
-			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
-			.collect()
+		const stats = await getStatsRow(ctx, args.barbershopId)
+		if (!stats?.backfilledAt) {
+			// Shops that predate the aggregate (or whose backfill has not run yet)
+			// still get exact numbers from the legacy computation.
+			return computeShopStats(ctx, args.barbershopId)
+		}
 
-		const completed = allAppts.filter((a) => a.status === "completed")
-		// Appointment dates are local-time "YYYY-MM-DD" strings; take the month
-		// from local date parts rather than a UTC timestamp.
-		const now = new Date()
-		const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
-
+		const month = currentMonthKey()
 		return {
-			totalRevenue: completed.reduce((sum, a) => sum + a.totalPrice, 0),
-			monthRevenue: completed
-				.filter((a) => a.date.startsWith(thisMonth))
-				.reduce((sum, a) => sum + a.totalPrice, 0),
-			completedCount: completed.length,
-			totalCount: allAppts.length,
-			pendingCount: allAppts.filter((a) => a.status === "pending" || a.status === "confirmed").length,
-			cancelledCount: allAppts.filter((a) => a.status === "cancelled").length,
+			totalRevenue: stats.totalRevenue,
+			monthRevenue:
+				stats.monthKey === month
+					? stats.monthRevenue
+					: await computeMonthRevenue(ctx, args.barbershopId, month),
+			completedCount: stats.completedCount,
+			totalCount: stats.totalCount,
+			pendingCount: stats.pendingCount,
+			cancelledCount: stats.cancelledCount,
 		}
 	},
 })

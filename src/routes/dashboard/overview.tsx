@@ -48,12 +48,12 @@ function CustomerDashboard() {
 	const { upcoming, completed, cancelled, past } = (appointments ?? []).reduce(
 		(
 			acc: {
-				upcoming: Doc<"appointments">[]
-				completed: Doc<"appointments">[]
-				cancelled: Doc<"appointments">[]
-				past: Doc<"appointments">[]
+				upcoming: (Doc<"appointments"> & { hasReview?: boolean })[]
+				completed: (Doc<"appointments"> & { hasReview?: boolean })[]
+				cancelled: (Doc<"appointments"> & { hasReview?: boolean })[]
+				past: (Doc<"appointments"> & { hasReview?: boolean })[]
 			},
-			appt: Doc<"appointments">,
+			appt: Doc<"appointments"> & { hasReview?: boolean },
 		) => {
 			if (appt.status === "pending" || appt.status === "confirmed") acc.upcoming.push(appt)
 			if (appt.status === "completed") acc.completed.push(appt)
@@ -112,11 +112,12 @@ function CustomerDashboard() {
 						</div>
 					) : (
 						<div className="divide-y divide-(--border)">
-							{upcoming.map((appt: Doc<"appointments">) => (
+							{upcoming.map((appt) => (
 								<AppointmentRow
 									key={appt._id}
 									appt={appt}
 									shop={shopMap.get(appt.barbershopId)}
+									hasReview={appt.hasReview}
 									showActions
 								/>
 							))}
@@ -128,8 +129,13 @@ function CustomerDashboard() {
 					<section className="card p-5">
 						<h2 className="card-title">{t("dashboard.pastTitle")}</h2>
 						<div className="divide-y divide-(--border)">
-							{past.slice(0, 8).map((appt: Doc<"appointments">) => (
-								<AppointmentRow key={appt._id} appt={appt} shop={shopMap.get(appt.barbershopId)} />
+							{past.slice(0, 8).map((appt) => (
+								<AppointmentRow
+									key={appt._id}
+									appt={appt}
+									shop={shopMap.get(appt.barbershopId)}
+									hasReview={appt.hasReview}
+								/>
 							))}
 						</div>
 					</section>
@@ -142,16 +148,17 @@ function CustomerDashboard() {
 function AppointmentRow({
 	appt,
 	shop,
+	hasReview,
 	showActions,
 }: {
-	appt: Appointment
+	appt: Appointment & { hasReview?: boolean }
 	shop?: Barbershop
+	hasReview?: boolean
 	showActions?: boolean
 }) {
 	const { t } = useTranslation()
 	const f = useFormatters()
 	const updateStatus = useMutation(api.appointments.updateStatus)
-	const hasReview = useQuery(api.reviews.hasReview, { appointmentId: appt._id })
 	const createReview = useMutation(api.reviews.create)
 	const [showForm, setShowForm] = useState(false)
 	const [rating, setRating] = useState(5)

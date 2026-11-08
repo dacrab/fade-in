@@ -1,11 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Building2, ShieldCheck, Star, Users } from "lucide-react"
-import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
-import type { UserRole } from "#/types"
-import { parseUserRole } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
 
@@ -57,16 +54,8 @@ function RecentShopsCard({ shops }: { shops: Doc<"barbershops">[] | undefined })
 function AdminDashboard() {
 	const { t } = useTranslation()
 
-	const allShops = useQuery(api.barbershops.listAll)
-	const allUsers = useQuery(api.users.listAll)
-
-	const roleCounts = useMemo(() => {
-		const counts: Record<UserRole, number> = { customer: 0, owner: 0, barber: 0, admin: 0 }
-		for (const u of allUsers ?? []) counts[parseUserRole(u.role)]++
-		return counts
-	}, [allUsers])
-
-	const verified = allShops?.filter((s: Doc<"barbershops">) => s.isVerified).length ?? 0
+	const overview = useQuery(api.admin.overview)
+	const roleCounts = overview?.roleCounts ?? { customer: 0, owner: 0, barber: 0, admin: 0 }
 
 	return (
 		<main className="page-main">
@@ -74,9 +63,13 @@ function AdminDashboard() {
 
 			<div className="stat-grid stat-grid-4">
 				{[
-					{ label: t("admin.stats.totalShops"), value: allShops?.length ?? "—", icon: Building2 },
-					{ label: t("admin.stats.verifiedShops"), value: verified, icon: ShieldCheck },
-					{ label: t("admin.stats.totalUsers"), value: allUsers?.length ?? "—", icon: Users },
+					{ label: t("admin.stats.totalShops"), value: overview?.totalShops ?? "—", icon: Building2 },
+					{
+						label: t("admin.stats.verifiedShops"),
+						value: overview?.verifiedShops ?? "—",
+						icon: ShieldCheck,
+					},
+					{ label: t("admin.stats.totalUsers"), value: overview?.totalUsers ?? "—", icon: Users },
 					{ label: t("admin.stats.owners"), value: roleCounts.owner, icon: Star },
 				].map(({ label, value, icon: Icon }) => (
 					<div key={label} className="card p-5">
@@ -90,11 +83,11 @@ function AdminDashboard() {
 			</div>
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-				<RecentShopsCard shops={allShops} />
+				<RecentShopsCard shops={overview?.recentShops} />
 
 				<div className="card p-5">
 					<h2 className="card-title">{t("admin.userBreakdown")}</h2>
-					{!allUsers ? (
+					{!overview ? (
 						<Skeleton className="h-32 w-full" />
 					) : (
 						<div className="space-y-3">
@@ -123,7 +116,7 @@ function AdminDashboard() {
 										<div
 											className="h-full rounded-full transition-all"
 											style={{
-												width: allUsers.length ? `${(count / allUsers.length) * 100}%` : "0%",
+												width: overview.totalUsers ? `${(count / overview.totalUsers) * 100}%` : "0%",
 												background: color,
 											}}
 										/>

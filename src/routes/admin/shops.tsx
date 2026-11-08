@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { useMutation, useQuery } from "convex/react"
+import { useMutation, usePaginatedQuery } from "convex/react"
 import { Building2, Check, Power, PowerOff, ShieldCheck, ShieldOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
@@ -68,7 +68,11 @@ function ShopRow({ shop, onVerify, onSuspend }: ShopRowProps) {
 function AdminShops() {
 	const { t } = useTranslation()
 
-	const allShops = useQuery(api.barbershops.listAll)
+	const {
+		results: allShops,
+		status,
+		loadMore,
+	} = usePaginatedQuery(api.barbershops.listAll, {}, { initialNumItems: 50 })
 	const verify = useMutation(api.barbershops.verify)
 	const suspend = useMutation(api.barbershops.suspend)
 
@@ -91,7 +95,7 @@ function AdminShops() {
 			<div className="page-wrap max-w-5xl">
 				<h1 className="page-title mb-6">{t("admin.shops.title")}</h1>
 
-				{!allShops ? (
+				{status === "LoadingFirstPage" ? (
 					<div className="space-y-3">
 						{[0, 1, 2, 3, 4].map((i) => (
 							<Skeleton key={i} className="h-16 w-full rounded-(--radius-lg)" />
@@ -107,6 +111,16 @@ function AdminShops() {
 						{allShops.map((shop) => (
 							<ShopRow key={shop._id} shop={shop} onVerify={handleVerify} onSuspend={handleSuspend} />
 						))}
+						{(status === "CanLoadMore" || status === "LoadingMore") && (
+							<button
+								type="button"
+								onClick={() => loadMore(50)}
+								disabled={status === "LoadingMore"}
+								className="btn btn-secondary btn-sm mx-auto mt-4"
+							>
+								{status === "LoadingMore" ? t("common.loading") : t("common.loadMore")}
+							</button>
+						)}
 					</div>
 				)}
 			</div>

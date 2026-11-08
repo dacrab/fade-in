@@ -99,12 +99,23 @@ function HomePage() {
 
 						<div className="relative fade-up [animation-delay:120ms]">
 							<div className="image-frame aspect-[4/5] max-h-[560px] w-full">
-								<img
-									src="/images/hero-barbershop.jpg"
-									alt={t("home.heroImageAlt")}
-									className="h-full w-full object-cover"
-									loading="eager"
-								/>
+								<picture className="contents">
+									<source
+										type="image/webp"
+										srcSet="/images/hero-barbershop-600.webp 600w, /images/hero-barbershop-1000.webp 1000w"
+										sizes="(min-width: 1024px) 45vw, 100vw"
+									/>
+									<img
+										src="/images/hero-barbershop.jpg"
+										alt={t("home.heroImageAlt")}
+										className="h-full w-full object-cover"
+										width={1200}
+										height={1800}
+										loading="eager"
+										fetchPriority="high"
+										decoding="async"
+									/>
+								</picture>
 								<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 								<div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 rounded-(--radius) border border-white/25 bg-black/25 px-4 py-3 backdrop-blur-md">
 									<p className="font-serif text-[1.15rem] leading-tight text-white">
@@ -151,11 +162,22 @@ function HomePage() {
 					) : featured.length === 0 ? (
 						<div className="grid overflow-hidden rounded-(--radius-lg) border border-(--border) bg-(--bg-card) md:grid-cols-[0.85fr_1.15fr]">
 							<div className="relative min-h-[260px] md:min-h-[340px]">
-								<img
-									src="/images/shop-barbershop.jpg"
-									alt=""
-									className="absolute inset-0 h-full w-full object-cover"
-								/>
+								<picture className="contents">
+									<source
+										type="image/webp"
+										srcSet="/images/shop-barbershop-600.webp 600w, /images/shop-barbershop-1000.webp 1000w"
+										sizes="(min-width: 768px) 45vw, 100vw"
+									/>
+									<img
+										src="/images/shop-barbershop.jpg"
+										alt=""
+										className="absolute inset-0 h-full w-full object-cover"
+										width={1000}
+										height={1500}
+										loading="lazy"
+										decoding="async"
+									/>
+								</picture>
 								<div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
 							</div>
 							<div className="flex flex-col justify-center p-8 md:p-12">
@@ -231,11 +253,22 @@ function HomePage() {
 							</Link>
 						</div>
 						<div className="relative min-h-[260px] md:min-h-[360px]">
-							<img
-								src="/images/for-business.jpg"
-								alt={t("forBusiness.imageAlt")}
-								className="absolute inset-0 h-full w-full object-cover"
-							/>
+							<picture className="contents">
+								<source
+									type="image/webp"
+									srcSet="/images/for-business-600.webp 600w, /images/for-business-1000.webp 1000w"
+									sizes="(min-width: 768px) 50vw, 100vw"
+								/>
+								<img
+									src="/images/for-business.jpg"
+									alt={t("forBusiness.imageAlt")}
+									className="absolute inset-0 h-full w-full object-cover"
+									width={1400}
+									height={1050}
+									loading="lazy"
+									decoding="async"
+								/>
+							</picture>
 							<div className="absolute inset-0 bg-gradient-to-r from-[#191512] via-[#191512]/25 to-transparent md:from-[#191512]/70" />
 						</div>
 					</div>

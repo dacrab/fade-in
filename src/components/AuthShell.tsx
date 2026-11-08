@@ -17,11 +17,21 @@ export default function AuthShell({
 		<main className="flex flex-1 items-center justify-center px-4 py-10 md:py-14">
 			<div className="grid w-full max-w-[1080px] overflow-hidden rounded-(--radius-lg) border border-(--border) bg-(--bg-card) shadow-[var(--shadow-md)] lg:grid-cols-[0.92fr_1.08fr]">
 				<div className="relative hidden min-h-[620px] lg:block">
-					<img
-						src="/images/barber-detail.jpg"
-						alt={t("auth.imageAlt")}
-						className="absolute inset-0 h-full w-full object-cover"
-					/>
+					<picture className="contents">
+						<source
+							type="image/webp"
+							srcSet="/images/barber-detail-600.webp 600w, /images/barber-detail-1000.webp 1000w"
+							sizes="(min-width: 1024px) 45vw, 100vw"
+						/>
+						<img
+							src="/images/barber-detail.jpg"
+							alt={t("auth.imageAlt")}
+							className="absolute inset-0 h-full w-full object-cover"
+							width={1000}
+							height={1500}
+							decoding="async"
+						/>
+					</picture>
 					<div className="absolute inset-0 bg-gradient-to-t from-[#191512]/85 via-[#191512]/15 to-[#191512]/10" />
 					<div className="absolute left-8 top-8 text-[#fffaf5]/85">
 						<BrandLockup
@@ -43,11 +53,21 @@ export default function AuthShell({
 
 				<div className="relative flex flex-col justify-center lg:min-h-[620px]">
 					<div className="relative h-32 overflow-hidden lg:hidden">
-						<img
-							src="/images/barber-detail.jpg"
-							alt=""
-							className="h-full w-full object-cover object-[center_35%]"
-						/>
+						<picture className="contents">
+							<source
+								type="image/webp"
+								srcSet="/images/barber-detail-600.webp 600w, /images/barber-detail-1000.webp 1000w"
+								sizes="100vw"
+							/>
+							<img
+								src="/images/barber-detail.jpg"
+								alt=""
+								className="h-full w-full object-cover object-[center_35%]"
+								width={1000}
+								height={1500}
+								decoding="async"
+							/>
+						</picture>
 						<div className="absolute inset-0 bg-gradient-to-t from-(--bg-card) via-transparent to-transparent" />
 					</div>
 					<div className="px-6 py-8 sm:px-10 md:px-14 md:py-12">

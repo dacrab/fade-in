@@ -1,10 +1,10 @@
-import * as Sentry from "@sentry/react"
 import type { ErrorComponentProps } from "@tanstack/react-router"
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router"
 import { useMemo } from "react"
 import { I18nextProvider, useTranslation } from "react-i18next"
 import Footer from "#/components/Footer"
 import Header from "#/components/Header"
+import RouteErrorBoundary from "#/components/RouteErrorBoundary"
 import { ToastContainer } from "#/components/ui/Toast"
 import { createI18n, isLanguage, resolveLanguage } from "#/i18n"
 import ConvexProvider from "#/integrations/convex/provider"
@@ -25,12 +25,19 @@ export const Route = createRootRoute({
 			{ name: "theme-color", content: "#F7F4EE" },
 		],
 		links: [
-			{ rel: "preconnect", href: "https://fonts.googleapis.com" },
-			{ rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
 			{
-				rel: "stylesheet",
-				href:
-					"https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..700&family=Fraunces:opsz,wght@9..144,400..700&display=swap",
+				rel: "preload",
+				href: "/fonts/dmsans-latin.woff2",
+				as: "font",
+				type: "font/woff2",
+				crossOrigin: "anonymous",
+			},
+			{
+				rel: "preload",
+				href: "/fonts/fraunces-latin.woff2",
+				as: "font",
+				type: "font/woff2",
+				crossOrigin: "anonymous",
 			},
 			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
 			{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
@@ -94,9 +101,9 @@ function RootHtml() {
 				<ConvexProvider>
 					<Header />
 					<div className="flex-1">
-						<Sentry.ErrorBoundary fallback={<p className="p-8 text-center">{t("errors.errorTitle")}</p>}>
+						<RouteErrorBoundary fallback={<p className="p-8 text-center">{t("errors.errorTitle")}</p>}>
 							<Outlet />
-						</Sentry.ErrorBoundary>
+						</RouteErrorBoundary>
 					</div>
 					<Footer />
 					<ToastContainer />

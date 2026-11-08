@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { useQuery } from "convex/react"
+import { preloadedQueryResult, preloadQuery } from "convex/nextjs"
+import { type Preloaded, usePreloadedQuery } from "convex/react"
 import {
 	Calendar,
 	Check,
@@ -15,20 +16,68 @@ import {
 	Share2,
 	Star,
 } from "lucide-react"
-import { QRCodeSVG } from "qrcode.react"
-import { useEffect, useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import BookingModal from "#/components/BookingModal"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
 import { withToast } from "#/components/ui/Toast"
 import { useFormatters } from "#/hooks/useFormatters"
 import { formatPrice } from "#/lib/format"
-import type { Barber, Review, Service, WeekDay } from "#/types"
+import type { Barber, Barbershop, Review, Service, WeekDay } from "#/types"
 import { PAGE_SIZE, WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
-export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProfilePage })
+export const Route = createFileRoute("/barbershops/$slug")({
+	loader: async ({ params }) => {
+		const url = import.meta.env.VITE_CONVEX_URL
+		const shop = await preloadQuery(api.barbershops.getBySlug, { slug: params.slug }, { url })
+		const shopValue = preloadedQueryResult(shop)
+		if (!shopValue) return { found: false as const, shop }
+
+		// Preload the rest of the page so SSR contains real content (services,
+		// barbers and reviews) instead of skeletons, and crawlers see the shop.
+		const [services, barbers, reviews] = await Promise.all([
+			preloadQuery(api.services.listByShop, { barbershopId: shopValue._id }, { url }),
+			preloadQuery(api.barbers.listByShop, { barbershopId: shopValue._id }, { url }),
+			preloadQuery(
+				api.reviews.listByShop,
+				{
+					barbershopId: shopValue._id,
+					paginationOpts: { cursor: null, numItems: PAGE_SIZE },
+				},
+				{ url },
+			),
+		])
+
+		return { found: true as const, shop, services, barbers, reviews }
+	},
+	head: ({ loaderData }) => {
+		const shop = loaderData ? preloadedQueryResult(loaderData.shop) : null
+		if (!shop) return {}
+		const description =
+			shop.description?.trim() ||
+			`Book an appointment at ${shop.name} in ${shop.city}. View services, barbers and reviews on FadeIn.`
+		return {
+			meta: [
+				{ title: `${shop.name} — FadeIn` },
+				{ name: "description", content: description },
+				{ property: "og:title", content: `${shop.name} — FadeIn` },
+				{ property: "og:description", content: description },
+				...(shop.images[0] ? [{ property: "og:image", content: shop.images[0] }] : []),
+			],
+		}
+	},
+	pendingComponent: ShopProfileSkeleton,
+	component: ShopProfilePage,
+})
+
+// Both are only needed after an interaction: the booking dialog on open, the
+// QR code when the share panel is expanded. Splitting them keeps the shop page
+// itself smaller and defers the QR encoder entirely.
+const BookingModal = lazy(() => import("#/components/BookingModal"))
+const QRCodeSVG = lazy(() =>
+	import("qrcode.react").then((module) => ({ default: module.QRCodeSVG })),
+)
 
 const DAY_INDEX: Record<number, WeekDay> = {
 	0: "sunday",
@@ -40,12 +89,52 @@ const DAY_INDEX: Record<number, WeekDay> = {
 	6: "saturday",
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function ShopProfilePage() {
+	const data = Route.useLoaderData()
+	const shop = usePreloadedQuery(data.shop)
+	if (!(shop && data.found)) return <ShopNotFound />
+	return (
+		<ShopProfileContent
+			shop={shop}
+			preloadedServices={data.services}
+			preloadedBarbers={data.barbers}
+			preloadedReviews={data.reviews}
+		/>
+	)
+}
+
+function ShopNotFound() {
+	const { t } = useTranslation()
+	return (
+		<main className="flex flex-1 items-center justify-center px-4">
+			<div className="text-center">
+				<span className="font-serif text-7xl font-medium italic text-(--gold)/30">404</span>
+				<h1 className="page-title mb-2 mt-3">{t("shop.notFound")}</h1>
+				<Link to="/barbershops/listing" className="btn btn-primary mt-5">
+					{t("shop.notFoundHint")}
+				</Link>
+			</div>
+		</main>
+	)
+}
+
+interface ShopProfileContentProps {
+	shop: Barbershop
+	preloadedServices: Preloaded<typeof api.services.listByShop>
+	preloadedBarbers: Preloaded<typeof api.barbers.listByShop>
+	preloadedReviews: Preloaded<typeof api.reviews.listByShop>
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
+function ShopProfileContent({
+	shop,
+	preloadedServices,
+	preloadedBarbers,
+	preloadedReviews,
+}: ShopProfileContentProps) {
 	const { t } = useTranslation()
 	const f = useFormatters()
 	const { slug } = Route.useParams()
-	const shop = useQuery(api.barbershops.getBySlug, { slug })
 	const [bookingOpen, setBookingOpen] = useState(false)
 	const [showQr, setShowQr] = useState(false)
 	const [bookingUrl, setBookingUrl] = useState("")
@@ -62,27 +151,9 @@ function ShopProfilePage() {
 			t("shop.linkCopied"),
 			t("shop.linkCopyFailed"),
 		)
-	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")
-	const barbers = useQuery(api.barbers.listByShop, shop ? { barbershopId: shop._id } : "skip")
-	const reviewsResult = useQuery(
-		api.reviews.listByShop,
-		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: PAGE_SIZE } } : "skip",
-	)
-	const reviews = reviewsResult?.page
-
-	if (shop === undefined) return <ShopProfileSkeleton />
-	if (!shop)
-		return (
-			<main className="flex flex-1 items-center justify-center px-4">
-				<div className="text-center">
-					<span className="font-serif text-7xl font-medium italic text-(--gold)/30">404</span>
-					<h1 className="page-title mb-2 mt-3">{t("shop.notFound")}</h1>
-					<Link to="/barbershops/listing" className="btn btn-primary mt-5">
-						{t("shop.notFoundHint")}
-					</Link>
-				</div>
-			</main>
-		)
+	const services = usePreloadedQuery(preloadedServices)
+	const barbers = usePreloadedQuery(preloadedBarbers)
+	const reviews = usePreloadedQuery(preloadedReviews).page
 
 	return (
 		<main className="pb-16">
@@ -377,7 +448,9 @@ function ShopProfilePage() {
 								</button>
 								{showQr && (
 									<div className="mt-3 flex justify-center rounded-(--radius) bg-white p-4">
-										<QRCodeSVG value={bookingUrl} size={140} />
+										<Suspense fallback={<Skeleton className="h-[140px] w-[140px]" />}>
+											<QRCodeSVG value={bookingUrl} size={140} />
+										</Suspense>
 									</div>
 								)}
 							</div>
@@ -409,7 +482,11 @@ function ShopProfilePage() {
 					</div>
 				</div>
 			</div>
-			{bookingOpen && <BookingModal shop={shop} onClose={() => setBookingOpen(false)} />}
+			{bookingOpen && (
+				<Suspense fallback={null}>
+					<BookingModal shop={shop} onClose={() => setBookingOpen(false)} />
+				</Suspense>
+			)}
 		</main>
 	)
 }

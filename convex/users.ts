@@ -1,7 +1,7 @@
+import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireUser } from "./lib/auth"
-import { MAX_LIST_ROWS } from "./lib/limits"
 import { definedPatch } from "./validators"
 
 export const getViewer = query({
@@ -72,9 +72,9 @@ export const toggleFavorite = mutation({
 })
 
 export const listAll = query({
-	args: {},
-	handler: async (ctx) => {
+	args: { paginationOpts: paginationOptsValidator },
+	handler: async (ctx, args) => {
 		await requireAdmin(ctx)
-		return ctx.db.query("users").take(MAX_LIST_ROWS)
+		return ctx.db.query("users").paginate(args.paginationOpts)
 	},
 })

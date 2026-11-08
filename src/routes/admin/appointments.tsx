@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useQuery } from "convex/react"
+import { usePaginatedQuery } from "convex/react"
 import type { FunctionReturnType } from "convex/server"
 import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -9,14 +9,18 @@ import { formatPrice } from "#/lib/format"
 import { isAppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
-type AppointmentRow = FunctionReturnType<typeof api.appointments.listAllWithDetails>[number]
+type AppointmentRow = FunctionReturnType<typeof api.appointments.listAllWithDetails>["page"][number]
 
 export const Route = createFileRoute("/admin/appointments")({ component: AdminAppointments })
 
 function AdminAppointments() {
 	const { t } = useTranslation()
 
-	const data = useQuery(api.appointments.listAllWithDetails)
+	const {
+		results: data,
+		status,
+		loadMore,
+	} = usePaginatedQuery(api.appointments.listAllWithDetails, {}, { initialNumItems: 50 })
 
 	const columns: ColumnDef<typeof features, AppointmentRow>[] = [
 		{
@@ -105,7 +109,7 @@ function AdminAppointments() {
 			<div className="page-wrap max-w-6xl">
 				<h1 className="page-title mb-6">{t("admin.appointments.title")}</h1>
 
-				{!data ? (
+				{status === "LoadingFirstPage" ? (
 					<DataTable columns={columns} data={[]} loading loadingRows={6} />
 				) : data.length === 0 ? (
 					<div className="empty-state">
@@ -113,12 +117,26 @@ function AdminAppointments() {
 						<p className="text-sm">{t("admin.appointments.noAppointments")}</p>
 					</div>
 				) : (
-					<DataTable
-						columns={columns}
-						data={data}
-						searchable
-						searchPlaceholder={t("admin.appointments.colCustomer")}
-					/>
+					<>
+						<DataTable
+							columns={columns}
+							data={data}
+							searchable
+							searchPlaceholder={t("admin.appointments.colCustomer")}
+						/>
+						{(status === "CanLoadMore" || status === "LoadingMore") && (
+							<div className="mt-4 flex justify-center">
+								<button
+									type="button"
+									onClick={() => loadMore(50)}
+									disabled={status === "LoadingMore"}
+									className="btn btn-secondary btn-sm"
+								>
+									{status === "LoadingMore" ? t("common.loading") : t("common.loadMore")}
+								</button>
+							</div>
+						)}
+					</>
 				)}
 			</div>
 		</main>

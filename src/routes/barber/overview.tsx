@@ -24,7 +24,7 @@ function BarberDashboard() {
 	const barber = useQuery(api.barbers.getByUserId, user ? { userId: user.id } : "skip")
 	const appointments = useQuery(
 		api.appointments.listByBarber,
-		barber ? { barberId: barber._id } : "skip",
+		barber ? { barberId: barber._id, date: selectedDate } : "skip",
 	)
 
 	// Batch-fetch the shops referenced by appointments (avoids a query per row).
@@ -44,7 +44,7 @@ function BarberDashboard() {
 
 	if (!user) return <Skeleton className="h-64 m-8 rounded-(--radius-lg)" />
 
-	const todayAppts = appointments?.filter((a: Doc<"appointments">) => a.date === selectedDate) ?? []
+	const todayAppts = appointments ?? []
 	const completedToday = todayAppts.filter((a: Doc<"appointments">) => a.status === "completed")
 	const todayEarnings = completedToday.reduce(
 		(sum: number, a: Doc<"appointments">) => sum + a.totalPrice,

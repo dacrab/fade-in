@@ -23,8 +23,7 @@ export const listByShop = query({
 	handler: async (ctx, args) => {
 		return ctx.db
 			.query("barbers")
-			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_shop_active", (q) => q.eq("barbershopId", args.barbershopId).eq("isActive", true))
 			.collect()
 	},
 })
@@ -34,8 +33,7 @@ export const getByUserId = query({
 	handler: async (ctx, args) => {
 		return ctx.db
 			.query("barbers")
-			.withIndex("by_user", (q) => q.eq("userId", args.userId))
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_user_active", (q) => q.eq("userId", args.userId).eq("isActive", true))
 			.first()
 	},
 })

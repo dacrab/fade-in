@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useQuery } from "convex/react"
+import { usePaginatedQuery } from "convex/react"
 import { useTranslation } from "react-i18next"
 import { DataTable, type features } from "#/components/ui/DataTable"
 import type { UserRole } from "#/types"
@@ -20,7 +20,11 @@ const ROLE_BADGE: Record<UserRole, string> = {
 function AdminUsers() {
 	const { t } = useTranslation()
 
-	const allUsers = useQuery(api.users.listAll)
+	const {
+		results: allUsers,
+		status,
+		loadMore,
+	} = usePaginatedQuery(api.users.listAll, {}, { initialNumItems: 50 })
 
 	const columns: ColumnDef<typeof features, Doc<"users">>[] = [
 		{
@@ -58,12 +62,24 @@ function AdminUsers() {
 				<h1 className="page-title mb-6">{t("admin.users.title")}</h1>
 				<DataTable
 					columns={columns}
-					data={allUsers ?? []}
-					loading={!allUsers}
+					data={allUsers}
+					loading={status === "LoadingFirstPage"}
 					searchable
 					searchPlaceholder={t("admin.users.colName")}
 					emptyMessage={t("admin.users.noUsers")}
 				/>
+				{(status === "CanLoadMore" || status === "LoadingMore") && (
+					<div className="mt-4 flex justify-center">
+						<button
+							type="button"
+							onClick={() => loadMore(50)}
+							disabled={status === "LoadingMore"}
+							className="btn btn-secondary btn-sm"
+						>
+							{status === "LoadingMore" ? t("common.loading") : t("common.loadMore")}
+						</button>
+					</div>
+				)}
 			</div>
 		</main>
 	)

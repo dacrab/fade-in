@@ -7,7 +7,7 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
 import { formatPrice, todayIso } from "#/lib/format"
-import { PAGE_SIZE, STATUS_BADGE } from "#/types"
+import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
 
@@ -28,7 +28,7 @@ function BusinessDashboard() {
 	const stats = useQuery(api.appointments.getShopStats, shop ? { barbershopId: shop._id } : "skip")
 	const reviewsResult = useQuery(
 		api.reviews.listByShop,
-		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: PAGE_SIZE } } : "skip",
+		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: 3 } } : "skip",
 	)
 	const reviews = reviewsResult?.page
 

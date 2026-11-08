@@ -1,7 +1,7 @@
-import * as Sentry from "@sentry/react"
 import { ConvexError } from "convex/values"
 import { AlertCircle, CheckCircle, Info } from "lucide-react"
 import { useSyncExternalStore } from "react"
+import { reportError } from "#/lib/reportError"
 
 type ToastType = "success" | "error" | "info"
 
@@ -68,7 +68,7 @@ export async function withToast<T>(
 		return { ok: true, value }
 	} catch (e) {
 		showToast(errorMessage(e, error), "error")
-		Sentry.captureException(e)
+		reportError(e)
 		return { ok: false }
 	}
 }

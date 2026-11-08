@@ -41,11 +41,22 @@ function ForBusinessPage() {
 
 						<div className="relative fade-up [animation-delay:120ms]">
 							<div className="image-frame aspect-[4/3] max-h-[480px] w-full">
-								<img
-									src="/images/for-business.jpg"
-									alt={t("forBusiness.imageAlt")}
-									className="h-full w-full object-cover"
-								/>
+								<picture className="contents">
+									<source
+										type="image/webp"
+										srcSet="/images/for-business-600.webp 600w, /images/for-business-1000.webp 1000w"
+										sizes="(min-width: 1024px) 45vw, 100vw"
+									/>
+									<img
+										src="/images/for-business.jpg"
+										alt={t("forBusiness.imageAlt")}
+										className="h-full w-full object-cover"
+										width={1400}
+										height={1050}
+										loading="eager"
+										decoding="async"
+									/>
+								</picture>
 								<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 								<p className="absolute inset-x-5 bottom-5 max-w-xs font-serif text-[1.35rem] leading-tight text-white">
 									{t("forBusiness.heroCaption")}

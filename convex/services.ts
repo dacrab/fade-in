@@ -17,8 +17,7 @@ export const listByShop = query({
 	handler: async (ctx, args) => {
 		return ctx.db
 			.query("services")
-			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_shop_active", (q) => q.eq("barbershopId", args.barbershopId).eq("isActive", true))
 			.collect()
 	},
 })

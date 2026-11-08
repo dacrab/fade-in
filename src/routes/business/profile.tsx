@@ -243,7 +243,7 @@ function BusinessProfile() {
 							</label>
 							<textarea
 								id="shop-desc"
-								className="input w-full text-sm resize-none"
+								className="input resize-none"
 								rows={3}
 								placeholder={t("business.profile.descPlaceholder")}
 								value={form.description}
