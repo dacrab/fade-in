@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next"
 import { CrudListPage } from "#/components/ui/CrudListPage"
 import { FormActions } from "#/components/ui/FormActions"
 import { RowActions } from "#/components/ui/RowActions"
+import { useAuth } from "#/hooks/useAuth"
 import { useCrudForm } from "#/hooks/useCrudForm"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice } from "#/lib/format"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -33,7 +33,7 @@ const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other
 
 function BusinessServices() {
 	const { t } = useTranslation()
-	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
+	const { user } = useAuth()
 
 	const { shop } = useOwnerShop(Boolean(user))
 	const services = useQuery(api.services.listByShop, shop ? { barbershopId: shop._id } : "skip")

@@ -103,11 +103,6 @@ const en = {
 			"Discover top-rated barbershops near you and book your next appointment in seconds.",
 		searchPlaceholder: "Barbershop name or service…",
 		cityPlaceholder: "City…",
-		stats: {
-			shops: "Barbershops",
-			clients: "Happy clients",
-			rating: "Average rating",
-		},
 		featured: "Featured Barbershops",
 		noFeatured: "No featured shops yet. Be the first to list yours!",
 		howTitle: "How FadeIn works",

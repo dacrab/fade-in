@@ -5,8 +5,8 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
+import { useAuth } from "#/hooks/useAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice, todayIso } from "#/lib/format"
 import type { AppointmentStatus } from "#/types"
 import { STATUS_DOT, WEEK_DAYS } from "#/types"
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/business/appointments")({ component: Busi
 
 function BusinessAppointments() {
 	const { t } = useTranslation()
-	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
+	const { user } = useAuth()
 	const [selectedDate, setSelectedDate] = useState(todayIso())
 
 	const { shop } = useOwnerShop(Boolean(user))

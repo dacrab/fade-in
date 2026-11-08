@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireUser } from "./lib/auth"
+import { MAX_LIST_ROWS } from "./lib/limits"
 import { definedPatch } from "./validators"
 
 export const getViewer = query({
@@ -77,6 +78,6 @@ export const listAll = query({
 	args: {},
 	handler: async (ctx) => {
 		await requireAdmin(ctx)
-		return ctx.db.query("users").collect()
+		return ctx.db.query("users").take(MAX_LIST_ROWS)
 	},
 })

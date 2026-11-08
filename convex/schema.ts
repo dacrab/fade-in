@@ -41,6 +41,7 @@ export default defineSchema({
 		.index("by_owner", ["ownerId"])
 		.index("by_city", ["city"])
 		.index("by_active", ["isActive"])
+		.index("by_active_verified_rating", ["isActive", "isVerified", "rating"])
 		.searchIndex("search_name", {
 			searchField: "name",
 			filterFields: ["city", "isActive"],

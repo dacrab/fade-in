@@ -4,8 +4,8 @@ import { PlusCircle, Scissors } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { DashSkeleton } from "#/components/ui/DashSkeleton"
 import { Skeleton } from "#/components/ui/Skeleton"
+import { useAuth } from "#/hooks/useAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import { formatPrice, todayIso } from "#/lib/format"
 import { PAGE_SIZE, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/business/overview")({ component: Business
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function BusinessDashboard() {
 	const { t } = useTranslation()
-	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
+	const { user } = useAuth()
 
 	const { shop, isLoading } = useOwnerShop(Boolean(user))
 

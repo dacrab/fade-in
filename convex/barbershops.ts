@@ -2,6 +2,7 @@ import { paginationOptsValidator } from "convex/server"
 import { ConvexError, v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
+import { MAX_LIST_ROWS } from "./lib/limits"
 import { slugify } from "./lib/slug"
 import {
 	assertValidWorkingHours,
@@ -58,13 +59,11 @@ export const getFeatured = query({
 	args: { limit: v.optional(v.number()) },
 	handler: async (ctx, args) => {
 		const limit = Math.min(Math.max(Math.floor(args.limit ?? 6), 1), 50)
-		const shops = await ctx.db
+		return ctx.db
 			.query("barbershops")
-			.withIndex("by_active", (q) => q.eq("isActive", true))
-			.filter((q) => q.eq(q.field("isVerified"), true))
-			.collect()
-
-		return shops.sort((a, b) => b.rating - a.rating).slice(0, limit)
+			.withIndex("by_active_verified_rating", (q) => q.eq("isActive", true).eq("isVerified", true))
+			.order("desc")
+			.take(limit)
 	},
 })
 
@@ -232,32 +231,6 @@ export const listAll = query({
 	args: {},
 	handler: async (ctx) => {
 		await requireAdmin(ctx)
-		return ctx.db.query("barbershops").collect()
-	},
-})
-
-export const getStats = query({
-	args: {},
-	handler: async (ctx) => {
-		const shops = await ctx.db
-			.query("barbershops")
-			.withIndex("by_active", (q) => q.eq("isActive", true))
-			.collect()
-
-		const avgRating =
-			shops.length > 0
-				? Math.round((shops.reduce((sum, s) => sum + s.rating, 0) / shops.length) * 10) / 10
-				: 0
-
-		const customers = await ctx.db
-			.query("users")
-			.withIndex("by_role", (q) => q.eq("role", "customer"))
-			.collect()
-
-		return {
-			shopCount: shops.length,
-			customerCount: customers.length,
-			avgRating,
-		}
+		return ctx.db.query("barbershops").take(MAX_LIST_ROWS)
 	},
 })

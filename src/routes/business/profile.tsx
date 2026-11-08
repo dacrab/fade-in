@@ -6,8 +6,8 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { DashSkeleton } from "#/components/ui/DashSkeleton"
 import { showToast, withToast } from "#/components/ui/Toast"
+import { useAuth } from "#/hooks/useAuth"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { OWNER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import type { WeekDay, WorkingHoursForm } from "#/types"
 import { WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -78,7 +78,7 @@ function coord(value: string): number | undefined {
 
 function BusinessProfile() {
 	const { t } = useTranslation()
-	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
+	const { user } = useAuth()
 	const router = useRouter()
 
 	const [form, setForm] = useState(EMPTY)

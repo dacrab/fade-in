@@ -10,6 +10,7 @@ import {
 } from "./_generated/server"
 import { getCurrentUser, requireAdmin, requireOwner, requireUser } from "./lib/auth"
 import { sendEmail } from "./lib/email"
+import { MAX_LIST_ROWS } from "./lib/limits"
 import {
 	DEFAULT_WINDOW,
 	generateSlots,
@@ -473,7 +474,7 @@ export const listByCustomer = query({
 			.query("appointments")
 			.withIndex("by_customer", (q) => q.eq("customerId", user._id))
 			.order("desc")
-			.collect()
+			.take(MAX_LIST_ROWS)
 	},
 })
 
@@ -491,13 +492,13 @@ export const listByShop = query({
 				.query("appointments")
 				.withIndex("by_shop_date", (q) => q.eq("barbershopId", args.barbershopId).eq("date", date))
 				.order("desc")
-				.collect()
+				.take(MAX_LIST_ROWS)
 		}
 		return ctx.db
 			.query("appointments")
 			.withIndex("by_shop", (q) => q.eq("barbershopId", args.barbershopId))
 			.order("desc")
-			.collect()
+			.take(MAX_LIST_ROWS)
 	},
 })
 
@@ -516,7 +517,7 @@ export const listByBarber = query({
 			.query("appointments")
 			.withIndex("by_barber", (q) => q.eq("barberId", args.barberId))
 			.order("desc")
-			.collect()
+			.take(MAX_LIST_ROWS)
 	},
 })
 
@@ -663,7 +664,7 @@ export const listAllWithDetails = query({
 	handler: async (ctx) => {
 		await requireAdmin(ctx)
 
-		const appts = await ctx.db.query("appointments").order("desc").collect()
+		const appts = await ctx.db.query("appointments").order("desc").take(MAX_LIST_ROWS)
 
 		// Resolve each referenced entity once instead of once per appointment.
 		const shopIds = [...new Set(appts.map((a) => a.barbershopId))]

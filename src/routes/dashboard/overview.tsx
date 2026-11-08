@@ -7,8 +7,8 @@ import { DashSkeleton } from "#/components/ui/DashSkeleton"
 import { SkeletonRows } from "#/components/ui/Skeleton"
 import { StatCard } from "#/components/ui/StatCard"
 import { withToast } from "#/components/ui/Toast"
+import { useAuth } from "#/hooks/useAuth"
 import { useFormatters } from "#/hooks/useFormatters"
-import { CUSTOMER_ADMIN_ROLES, useRequireRole } from "#/hooks/useRequireRole"
 import type { Appointment, Barbershop } from "#/types"
 import { STATUS_DOT } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/dashboard/overview")({ component: Custome
 
 function CustomerDashboard() {
 	const { t } = useTranslation()
-	const { user } = useRequireRole(CUSTOMER_ADMIN_ROLES)
+	const { user } = useAuth()
 
 	const appointments = useQuery(api.appointments.listByCustomer, user ? {} : "skip")
 

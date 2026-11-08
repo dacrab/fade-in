@@ -17,7 +17,6 @@ function HomePage() {
 	const [city, setCity] = useState("")
 	const navigate = useNavigate()
 	const featured = useQuery(api.barbershops.getFeatured, { limit: 6 })
-	const stats = useQuery(api.barbershops.getStats, {})
 
 	const handleSearch = (e: FormEvent) => {
 		e.preventDefault()
@@ -70,26 +69,6 @@ function HomePage() {
 							{t("common.search")}
 						</button>
 					</form>
-
-					{stats && (stats.shopCount > 0 || stats.customerCount > 0) && (
-						<div className="flex items-center gap-6 muted-sm mt-8">
-							{stats.shopCount > 0 && (
-								<span>
-									<strong className="text-(--text)">{stats.shopCount}</strong> {t("home.stats.shops")}
-								</span>
-							)}
-							{stats.customerCount > 0 && (
-								<span>
-									<strong className="text-(--text)">{stats.customerCount}</strong> {t("home.stats.clients")}
-								</span>
-							)}
-							{stats.avgRating > 0 && (
-								<span>
-									<strong className="text-(--text)">{stats.avgRating}</strong> {t("home.stats.rating")}
-								</span>
-							)}
-						</div>
-					)}
 				</div>
 			</section>
 
