@@ -87,10 +87,7 @@ function ShopProfilePage() {
 	return (
 		<main className="pb-16">
 			<div className="page-container !pt-6">
-				<Link
-					to="/barbershops/listing"
-					className="inline-flex items-center gap-1.5 text-[12px] font-medium text-(--text-muted) transition-colors hover:text-(--gold)"
-				>
+				<Link to="/barbershops/listing" className="back-link">
 					<ChevronLeft size={14} /> {t("shop.back")}
 				</Link>
 

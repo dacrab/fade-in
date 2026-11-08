@@ -241,7 +241,7 @@ function AppointmentRow({
 						))}
 					</div>
 					<textarea
-						className="w-full rounded-lg border border-(--border) bg-(--bg-card) px-3 py-2 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:ring-2 focus:ring-(--gold)/30 resize-none"
+						className="input resize-none"
 						rows={2}
 						placeholder={t("dashboard.reviewPlaceholder")}
 						aria-label={t("dashboard.reviewPlaceholder")}

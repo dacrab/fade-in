@@ -225,7 +225,7 @@ function BusinessProfile() {
 							</label>
 							<input
 								id="shop-name"
-								className="input w-full text-sm"
+								className="input"
 								placeholder={t("business.profile.namePlaceholder")}
 								value={form.name}
 								onChange={set("name")}
@@ -257,7 +257,7 @@ function BusinessProfile() {
 								</label>
 								<input
 									id="shop-phone"
-									className="input w-full text-sm"
+									className="input"
 									placeholder={t("business.profile.phonePlaceholder")}
 									value={form.phone}
 									onChange={set("phone")}
@@ -270,7 +270,7 @@ function BusinessProfile() {
 								</label>
 								<input
 									id="shop-city"
-									className="input w-full text-sm"
+									className="input"
 									placeholder={t("form.cityPlaceholder")}
 									value={form.city}
 									onChange={set("city")}
@@ -284,7 +284,7 @@ function BusinessProfile() {
 							</label>
 							<input
 								id="shop-address"
-								className="input w-full text-sm"
+								className="input"
 								placeholder={t("business.profile.addressPlaceholder")}
 								value={form.address}
 								onChange={set("address")}
@@ -349,7 +349,7 @@ function BusinessProfile() {
 								</label>
 								<input
 									id="shop-lat"
-									className="input w-full text-sm"
+									className="input"
 									value={form.lat}
 									onChange={set("lat")}
 									type="number"
@@ -362,7 +362,7 @@ function BusinessProfile() {
 								</label>
 								<input
 									id="shop-lng"
-									className="input w-full text-sm"
+									className="input"
 									value={form.lng}
 									onChange={set("lng")}
 									type="number"
@@ -384,7 +384,7 @@ function BusinessProfile() {
 								</label>
 								<input
 									id={`social-${key}`}
-									className="input w-full text-sm"
+									className="input"
 									placeholder="https://..."
 									value={form[key]}
 									onChange={set(key)}

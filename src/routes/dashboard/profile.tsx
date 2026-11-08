@@ -61,7 +61,7 @@ function ProfilePage() {
 
 					<form onSubmit={(e) => void handleSave(e)} className="space-y-4">
 						<div>
-							<label className="form-label" htmlFor="profile-name">
+							<label className="field-label" htmlFor="profile-name">
 								{t("auth.nameLabel")}
 							</label>
 							<input
@@ -73,7 +73,7 @@ function ProfilePage() {
 							/>
 						</div>
 						<div>
-							<label className="form-label" htmlFor="profile-phone">
+							<label className="field-label" htmlFor="profile-phone">
 								{t("form.phoneLabel")}
 							</label>
 							<input
@@ -86,7 +86,7 @@ function ProfilePage() {
 							/>
 						</div>
 						<div>
-							<label className="form-label" htmlFor="profile-email">
+							<label className="field-label" htmlFor="profile-email">
 								{t("auth.emailLabel")}
 							</label>
 							<input

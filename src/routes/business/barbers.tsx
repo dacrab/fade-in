@@ -71,7 +71,7 @@ function BusinessBarbers() {
 						</label>
 						<input
 							id="barber-name"
-							className="input w-full text-sm"
+							className="input"
 							placeholder={t("business.barbers.namePlaceholder")}
 							value={crud.form.name}
 							onChange={(e) => crud.setForm((f) => ({ ...f, name: e.target.value }))}
@@ -84,7 +84,7 @@ function BusinessBarbers() {
 						</label>
 						<input
 							id="barber-specs"
-							className="input w-full text-sm"
+							className="input"
 							placeholder={t("business.barbers.specializationsPlaceholder")}
 							value={crud.form.specializations}
 							onChange={(e) => crud.setForm((f) => ({ ...f, specializations: e.target.value }))}
@@ -97,7 +97,7 @@ function BusinessBarbers() {
 						<input
 							id="barber-account-email"
 							type="email"
-							className="input w-full text-sm"
+							className="input"
 							placeholder={t("business.barbers.accountEmailPlaceholder")}
 							value={crud.form.accountEmail}
 							onChange={(e) => crud.setForm((f) => ({ ...f, accountEmail: e.target.value }))}
@@ -110,7 +110,7 @@ function BusinessBarbers() {
 						</label>
 						<textarea
 							id="barber-bio"
-							className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors resize-none"
+							className="input resize-none"
 							rows={2}
 							placeholder={t("business.barbers.bioPlaceholder")}
 							value={crud.form.bio}

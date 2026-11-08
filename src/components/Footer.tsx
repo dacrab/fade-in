@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import { ArrowUpRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import BrandMark from "./BrandMark"
+import BrandLockup from "./BrandLockup"
 
 export default function Footer() {
 	const { t } = useTranslation()
@@ -11,11 +11,8 @@ export default function Footer() {
 			<div className="page-wrap px-5 md:px-8 py-12 md:py-16">
 				<div className="grid gap-10 md:grid-cols-12">
 					<div className="md:col-span-6">
-						<Link to="/" className="inline-flex items-center gap-2.5 no-underline">
-							<BrandMark size={32} />
-							<span className="font-serif text-[1.3rem] font-medium leading-none tracking-[-0.03em] text-(--text)">
-								Fade<span className="italic text-(--gold)">In</span>
-							</span>
+						<Link to="/" className="no-underline">
+							<BrandLockup size={32} wordmarkClassName="text-[1.3rem] text-(--text)" />
 						</Link>
 						<p className="mt-4 max-w-xs font-serif text-[1.35rem] leading-[1.3] tracking-[-0.02em] text-(--text-muted)">
 							{t("footer.tagline")}

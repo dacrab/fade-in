@@ -78,7 +78,7 @@ function BusinessReviews() {
 								) : replyId === r._id ? (
 									<div className="flex gap-2 mt-3">
 										<input
-											className="flex-1 bg-(--bg-card) border border-(--border) rounded-lg px-3 py-2 main-sm placeholder:text-(--text-subtle) focus:outline-none focus:border-(--gold) transition-colors"
+											className="input flex-1"
 											placeholder={t("business.reviews.replyPlaceholder")}
 											aria-label={t("business.reviews.replyPlaceholder")}
 											value={replyText}

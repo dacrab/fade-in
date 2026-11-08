@@ -82,7 +82,7 @@ function BusinessServices() {
 							{t("form.nameStar")}
 						</label>
 						<input
-							className="input w-full text-sm"
+							className="input"
 							id="svc-name"
 							placeholder={t("business.services.namePlaceholder")}
 							value={crud.form.name}
@@ -95,7 +95,7 @@ function BusinessServices() {
 							{t("form.priceLabel")} *
 						</label>
 						<input
-							className="input w-full text-sm"
+							className="input"
 							type="number"
 							step="0.01"
 							min="0.01"
@@ -110,7 +110,7 @@ function BusinessServices() {
 							{t("form.durationLabel")} *
 						</label>
 						<input
-							className="input w-full text-sm"
+							className="input"
 							type="number"
 							min="5"
 							step="5"
@@ -126,7 +126,7 @@ function BusinessServices() {
 						</label>
 						<select
 							id="svc-category"
-							className="w-full bg-(--bg-card) border border-(--border) rounded-lg px-4 py-3 main-sm focus:outline-none focus:border-(--gold) transition-colors"
+							className="input"
 							value={crud.form.category}
 							onChange={set("category")}
 						>
@@ -142,7 +142,7 @@ function BusinessServices() {
 							{t("form.descriptionLabel")}
 						</label>
 						<input
-							className="input w-full text-sm"
+							className="input"
 							placeholder={t("form.optional")}
 							value={crud.form.description}
 							onChange={set("description")}

@@ -11,10 +11,7 @@ function TermsPage() {
 	return (
 		<main className="page-main">
 			<div className="page-wrap max-w-3xl px-5 py-10 md:px-8 md:py-14">
-				<Link
-					to="/"
-					className="inline-flex items-center gap-1.5 text-[12px] font-medium text-(--text-muted) transition-colors hover:text-(--gold)"
-				>
+				<Link to="/" className="back-link">
 					<ArrowLeft size={14} />
 					{t("common.back")}
 				</Link>

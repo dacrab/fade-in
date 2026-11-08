@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
-import BrandMark from "./BrandMark"
+import BrandLockup from "./BrandLockup"
 
 export default function AuthShell({
 	title,
@@ -23,11 +23,13 @@ export default function AuthShell({
 						className="absolute inset-0 h-full w-full object-cover"
 					/>
 					<div className="absolute inset-0 bg-gradient-to-t from-[#191512]/85 via-[#191512]/15 to-[#191512]/10" />
-					<div className="absolute left-8 top-8 flex items-center gap-2 text-[#fffaf5]/85">
-						<BrandMark size={32} />
-						<span className="font-serif text-[1.2rem] font-medium tracking-[-0.03em]">
-							Fade<span className="italic text-(--gold-light)">In</span>
-						</span>
+					<div className="absolute left-8 top-8 text-[#fffaf5]/85">
+						<BrandLockup
+							size={32}
+							className="gap-2"
+							wordmarkClassName="text-[1.2rem]"
+							accentClassName="text-(--gold-light)"
+						/>
 					</div>
 					<div className="absolute inset-x-8 bottom-8">
 						<p className="max-w-xs font-serif text-[2rem] font-medium leading-[1.12] tracking-[-0.025em] text-[#fffaf5]">

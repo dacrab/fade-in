@@ -45,16 +45,13 @@ function HomePage() {
 
 							<form
 								onSubmit={handleSearch}
-								className="mt-9 max-w-xl rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-2 shadow-[var(--shadow-xs)] fade-up [animation-delay:180ms]"
+								className="search-bar mt-9 max-w-xl fade-up [animation-delay:180ms]"
 							>
 								<div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-									<div className="flex flex-1 items-center gap-2.5 rounded-(--radius) px-3 py-2 transition-colors focus-within:bg-(--bg-input)/60">
-										<Search size={16} className="shrink-0 text-(--text-subtle)" />
+									<div className="search-field">
+										<Search size={16} />
 										<div className="min-w-0 flex-1">
-											<label
-												htmlFor="home-search"
-												className="block text-[9.5px] font-semibold uppercase tracking-[0.14em] text-(--text-subtle)"
-											>
+											<label htmlFor="home-search" className="search-field-label">
 												{t("home.searchLabel")}
 											</label>
 											<input
@@ -63,20 +60,17 @@ function HomePage() {
 												placeholder={t("home.searchPlaceholder")}
 												value={search}
 												onChange={(e) => setSearch(e.target.value)}
-												className="w-full border-none bg-transparent p-0 text-sm text-(--text) outline-none placeholder:text-(--text-subtle)"
+												className="search-field-input"
 											/>
 										</div>
 									</div>
 
 									<div className="hidden w-px self-stretch bg-(--border) sm:block" />
 
-									<div className="flex flex-1 items-center gap-2.5 rounded-(--radius) px-3 py-2 transition-colors focus-within:bg-(--bg-input)/60">
-										<MapPin size={16} className="shrink-0 text-(--text-subtle)" />
+									<div className="search-field">
+										<MapPin size={16} />
 										<div className="min-w-0 flex-1">
-											<label
-												htmlFor="home-city"
-												className="block text-[9.5px] font-semibold uppercase tracking-[0.14em] text-(--text-subtle)"
-											>
+											<label htmlFor="home-city" className="search-field-label">
 												{t("home.cityLabel")}
 											</label>
 											<input
@@ -85,7 +79,7 @@ function HomePage() {
 												placeholder={t("home.cityPlaceholder")}
 												value={city}
 												onChange={(e) => setCity(e.target.value)}
-												className="w-full border-none bg-transparent p-0 text-sm text-(--text) outline-none placeholder:text-(--text-subtle)"
+												className="search-field-input"
 											/>
 										</div>
 									</div>

@@ -130,7 +130,7 @@ function BookingPage() {
 			<div className="page-wrap max-w-3xl px-5 py-10 md:px-8 md:py-14">
 				<Link
 					to={isOwnerOrAdmin(user) ? "/business/appointments" : "/dashboard/overview"}
-					className="inline-flex items-center gap-1.5 text-[12px] font-medium text-(--text-muted) transition-colors hover:text-(--gold)"
+					className="back-link"
 				>
 					<ArrowLeft size={14} />
 					{t("common.back")}

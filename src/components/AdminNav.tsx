@@ -9,10 +9,8 @@ const NAV_LINKS = [
 	{ to: "/admin/appointments" as const, labelKey: "admin.appointments.title", icon: Calendar },
 ]
 
-const NAV_ITEM =
-	"flex items-center gap-2.5 rounded-(--radius) border-l-2 border-transparent px-3 py-2 text-[13px] font-medium text-(--text-muted) transition-colors hover:bg-(--bg-input) hover:text-(--text)"
-const NAV_ITEM_ACTIVE =
-	"flex items-center gap-2.5 rounded-(--radius) border-l-2 border-(--gold) bg-(--gold)/7 px-3 py-2 text-[13px] font-medium text-(--text)"
+const NAV_ITEM = "side-nav-item"
+const NAV_ITEM_ACTIVE = "is-active"
 
 export default function AdminNav() {
 	const { t } = useTranslation()
@@ -21,15 +19,7 @@ export default function AdminNav() {
 			<div className="border-b border-(--border) md:hidden">
 				<nav className="flex gap-1 overflow-x-auto px-3 py-2.5 scrollbar-hide">
 					{NAV_LINKS.map(({ to, labelKey, icon: Icon }) => (
-						<Link
-							key={to}
-							to={to}
-							className="flex shrink-0 items-center gap-1.5 rounded-(--radius) px-2.5 py-2 text-[11.5px] font-medium text-(--text-muted) transition-colors hover:bg-(--bg-input) hover:text-(--text)"
-							activeProps={{
-								className:
-									"flex shrink-0 items-center gap-1.5 rounded-(--radius) bg-(--ink) px-2.5 py-2 text-[11.5px] font-medium text-(--bg)",
-							}}
-						>
+						<Link key={to} to={to} className="mobile-nav-item" activeProps={{ className: "is-active" }}>
 							<Icon size={13} />
 							{t(labelKey)}
 						</Link>

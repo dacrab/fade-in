@@ -109,11 +109,11 @@ function BarbershopsPage() {
 				</div>
 
 				<form onSubmit={handleSearch} className="mb-5">
-					<div className="flex flex-col rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-2 shadow-[var(--shadow-xs)] sm:flex-row sm:items-stretch">
-						<div className="flex flex-1 items-center gap-2.5 rounded-(--radius) px-3 py-2 transition-colors focus-within:bg-(--bg-input)/60">
-							<Search size={16} className="shrink-0 text-(--text-subtle)" />
+					<div className="search-bar flex flex-col sm:flex-row sm:items-stretch">
+						<div className="search-field">
+							<Search size={16} />
 							<input
-								className="min-w-0 flex-1 border-none bg-transparent p-0 text-sm text-(--text) outline-none placeholder:text-(--text-subtle)"
+								className="search-field-input"
 								placeholder={t("barbershops.searchPlaceholder")}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
@@ -122,10 +122,10 @@ function BarbershopsPage() {
 						</div>
 						<div className="hidden w-px self-stretch bg-(--border) sm:block" />
 						<div className="h-px w-full bg-(--border) sm:hidden" />
-						<div className="flex flex-1 items-center gap-2.5 rounded-(--radius) px-3 py-2 transition-colors focus-within:bg-(--bg-input)/60">
-							<MapPin size={15} className="shrink-0 text-(--text-subtle)" />
+						<div className="search-field">
+							<MapPin size={15} />
 							<input
-								className="min-w-0 flex-1 border-none bg-transparent p-0 text-sm text-(--text) outline-none placeholder:text-(--text-subtle)"
+								className="search-field-input"
 								placeholder={t("home.cityPlaceholder")}
 								value={city}
 								onChange={(e) => setCity(e.target.value)}
