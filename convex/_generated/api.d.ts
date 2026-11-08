@@ -14,6 +14,7 @@ import type * as appointments from "../appointments.js";
 import type * as barbers from "../barbers.js";
 import type * as barbershops from "../barbershops.js";
 import type * as crons from "../crons.js";
+import type * as devSeed from "../devSeed.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_email from "../lib/email.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   barbers: typeof barbers;
   barbershops: typeof barbershops;
   crons: typeof crons;
+  devSeed: typeof devSeed;
   http: typeof http;
   "lib/auth": typeof lib_auth;
   "lib/email": typeof lib_email;

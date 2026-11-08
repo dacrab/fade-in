@@ -5,7 +5,7 @@ export default {
 	providers: [
 		{
 			domain,
-			applicationID: "clerk",
+			applicationID: "convex",
 		},
 	],
 }
