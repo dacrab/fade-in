@@ -1,11 +1,11 @@
 import { useSignUp } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
-import { Scissors } from "lucide-react"
 import type { FormEvent } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
+import AuthShell from "#/components/AuthShell"
 import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
 import type { UserRole } from "#/types"
@@ -105,142 +105,122 @@ function RegisterPage() {
 	}
 
 	return (
-		<main className="flex-1 flex items-center justify-center px-4 py-8">
-			<div className="w-full max-w-sm">
-				<Link to="/" className="flex items-center justify-center gap-2 mb-5 no-underline">
-					<div className="w-9 h-9 rounded-lg bg-(--gold) flex items-center justify-center">
-						<Scissors size={16} className="text-white" />
-					</div>
-					<span className="text-lg font-bold text-(--text)">
-						Fade<span className="text-(--gold)">In</span>
-					</span>
-				</Link>
-
-				<div className="bg-(--bg-card) rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-8">
-					<h1 className="page-title mb-1 text-center">{t("auth.registerTitle")}</h1>
-					<p className="muted-sm mb-6 text-center">{t("auth.registerSubtitle")}</p>
-
-					<div className="flex rounded-lg bg-(--bg) border border-(--border) p-1 mb-6">
-						{(["customer", "owner"] as const).map((r) => (
-							<button
-								key={r}
-								type="button"
-								onClick={() => setRole(r)}
-								className={`flex-1 py-2 text-sm font-medium rounded-md transition-all duration-200 ${role === r ? "bg-(--gold) text-white shadow-sm" : "text-(--text-muted) hover:text-(--text)"}`}
-							>
-								{r === "customer" ? t("auth.roleCustomer") : t("auth.roleOwner")}
-							</button>
-						))}
-					</div>
-
-					<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
-						<div>
-							<label className="block strong-sm mb-1.5" htmlFor="reg-name">
-								{t("auth.nameLabel")}
-							</label>
-							<input
-								id="reg-name"
-								className="input"
-								placeholder={t("auth.namePlaceholder")}
-								value={name}
-								onChange={(e) => setName(e.target.value)}
-								required
-								autoComplete="name"
-							/>
-						</div>
-						<div>
-							<label className="block strong-sm mb-1.5" htmlFor="reg-email">
-								{t("auth.emailLabel")}
-							</label>
-							<input
-								id="reg-email"
-								type="email"
-								className="input"
-								placeholder={t("auth.emailPlaceholder")}
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-								autoComplete="email"
-							/>
-						</div>
-						<div>
-							<label className="block strong-sm mb-1.5" htmlFor="reg-password">
-								{t("auth.passwordLabel")}
-							</label>
-							<PasswordInput
-								id="reg-password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								placeholder={t("form.passwordMin")}
-								autoComplete="new-password"
-								required
-							/>
-							{password.length > 0 && (
-								<div className="mt-2">
-									<div className="flex gap-1">
-										{[1, 2, 3, 4].map((i) => (
-											<div
-												key={i}
-												className={`h-1 flex-1 rounded-full transition-colors duration-200 ${i <= strength.score ? STRENGTH_STYLE[strength.key].bar : "bg-(--border)"}`}
-											/>
-										))}
-									</div>
-									<p className={`text-xs mt-1 ${STRENGTH_STYLE[strength.key].text}`}>
-										{t(`auth.strength.${strength.key}`)}
-									</p>
-								</div>
-							)}
-						</div>
-						<div>
-							<label className="block strong-sm mb-1.5" htmlFor="reg-confirm">
-								{t("auth.confirmPasswordLabel")}
-							</label>
-							<PasswordInput
-								id="reg-confirm"
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								placeholder={t("auth.confirmPasswordPlaceholder")}
-								autoComplete="new-password"
-								required
-							/>
-							{confirmPassword.length > 0 && password !== confirmPassword && (
-								<p className="text-xs text-(--error) mt-1">{t("errors.passwordMismatch")}</p>
-							)}
-						</div>
-						<button
-							type="submit"
-							disabled={loading}
-							className="btn btn-primary w-full justify-center py-3"
-						>
-							{loading ? t("auth.creatingAccount") : t("common.createAccount")}
-						</button>
-					</form>
-
-					<p className="mt-5 text-xs text-center text-(--text-subtle)">
-						{t("auth.agreeTerms")}{" "}
-						<Link
-							to="/terms"
-							className="text-(--gold)/70 hover:text-(--gold) hover:underline no-underline"
-						>
-							{t("auth.terms")}
-						</Link>
-						{t("form.andSeparator")}
-						<Link
-							to="/privacy"
-							className="text-(--gold)/70 hover:text-(--gold) hover:underline no-underline"
-						>
-							{t("auth.privacy")}
-						</Link>
-					</p>
-
-					<p className="mt-4 text-center muted-sm">
-						{t("auth.haveAccount")}{" "}
-						<Link to="/login" className="text-(--gold) hover:underline no-underline font-medium">
-							{t("common.signIn")}
-						</Link>
-					</p>
-				</div>
+		<AuthShell title={t("auth.registerTitle")} subtitle={t("auth.registerSubtitle")}>
+			<div className="mb-6 grid grid-cols-2 gap-1 rounded-(--radius) border border-(--border) bg-(--bg) p-1">
+				{(["customer", "owner"] as const).map((r) => (
+					<button
+						key={r}
+						type="button"
+						onClick={() => setRole(r)}
+						className={`rounded-[3px] py-2 text-[12px] font-semibold transition-colors ${
+							role === r
+								? "bg-(--ink) text-(--bg)"
+								: "text-(--text-muted) hover:bg-(--bg-card) hover:text-(--text)"
+						}`}
+					>
+						{r === "customer" ? t("auth.roleCustomer") : t("auth.roleOwner")}
+					</button>
+				))}
 			</div>
-		</main>
+
+			<form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+				<div>
+					<label className="field-label" htmlFor="reg-name">
+						{t("auth.nameLabel")}
+					</label>
+					<input
+						id="reg-name"
+						className="input"
+						placeholder={t("auth.namePlaceholder")}
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+						required
+						autoComplete="name"
+					/>
+				</div>
+				<div>
+					<label className="field-label" htmlFor="reg-email">
+						{t("auth.emailLabel")}
+					</label>
+					<input
+						id="reg-email"
+						type="email"
+						className="input"
+						placeholder={t("auth.emailPlaceholder")}
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						required
+						autoComplete="email"
+					/>
+				</div>
+				<div>
+					<label className="field-label" htmlFor="reg-password">
+						{t("auth.passwordLabel")}
+					</label>
+					<PasswordInput
+						id="reg-password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						placeholder={t("form.passwordMin")}
+						autoComplete="new-password"
+						required
+					/>
+					{password.length > 0 && (
+						<div className="mt-2">
+							<div className="flex gap-1">
+								{[1, 2, 3, 4].map((i) => (
+									<div
+										key={i}
+										className={`h-1 flex-1 rounded-full transition-colors duration-200 ${i <= strength.score ? STRENGTH_STYLE[strength.key].bar : "bg-(--border)"}`}
+									/>
+								))}
+							</div>
+							<p className={`mt-1 text-[11px] ${STRENGTH_STYLE[strength.key].text}`}>
+								{t(`auth.strength.${strength.key}`)}
+							</p>
+						</div>
+					)}
+				</div>
+				<div>
+					<label className="field-label" htmlFor="reg-confirm">
+						{t("auth.confirmPasswordLabel")}
+					</label>
+					<PasswordInput
+						id="reg-confirm"
+						value={confirmPassword}
+						onChange={(e) => setConfirmPassword(e.target.value)}
+						placeholder={t("auth.confirmPasswordPlaceholder")}
+						autoComplete="new-password"
+						required
+					/>
+					{confirmPassword.length > 0 && password !== confirmPassword && (
+						<p className="mt-1 text-[11px] text-(--error)">{t("errors.passwordMismatch")}</p>
+					)}
+				</div>
+				<button type="submit" disabled={loading} className="btn btn-primary w-full justify-center py-3">
+					{loading ? t("auth.creatingAccount") : t("common.createAccount")}
+				</button>
+			</form>
+
+			<p className="mt-4 text-[11px] leading-relaxed text-(--text-subtle)">
+				{t("auth.agreeTerms")}{" "}
+				<Link to="/terms" className="text-(--gold) hover:underline">
+					{t("auth.terms")}
+				</Link>{" "}
+				{t("form.andSeparator")}{" "}
+				<Link to="/privacy" className="text-(--gold) hover:underline">
+					{t("auth.privacy")}
+				</Link>
+			</p>
+
+			<div className="mt-5 border-t border-(--border) pt-5">
+				<p className="muted-sm m-0">
+					{t("auth.haveAccount")}{" "}
+					<Link to="/login" className="font-semibold text-(--gold) hover:underline">
+						{t("common.signIn")}
+					</Link>
+				</p>
+			</div>
+		</AuthShell>
 	)
 }

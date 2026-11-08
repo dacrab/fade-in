@@ -1,9 +1,9 @@
 import { useSignIn } from "@clerk/tanstack-react-start"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
-import { Scissors } from "lucide-react"
 import type { FormEvent } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import AuthShell from "#/components/AuthShell"
 import PasswordInput from "#/components/ui/PasswordInput"
 import { showToast } from "#/components/ui/Toast"
 
@@ -87,121 +87,106 @@ function ResetPasswordPage() {
 	}
 
 	return (
-		<main className="auth-page">
-			<div className="w-full max-w-md">
-				<div className="text-center mb-8">
-					<Link to="/" className="auth-logo">
-						<div className="auth-logo-icon text-(--gold)">
-							<Scissors size={20} className="text-black" />
-						</div>
-						<span className="page-title">
-							Fade<span className="text-(--gold)">In</span>
-						</span>
-					</Link>
-					<h1 className="page-title mb-1">{t("resetPassword.title")}</h1>
-					<p className="muted-sm">{t("resetPassword.subtitle")}</p>
-				</div>
-
-				<div className="card p-6 sm:p-8">
-					{step === "reset" ? (
-						<form onSubmit={(e) => void handleReset(e)} className="space-y-4">
-							<p className="muted-sm">{t("resetPassword.checkEmail")}</p>
-							<div>
-								<label className="form-label" htmlFor="reset-code">
-									{t("resetPassword.codeLabel")}
-								</label>
-								<input
-									id="reset-code"
-									type="text"
-									inputMode="numeric"
-									className="input"
-									placeholder={t("resetPassword.codePlaceholder")}
-									value={code}
-									onChange={(e) => setCode(e.target.value)}
-									required
-									disabled={loading}
-									autoComplete="one-time-code"
-								/>
-							</div>
-							<div>
-								<label className="form-label" htmlFor="reset-password">
-									{t("resetPassword.newPasswordLabel")}
-								</label>
-								<PasswordInput
-									id="reset-password"
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-									placeholder={t("resetPassword.newPasswordPlaceholder")}
-									autoComplete="new-password"
-									required
-									disabled={loading}
-								/>
-							</div>
-							<div>
-								<label className="form-label" htmlFor="reset-confirm-password">
-									{t("resetPassword.confirmPasswordLabel")}
-								</label>
-								<PasswordInput
-									id="reset-confirm-password"
-									value={confirmPassword}
-									onChange={(e) => setConfirmPassword(e.target.value)}
-									placeholder={t("resetPassword.confirmPasswordLabel")}
-									autoComplete="new-password"
-									required
-									disabled={loading}
-								/>
-							</div>
-							<button
-								type="submit"
-								disabled={loading}
-								className="btn btn-primary w-full justify-center py-3 mt-2"
-							>
-								{loading ? t("resetPassword.resetting") : t("resetPassword.resetButton")}
-							</button>
-							<button
-								type="button"
-								onClick={backToEmail}
-								disabled={loading}
-								className="btn w-full justify-center"
-							>
-								{t("common.back")}
-							</button>
-						</form>
-					) : (
-						<form onSubmit={(e) => void handleSendCode(e)} className="space-y-4">
-							<div>
-								<label className="form-label" htmlFor="reset-email">
-									{t("resetPassword.emailLabel")}
-								</label>
-								<input
-									id="reset-email"
-									type="email"
-									className="input"
-									placeholder={t("resetPassword.emailPlaceholder")}
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									required
-									autoComplete="email"
-								/>
-							</div>
-							<button
-								type="submit"
-								disabled={loading}
-								className="btn btn-primary w-full justify-center py-3 mt-2"
-							>
-								{loading ? t("resetPassword.sending") : t("resetPassword.sendLink")}
-							</button>
-						</form>
-					)}
-
-					<div className="mt-6 text-center muted-sm">
-						{t("resetPassword.rememberPassword")}{" "}
-						<Link to="/login" className="text-(--gold) hover:underline no-underline font-semibold">
-							{t("common.signIn")}
-						</Link>
+		<AuthShell title={t("resetPassword.title")} subtitle={t("resetPassword.subtitle")}>
+			{step === "reset" ? (
+				<form onSubmit={(e) => void handleReset(e)} className="space-y-4">
+					<p className="muted-sm">{t("resetPassword.checkEmail")}</p>
+					<div>
+						<label className="field-label" htmlFor="reset-code">
+							{t("resetPassword.codeLabel")}
+						</label>
+						<input
+							id="reset-code"
+							type="text"
+							inputMode="numeric"
+							className="input"
+							placeholder={t("resetPassword.codePlaceholder")}
+							value={code}
+							onChange={(e) => setCode(e.target.value)}
+							required
+							disabled={loading}
+							autoComplete="one-time-code"
+						/>
 					</div>
-				</div>
+					<div>
+						<label className="field-label" htmlFor="reset-password">
+							{t("resetPassword.newPasswordLabel")}
+						</label>
+						<PasswordInput
+							id="reset-password"
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							placeholder={t("resetPassword.newPasswordPlaceholder")}
+							autoComplete="new-password"
+							required
+							disabled={loading}
+						/>
+					</div>
+					<div>
+						<label className="field-label" htmlFor="reset-confirm-password">
+							{t("resetPassword.confirmPasswordLabel")}
+						</label>
+						<PasswordInput
+							id="reset-confirm-password"
+							value={confirmPassword}
+							onChange={(e) => setConfirmPassword(e.target.value)}
+							placeholder={t("resetPassword.confirmPasswordLabel")}
+							autoComplete="new-password"
+							required
+							disabled={loading}
+						/>
+					</div>
+					<button
+						type="submit"
+						disabled={loading}
+						className="btn btn-primary mt-2 w-full justify-center py-3"
+					>
+						{loading ? t("resetPassword.resetting") : t("resetPassword.resetButton")}
+					</button>
+					<button
+						type="button"
+						onClick={backToEmail}
+						disabled={loading}
+						className="btn btn-ghost w-full justify-center"
+					>
+						{t("common.back")}
+					</button>
+				</form>
+			) : (
+				<form onSubmit={(e) => void handleSendCode(e)} className="space-y-4">
+					<div>
+						<label className="field-label" htmlFor="reset-email">
+							{t("resetPassword.emailLabel")}
+						</label>
+						<input
+							id="reset-email"
+							type="email"
+							className="input"
+							placeholder={t("resetPassword.emailPlaceholder")}
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							required
+							autoComplete="email"
+						/>
+					</div>
+					<button
+						type="submit"
+						disabled={loading}
+						className="btn btn-primary mt-2 w-full justify-center py-3"
+					>
+						{loading ? t("resetPassword.sending") : t("resetPassword.sendLink")}
+					</button>
+				</form>
+			)}
+
+			<div className="mt-6 border-t border-(--border) pt-5">
+				<p className="muted-sm m-0">
+					{t("resetPassword.rememberPassword")}{" "}
+					<Link to="/login" className="font-semibold text-(--gold) hover:underline">
+						{t("common.signIn")}
+					</Link>
+				</p>
 			</div>
-		</main>
+		</AuthShell>
 	)
 }

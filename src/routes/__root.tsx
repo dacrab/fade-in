@@ -22,7 +22,7 @@ export const Route = createRootRoute({
 				content:
 					"Discover and book top barbershops near you. FadeIn is the modern platform for premium grooming experiences.",
 			},
-			{ name: "theme-color", content: "#C84B31" },
+			{ name: "theme-color", content: "#F7F4EE" },
 		],
 		links: [
 			{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -30,7 +30,7 @@ export const Route = createRootRoute({
 			{
 				rel: "stylesheet",
 				href:
-					"https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap",
+					"https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..700&family=Fraunces:opsz,wght@9..144,400..700&display=swap",
 			},
 			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
 			{ rel: "stylesheet", href: appCss },
@@ -45,8 +45,8 @@ function NotFound() {
 	const { t } = useTranslation()
 	return (
 		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
-			<h1 className="text-6xl font-bold text-(--border)">404</h1>
-			<p className="text-lg font-semibold text-(--text)">{t("errors.notFoundTitle")}</p>
+			<span className="font-serif text-7xl font-medium italic leading-none text-(--gold)/30">404</span>
+			<h1 className="display text-[2.1rem] text-(--text)">{t("errors.notFoundTitle")}</h1>
 			<p className="muted-sm max-w-sm">{t("errors.notFoundMessage")}</p>
 			<Link to="/" className="btn btn-primary mt-4">
 				{t("errors.backHome")}
@@ -60,7 +60,7 @@ function RouteError({ reset }: ErrorComponentProps) {
 
 	return (
 		<main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
-			<h1 className="text-xl font-bold text-(--text)">{t("errors.errorTitle")}</h1>
+			<h1 className="display text-[2rem] text-(--text)">{t("errors.errorTitle")}</h1>
 			<p className="muted-sm max-w-sm">{t("errors.errorMessage")}</p>
 			<button type="button" onClick={reset} className="btn btn-primary mt-4">
 				{t("errors.tryAgain")}

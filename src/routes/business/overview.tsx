@@ -62,9 +62,9 @@ function BusinessDashboard() {
 	}
 
 	return (
-		<div className="px-8 py-8">
+		<div className="px-5 py-8 md:px-8 md:py-10">
 			<div className="mb-5">
-				<h1 className="section-title">{t("business.overviewTitle")}</h1>
+				<h1 className="page-title">{t("business.overviewTitle")}</h1>
 				<p className="muted-sm mt-1">{t("dashboard.welcome", { name: user.name })}</p>
 			</div>
 
@@ -90,7 +90,9 @@ function BusinessDashboard() {
 					] as const
 				).map(({ label, value }) => (
 					<div key={label} className="border-l-2 border-(--gold)/40 pl-4 py-3">
-						<div className="text-2xl font-semibold text-(--text) tracking-tight">{value}</div>
+						<div className="font-serif text-[2rem] font-medium leading-none tracking-[-0.03em] text-(--text)">
+							{value}
+						</div>
 						<div className="muted-xs mt-1">{label}</div>
 					</div>
 				))}
@@ -131,7 +133,9 @@ function BusinessDashboard() {
 											{appt.endTime} · {formatPrice(appt.totalPrice)}
 										</div>
 									</div>
-									<span className={`text-[10px] px-2 py-0.5 rounded-full ${STATUS_BADGE[appt.status]}`}>
+									<span
+										className={`text-[10px] px-2 py-0.5 rounded-(--radius-sm) ${STATUS_BADGE[appt.status]}`}
+									>
 										{t(`status.${appt.status}`)}
 									</span>
 								</div>
@@ -140,7 +144,7 @@ function BusinessDashboard() {
 				)}
 			</div>
 
-			<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5">
+			<div className="rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-6 mb-5">
 				<h2 className="text-xs font-medium text-(--text-muted) mb-5">{t("business.revenue.title")}</h2>
 				{stats === undefined ? (
 					<Skeleton className="h-24 w-full" />

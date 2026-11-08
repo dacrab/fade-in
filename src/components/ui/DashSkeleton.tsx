@@ -8,10 +8,10 @@ export function DashSkeleton({ className }: { className?: string }) {
 			<Skeleton className="h-8 w-48" />
 			<div className="grid grid-cols-4 gap-3">
 				{[0, 1, 2, 3].map((i) => (
-					<Skeleton key={i} className="h-16 rounded-xl" />
+					<Skeleton key={i} className="h-16 rounded-(--radius-lg)" />
 				))}
 			</div>
-			<Skeleton className="h-48 rounded-xl" />
+			<Skeleton className="h-48 rounded-(--radius-lg)" />
 		</div>
 	)
 }

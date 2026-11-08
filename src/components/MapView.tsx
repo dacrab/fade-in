@@ -106,7 +106,7 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 	}, [ready, shopsWithCoords, onShopClick, t])
 
 	return (
-		<div className="relative rounded-2xl overflow-hidden border border-(--border) h-125">
+		<div className="relative rounded-(--radius-lg) overflow-hidden border border-(--border) h-125">
 			<div ref={mapContainerRef} className="w-full h-full" />
 			{shopsWithCoords.length === 0 && (
 				<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">

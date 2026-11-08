@@ -183,13 +183,17 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="flex items-center justify-center px-5 py-4 gap-3">
+				<div className="grid grid-cols-4 gap-2 px-6 pb-4">
 					{stepLabels.map((label, i) => (
-						<div
-							key={label}
-							className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold transition-all duration-300 ${i + 1 <= step ? "bg-(--gold) text-white" : "bg-(--bg-input) text-(--text-subtle)"}`}
-						>
-							{i + 1 < step ? <Check size={14} /> : i + 1}
+						<div key={label}>
+							<div
+								className={`h-0.5 w-full transition-colors duration-300 ${i + 1 <= step ? "bg-(--gold)" : "bg-(--border)"}`}
+							/>
+							<span
+								className={`mt-2 block text-[9.5px] font-semibold uppercase tracking-[0.08em] transition-colors ${i + 1 <= step ? "text-(--text)" : "text-(--text-subtle)"}`}
+							>
+								{label}
+							</span>
 						</div>
 					))}
 				</div>
@@ -210,10 +214,10 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											key={svc._id}
 											type="button"
 											onClick={() => toggleService(svc._id)}
-											className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
+											className={`flex w-full cursor-pointer items-center gap-3 rounded-(--radius) border p-4 text-left transition-colors duration-200 ${selected ? "border-(--gold)/40 bg-(--gold)/5" : "border-(--border) bg-(--bg-card) hover:border-(--border-hover)"}`}
 										>
 											<div
-												className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${selected ? "bg-(--gold)" : "border-2 border-(--border)"}`}
+												className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[3px] border transition-colors duration-200 ${selected ? "border-(--gold) bg-(--gold)" : "border-(--border-hover) bg-(--bg-card)"}`}
 											>
 												{selected && <Check size={12} className="text-(--bg-card)" />}
 											</div>
@@ -248,7 +252,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											setSelectedSlot("")
 											setResolvedBarberId(null)
 										}}
-										className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${anyBarber ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
+										className={`flex w-full cursor-pointer items-center gap-3 rounded-(--radius) border p-4 text-left transition-colors duration-200 ${anyBarber ? "border-(--gold)/40 bg-(--gold)/5" : "border-(--border) bg-(--bg-card) hover:border-(--border-hover)"}`}
 									>
 										<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
 											<Users size={18} />
@@ -257,7 +261,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 											<div className="strong-sm">{t("booking.anyBarber")}</div>
 										</div>
 										{anyBarber && (
-											<div className="w-6 h-6 rounded-full flex items-center justify-center bg-(--gold)">
+											<div className="flex h-5 w-5 items-center justify-center rounded-[3px] bg-(--gold)">
 												<Check size={14} className="text-(--bg-card)" />
 											</div>
 										)}
@@ -274,7 +278,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 													setSelectedSlot("")
 													setResolvedBarberId(b._id)
 												}}
-												className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer ${selected ? "bg-(--gold)/5 border-(--gold)/40" : "bg-(--bg-card) border-(--border) hover:border-(--border-hover)"}`}
+												className={`flex w-full cursor-pointer items-center gap-3 rounded-(--radius) border p-4 text-left transition-colors duration-200 ${selected ? "border-(--gold)/40 bg-(--gold)/5" : "border-(--border) bg-(--bg-card) hover:border-(--border-hover)"}`}
 											>
 												<div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-(--gold)/10 text-(--gold)">
 													{b.avatarUrl ? (
@@ -294,7 +298,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 													)}
 												</div>
 												{selected && (
-													<div className="w-6 h-6 rounded-full flex items-center justify-center bg-(--gold)">
+													<div className="flex h-5 w-5 items-center justify-center rounded-[3px] bg-(--gold)">
 														<Check size={14} className="text-(--bg-card)" />
 													</div>
 												)}
@@ -339,7 +343,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 															setSelectedSlot(entry.startTime)
 															setResolvedBarberId(entry.barberId)
 														}}
-														className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${selectedSlot === entry.startTime ? "bg-(--gold) border-(--gold) text-white" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--gold)/40"}`}
+														className={`cursor-pointer rounded-(--radius) border px-2 py-2.5 text-xs font-medium tabular-nums transition-colors duration-200 ${selectedSlot === entry.startTime ? "border-(--gold) bg-(--gold) text-white" : "border-(--border) bg-(--bg-card) text-(--text) hover:border-(--gold)/40"}`}
 													>
 														{entry.startTime}
 													</button>
@@ -357,7 +361,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 													key={slot}
 													type="button"
 													onClick={() => setSelectedSlot(slot)}
-													className={`py-2.5 px-2 text-xs rounded-full font-medium transition-all duration-200 border cursor-pointer ${selectedSlot === slot ? "bg-(--gold) border-(--gold) text-white" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--gold)/40"}`}
+													className={`cursor-pointer rounded-(--radius) border px-2 py-2.5 text-xs font-medium tabular-nums transition-colors duration-200 ${selectedSlot === slot ? "border-(--gold) bg-(--gold) text-white" : "border-(--border) bg-(--bg-card) text-(--text) hover:border-(--gold)/40"}`}
 												>
 													{slot}
 												</button>
@@ -384,8 +388,10 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 
 					{step === 4 && (
 						<div className="space-y-5">
-							<h3 className="font-semibold text-(--text)">{t("booking.summary")}</h3>
-							<div className="rounded-xl p-5 space-y-3 bg-(--bg-card) border border-(--border)">
+							<h3 className="font-serif text-xl font-medium tracking-[-0.02em] text-(--text)">
+								{t("booking.summary")}
+							</h3>
+							<div className="rounded-(--radius-lg) p-5 space-y-3 bg-(--bg-card) border border-(--border)">
 								{summaryRows.map(([label, val]) => (
 									<div key={label} className="flex justify-between text-sm">
 										<span className="text-(--text-muted)">{label}</span>
@@ -405,14 +411,14 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 									<button
 										type="button"
 										onClick={() => setPaymentMethod("onsite")}
-										className={`py-2.5 px-3 text-sm rounded-lg font-medium transition-all duration-200 border cursor-pointer ${paymentMethod === "onsite" ? "bg-(--gold)/5 border-(--gold)/40 text-(--text)" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--border-hover)"}`}
+										className={`cursor-pointer rounded-(--radius) border px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${paymentMethod === "onsite" ? "border-(--gold)/40 bg-(--gold)/5 text-(--text)" : "border-(--border) bg-(--bg-card) text-(--text) hover:border-(--border-hover)"}`}
 									>
 										{t("booking.payAtShop")}
 									</button>
 									<button
 										type="button"
 										onClick={() => setPaymentMethod("online")}
-										className={`py-2.5 px-3 text-sm rounded-lg font-medium transition-all duration-200 border cursor-pointer ${paymentMethod === "online" ? "bg-(--gold)/5 border-(--gold)/40 text-(--text)" : "bg-(--bg-card) border-(--border) text-(--text) hover:border-(--border-hover)"}`}
+										className={`cursor-pointer rounded-(--radius) border px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${paymentMethod === "online" ? "border-(--gold)/40 bg-(--gold)/5 text-(--text)" : "border-(--border) bg-(--bg-card) text-(--text) hover:border-(--border-hover)"}`}
 									>
 										{t("booking.payOnline")}
 									</button>
@@ -427,7 +433,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 						<button
 							type="button"
 							onClick={() => setStep((s) => (s > 1 ? ((s - 1) as Step) : s))}
-							className="rounded-lg px-5 py-2.5 text-sm font-medium border border-(--border) text-(--text) hover:bg-(--bg-input) transition-all duration-200 flex items-center gap-1 cursor-pointer"
+							className="btn btn-secondary"
 						>
 							<ChevronLeft size={16} /> {t("common.back")}
 						</button>
@@ -438,7 +444,7 @@ export default function BookingModal({ shop, onClose }: { shop: Barbershop; onCl
 							step === 4 ? void handleConfirm() : setStep((s) => (s < 4 ? ((s + 1) as Step) : s))
 						}
 						disabled={!canNext || loading}
-						className="rounded-lg flex-1 py-2.5 text-sm font-medium text-white transition-all duration-200 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed bg-(--gold) hover:bg-(--gold-dark) cursor-pointer"
+						className="btn btn-primary flex-1"
 					>
 						{loading
 							? t("booking.confirming")

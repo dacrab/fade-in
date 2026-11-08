@@ -31,31 +31,33 @@ export function CrudListPage({
 	const { t } = useTranslation()
 
 	return (
-		<div className="px-8 py-8">
-			<div className="max-w-3xl mx-auto px-6 py-8">
-				<div className="flex items-start justify-between mb-5">
-					<h1 className="section-title">{title}</h1>
-					<button type="button" onClick={onToggleForm} className="btn btn-primary btn-sm">
-						{showForm ? <X size={13} /> : <PlusCircle size={13} />}
-						{showForm ? t("common.cancel") : addLabel}
-					</button>
-				</div>
-
-				{showForm && (
-					<div className="rounded-xl border border-(--border) bg-(--bg-card) p-6 mb-5 animate-in fade-in slide-in-from-top-2 duration-200">
-						<h2 className="text-[11px] font-medium text-(--text-subtle) mb-5">{formTitle}</h2>
-						{form}
-					</div>
-				)}
-
-				{loading ? (
-					<SkeletonRows count={4} className="h-14 rounded-lg" />
-				) : empty ? (
-					<p className="empty-text">{emptyText}</p>
-				) : (
-					<div className="divide-y divide-(--border)">{children}</div>
-				)}
+		<div className="mx-auto w-full max-w-4xl px-5 py-8 md:py-10">
+			<div className="mb-6 flex items-start justify-between gap-4 border-b border-(--border) pb-5">
+				<h1 className="page-title">{title}</h1>
+				<button type="button" onClick={onToggleForm} className="btn btn-primary btn-sm">
+					{showForm ? <X size={13} /> : <PlusCircle size={13} />}
+					{showForm ? t("common.cancel") : addLabel}
+				</button>
 			</div>
+
+			{showForm && (
+				<div className="mb-5 rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-6 fade-in">
+					<h2 className="mb-5 text-[10px] font-semibold uppercase tracking-[0.12em] text-(--text-subtle)">
+						{formTitle}
+					</h2>
+					{form}
+				</div>
+			)}
+
+			{loading ? (
+				<SkeletonRows count={4} className="h-14 rounded-(--radius)" />
+			) : empty ? (
+				<p className="empty-text">{emptyText}</p>
+			) : (
+				<div className="divide-y divide-(--border) rounded-(--radius-lg) border border-(--border) bg-(--bg-card) px-5">
+					{children}
+				</div>
+			)}
 		</div>
 	)
 }

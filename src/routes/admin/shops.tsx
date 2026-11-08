@@ -94,7 +94,7 @@ function AdminShops() {
 				{!allShops ? (
 					<div className="space-y-3">
 						{[0, 1, 2, 3, 4].map((i) => (
-							<Skeleton key={i} className="h-16 w-full rounded-xl" />
+							<Skeleton key={i} className="h-16 w-full rounded-(--radius-lg)" />
 						))}
 					</div>
 				) : allShops.length === 0 ? (

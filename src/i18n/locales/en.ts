@@ -73,6 +73,7 @@ const en = {
 		emailPlaceholder: "you@example.com",
 		passwordLabel: "Password",
 		passwordPlaceholder: "••••••••",
+		forgotPassword: "Forgot password?",
 		nameLabel: "Full name",
 		namePlaceholder: "John Doe",
 		roleCustomer: "Customer",
@@ -88,6 +89,9 @@ const en = {
 		confirmPasswordPlaceholder: "Re-enter your password",
 		welcomeBack: "Welcome back!",
 		accountCreated: "Account created! Welcome to FadeIn.",
+		imageTitle: "Good hair starts with a good chair.",
+		imageSubtitle: "Book with the barbers who know your name.",
+		imageAlt: "A barber preparing a chair in a warm barbershop",
 		strength: {
 			weak: "Weak",
 			fair: "Fair",
@@ -97,14 +101,26 @@ const en = {
 	},
 
 	home: {
+		heroEyebrow: "The neighborhood, on your schedule",
 		heroTitle: "Look sharp,",
 		heroTitleHighlight: "book fast",
 		heroSubtitle:
 			"Discover top-rated barbershops near you and book your next appointment in seconds.",
-		searchPlaceholder: "Barbershop name or service…",
+		heroCaption: "Your chair is waiting.",
+		heroImageAlt: "A barber cutting hair behind a barbershop window",
+		heroNote: "No phone calls. No waiting rooms. Just pick a chair and a time.",
+		searchLabel: "Shop",
+		cityLabel: "City",
+		searchPlaceholder: "Shop or service…",
 		cityPlaceholder: "City…",
 		featured: "Featured Barbershops",
+		featuredEyebrow: "Featured",
+		featuredSubtitle: "A short list of shops worth the trip.",
 		noFeatured: "No featured shops yet. Be the first to list yours!",
+		emptyFeaturedHint:
+			"The first shop on the block gets the spotlight. List yours and start taking bookings today.",
+		listYourShop: "List your shop",
+		howEyebrow: "How it works",
 		howTitle: "How FadeIn works",
 		howSubtitle: "Book your barbershop in three simple steps.",
 		steps: {
@@ -121,6 +137,7 @@ const en = {
 				desc: "Get groomed, then leave a review to help others find great barbers.",
 			},
 		},
+		ownersEyebrow: "For shop owners",
 		ctaTitle: "Own a barbershop?",
 		ctaSubtitle: "Join hundreds of barbershops already using FadeIn to grow their business.",
 	},
@@ -143,6 +160,7 @@ const en = {
 		back: "Back to barbershops",
 		notFound: "Shop not found",
 		notFoundHint: "Browse barbershops",
+		about: "About",
 		services: "Services",
 		noServices: "No services listed yet.",
 		ourBarbers: "Our Barbers",
@@ -150,6 +168,7 @@ const en = {
 		reviewsTitle: "Reviews",
 		noReviews: "No reviews yet.",
 		bookAppointment: "Book an appointment",
+		bookEyebrow: "Book a visit",
 		hours: "Hours",
 		closed: "Closed",
 		ownerReply: "Owner reply:",
@@ -195,6 +214,8 @@ const en = {
 		confirmBooking: "Confirm booking",
 		signInRequired: "Please sign in to book.",
 		failed: "Booking failed. Please try again.",
+		yourAppointment: "Your appointment",
+		detailHint: "Manage your visit",
 		notFound: "Appointment not found",
 		notFoundMessage: "This appointment doesn't exist or has been removed.",
 		paid: "Paid",
@@ -215,13 +236,19 @@ const en = {
 	},
 
 	forBusiness: {
-		badge: "FOR BARBERSHOP OWNERS",
+		badge: "For barbershop owners",
 		title: "Grow your barbershop",
 		titleHighlight: "with FadeIn",
 		subtitle:
 			"Join hundreds of barbershops already using FadeIn to manage appointments, attract new clients, and build their online reputation.",
-		featuresTitle: "EVERYTHING YOU NEED TO RUN YOUR SHOP",
+		heroCaption: "Built for the chair, not the spreadsheet.",
+		toolkitEyebrow: "The toolkit",
+		ctaEyebrow: "Ready when you are",
+		imageAlt: "A warm, quiet barbershop interior",
+		featuresTitle: "Everything you need to run your shop",
 		featuresSubtitle: "Powerful tools built for modern barbershops.",
+		ctaTitle: "Ready to fill your chairs?",
+		ctaSubtitle: "Set up your shop in minutes. No setup fees, no long contracts.",
 		features: {
 			calendar: {
 				title: "Smart Booking Calendar",
@@ -283,6 +310,7 @@ const en = {
 		noReviewsYet: "No reviews yet.",
 		defaultAppointmentNote: "Appointment",
 		createShop: "Create your shop",
+		viewPublic: "View public page",
 		overviewTitle: "Overview",
 		stats: {
 			todayBookings: "Today's bookings",
@@ -442,6 +470,10 @@ const en = {
 	},
 
 	footer: {
+		tagline: "The neighborhood barbershop, on your schedule.",
+		explore: "Explore",
+		account: "Account",
+		madeFor: "Made for the chair.",
 		rights: "© {{year}} FadeIn. All rights reserved.",
 		links: {
 			privacy: "Privacy",
@@ -528,6 +560,7 @@ const en = {
 	},
 
 	legal: {
+		eyebrow: "Legal",
 		termsTitle: "Terms of Service",
 		privacyTitle: "Privacy Policy",
 		lastUpdated: "Last updated: {{date}}",

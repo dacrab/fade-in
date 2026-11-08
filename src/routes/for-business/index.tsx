@@ -16,51 +16,96 @@ function ForBusinessPage() {
 
 	return (
 		<main>
-			<section className="px-4 pt-16 pb-12">
-				<div className="page-wrap max-w-4xl">
-					<p className="text-[11px] text-(--gold) font-medium mb-6 fade-up">{t("forBusiness.badge")}</p>
-					<h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-(--text) mb-4 fade-up [animation-delay:60ms]">
-						{t("forBusiness.title")}
-						<br />
-						<span className="text-(--gold)">{t("forBusiness.titleHighlight")}</span>
-					</h1>
-					<p className="text-lg text-(--text-muted) max-w-xl mb-6 leading-relaxed fade-up [animation-delay:120ms]">
-						{t("forBusiness.subtitle")}
-					</p>
-					<div className="flex gap-3 fade-up [animation-delay:180ms]">
-						<Link to="/register" search={{ role: "owner" }} className="btn btn-primary px-8 py-3">
-							{t("common.getStarted")} <ArrowRight size={16} />
-						</Link>
-						<Link to="/login" className="btn btn-ghost px-6 py-3">
-							{t("common.signIn")}
-						</Link>
+			<section className="border-b border-(--border)">
+				<div className="page-wrap px-5 md:px-8 py-12 md:py-20">
+					<div className="grid items-center gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16">
+						<div>
+							<p className="eyebrow fade-up">{t("forBusiness.badge")}</p>
+							<h1 className="display display-md mt-6 text-(--text) fade-up [animation-delay:60ms]">
+								{t("forBusiness.title")}
+								<br />
+								<span className="italic text-(--gold)">{t("forBusiness.titleHighlight")}</span>
+							</h1>
+							<p className="mt-6 max-w-lg text-[1.02rem] leading-relaxed text-(--text-muted) fade-up [animation-delay:120ms]">
+								{t("forBusiness.subtitle")}
+							</p>
+							<div className="mt-8 flex flex-wrap gap-3 fade-up [animation-delay:180ms]">
+								<Link to="/register" search={{ role: "owner" }} className="btn btn-primary btn-lg">
+									{t("common.getStarted")} <ArrowRight size={16} />
+								</Link>
+								<Link to="/login" className="btn btn-secondary btn-lg">
+									{t("common.signIn")}
+								</Link>
+							</div>
+						</div>
+
+						<div className="relative fade-up [animation-delay:120ms]">
+							<div className="image-frame aspect-[4/3] max-h-[480px] w-full">
+								<img
+									src="/images/for-business.jpg"
+									alt={t("forBusiness.imageAlt")}
+									className="h-full w-full object-cover"
+								/>
+								<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+								<p className="absolute inset-x-5 bottom-5 max-w-xs font-serif text-[1.35rem] leading-tight text-white">
+									{t("forBusiness.heroCaption")}
+								</p>
+							</div>
+						</div>
 					</div>
 				</div>
 			</section>
 
-			<section className="px-4 py-8 border-t border-(--border)">
-				<div className="page-wrap max-w-4xl">
-					<p className="muted-tiny font-medium mb-3">{t("forBusiness.featuresTitle")}</p>
-					<p className="text-(--text-muted) text-sm mb-6">{t("forBusiness.featuresSubtitle")}</p>
+			<section>
+				<div className="page-wrap px-5 md:px-8 py-14 md:py-20">
+					<div className="mb-10 grid gap-3 border-b border-(--border) pb-8 md:grid-cols-2 md:items-end">
+						<div>
+							<p className="eyebrow">{t("forBusiness.toolkitEyebrow")}</p>
+							<h2 className="display display-sm mt-3">{t("forBusiness.featuresTitle")}</h2>
+						</div>
+						<p className="text-sm leading-relaxed text-(--text-muted) md:justify-self-end md:max-w-sm">
+							{t("forBusiness.featuresSubtitle")}
+						</p>
+					</div>
 
-					<div className="space-y-4">
+					<div className="grid gap-x-12 gap-y-10 sm:grid-cols-2">
 						{features.map(({ icon: Icon, key }, i) => (
-							<div
-								key={key}
-								className="flex gap-6 items-start group py-6 border-b border-(--border) last:border-0"
-							>
-								<span className="text-4xl font-bold text-(--border) leading-none shrink-0 w-12">
-									{String(i + 1).padStart(2, "0")}
-								</span>
-								<div className="flex-1">
-									<h3 className="font-semibold text-(--text) mb-1 flex items-center gap-2">
-										<Icon size={16} className="text-(--gold) opacity-70" />
-										{t(`forBusiness.features.${key}.title`)}
-									</h3>
-									<p className="muted-sm leading-relaxed">{t(`forBusiness.features.${key}.desc`)}</p>
+							<div key={key} className="border-t border-(--border) pt-6">
+								<div className="flex items-center justify-between">
+									<span className="font-serif text-[1.15rem] font-medium italic text-(--gold)">
+										{String(i + 1).padStart(2, "0")}
+									</span>
+									<Icon size={18} strokeWidth={1.5} className="text-(--text-subtle)" />
 								</div>
+								<h3 className="mt-5 font-serif text-[1.4rem] font-medium tracking-[-0.02em] text-(--text)">
+									{t(`forBusiness.features.${key}.title`)}
+								</h3>
+								<p className="mt-2 max-w-sm text-[0.84rem] leading-relaxed text-(--text-muted)">
+									{t(`forBusiness.features.${key}.desc`)}
+								</p>
 							</div>
 						))}
+					</div>
+				</div>
+			</section>
+
+			<section className="bg-(--gold) text-[#fffaf5]">
+				<div className="page-wrap px-5 md:px-8 py-14 md:py-18">
+					<div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
+						<div>
+							<p className="eyebrow text-[#fffaf5]/80 before:bg-[#fffaf5]/60">
+								{t("forBusiness.ctaEyebrow")}
+							</p>
+							<h2 className="display display-sm mt-4 max-w-xl text-[#fffaf5]">
+								{t("forBusiness.ctaTitle")}
+							</h2>
+							<p className="mt-3 max-w-md text-sm leading-relaxed text-[#fffaf5]/70">
+								{t("forBusiness.ctaSubtitle")}
+							</p>
+						</div>
+						<Link to="/register" search={{ role: "owner" }} className="btn btn-ink btn-lg shrink-0">
+							{t("common.getStarted")} <ArrowRight size={16} />
+						</Link>
 					</div>
 				</div>
 			</section>

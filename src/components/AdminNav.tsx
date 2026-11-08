@@ -9,30 +9,52 @@ const NAV_LINKS = [
 	{ to: "/admin/appointments" as const, labelKey: "admin.appointments.title", icon: Calendar },
 ]
 
+const NAV_ITEM =
+	"flex items-center gap-2.5 rounded-(--radius) border-l-2 border-transparent px-3 py-2 text-[13px] font-medium text-(--text-muted) transition-colors hover:bg-(--bg-input) hover:text-(--text)"
+const NAV_ITEM_ACTIVE =
+	"flex items-center gap-2.5 rounded-(--radius) border-l-2 border-(--gold) bg-(--gold)/7 px-3 py-2 text-[13px] font-medium text-(--text)"
+
 export default function AdminNav() {
 	const { t } = useTranslation()
 	return (
-		<aside className="px-4 py-6 hidden md:block">
-			<div className="mb-6">
-				<h2 className="font-semibold text-(--text)">{t("admin.title")}</h2>
-				<p className="muted-xs">{t("admin.subtitle")}</p>
+		<div className="w-full flex-shrink-0 md:w-64">
+			<div className="border-b border-(--border) md:hidden">
+				<nav className="flex gap-1 overflow-x-auto px-3 py-2.5 scrollbar-hide">
+					{NAV_LINKS.map(({ to, labelKey, icon: Icon }) => (
+						<Link
+							key={to}
+							to={to}
+							className="flex shrink-0 items-center gap-1.5 rounded-(--radius) px-2.5 py-2 text-[11.5px] font-medium text-(--text-muted) transition-colors hover:bg-(--bg-input) hover:text-(--text)"
+							activeProps={{
+								className:
+									"flex shrink-0 items-center gap-1.5 rounded-(--radius) bg-(--ink) px-2.5 py-2 text-[11.5px] font-medium text-(--bg)",
+							}}
+						>
+							<Icon size={13} />
+							{t(labelKey)}
+						</Link>
+					))}
+				</nav>
 			</div>
-			<nav className="space-y-0.5">
-				{NAV_LINKS.map(({ to, labelKey, icon: Icon }) => (
-					<Link
-						key={to}
-						to={to}
-						className="flex items-center gap-2.5 px-3 py-2 muted-sm rounded-lg border-l-2 border-transparent transition-colors hover:text-(--text) hover:bg-(--bg-input)"
-						activeProps={{
-							className:
-								"flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg border-l-2 border-(--gold) text-(--text) bg-(--bg-input)",
-						}}
-					>
-						<Icon size={16} />
-						{t(labelKey)}
-					</Link>
-				))}
-			</nav>
-		</aside>
+
+			<aside className="hidden flex-col border-r border-(--border) px-5 py-8 md:sticky md:top-(--header-height) md:flex md:h-[calc(100vh-var(--header-height))] md:overflow-y-auto">
+				<div className="mb-6 px-3">
+					<p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-(--text-subtle)">
+						{t("admin.subtitle")}
+					</p>
+					<h2 className="mt-2 font-serif text-[1.35rem] font-medium tracking-[-0.02em] text-(--text)">
+						{t("admin.title")}
+					</h2>
+				</div>
+				<nav className="space-y-0.5">
+					{NAV_LINKS.map(({ to, labelKey, icon: Icon }) => (
+						<Link key={to} to={to} className={NAV_ITEM} activeProps={{ className: NAV_ITEM_ACTIVE }}>
+							<Icon size={15} strokeWidth={1.7} />
+							{t(labelKey)}
+						</Link>
+					))}
+				</nav>
+			</aside>
+		</div>
 	)
 }

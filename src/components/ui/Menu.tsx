@@ -24,7 +24,7 @@ export function Menu({ trigger, items }: MenuProps) {
 			<BaseMenu.Trigger render={trigger} />
 			<BaseMenu.Portal>
 				<BaseMenu.Positioner align="end" sideOffset={16}>
-					<BaseMenu.Popup className="min-w-[11rem] rounded-xl border border-(--border) bg-(--bg-card) shadow-lg p-1.5">
+					<BaseMenu.Popup className="min-w-[11rem] rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-1.5 shadow-[var(--shadow-sm)]">
 						{items.map((item) =>
 							item.separator ? (
 								<BaseMenu.Separator key={item.id} className="my-1.5 h-px mx-2 bg-(--bg-input)" />
@@ -33,7 +33,7 @@ export function Menu({ trigger, items }: MenuProps) {
 									key={item.id}
 									onClick={item.onClick}
 									className={cn(
-										"flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg cursor-pointer transition-colors text-(--text-muted) hover:text-(--text) hover:bg-(--bg-input)",
+										"flex cursor-pointer items-center gap-2.5 rounded-(--radius) px-3 py-2.5 text-[13px] font-medium text-(--text-muted) transition-colors hover:bg-(--bg-input) hover:text-(--text)",
 										item.danger && "text-(--error) hover:text-(--error) hover:bg-(--error)/5",
 									)}
 								>

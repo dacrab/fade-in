@@ -8,12 +8,14 @@ export const Route = createFileRoute("/admin")({ component: AdminLayout })
 function AdminLayout() {
 	const { user } = useRequireRole(ADMIN_ROLES)
 
-	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
+	if (!user) return <Skeleton className="m-8 h-64 rounded-(--radius-lg)" />
 
 	return (
-		<div className="dashboard-layout">
+		<div className="flex flex-1 flex-col md:flex-row">
 			<AdminNav />
-			<Outlet />
+			<div className="min-w-0 flex-1 overflow-auto">
+				<Outlet />
+			</div>
 		</div>
 	)
 }

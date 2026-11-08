@@ -34,7 +34,7 @@ function RecentShopsCard({ shops }: { shops: Doc<"barbershops">[] | undefined })
 	return (
 		<div className="card p-5">
 			<div className="section-header">
-				<h2 className="font-bold text-(--text)">{t("admin.recentShops")}</h2>
+				<h2>{t("admin.recentShops")}</h2>
 				<Link to="/admin/shops" className="section-link">
 					{t("admin.shops.title")} →
 				</Link>
@@ -79,9 +79,11 @@ function AdminDashboard() {
 					{ label: t("admin.stats.totalUsers"), value: allUsers?.length ?? "—", icon: Users },
 					{ label: t("admin.stats.owners"), value: roleCounts.owner, icon: Star },
 				].map(({ label, value, icon: Icon }) => (
-					<div key={label} className="card p-4">
+					<div key={label} className="card p-5">
 						<Icon size={18} className="text-(--gold) mb-2" />
-						<div className="page-title">{value}</div>
+						<div className="mt-3 font-serif text-[2rem] font-medium leading-none tracking-[-0.03em] text-(--text)">
+							{value}
+						</div>
 						<div className="muted-xs">{label}</div>
 					</div>
 				))}
@@ -91,7 +93,7 @@ function AdminDashboard() {
 				<RecentShopsCard shops={allShops} />
 
 				<div className="card p-5">
-					<h2 className="font-bold text-(--text) mb-4">{t("admin.userBreakdown")}</h2>
+					<h2 className="card-title">{t("admin.userBreakdown")}</h2>
 					{!allUsers ? (
 						<Skeleton className="h-32 w-full" />
 					) : (

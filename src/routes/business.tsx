@@ -15,44 +15,84 @@ const NAV_LINK_DEFS = [
 	{ to: "/business/profile", key: "profile", icon: Settings },
 ] as const
 
+const NAV_ITEM =
+	"flex shrink-0 items-center gap-2.5 rounded-(--radius) border-l-2 border-transparent px-3 py-2 text-[13px] font-medium text-(--text-muted) transition-colors hover:bg-(--bg-input) hover:text-(--text)"
+const NAV_ITEM_ACTIVE =
+	"flex shrink-0 items-center gap-2.5 rounded-(--radius) border-l-2 border-(--gold) bg-(--gold)/7 px-3 py-2 text-[13px] font-medium text-(--text)"
+
 function BusinessLayout() {
 	const { t } = useTranslation()
 	const { user } = useRequireRole(OWNER_ADMIN_ROLES, true)
 	const { shop } = useOwnerShop(Boolean(user))
 
 	return (
-		<div className="flex flex-1">
-			<aside className="w-56 flex-shrink-0 hidden md:flex flex-col py-8 px-5 border-r border-(--border)">
-				{shop && (
-					<div className="mb-5">
-						<h2 className="strong-sm truncate">{shop.name}</h2>
-						<p className="muted-xs mt-0.5">{shop.city}</p>
-						{shop.isVerified && (
-							<span className="inline-flex items-center gap-1 text-[10px] text-(--gold) mt-1.5">
-								<Check size={9} /> {t("common.verified")}
-							</span>
-						)}
-					</div>
-				)}
+		<div className="flex flex-1 flex-col md:flex-row">
+			<aside className="hidden w-64 flex-shrink-0 flex-col border-r border-(--border) px-5 py-8 md:sticky md:top-(--header-height) md:flex md:h-[calc(100vh-var(--header-height))] md:overflow-y-auto">
+				<div className="mb-6 px-3">
+					<p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-(--text-subtle)">
+						{t("nav.business")}
+					</p>
+					{shop ? (
+						<>
+							<h2 className="mt-2 truncate font-serif text-[1.25rem] font-medium tracking-[-0.02em] text-(--text)">
+								{shop.name}
+							</h2>
+							<p className="mt-0.5 text-xs text-(--text-muted)">{shop.city}</p>
+							{shop.isVerified && (
+								<span className="mt-2 inline-flex items-center gap-1 rounded-(--radius-sm) border border-(--gold)/20 bg-(--gold)/8 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-(--gold)">
+									<Check size={9} /> {t("common.verified")}
+								</span>
+							)}
+						</>
+					) : (
+						<h2 className="mt-2 font-serif text-[1.25rem] font-medium tracking-[-0.02em] text-(--text)">
+							{t("business.setupTitle")}
+						</h2>
+					)}
+				</div>
+
 				<nav className="space-y-0.5">
 					{NAV_LINK_DEFS.map(({ to, key, icon: Icon }) => (
-						<Link
-							key={to}
-							to={to}
-							className="flex items-center gap-2.5 px-3 py-2 muted-sm hover:text-(--text) transition-colors rounded-md"
-							activeProps={{
-								className:
-									"flex items-center gap-2.5 px-3 py-2 main-sm font-medium rounded-md relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-0.5 before:h-4 before:bg-(--gold) before:rounded-full",
-							}}
-						>
-							<Icon size={15} />
+						<Link key={to} to={to} className={NAV_ITEM} activeProps={{ className: NAV_ITEM_ACTIVE }}>
+							<Icon size={15} strokeWidth={1.7} />
 							{t(`business.nav.${key}`)}
 						</Link>
 					))}
 				</nav>
+
+				{shop && (
+					<div className="mt-auto border-t border-(--border) pt-4">
+						<Link
+							to="/barbershops/$slug"
+							params={{ slug: shop.slug }}
+							className="flex items-center gap-2 px-3 py-2 text-[11.5px] text-(--text-muted) transition-colors hover:text-(--gold)"
+						>
+							{t("business.viewPublic")}
+						</Link>
+					</div>
+				)}
 			</aside>
 
-			<div className="flex-1 overflow-auto">
+			<div className="border-b border-(--border) bg-(--bg) md:hidden">
+				<nav className="flex gap-1 overflow-x-auto px-3 py-2.5 scrollbar-hide">
+					{NAV_LINK_DEFS.map(({ to, key, icon: Icon }) => (
+						<Link
+							key={to}
+							to={to}
+							className="flex shrink-0 items-center gap-1.5 rounded-(--radius) px-2.5 py-2 text-[11.5px] font-medium text-(--text-muted) transition-colors hover:bg-(--bg-input) hover:text-(--text)"
+							activeProps={{
+								className:
+									"flex shrink-0 items-center gap-1.5 rounded-(--radius) bg-(--ink) px-2.5 py-2 text-[11.5px] font-medium text-(--bg)",
+							}}
+						>
+							<Icon size={13} />
+							{t(`business.nav.${key}`)}
+						</Link>
+					))}
+				</nav>
+			</div>
+
+			<div className="min-w-0 flex-1 overflow-auto">
 				<Outlet />
 			</div>
 		</div>

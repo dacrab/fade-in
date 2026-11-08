@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { ArrowLeft } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export const Route = createFileRoute("/terms/")({ component: TermsPage })
@@ -9,17 +10,40 @@ function TermsPage() {
 	const { t } = useTranslation()
 	return (
 		<main className="page-main">
-			<div className="page-wrap max-w-3xl py-8">
-				<Link to="/" className="muted-sm hover:text-(--gold) mb-6 inline-block">
-					← {t("common.back")}
+			<div className="page-wrap max-w-3xl px-5 py-10 md:px-8 md:py-14">
+				<Link
+					to="/"
+					className="inline-flex items-center gap-1.5 text-[12px] font-medium text-(--text-muted) transition-colors hover:text-(--gold)"
+				>
+					<ArrowLeft size={14} />
+					{t("common.back")}
 				</Link>
-				<h1 className="text-3xl font-bold text-(--text) mb-2">{t("legal.termsTitle")}</h1>
-				<p className="muted-sm mb-5">{t("legal.lastUpdated", { date: "2026-01-01" })}</p>
-				<div className="space-y-6 muted-sm leading-relaxed">
-					{SECTIONS.map((s) => (
-						<section key={s}>
-							<h2 className="text-base font-semibold text-(--text) mb-2">{t(`legal.terms.${s}.title`)}</h2>
-							<p>{t(`legal.terms.${s}.body`)}</p>
+
+				<header className="mt-8 border-b border-(--border) pb-7">
+					<p className="eyebrow">{t("legal.eyebrow")}</p>
+					<h1 className="display display-sm mt-4 text-(--text)">{t("legal.termsTitle")}</h1>
+					<p className="mt-3 text-[13px] text-(--text-subtle)">
+						{t("legal.lastUpdated", { date: "2026-01-01" })}
+					</p>
+				</header>
+
+				<div className="mt-9 space-y-9">
+					{SECTIONS.map((s, i) => (
+						<section
+							key={s}
+							className="grid gap-3 border-b border-(--border) pb-8 last:border-0 md:grid-cols-[auto_1fr] md:gap-6"
+						>
+							<span className="font-serif text-[1.05rem] font-medium italic leading-none text-(--gold)">
+								{String(i + 1).padStart(2, "0")}
+							</span>
+							<div>
+								<h2 className="font-serif text-[1.3rem] font-medium tracking-[-0.02em] text-(--text)">
+									{t(`legal.terms.${s}.title`)}
+								</h2>
+								<p className="mt-2 text-sm leading-relaxed text-(--text-muted)">
+									{t(`legal.terms.${s}.body`)}
+								</p>
+							</div>
 						</section>
 					))}
 				</div>

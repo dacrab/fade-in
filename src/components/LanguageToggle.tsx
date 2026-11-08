@@ -1,10 +1,12 @@
+import { Globe } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { isLanguage, LANGUAGES, persistLanguage } from "#/i18n"
 
 export default function LanguageToggle() {
 	const { i18n, t } = useTranslation()
-	const next = isLanguage(i18n.language) && i18n.language === "en" ? "el" : "en"
-	const { flag, label } = LANGUAGES[next]
+	const current = isLanguage(i18n.language) ? i18n.language : "en"
+	const next = current === "en" ? "el" : "en"
+	const { label } = LANGUAGES[next]
 
 	const switchLanguage = () => {
 		void i18n.changeLanguage(next)
@@ -15,12 +17,12 @@ export default function LanguageToggle() {
 		<button
 			type="button"
 			onClick={switchLanguage}
-			className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:bg-(--bg-input) text-(--text-muted)"
+			className="flex h-9 items-center gap-1.5 rounded-(--radius) border border-(--border) bg-(--bg-card) px-2.5 text-[11px] font-semibold tracking-[0.06em] text-(--text-muted) transition-colors hover:border-(--border-hover) hover:text-(--text)"
 			title={t("common.switchLanguage", { lang: label })}
 			aria-label={t("common.switchLanguage", { lang: label })}
 		>
-			<span>{flag}</span>
-			<span className="hidden sm:inline">{label}</span>
+			<Globe size={13} strokeWidth={1.7} />
+			{LANGUAGES[current].flag}
 		</button>
 	)
 }

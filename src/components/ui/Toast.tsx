@@ -89,7 +89,7 @@ export function ToastContainer() {
 				return (
 					<div
 						key={toast.id}
-						className="flex items-center gap-2.5 px-4 py-3 rounded-lg bg-(--bg-card) shadow-md border border-(--border) animate-in slide-in-from-top-2"
+						className="flex items-center gap-2.5 rounded-(--radius) border border-(--border) bg-(--bg-card) px-4 py-3 shadow-[var(--shadow-sm)] fade-in"
 						style={{ borderLeft: `3px solid ${borderColor}`, color: borderColor }}
 					>
 						<Icon size={15} className="flex-shrink-0" />

@@ -42,7 +42,7 @@ function BarberDashboard() {
 		return map
 	}, [shopsRaw])
 
-	if (!user) return <Skeleton className="h-64 m-8 rounded-xl" />
+	if (!user) return <Skeleton className="h-64 m-8 rounded-(--radius-lg)" />
 
 	const todayAppts = appointments?.filter((a: Doc<"appointments">) => a.date === selectedDate) ?? []
 	const completedToday = todayAppts.filter((a: Doc<"appointments">) => a.status === "completed")
@@ -73,7 +73,7 @@ function BarberDashboard() {
 					/>
 				</div>
 
-				<div className="grid grid-cols-3 gap-3 mb-6">
+				<div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
 					<StatCard icon={Calendar} value={todayAppts.length} label={t("barber.schedule")} />
 					<StatCard icon={Scissors} value={completedToday.length} label={t("status.completed")} />
 					<StatCard
@@ -87,7 +87,9 @@ function BarberDashboard() {
 					<div className="card p-4 mb-4 border-l-2 border-l-(--gold)">
 						<div className="text-[11px] text-(--gold) font-medium mb-1">{t("barber.nextUp")}</div>
 						<div className="flex items-center gap-3">
-							<span className="text-lg font-bold text-(--text) font-mono">{nextAppt.startTime}</span>
+							<span className="font-serif text-[1.35rem] font-medium tabular-nums tracking-[-0.02em] text-(--text)">
+								{nextAppt.startTime}
+							</span>
 							<span className="muted-sm">→ {nextAppt.endTime}</span>
 							<span className="ml-auto strong-sm">{f.formatPrice(nextAppt.totalPrice)}</span>
 						</div>

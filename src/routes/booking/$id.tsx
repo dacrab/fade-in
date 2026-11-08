@@ -10,7 +10,6 @@ import {
 	MapPin,
 	Phone,
 	RefreshCw,
-	Scissors,
 	User,
 	XCircle,
 } from "lucide-react"
@@ -128,118 +127,105 @@ function BookingPage() {
 
 	return (
 		<main className="page-main">
-			<div className="page-wrap max-w-2xl py-8">
+			<div className="page-wrap max-w-3xl px-5 py-10 md:px-8 md:py-14">
 				<Link
 					to={isOwnerOrAdmin(user) ? "/business/appointments" : "/dashboard/overview"}
-					className="inline-flex items-center gap-1.5 muted-sm hover:text-(--gold) transition-colors mb-6"
+					className="inline-flex items-center gap-1.5 text-[12px] font-medium text-(--text-muted) transition-colors hover:text-(--gold)"
 				>
-					<ArrowLeft size={15} />
+					<ArrowLeft size={14} />
 					{t("common.back")}
 				</Link>
 
 				{isLoading ? (
 					<BookingSkeleton />
 				) : !appt ? (
-					<div className="text-center py-16">
-						<XCircle size={48} className="mx-auto mb-4 text-(--text-subtle)" />
-						<h1 className="text-xl font-bold text-(--text) mb-2">{t("booking.notFound")}</h1>
-						<p className="muted-sm mb-6">{t("booking.notFoundMessage")}</p>
-						<Link to="/" className="btn btn-primary">
+					<div className="mt-10 flex flex-col items-center justify-center rounded-(--radius-lg) border border-(--border) bg-(--bg-card) px-6 py-16 text-center">
+						<span className="font-serif text-6xl font-medium italic leading-none text-(--gold)/30">
+							404
+						</span>
+						<h1 className="display mt-5 text-[2.1rem] text-(--text)">{t("booking.notFound")}</h1>
+						<p className="mt-2 max-w-xs text-sm text-(--text-muted)">{t("booking.notFoundMessage")}</p>
+						<Link to="/" className="btn btn-primary mt-7">
 							{t("errors.backHome")}
 						</Link>
 					</div>
 				) : (
 					<>
 						{payment === "success" && (
-							<div className="rounded-xl border border-(--success)/20 bg-(--success)/5 p-4 mb-6 flex items-center gap-3">
-								<CheckCircle size={20} className="text-(--success) shrink-0" />
+							<div className="mt-6 flex items-start gap-3 rounded-(--radius) border border-(--success)/20 bg-(--success)/5 p-4">
+								<CheckCircle size={18} className="mt-0.5 shrink-0 text-(--success)" />
 								<p className="main-sm font-medium">{t("booking.paymentSuccess")}</p>
 							</div>
 						)}
 						{payment === "canceled" && (
-							<div className="rounded-xl border border-(--gold)/20 bg-(--gold)/5 p-4 mb-6 flex items-center gap-3">
-								<AlertCircle size={20} className="text-(--gold) shrink-0" />
+							<div className="mt-6 flex items-start gap-3 rounded-(--radius) border border-(--gold)/20 bg-(--gold)/5 p-4">
+								<AlertCircle size={18} className="mt-0.5 shrink-0 text-(--gold)" />
 								<p className="main-sm font-medium">{t("booking.paymentCanceled")}</p>
 							</div>
 						)}
 
-						<div className="card-lg">
-							<div className="p-6 pb-4 border-b border-(--border)">
-								<div className="flex items-center gap-4 mb-3">
-									<div className="w-12 h-12 rounded-xl bg-(--gold)/10 flex items-center justify-center">
-										<Scissors size={22} className="text-(--gold)" />
-									</div>
-									<div>
-										<h1 className="text-lg font-bold text-(--text)">{shop?.name ?? "—"}</h1>
-										{shop && (
-											<p className="muted-xs flex items-center gap-1 mt-0.5">
-												<MapPin size={11} />
-												{shop.address}, {shop.city}
-											</p>
-										)}
-									</div>
+						<div className="mt-7 border-b border-(--border) pb-7">
+							<p className="eyebrow">{t("booking.yourAppointment")}</p>
+							<div className="mt-4 flex flex-wrap items-end justify-between gap-5">
+								<div className="min-w-0">
+									<h1 className="display text-[clamp(2.15rem,5vw,3.4rem)] text-(--text)">
+										{shop?.name ?? "—"}
+									</h1>
+									{shop && (
+										<p className="mt-2 flex items-center gap-1.5 text-[13px] text-(--text-muted)">
+											<MapPin size={13} className="shrink-0 text-(--text-subtle)" />
+											{shop.address}, {shop.city}
+										</p>
+									)}
 								</div>
-								<div className="flex items-center gap-2">
-									<span
-										className={`badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${STATUS_BADGE[appt.status]}`}
-									>
-										<StatusIcon size={11} />
+								<div className="flex flex-wrap items-center gap-2 pb-1">
+									<span className={`badge ${STATUS_BADGE[appt.status]}`}>
+										<StatusIcon size={10} />
 										{t(`status.${appt.status}`)}
 									</span>
 									{appt.paymentStatus && (
-										<span
-											className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
-												appt.paymentStatus === "paid"
-													? "bg-(--success)/10 text-(--success)"
-													: "bg-(--gold)/10 text-(--gold)"
-											}`}
-										>
-											<CreditCard size={11} />
+										<span className={`badge ${appt.paymentStatus === "paid" ? "badge-green" : "badge-gold"}`}>
+											<CreditCard size={10} />
 											{appt.paymentStatus === "paid" ? t("booking.paid") : t("booking.unpaid")}
 										</span>
 									)}
 								</div>
 							</div>
+						</div>
 
-							<div className="p-6 space-y-5">
-								<div className="grid grid-cols-2 gap-5">
-									<div>
-										<p className="detail-label">{t("booking.summaryFields.date")}</p>
-										<p className="detail-value">
-											<Calendar size={14} className="text-(--text-subtle)" />
-											{f.formatDate(appt.date)}
-										</p>
-									</div>
-									<div>
-										<p className="detail-label">{t("booking.summaryFields.time")}</p>
-										<p className="detail-value">
-											<Clock size={14} className="text-(--text-subtle)" />
-											{appt.startTime} – {appt.endTime}
-										</p>
-									</div>
-									<div>
-										<p className="detail-label">{t("booking.summaryFields.barber")}</p>
-										<p className="detail-value">
-											<User size={14} className="text-(--text-subtle)" />
-											{barber?.name ?? "—"}
-										</p>
-									</div>
-									<div>
-										<p className="detail-label">{t("booking.summaryFields.total")}</p>
-										<p className="text-sm font-bold text-(--gold)">{f.formatPrice(appt.totalPrice)}</p>
-									</div>
+						<div className="mt-8 overflow-hidden rounded-(--radius-lg) border border-(--border) bg-(--bg-card)">
+							<div className="grid gap-6 border-b border-(--border) p-6 md:grid-cols-2 md:p-8">
+								<div>
+									<p className="detail-label">{t("booking.summaryFields.date")}</p>
+									<p className="mt-1.5 font-serif text-[1.6rem] font-medium leading-tight tracking-[-0.02em] text-(--text)">
+										{f.formatDate(appt.date)}
+									</p>
+									<p className="mt-2 flex items-center gap-1.5 text-[13px] tabular-nums text-(--text-muted)">
+										<Clock size={13} className="text-(--text-subtle)" />
+										{appt.startTime} – {appt.endTime}
+									</p>
 								</div>
+								<div>
+									<p className="detail-label">{t("booking.summaryFields.total")}</p>
+									<p className="mt-1.5 font-serif text-[1.6rem] font-medium leading-tight tracking-[-0.02em] text-(--gold)">
+										{f.formatPrice(appt.totalPrice)}
+									</p>
+									<p className="mt-2 flex items-center gap-1.5 text-[13px] text-(--text-muted)">
+										<User size={13} className="text-(--text-subtle)" />
+										{barber?.name ?? "—"}
+									</p>
+								</div>
+							</div>
 
+							<div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
 								{selectedServices.length > 0 && (
 									<div>
-										<p className="text-[11px] text-(--text-subtle) mb-2">
-											{t("booking.summaryFields.services")}
-										</p>
-										<div className="flex flex-wrap gap-1.5">
+										<p className="detail-label">{t("booking.summaryFields.services")}</p>
+										<div className="mt-2 flex flex-wrap gap-1.5">
 											{selectedServices.map((s: Doc<"services">) => (
 												<span
 													key={s._id}
-													className="px-2.5 py-1 rounded-full bg-(--gold)/8 text-(--gold) text-xs font-medium"
+													className="rounded-(--radius-sm) border border-(--gold)/15 bg-(--gold)/7 px-2 py-1 text-[11.5px] font-medium text-(--gold)"
 												>
 													{s.name}
 												</span>
@@ -248,29 +234,31 @@ function BookingPage() {
 									</div>
 								)}
 
-								{appt.notes && (
-									<div>
-										<p className="detail-label">{t("booking.notes")}</p>
-										<p className="muted-sm bg-(--bg-input) rounded-lg px-3 py-2">{appt.notes}</p>
-									</div>
-								)}
-
 								{shop?.phone && (
 									<div>
 										<p className="detail-label">{t("form.phoneLabel")}</p>
 										<a
 											href={`tel:${shop.phone}`}
-											className="text-sm text-(--gold) hover:underline flex items-center gap-1.5"
+											className="mt-1.5 flex items-center gap-1.5 text-sm text-(--text) transition-colors hover:text-(--gold)"
 										>
-											<Phone size={14} />
+											<Phone size={13} className="text-(--text-subtle)" />
 											{shop.phone}
 										</a>
+									</div>
+								)}
+
+								{appt.notes && (
+									<div className="md:col-span-2">
+										<p className="detail-label">{t("booking.notes")}</p>
+										<p className="mt-1.5 rounded-(--radius) bg-(--bg-input) px-3.5 py-2.5 text-[13px] leading-relaxed text-(--text-muted)">
+											{appt.notes}
+										</p>
 									</div>
 								)}
 							</div>
 
 							{(appt.status === "pending" || appt.status === "confirmed") && (
-								<div className="px-6 py-4 border-t border-(--border) bg-(--bg-input)/30 flex items-center gap-3">
+								<div className="flex flex-wrap items-center gap-3 border-t border-(--border) bg-(--bg-input)/30 px-6 py-4 md:px-8">
 									{canReschedule && (
 										<button
 											type="button"
@@ -285,24 +273,28 @@ function BookingPage() {
 										<button
 											type="button"
 											onClick={() => void handleCancel()}
-											className="px-4 py-2 rounded-full border border-(--error)/20 text-xs text-(--error) hover:bg-(--error)/5 transition-colors"
+											className="btn btn-ghost btn-sm text-(--error) hover:bg-(--error)/5"
 										>
 											{t("business.appointments.cancel")}
 										</button>
 									)}
+									<span className="ml-auto hidden items-center gap-1.5 text-[11px] text-(--text-subtle) sm:flex">
+										<Calendar size={12} />
+										{t("booking.detailHint")}
+									</span>
 								</div>
 							)}
 						</div>
 
 						{showReschedule && (
-							<div className="mt-4 rounded-xl border border-(--border) bg-(--bg-card) p-5">
-								<h3 className="text-sm font-semibold text-(--text) mb-4">{t("booking.rescheduleTitle")}</h3>
+							<div className="mt-5 rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-6 fade-in">
+								<p className="eyebrow">{t("booking.rescheduleTitle")}</p>
 								<form
 									onSubmit={(e) => {
 										e.preventDefault()
 										void handleReschedule()
 									}}
-									className="space-y-4"
+									className="mt-5 space-y-4"
 								>
 									<div>
 										<label className="field-label" htmlFor="reschedule-date">
@@ -311,7 +303,7 @@ function BookingPage() {
 										<input
 											id="reschedule-date"
 											type="date"
-											className="input w-full text-sm"
+											className="input"
 											min={minDate}
 											value={rescheduleValues.date}
 											onChange={(e) => setRescheduleField("date")(e.target.value)}
@@ -325,7 +317,7 @@ function BookingPage() {
 											<input
 												id="reschedule-start"
 												type="time"
-												className="input w-full text-sm"
+												className="input"
 												value={rescheduleValues.startTime}
 												onChange={(e) => setRescheduleField("startTime")(e.target.value)}
 											/>
@@ -337,13 +329,13 @@ function BookingPage() {
 											<input
 												id="reschedule-end"
 												type="time"
-												className="input w-full text-sm"
+												className="input"
 												value={rescheduleValues.endTime}
 												onChange={(e) => setRescheduleField("endTime")(e.target.value)}
 											/>
 										</div>
 									</div>
-									<div className="flex gap-3">
+									<div className="flex flex-wrap gap-3 pt-1">
 										<button type="submit" disabled={rescheduling} className="btn btn-primary btn-sm">
 											{rescheduling ? t("common.loading") : t("booking.rescheduleConfirm")}
 										</button>
@@ -353,7 +345,7 @@ function BookingPage() {
 												setShowReschedule(false)
 												setRescheduleValues(EMPTY_RESCHEDULE)
 											}}
-											className="px-4 py-2 rounded-full border border-(--border) muted-xs"
+											className="btn btn-ghost btn-sm"
 										>
 											{t("common.cancel")}
 										</button>
@@ -370,25 +362,29 @@ function BookingPage() {
 
 function BookingSkeleton() {
 	return (
-		<div className="card-lg">
-			<div className="p-6 border-b border-(--border)">
-				<div className="flex items-center gap-4 mb-3">
-					<Skeleton className="w-12 h-12 rounded-xl" />
-					<div>
-						<Skeleton className="h-5 w-40 mb-1" />
-						<Skeleton className="h-3 w-56" />
+		<div className="mt-8">
+			<div className="space-y-3 border-b border-(--border) pb-7">
+				<Skeleton className="h-3 w-28" />
+				<Skeleton className="h-11 w-80 max-w-full" />
+				<Skeleton className="h-4 w-56" />
+			</div>
+			<div className="mt-8 overflow-hidden rounded-(--radius-lg) border border-(--border) bg-(--bg-card)">
+				<div className="grid gap-6 border-b border-(--border) p-6 md:grid-cols-2 md:p-8">
+					<div className="space-y-3">
+						<Skeleton className="h-3 w-16" />
+						<Skeleton className="h-7 w-40" />
+						<Skeleton className="h-4 w-28" />
+					</div>
+					<div className="space-y-3">
+						<Skeleton className="h-3 w-16" />
+						<Skeleton className="h-7 w-28" />
+						<Skeleton className="h-4 w-32" />
 					</div>
 				</div>
-			</div>
-			<div className="p-6 space-y-5">
-				<div className="grid grid-cols-2 gap-5">
-					<Skeleton className="h-14 rounded-lg" />
-					<Skeleton className="h-14 rounded-lg" />
-					<Skeleton className="h-14 rounded-lg" />
-					<Skeleton className="h-14 rounded-lg" />
+				<div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
+					<Skeleton className="h-9 w-full" />
+					<Skeleton className="h-9 w-3/4" />
 				</div>
-				<Skeleton className="h-8 w-48 rounded-full" />
-				<Skeleton className="h-16 rounded-lg" />
 			</div>
 		</div>
 	)

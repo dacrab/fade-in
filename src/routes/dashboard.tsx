@@ -7,7 +7,7 @@ export const Route = createFileRoute("/dashboard")({ component: DashboardLayout 
 function DashboardLayout() {
 	const { user } = useRequireRole(CUSTOMER_ADMIN_ROLES)
 
-	if (!user) return <Skeleton className="h-64 m-8 rounded-2xl" />
+	if (!user) return <Skeleton className="h-64 m-8 rounded-(--radius-lg)" />
 
 	return <Outlet />
 }

@@ -86,7 +86,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 			{searchable && (
 				<div className="mb-4">
 					<input
-						className="input w-full max-w-xs text-sm"
+						className="input w-full max-w-xs"
 						placeholder={searchPlaceholder ?? t("common.search")}
 						aria-label={searchPlaceholder ?? t("common.search")}
 						value={globalFilter}
@@ -94,7 +94,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 					/>
 				</div>
 			)}
-			<div className="overflow-x-auto rounded-xl border border-(--border)">
+			<div className="overflow-x-auto rounded-(--radius-lg) border border-(--border)">
 				<table className="w-full">
 					<thead>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -102,7 +102,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 								{headerGroup.headers.map((header) => (
 									<th
 										key={header.id}
-										className="px-4 py-3 text-left text-xs font-semibold text-(--text-muted) select-none"
+										className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.1em] text-(--text-subtle) select-none"
 										style={{ width: header.getSize() }}
 									>
 										{header.isPlaceholder ? null : (
@@ -130,7 +130,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 						{table.getRowModel().rows.map((row) => (
 							<tr
 								key={row.id}
-								className="border-b border-(--border) last:border-0 hover:bg-(--bg-input)/20 transition-colors"
+								className="border-b border-(--border) last:border-0 transition-colors hover:bg-(--bg-input)/30"
 							>
 								{row.getVisibleCells().map((cell) => (
 									<td key={cell.id} className="px-4 py-3 main-sm">
@@ -155,7 +155,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 						onClick={() => table.previousPage()}
 						disabled={!table.getCanPreviousPage()}
 						aria-label={t("common.previousPage")}
-						className="p-1.5 rounded-md hover:bg-(--bg-input) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+						className="rounded-(--radius) border border-(--border) p-1.5 transition-colors hover:border-(--border-hover) hover:bg-(--bg-input) disabled:cursor-not-allowed disabled:opacity-30"
 					>
 						<ChevronLeft size={14} />
 					</button>
@@ -164,7 +164,7 @@ export function DataTable<TData extends RowData & { _id: string }>({
 						onClick={() => table.nextPage()}
 						disabled={!table.getCanNextPage()}
 						aria-label={t("common.nextPage")}
-						className="p-1.5 rounded-md hover:bg-(--bg-input) disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+						className="rounded-(--radius) border border-(--border) p-1.5 transition-colors hover:border-(--border-hover) hover:bg-(--bg-input) disabled:cursor-not-allowed disabled:opacity-30"
 					>
 						<ChevronRight size={14} />
 					</button>

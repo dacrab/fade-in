@@ -82,7 +82,7 @@ function CustomerDashboard() {
 					</div>
 				</div>
 
-				<div className="grid grid-cols-4 gap-3 mb-6">
+				<div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
 					{(
 						[
 							{ label: t("dashboard.stats.total"), value: appointments?.length ?? "—", icon: Calendar },

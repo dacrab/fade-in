@@ -30,6 +30,16 @@ import { api } from "../../../convex/_generated/api"
 
 export const Route = createFileRoute("/barbershops/$slug")({ component: ShopProfilePage })
 
+const DAY_INDEX: Record<number, WeekDay> = {
+	0: "sunday",
+	1: "monday",
+	2: "tuesday",
+	3: "wednesday",
+	4: "thursday",
+	5: "friday",
+	6: "saturday",
+}
+
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function ShopProfilePage() {
 	const { t } = useTranslation()
@@ -39,6 +49,7 @@ function ShopProfilePage() {
 	const [bookingOpen, setBookingOpen] = useState(false)
 	const [showQr, setShowQr] = useState(false)
 	const [bookingUrl, setBookingUrl] = useState("")
+	const today = DAY_INDEX[new Date().getDay()]
 
 	useEffect(() => {
 		// Computed after mount: window.location is unavailable during SSR.
@@ -62,16 +73,11 @@ function ShopProfilePage() {
 	if (shop === undefined) return <ShopProfileSkeleton />
 	if (!shop)
 		return (
-			<main className="flex-1 flex items-center justify-center px-4">
+			<main className="flex flex-1 items-center justify-center px-4">
 				<div className="text-center">
-					<div className="w-20 h-20 rounded-full bg-(--gold)/8 flex items-center justify-center mx-auto mb-6">
-						<Scissors size={32} className="text-(--gold)/40" />
-					</div>
-					<h1 className="page-title mb-2">{t("shop.notFound")}</h1>
-					<Link
-						to="/barbershops/listing"
-						className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-lg bg-(--gold) text-white text-sm font-medium hover:bg-(--gold-dark) transition-colors"
-					>
+					<span className="font-serif text-7xl font-medium italic text-(--gold)/30">404</span>
+					<h1 className="page-title mb-2 mt-3">{t("shop.notFound")}</h1>
+					<Link to="/barbershops/listing" className="btn btn-primary mt-5">
 						{t("shop.notFoundHint")}
 					</Link>
 				</div>
@@ -79,96 +85,121 @@ function ShopProfilePage() {
 		)
 
 	return (
-		<main className="page-main">
-			<div className="relative w-full h-[50vh] min-h-90 max-h-130 overflow-hidden">
-				{shop.images[0] ? (
-					<img src={shop.images[0]} alt={shop.name} className="w-full h-full object-cover" />
-				) : (
-					<div className="w-full h-full bg-gradient-to-br from-(--bg-card) to-(--bg) flex items-center justify-center">
-						<Scissors size={80} className="text-(--text-subtle) opacity-30" />
-					</div>
-				)}
-				<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
+		<main className="pb-16">
+			<div className="page-container !pt-6">
 				<Link
 					to="/barbershops/listing"
-					className="absolute top-6 left-6 flex items-center gap-1.5 px-4 py-2 rounded-full bg-black/30 border border-white/10 text-white/90 text-sm font-medium hover:bg-black/50 transition-all duration-300"
+					className="inline-flex items-center gap-1.5 text-[12px] font-medium text-(--text-muted) transition-colors hover:text-(--gold)"
 				>
-					<ChevronLeft size={16} /> {t("shop.back")}
+					<ChevronLeft size={14} /> {t("shop.back")}
 				</Link>
 
-				{shop.isVerified && (
-					<div className="absolute top-6 right-6 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--gold)/90 text-white text-xs font-medium">
-						<Check size={12} /> {t("common.verified")}
-					</div>
-				)}
+				<div className="mt-6 flex flex-wrap items-start justify-between gap-6 border-b border-(--border) pb-7">
+					<div className="min-w-0">
+						<div className="mb-3 flex flex-wrap items-center gap-2.5">
+							<span className="inline-flex items-center gap-1 text-[12px] font-semibold text-(--text)">
+								<Star size={13} fill="currentColor" className="text-(--gold)" />
+								{shop.rating.toFixed(1)}
+								<span className="font-normal text-(--text-subtle)">
+									({t("map.reviewsCount", { count: shop.reviewCount })})
+								</span>
+							</span>
+							{shop.isVerified && (
+								<span className="inline-flex items-center gap-1 rounded-(--radius-sm) border border-(--gold)/20 bg-(--gold)/8 px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.08em] text-(--gold)">
+									<Check size={10} strokeWidth={2.5} />
+									{t("common.verified")}
+								</span>
+							)}
+						</div>
 
-				<div className="absolute bottom-0 left-0 right-0 px-6 sm:px-8 pb-8">
-					<div className="max-w-7xl mx-auto">
-						<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-2">
-							{shop.name}
-						</h1>
-						<div className="flex items-center gap-4 text-white/70 text-sm">
+						<h1 className="display text-[clamp(2.5rem,5.5vw,4.25rem)] text-(--text)">{shop.name}</h1>
+
+						<div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-(--text-muted)">
 							<span className="flex items-center gap-1.5">
-								<MapPin size={14} />
+								<MapPin size={13} className="text-(--text-subtle)" />
 								{shop.address}, {shop.city}
 							</span>
 							{shop.phone && (
 								<a
 									href={`tel:${shop.phone}`}
-									className="flex items-center gap-1.5 hover:text-white transition-colors"
+									className="flex items-center gap-1.5 transition-colors hover:text-(--gold)"
 								>
-									<Phone size={14} />
+									<Phone size={13} className="text-(--text-subtle)" />
 									{shop.phone}
 								</a>
 							)}
 						</div>
 					</div>
-				</div>
-			</div>
 
-			<div className="page-container">
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					<div className="lg:col-span-2 space-y-10">
+					<button
+						type="button"
+						onClick={() => setBookingOpen(true)}
+						className="btn btn-primary btn-lg shrink-0"
+					>
+						<Calendar size={16} /> {t("common.bookNow")}
+					</button>
+				</div>
+
+				<div className="image-frame mt-7 aspect-[16/7] max-h-[420px] w-full">
+					{shop.images[0] ? (
+						<img src={shop.images[0]} alt={shop.name} className="h-full w-full object-cover" />
+					) : (
+						<div className="flex h-full w-full items-center justify-center bg-[#efe5d8]">
+							<Scissors size={56} className="text-(--gold)/25" />
+						</div>
+					)}
+				</div>
+
+				<div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-[1.6fr_0.9fr] lg:gap-14">
+					<div className="space-y-12">
 						<div>
-							<div className="flex items-center gap-3 mb-4">
-								<div className="flex items-center gap-2">
-									<Star size={20} fill="currentColor" className="text-(--gold)" />
-									<span className="page-title">{shop.rating.toFixed(1)}</span>
-								</div>
-								<span className="muted-sm">{t("map.reviewsCount", { count: shop.reviewCount })}</span>
-							</div>
+							<p className="eyebrow">{t("shop.about")}</p>
 							{shop.description && (
-								<p className="text-(--text-muted) leading-relaxed text-base">{shop.description}</p>
+								<p className="mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-(--text-muted)">
+									{shop.description}
+								</p>
 							)}
 						</div>
 
 						<section>
-							<h2 className="text-xl font-bold text-(--text) mb-5 tracking-tight">{t("shop.services")}</h2>
+							<div className="mb-5 flex items-baseline justify-between gap-4">
+								<h2 className="display text-[1.9rem] text-(--text)">{t("shop.services")}</h2>
+								{services && services.length > 0 && (
+									<span className="text-[11px] font-medium uppercase tracking-[0.1em] text-(--text-subtle)">
+										{services.length}
+									</span>
+								)}
+							</div>
 							{!services ? (
 								<div className="space-y-3">
 									{[0, 1, 2].map((i) => (
-										<Skeleton key={i} className="h-14 w-full rounded-xl" />
+										<Skeleton key={i} className="h-16 w-full rounded-(--radius)" />
 									))}
 								</div>
 							) : services.length === 0 ? (
 								<p className="muted-sm">{t("shop.noServices")}</p>
 							) : (
-								<div className="space-y-1">
+								<div className="divide-y divide-(--border) rounded-(--radius-lg) border border-(--border) bg-(--bg-card)">
 									{services.map((svc: Service) => (
 										<div
 											key={svc._id}
-											className="flex items-center justify-between py-4 px-4 rounded-xl hover:bg-(--gold)/[0.04] transition-colors duration-200 group"
+											className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-(--bg-input)/40"
 										>
-											<div className="flex-1">
-												<div className="strong-sm group-hover:text-(--gold) transition-colors">{svc.name}</div>
-												{svc.description && <div className="muted-xs mt-0.5">{svc.description}</div>}
+											<div className="min-w-0 flex-1">
+												<div className="text-[14px] font-semibold text-(--text) transition-colors group-hover:text-(--gold)">
+													{svc.name}
+												</div>
+												{svc.description && (
+													<div className="mt-0.5 text-xs leading-relaxed text-(--text-muted)">
+														{svc.description}
+													</div>
+												)}
 											</div>
-											<div className="flex items-center gap-4">
-												<span className="subtle-xs">
+											<div className="flex shrink-0 items-center gap-5">
+												<span className="text-[11px] text-(--text-subtle)">
 													{svc.durationMinutes} {t("common.min")}
 												</span>
-												<span className="text-sm font-bold text-(--gold) min-w-15 text-right">
+												<span className="min-w-16 text-right text-sm font-semibold tabular-nums text-(--text)">
 													{formatPrice(svc.price)}
 												</span>
 											</div>
@@ -179,35 +210,35 @@ function ShopProfilePage() {
 						</section>
 
 						<section>
-							<h2 className="text-xl font-bold text-(--text) mb-5 tracking-tight">
-								{t("shop.ourBarbers")}
-							</h2>
+							<h2 className="display mb-5 text-[1.9rem] text-(--text)">{t("shop.ourBarbers")}</h2>
 							{!barbers ? (
 								<div className="flex gap-4">
 									{[0, 1, 2].map((i) => (
-										<Skeleton key={i} className="h-24 w-24 rounded-2xl flex-shrink-0" />
+										<Skeleton key={i} className="h-40 w-36 flex-shrink-0 rounded-(--radius-lg)" />
 									))}
 								</div>
 							) : barbers.length === 0 ? (
 								<p className="muted-sm">{t("shop.noBarbers")}</p>
 							) : (
-								<div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+								<div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2 scrollbar-hide">
 									{barbers.map((b: Barber) => (
 										<div
 											key={b._id}
-											className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-(--bg-card) border border-(--gold)/10 min-w-30 flex-shrink-0 hover:border-(--gold)/30 transition-all duration-300"
+											className="flex w-36 flex-shrink-0 flex-col items-center gap-3 rounded-(--radius-lg) border border-(--border) bg-(--bg-card) px-4 py-5 text-center transition-colors hover:border-(--border-hover)"
 										>
-											<div className="w-14 h-14 rounded-full overflow-hidden bg-(--gold)/8 flex items-center justify-center ring-2 ring-(--gold)/15">
+											<div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-[#efe5d8] ring-1 ring-(--gold)/20">
 												{b.avatarUrl ? (
-													<img src={b.avatarUrl} alt={b.name} className="w-full h-full object-cover" />
+													<img src={b.avatarUrl} alt={b.name} className="h-full w-full object-cover" />
 												) : (
-													<span className="text-lg font-bold text-(--gold)">{b.name.charAt(0)}</span>
+													<span className="font-serif text-2xl font-medium text-(--gold)">
+														{b.name.charAt(0)}
+													</span>
 												)}
 											</div>
-											<div className="text-center">
-												<div className="text-sm font-semibold text-(--text)">{b.name}</div>
+											<div>
+												<div className="text-[13px] font-semibold text-(--text)">{b.name}</div>
 												{b.specializations[0] && (
-													<div className="muted-tiny mt-0.5">{b.specializations[0]}</div>
+													<div className="mt-0.5 text-[10.5px] text-(--text-subtle)">{b.specializations[0]}</div>
 												)}
 											</div>
 										</div>
@@ -217,33 +248,35 @@ function ShopProfilePage() {
 						</section>
 
 						<section>
-							<div className="flex items-baseline gap-4 mb-6">
-								<h2 className="text-xl font-bold text-(--text) tracking-tight">{t("shop.reviewsTitle")}</h2>
+							<div className="mb-6 flex items-baseline gap-4">
+								<h2 className="display text-[1.9rem] text-(--text)">{t("shop.reviewsTitle")}</h2>
 								{reviews && reviews.length > 0 && (
-									<span className="text-4xl font-bold text-(--gold)">{shop.rating.toFixed(1)}</span>
+									<span className="font-serif text-2xl italic text-(--gold)">{shop.rating.toFixed(1)}</span>
 								)}
 							</div>
 							{!reviews ? (
 								<div className="space-y-4">
 									{[0, 1, 2].map((i) => (
-										<Skeleton key={i} className="h-20 w-full rounded-xl" />
+										<Skeleton key={i} className="h-24 w-full rounded-(--radius)" />
 									))}
 								</div>
 							) : reviews.length === 0 ? (
 								<p className="muted-sm">{t("shop.noReviews")}</p>
 							) : (
-								<div className="space-y-4">
+								<div className="divide-y divide-(--border)">
 									{reviews.map((r: Review) => (
-										<div key={r._id} className="pb-6 border-b border-(--border) last:border-0 last:pb-0">
-											<div className="flex items-center gap-3 mb-2">
-												<StarRating rating={r.rating} size={13} />
-												<span className="subtle-xs tracking-wide">{f.formatRelative(r.createdAt)}</span>
+										<div key={r._id} className="py-5 first:pt-0 last:pb-0">
+											<div className="mb-2 flex items-center gap-3">
+												<StarRating rating={r.rating} size={12} />
+												<span className="text-[10.5px] uppercase tracking-[0.08em] text-(--text-subtle)">
+													{f.formatRelative(r.createdAt)}
+												</span>
 											</div>
-											<p className="main-sm leading-relaxed">{r.comment}</p>
+											<p className="text-[13.5px] leading-relaxed text-(--text)">{r.comment}</p>
 											{r.ownerReply && (
-												<div className="mt-3 pl-4 border-l-2 border-(--gold)/25">
-													<p className="muted-xs leading-relaxed">
-														<span className="text-(--gold) font-semibold">{t("shop.ownerReply")}</span>{" "}
+												<div className="mt-3 border-l-2 border-(--gold)/30 pl-4">
+													<p className="text-xs leading-relaxed text-(--text-muted)">
+														<span className="font-semibold text-(--gold)">{t("shop.ownerReply")}</span>{" "}
 														{r.ownerReply}
 													</p>
 												</div>
@@ -255,32 +288,57 @@ function ShopProfilePage() {
 						</section>
 					</div>
 
-					<div className="space-y-5">
-						<div className="lg:sticky lg:top-6">
-							<div className="rounded-2xl bg-(--bg-card) border border-(--gold)/12 p-6 mb-5">
-								<h3 className="font-bold text-(--text) mb-4 text-lg">{t("shop.bookAppointment")}</h3>
+					<div>
+						<div className="lg:sticky lg:top-24">
+							<div className="rounded-(--radius-lg) bg-(--ink) p-6 text-[#f7f4ee]">
+								<p className="eyebrow text-[#f7f4ee]/50 before:bg-(--gold-light)">
+									{t("shop.bookEyebrow")}
+								</p>
+								<h3 className="mt-3 font-serif text-2xl font-medium tracking-[-0.02em]">
+									{t("shop.bookAppointment")}
+								</h3>
+								<div className="mt-4 flex items-center gap-2 text-[12px] text-[#f7f4ee]/60">
+									<Star size={13} fill="currentColor" className="text-[#f3c67c]" />
+									<span className="font-semibold text-[#f7f4ee]">{shop.rating.toFixed(1)}</span>
+									<span>·</span>
+									<span>{t("map.reviewsCount", { count: shop.reviewCount })}</span>
+								</div>
 								<button
 									type="button"
 									onClick={() => setBookingOpen(true)}
-									className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-(--gold) text-white font-medium text-sm hover:bg-(--gold-dark) transition-all duration-300 shadow-[0_4px_16px_--alpha(var(--gold)/25%)] hover:shadow-[0_6px_24px_--alpha(var(--gold)/35%)]"
+									className="btn btn-primary mt-5 w-full"
 								>
-									<Calendar size={16} /> {t("common.bookNow")}
+									<Calendar size={15} /> {t("common.bookNow")}
 								</button>
 							</div>
 
 							{shop.workingHours && (
-								<div className="rounded-2xl bg-(--bg-card) border border-(--gold)/8 p-6 mb-5">
-									<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2 text-sm">
-										<Clock size={14} className="text-(--gold)" /> {t("shop.hours")}
+								<div className="mt-4 rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-5">
+									<h3 className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-(--text-muted)">
+										<Clock size={13} className="text-(--gold)" /> {t("shop.hours")}
 									</h3>
-									<div className="grid grid-cols-2 gap-x-4 gap-y-2">
+									<div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2">
 										{WEEK_DAYS.map((day: WeekDay) => {
 											const h = shop.workingHours?.[day]
+											const isToday = day === today
 											return (
 												<div key={day} className="contents">
-													<span className="muted-xs">{t(`days.${day}`)}</span>
 													<span
-														className={`text-xs text-right ${h?.closed ? "text-(--error)" : "text-(--text)"}`}
+														className={`flex items-center gap-1.5 text-xs ${
+															isToday ? "font-semibold text-(--text)" : "text-(--text-muted)"
+														}`}
+													>
+														{isToday && <span className="h-1 w-1 rounded-full bg-(--gold)" />}
+														{t(`days.${day}`)}
+													</span>
+													<span
+														className={`text-right text-xs tabular-nums ${
+															h?.closed
+																? "text-(--error)"
+																: isToday
+																	? "font-semibold text-(--text)"
+																	: "text-(--text)"
+														}`}
 													>
 														{h?.closed ? t("shop.closed") : h ? `${h.open}–${h.close}` : "–"}
 													</span>
@@ -291,21 +349,23 @@ function ShopProfilePage() {
 								</div>
 							)}
 
-							<div className="rounded-2xl bg-(--bg-card) border border-(--gold)/8 p-5">
-								<div className="flex items-center gap-2 mb-3">
+							<div className="mt-4 rounded-(--radius-lg) border border-(--border) bg-(--bg-card) p-5">
+								<div className="mb-3 flex items-center gap-2">
 									<Share2 size={13} className="text-(--text-subtle)" />
-									<span className="text-xs font-medium text-(--text-muted)">{t("shop.shareTitle")}</span>
+									<span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-(--text-muted)">
+										{t("shop.shareTitle")}
+									</span>
 								</div>
-								<div className="flex gap-2 mb-2">
+								<div className="mb-2 flex gap-2">
 									<input
 										readOnly
 										value={bookingUrl}
-										className="flex-1 min-w-0 bg-(--bg) border border-(--border) rounded-full px-3 py-2 muted-tiny outline-none"
+										className="min-w-0 flex-1 rounded-(--radius) border border-(--border) bg-(--bg) px-3 py-2 text-[11px] text-(--text-muted) outline-none"
 									/>
 									<button
 										type="button"
 										onClick={() => void handleCopyLink()}
-										className="flex-shrink-0 w-8 h-8 rounded-full bg-(--gold)/8 flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:bg-(--gold)/15 transition-all"
+										className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-(--radius) border border-(--border) text-(--text-muted) transition-colors hover:border-(--gold)/40 hover:text-(--gold)"
 										title={t("shop.copyLink")}
 									>
 										<Copy size={13} />
@@ -314,19 +374,19 @@ function ShopProfilePage() {
 								<button
 									type="button"
 									onClick={() => setShowQr((v) => !v)}
-									className="w-full flex items-center justify-center gap-1.5 py-2 text-[11px] text-(--text-subtle) hover:text-(--gold) transition-colors"
+									className="flex w-full items-center justify-center gap-1.5 py-2 text-[11px] text-(--text-subtle) transition-colors hover:text-(--gold)"
 								>
 									<QrCode size={12} /> {showQr ? t("shop.hideQr") : t("shop.showQr")}
 								</button>
 								{showQr && (
-									<div className="flex justify-center mt-3 p-4 bg-(--bg-card) rounded-xl">
+									<div className="mt-3 flex justify-center rounded-(--radius) bg-white p-4">
 										<QRCodeSVG value={bookingUrl} size={140} />
 									</div>
 								)}
 							</div>
 
 							{shop.socialLinks && (
-								<div className="flex items-center gap-2 mt-4 px-2">
+								<div className="mt-4 flex items-center gap-2 px-1">
 									{(
 										[
 											["instagram", shop.socialLinks.instagram, Link2],
@@ -340,7 +400,7 @@ function ShopProfilePage() {
 												href={url}
 												target="_blank"
 												rel="noreferrer"
-												className="w-9 h-9 rounded-full bg-(--bg-card) border border-(--gold)/10 flex items-center justify-center text-(--text-muted) hover:text-(--gold) hover:border-(--gold)/30 transition-all duration-300"
+												className="flex h-9 w-9 items-center justify-center rounded-(--radius) border border-(--border) bg-(--bg-card) text-(--text-muted) transition-colors hover:border-(--gold)/40 hover:text-(--gold)"
 											>
 												<Icon size={15} />
 											</a>
@@ -359,19 +419,26 @@ function ShopProfilePage() {
 
 function ShopProfileSkeleton() {
 	return (
-		<main className="page-main">
-			<Skeleton className="h-[50vh] w-full" />
-			<div className="page-container">
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					<div className="lg:col-span-2 space-y-4">
-						<Skeleton className="h-8 w-48 rounded-xl" />
-						<Skeleton className="h-4 w-full rounded-lg" />
-						<Skeleton className="h-4 w-3/4 rounded-lg" />
-						<Skeleton className="h-48 w-full rounded-2xl" />
+		<main className="pb-16">
+			<div className="page-container !pt-6">
+				<Skeleton className="h-4 w-40" />
+				<div className="mt-6 flex items-end justify-between gap-6 border-b border-(--border) pb-7">
+					<div className="space-y-4">
+						<Skeleton className="h-4 w-28" />
+						<Skeleton className="h-12 w-72 max-w-full" />
+						<Skeleton className="h-4 w-56" />
 					</div>
-					<div>
-						<Skeleton className="h-40 w-full rounded-2xl" />
+					<Skeleton className="h-10 w-32" />
+				</div>
+				<Skeleton className="mt-7 aspect-[16/7] max-h-[420px] w-full rounded-(--radius-lg)" />
+				<div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-[1.6fr_0.9fr]">
+					<div className="space-y-4">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-4 w-full" />
+						<Skeleton className="h-4 w-3/4" />
+						<Skeleton className="h-48 w-full rounded-(--radius-lg)" />
 					</div>
+					<Skeleton className="h-56 w-full rounded-(--radius-lg)" />
 				</div>
 			</div>
 		</main>
