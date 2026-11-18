@@ -7,8 +7,8 @@ import { FormActions } from "#/components/ui/FormActions"
 import { RowActions } from "#/components/ui/RowActions"
 import { useAuth } from "#/hooks/useAuth"
 import { useCrudForm } from "#/hooks/useCrudForm"
+import { useFormatters } from "#/hooks/useFormatters"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { formatPrice } from "#/lib/format"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -33,6 +33,7 @@ const CATEGORIES = ["haircut", "beard", "shave", "coloring", "treatment", "other
 
 function BusinessServices() {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const { user } = useAuth()
 
 	const { shop } = useOwnerShop(Boolean(user))
@@ -49,8 +50,8 @@ function BusinessServices() {
 			const payload = {
 				name: form.name,
 				description: form.description || undefined,
-				price: Math.round(parseFloat(form.price) * 100),
-				durationMinutes: parseInt(form.durationMinutes, 10),
+				price: Math.round(Number.parseFloat(form.price) * 100),
+				durationMinutes: Number.parseInt(form.durationMinutes, 10),
 				category: form.category,
 			}
 			return editId
@@ -168,7 +169,7 @@ function BusinessServices() {
 							{svc.durationMinutes} {t("common.min")} · {t(`business.services.categories.${svc.category}`)}
 						</div>
 					</div>
-					<div className="text-sm font-medium text-(--gold)">{formatPrice(svc.price)}</div>
+					<div className="text-sm font-medium text-(--gold)">{f.formatPrice(svc.price)}</div>
 					<RowActions
 						onEdit={() =>
 							crud.edit(svc._id, {

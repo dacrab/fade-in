@@ -6,8 +6,9 @@ import { useTranslation } from "react-i18next"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { withToast } from "#/components/ui/Toast"
 import { useAuth } from "#/hooks/useAuth"
+import { useFormatters } from "#/hooks/useFormatters"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { formatPrice, todayIso } from "#/lib/format"
+import { todayIso } from "#/lib/format"
 import type { AppointmentStatus } from "#/types"
 import { STATUS_DOT, WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/business/appointments")({ component: Busi
 
 function BusinessAppointments() {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const { user } = useAuth()
 	const [selectedDate, setSelectedDate] = useState(todayIso())
 
@@ -91,8 +93,8 @@ function BusinessAppointments() {
 						</div>
 					) : (
 						<div className="divide-y divide-(--border)">
-							{[...appointments]
-								.sort((a: Doc<"appointments">, b: Doc<"appointments">) =>
+							{appointments
+								.toSorted((a: Doc<"appointments">, b: Doc<"appointments">) =>
 									a.startTime.localeCompare(b.startTime),
 								)
 								.map((appt: Doc<"appointments">) => (
@@ -104,7 +106,7 @@ function BusinessAppointments() {
 										<span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[appt.status]}`} />
 										<div className="flex-1 min-w-0">
 											<div className="main-sm truncate">{appt.notes || "—"}</div>
-											<div className="subtle-xs">{formatPrice(appt.totalPrice)}</div>
+											<div className="subtle-xs">{f.formatPrice(appt.totalPrice)}</div>
 										</div>
 										<div className="flex items-center gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
 											{appt.status === "pending" && (
@@ -151,6 +153,7 @@ function BusinessAppointments() {
 
 function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: string) => void }) {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const [viewDate, setViewDate] = useState(() => {
 		const d = selected ? new Date(selected) : new Date()
 		return { year: d.getFullYear(), month: d.getMonth() }
@@ -161,10 +164,7 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 	const offset = firstDay === 0 ? 6 : firstDay - 1
 
 	const today = todayIso()
-	const monthLabel = new Date(viewDate.year, viewDate.month).toLocaleDateString(undefined, {
-		month: "long",
-		year: "numeric",
-	})
+	const monthLabel = f.formatMonthYear(viewDate.year, viewDate.month)
 
 	const shift = (dir: 1 | -1) =>
 		setViewDate((v) => {

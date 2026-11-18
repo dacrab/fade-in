@@ -55,7 +55,7 @@ function errorMessage(e: unknown, fallback: string): string {
 	return fallback
 }
 
-export type ToastResult<T> = { ok: true; value: T } | { ok: false }
+type ToastResult<T> = { ok: true; value: T } | { ok: false }
 
 export async function withToast<T>(
 	fn: () => Promise<T>,

@@ -5,8 +5,9 @@ import { useTranslation } from "react-i18next"
 import { DashSkeleton } from "#/components/ui/DashSkeleton"
 import { Skeleton } from "#/components/ui/Skeleton"
 import { useAuth } from "#/hooks/useAuth"
+import { useFormatters } from "#/hooks/useFormatters"
 import { useOwnerShop } from "#/hooks/useOwnerShop"
-import { formatPrice, todayIso } from "#/lib/format"
+import { todayIso } from "#/lib/format"
 import { STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 import type { Doc } from "../../../convex/_generated/dataModel"
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/business/overview")({ component: Business
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: large linear JSX view component
 function BusinessDashboard() {
 	const { t } = useTranslation()
+	const f = useFormatters()
 	const { user } = useAuth()
 
 	const { shop, isLoading } = useOwnerShop(Boolean(user))
@@ -77,11 +79,11 @@ function BusinessDashboard() {
 						},
 						{
 							label: t("business.stats.totalRevenue"),
-							value: stats ? formatPrice(stats.totalRevenue) : "—",
+							value: stats ? f.formatPrice(stats.totalRevenue) : "—",
 						},
 						{
 							label: t("business.stats.monthRevenue"),
-							value: stats ? formatPrice(stats.monthRevenue) : "—",
+							value: stats ? f.formatPrice(stats.monthRevenue) : "—",
 						},
 						{
 							label: t("business.stats.avgRating"),
@@ -130,7 +132,7 @@ function BusinessDashboard() {
 											{appt.notes ?? t("business.defaultAppointmentNote")}
 										</div>
 										<div className="subtle-xs">
-											{appt.endTime} · {formatPrice(appt.totalPrice)}
+											{appt.endTime} · {f.formatPrice(appt.totalPrice)}
 										</div>
 									</div>
 									<span

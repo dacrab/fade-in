@@ -5,7 +5,7 @@ import type { FunctionReturnType } from "convex/server"
 import { Calendar, Euro, Scissors, Store, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { DataTable, type features } from "#/components/ui/DataTable"
-import { formatPrice } from "#/lib/format"
+import { useFormatters } from "#/hooks/useFormatters"
 import { isAppointmentStatus, STATUS_BADGE } from "#/types"
 import { api } from "../../../convex/_generated/api"
 
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/admin/appointments")({ component: AdminAp
 
 function AdminAppointments() {
 	const { t } = useTranslation()
+	const f = useFormatters()
 
 	const {
 		results: data,
@@ -98,7 +99,7 @@ function AdminAppointments() {
 			cell: ({ row }) => (
 				<div className="flex items-center gap-1">
 					<Euro size={13} className="text-(--text-subtle)" />
-					<span className="strong-sm">{formatPrice(row.original.totalPrice)}</span>
+					<span className="strong-sm">{f.formatPrice(row.original.totalPrice)}</span>
 				</div>
 			),
 		},

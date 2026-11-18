@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { useMutation, useQuery } from "convex/react"
+import { useMutation, usePaginatedQuery } from "convex/react"
 import { Send } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -20,11 +20,13 @@ function BusinessReviews() {
 	const f = useFormatters()
 
 	const { shop } = useOwnerShop(Boolean(user))
-	const reviewsResult = useQuery(
-		api.reviews.listByShop,
-		shop ? { barbershopId: shop._id, paginationOpts: { cursor: null, numItems: PAGE_SIZE } } : "skip",
-	)
-	const reviews = reviewsResult?.page
+	const {
+		results: reviews,
+		status,
+		loadMore,
+	} = usePaginatedQuery(api.reviews.listByShop, shop ? { barbershopId: shop._id } : "skip", {
+		initialNumItems: PAGE_SIZE,
+	})
 	const addReply = useMutation(api.reviews.addOwnerReply)
 	const [replyId, setReplyId] = useState<string | null>(null)
 	const [replyText, setReplyText] = useState("")
@@ -54,70 +56,82 @@ function BusinessReviews() {
 					</div>
 				)}
 
-				{!reviews ? (
+				{status === "LoadingFirstPage" ? (
 					<SkeletonRows count={3} className="h-24 rounded-lg" />
 				) : reviews.length === 0 ? (
 					<p className="empty-text">{t("business.reviews.noReviews")}</p>
 				) : (
-					<div className="space-y-0 divide-y divide-(--border)">
-						{reviews.map((r: Doc<"reviews">) => (
-							<div key={r._id} className="py-5">
-								<div className="flex items-center justify-between mb-2">
-									<div className="flex items-baseline gap-1.5">
-										<span className="text-sm font-medium text-(--gold)">{r.rating.toFixed(1)}</span>
-										<span className="subtle-xs">/ 5</span>
+					<>
+						<div className="space-y-0 divide-y divide-(--border)">
+							{reviews.map((r: Doc<"reviews">) => (
+								<div key={r._id} className="py-5">
+									<div className="flex items-center justify-between mb-2">
+										<div className="flex items-baseline gap-1.5">
+											<span className="text-sm font-medium text-(--gold)">{r.rating.toFixed(1)}</span>
+											<span className="subtle-xs">/ 5</span>
+										</div>
+										<span className="text-[11px] text-(--text-subtle)">{f.formatRelative(r.createdAt)}</span>
 									</div>
-									<span className="text-[11px] text-(--text-subtle)">{f.formatRelative(r.createdAt)}</span>
-								</div>
-								<p className="muted-sm leading-relaxed">{r.comment}</p>
-								{r.ownerReply ? (
-									<div className="mt-3 ml-4 pl-3 border-l border-(--gold)/20 muted-xs leading-relaxed">
-										<span className="text-(--gold)/70 font-medium">{t("business.reviews.yourReply")}</span>{" "}
-										{r.ownerReply}
-									</div>
-								) : replyId === r._id ? (
-									<div className="flex gap-2 mt-3">
-										<input
-											className="input flex-1"
-											placeholder={t("business.reviews.replyPlaceholder")}
-											aria-label={t("business.reviews.replyPlaceholder")}
-											value={replyText}
-											onChange={(e) => setReplyText(e.target.value)}
-											onKeyDown={(e) => {
-												if (e.key === "Enter") void handleReply(r._id)
+									<p className="muted-sm leading-relaxed">{r.comment}</p>
+									{r.ownerReply ? (
+										<div className="mt-3 ml-4 pl-3 border-l border-(--gold)/20 muted-xs leading-relaxed">
+											<span className="text-(--gold)/70 font-medium">{t("business.reviews.yourReply")}</span>{" "}
+											{r.ownerReply}
+										</div>
+									) : replyId === r._id ? (
+										<div className="flex gap-2 mt-3">
+											<input
+												className="input flex-1"
+												placeholder={t("business.reviews.replyPlaceholder")}
+												aria-label={t("business.reviews.replyPlaceholder")}
+												value={replyText}
+												onChange={(e) => setReplyText(e.target.value)}
+												onKeyDown={(e) => {
+													if (e.key === "Enter") void handleReply(r._id)
+												}}
+											/>
+											<button
+												type="button"
+												onClick={() => void handleReply(r._id)}
+												className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-(--gold) text-white text-xs font-medium hover:bg-(--gold-dark) transition-colors"
+											>
+												<Send size={11} />
+												{t("business.reviews.replyButton")}
+											</button>
+											<button
+												type="button"
+												onClick={() => setReplyId(null)}
+												className="px-3 py-2 rounded-full muted-xs hover:text-(--text-muted) transition-colors"
+											>
+												{t("common.cancel")}
+											</button>
+										</div>
+									) : (
+										<button
+											type="button"
+											onClick={() => {
+												setReplyId(r._id)
+												setReplyText("")
 											}}
-										/>
-										<button
-											type="button"
-											onClick={() => void handleReply(r._id)}
-											className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-(--gold) text-white text-xs font-medium hover:bg-(--gold-dark) transition-colors"
+											className="mt-2 text-xs text-(--gold)/70 hover:text-(--gold) transition-colors"
 										>
-											<Send size={11} />
-											{t("business.reviews.replyButton")}
+											{t("business.reviews.replyAction")}
 										</button>
-										<button
-											type="button"
-											onClick={() => setReplyId(null)}
-											className="px-3 py-2 rounded-full muted-xs hover:text-(--text-muted) transition-colors"
-										>
-											{t("common.cancel")}
-										</button>
-									</div>
-								) : (
-									<button
-										type="button"
-										onClick={() => {
-											setReplyId(r._id)
-											setReplyText("")
-										}}
-										className="mt-2 text-xs text-(--gold)/70 hover:text-(--gold) transition-colors"
-									>
-										{t("business.reviews.replyAction")}
-									</button>
-								)}
-							</div>
-						))}
-					</div>
+									)}
+								</div>
+							))}
+						</div>
+						{(status === "CanLoadMore" || status === "LoadingMore") && (
+							<button
+								type="button"
+								onClick={() => loadMore(PAGE_SIZE)}
+								disabled={status === "LoadingMore"}
+								className="btn btn-secondary btn-sm mx-auto mt-4"
+							>
+								{status === "LoadingMore" ? t("common.loading") : t("common.loadMore")}
+							</button>
+						)}
+					</>
 				)}
 			</div>
 		</div>

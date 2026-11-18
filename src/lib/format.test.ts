@@ -3,6 +3,7 @@ import { slugify } from "../../convex/lib/slug"
 import {
 	formatDate,
 	formatDateShort,
+	formatMonthYear,
 	formatPrice,
 	formatRelative,
 	nextDayIso,
@@ -76,6 +77,18 @@ describe("formatRelative", () => {
 	it("describes a future timestamp with 'in'", () => {
 		const future = Date.now() + 3 * 60 * 60 * 1000
 		expect(formatRelative(future)).toMatch(/^in /)
+	})
+})
+
+describe("formatMonthYear", () => {
+	it("formats month and year in the default locale", () => {
+		expect(formatMonthYear(2026, 0)).toBe("January 2026")
+		expect(formatMonthYear(2026, 11)).toBe("December 2026")
+	})
+
+	it("localizes month names for Greek", () => {
+		expect(formatMonthYear(2026, 0, "el")).toMatch(/2026$/)
+		expect(formatMonthYear(2026, 0, "el")).not.toBe(formatMonthYear(2026, 0))
 	})
 })
 

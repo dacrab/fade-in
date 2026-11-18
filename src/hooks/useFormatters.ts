@@ -4,6 +4,7 @@ import {
 	type DateLocale,
 	formatDate,
 	formatDateShort,
+	formatMonthYear,
 	formatPrice,
 	formatRelative,
 } from "#/lib/format"
@@ -13,6 +14,7 @@ export interface Formatters {
 	formatDate: (dateStr: string) => string
 	formatDateShort: (dateStr: string) => string
 	formatRelative: (timestamp: number) => string
+	formatMonthYear: (year: number, month: number) => string
 }
 
 export function useFormatters(): Formatters {
@@ -25,6 +27,7 @@ export function useFormatters(): Formatters {
 			formatDate: (dateStr: string) => formatDate(dateStr, locale),
 			formatDateShort: (dateStr: string) => formatDateShort(dateStr, locale),
 			formatRelative: (timestamp: number) => formatRelative(timestamp, locale),
+			formatMonthYear: (year: number, month: number) => formatMonthYear(year, month, locale),
 		}),
 		[locale],
 	)

@@ -52,7 +52,7 @@ function BarberDashboard() {
 	)
 	const nextAppt = todayAppts
 		.filter((a: Doc<"appointments">) => a.status === "pending" || a.status === "confirmed")
-		.sort((a: Doc<"appointments">, b: Doc<"appointments">) =>
+		.toSorted((a: Doc<"appointments">, b: Doc<"appointments">) =>
 			a.startTime.localeCompare(b.startTime),
 		)[0]
 
@@ -108,7 +108,7 @@ function BarberDashboard() {
 					) : (
 						<div className="divide-y divide-(--border)">
 							{todayAppts
-								.sort((a: Doc<"appointments">, b: Doc<"appointments">) =>
+								.toSorted((a: Doc<"appointments">, b: Doc<"appointments">) =>
 									a.startTime.localeCompare(b.startTime),
 								)
 								.map((appt: Doc<"appointments">) => (

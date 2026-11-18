@@ -92,7 +92,7 @@ function ProfilePage() {
 							<input
 								id="profile-email"
 								className="input opacity-50 cursor-not-allowed"
-								value={viewer?.email}
+								value={viewer?.email ?? ""}
 								disabled
 							/>
 							<p className="subtle-xs mt-1">{t("dashboard.emailNote")}</p>

@@ -43,6 +43,11 @@ const RELATIVE_FORMATTERS: Record<DateLocale, Intl.RelativeTimeFormat> = {
 	el: new Intl.RelativeTimeFormat(INTL_LOCALES.el, { numeric: "auto" }),
 }
 
+const MONTH_YEAR_FORMATTERS: Record<DateLocale, Intl.DateTimeFormat> = {
+	en: new Intl.DateTimeFormat(INTL_LOCALES.en, { month: "long", year: "numeric" }),
+	el: new Intl.DateTimeFormat(INTL_LOCALES.el, { month: "long", year: "numeric" }),
+}
+
 export function formatPrice(cents: number, locale: DateLocale = "en"): string {
 	if (!Number.isFinite(cents)) return "—"
 	return PRICE_FORMATTERS[locale].format(cents / 100)
@@ -87,6 +92,10 @@ export function formatRelative(timestamp: number, locale: DateLocale = "en"): st
 	if (abs < 5 * 7 * 24 * 60 * 60) return rtf.format(Math.round(seconds / (7 * 24 * 60 * 60)), "week")
 	if (abs < 365 * 24 * 60 * 60) return rtf.format(Math.round(seconds / (30 * 24 * 60 * 60)), "month")
 	return rtf.format(Math.round(seconds / (365 * 24 * 60 * 60)), "year")
+}
+
+export function formatMonthYear(year: number, month: number, locale: DateLocale = "en"): string {
+	return MONTH_YEAR_FORMATTERS[locale].format(new Date(year, month, 1))
 }
 
 function toIsoDate(d: Date): string {

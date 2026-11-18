@@ -13,7 +13,7 @@ import {
 
 export const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
-export type AppointmentFields = {
+type AppointmentFields = {
 	barbershopId: Id<"barbershops">
 	barberId: Id<"barbers">
 	date: string

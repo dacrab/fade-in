@@ -22,7 +22,6 @@ import { Skeleton } from "#/components/ui/Skeleton"
 import { StarRating } from "#/components/ui/StarRating"
 import { withToast } from "#/components/ui/Toast"
 import { useFormatters } from "#/hooks/useFormatters"
-import { formatPrice } from "#/lib/format"
 import type { Barber, Barbershop, Review, Service, WeekDay } from "#/types"
 import { PAGE_SIZE, WEEK_DAYS } from "#/types"
 import { api } from "../../../convex/_generated/api"
@@ -271,7 +270,7 @@ function ShopProfileContent({
 													{svc.durationMinutes} {t("common.min")}
 												</span>
 												<span className="min-w-16 text-right text-sm font-semibold tabular-nums text-(--text)">
-													{formatPrice(svc.price)}
+													{f.formatPrice(svc.price)}
 												</span>
 											</div>
 										</div>
@@ -291,7 +290,7 @@ function ShopProfileContent({
 							) : barbers.length === 0 ? (
 								<p className="muted-sm">{t("shop.noBarbers")}</p>
 							) : (
-								<div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2 scrollbar-hide">
+								<div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
 									{barbers.map((b: Barber) => (
 										<div
 											key={b._id}

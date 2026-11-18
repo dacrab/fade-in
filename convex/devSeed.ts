@@ -29,20 +29,22 @@ const WEEK_HOURS = {
 	sunday: { open: "09:00", close: "20:00", closed: false },
 }
 
+// Categories must match the app vocabulary in src/routes/business/services.tsx,
+// whose list page renders t(`business.services.categories.${category}`).
 const SERVICES = [
 	{
 		name: "Signature Haircut",
 		description: "Consultation, precision cut and styling with a hot towel finish.",
 		price: 25,
 		durationMinutes: 30,
-		category: "hair",
+		category: "haircut",
 	},
 	{
 		name: "Skin Fade",
 		description: "Close skin fade blended into your preferred length on top.",
 		price: 28,
 		durationMinutes: 40,
-		category: "hair",
+		category: "haircut",
 	},
 	{
 		name: "Beard Trim & Shape",
@@ -56,14 +58,14 @@ const SERVICES = [
 		description: "The full reset: haircut plus a shaped and conditioned beard.",
 		price: 38,
 		durationMinutes: 50,
-		category: "combo",
+		category: "haircut",
 	},
 	{
 		name: "Kids Cut",
 		description: "Relaxed cut for under-12s, with a chair that goes up and down.",
 		price: 18,
 		durationMinutes: 25,
-		category: "kids",
+		category: "haircut",
 	},
 ]
 
@@ -250,9 +252,11 @@ function dateToMs(date: string): number {
 /** Refuse to run against a deployment whose public site is not local. */
 function assertDevDeployment() {
 	const siteUrl = process.env.PUBLIC_SITE_URL ?? ""
-	if (siteUrl && !/^https?:\/\/(localhost|127\.0\.0\.1)([:/]|$)/.test(siteUrl)) {
+	// Fail closed: an unset PUBLIC_SITE_URL proves nothing about the deployment,
+	// and re-seeding a production deployment would wipe real shops.
+	if (!/^https?:\/\/(localhost|127\.0\.0\.1)([:/]|$)/.test(siteUrl)) {
 		throw new Error(
-			"devSeed is development-only: PUBLIC_SITE_URL does not point at localhost on this deployment.",
+			"devSeed is development-only: set PUBLIC_SITE_URL to a localhost URL on this deployment.",
 		)
 	}
 }

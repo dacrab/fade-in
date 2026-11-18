@@ -14,7 +14,7 @@ const ZERO_COUNTERS = {
 } as const
 
 /** Appointment dates are local-time `YYYY-MM-DD`, so the month is its prefix. */
-export function monthKeyOf(date: string): string {
+function monthKeyOf(date: string): string {
 	return date.slice(0, 7)
 }
 

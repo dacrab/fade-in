@@ -72,7 +72,7 @@ function BusinessLayout() {
 			</aside>
 
 			<div className="border-b border-(--border) bg-(--bg) md:hidden">
-				<nav className="flex gap-1 overflow-x-auto px-3 py-2.5 scrollbar-hide">
+				<nav className="flex gap-1 overflow-x-auto px-3 py-2.5">
 					{NAV_LINK_DEFS.map(({ to, key, icon: Icon }) => (
 						<Link key={to} to={to} className="mobile-nav-item" activeProps={{ className: "is-active" }}>
 							<Icon size={13} />

@@ -93,7 +93,6 @@ export default function MapView({ shops, onShopClick }: MapViewProps) {
 						<div style="font-size:12px;color:var(--gold);margin-bottom:8px;">${shop.rating.toFixed(1)} / 5 (${t("map.reviewsCount", { count: shop.reviewCount })})</div>
 						<a href="/barbershops/${escapeHtml(shop.slug)}" style="display:block;text-align:center;padding:6px 12px;background:linear-gradient(135deg,var(--gold),#A63D28);color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">${t("map.bookNowArrow")} →</a>
 					</div>`,
-						{ className: "fadein-popup" },
 					)
 
 				if (onShopClick) marker.on("click", () => onShopClick(shop.slug))
